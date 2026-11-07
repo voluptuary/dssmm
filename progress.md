@@ -9,7 +9,8 @@
 ## 2026-11-07 — Prepare 8.3.0 release
 
 - **Complete:** PR [#3](https://github.com/voluptuary/ezfode-dssmm-kernel/pull/3) merged as `6c01d812d38d8075608ca4e2dd4db5240edae397`; stable [v8.3.0](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.0) published with the kernel and source ZIP. The release tag points to the merge commit.
-- Forced build from merged `main` contains `DS Style Merkin Mix 8.3.0`, is 2,012,736 bytes, and has SHA-256 `19614e9010dde66364f69d264e9203edcd54481271ae913d413c109621ccda54`. Local candidate: `files/candidate/8.3.0/ezkernelnew.bin`. Source ZIP: 18,140,687 bytes, SHA-256 `9a402d98f3c829a68bb7cfe0beb04942dd9a36c7060f172fc97b907d128b35e7`. Both remote downloads match local assets byte-for-byte; ZIP integrity passed.
+- Follow-up docs PRs #4 and #5 merged: README now focuses on Merkin Mix and user-facing information; test-candidate references were removed and user-visible changelog wording was clarified. The superseded opaque-art test binary was removed.
+- Forced build from merged `main` contains `DS Style Merkin Mix 8.3.0`, is 2,012,736 bytes, and has SHA-256 `19614e9010dde66364f69d264e9203edcd54481271ae913d413c109621ccda54`. Local candidate: `files/candidate/8.3.0/ezkernelnew.bin`. Refreshed source ZIP: 18,139,527 bytes, SHA-256 `4059c0eb04c19e8e5c9e3ab106127a5223138f85878245d724848196ace96fc7`. The final remote downloads match local assets byte-for-byte; ZIP integrity passed and includes the updated README.
 - The full audit passed before the docs-only attribution correction; no GitHub CI checks are configured. This exact final build has not been hardware-verified in this workspace.
 - **Next focus:** resolve F-036 save overwrite data loss safely, then address F-011 unchecked settings writes and NOR metadata interruption/timing risks. Do not describe these as fixed.
 ## 2026-11-07 — Candidate and review-file cleanup
