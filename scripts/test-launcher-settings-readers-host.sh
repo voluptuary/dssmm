@@ -30,6 +30,22 @@ for v in ref new; do
 	"$tmp/$v" > "$tmp/$v.out"
 done
 
+# Only missing Wrap changes: assert its new value, then normalize that exact
+# intentional delta for the historical comparison. Present-invalid stays Off.
+python3 - "$tmp/new.out" <<'PYTEST'
+import pathlib, sys
+p = pathlib.Path(sys.argv[1])
+lines = p.read_text().splitlines()
+n = 0
+for i, line in enumerate(lines):
+    if line.startswith('WrapAround|') and '|absent|' in line:
+        assert line.endswith('|1|0'), line
+        lines[i] = line[:-3] + '0|0'
+        n += 1
+assert n == 10, n
+p.write_text('\n'.join(lines) + '\n')
+PYTEST
+
 lines=$(wc -l < "$tmp/new.out")
 if cmp -s "$tmp/ref.out" "$tmp/new.out"; then
 	echo "Settings readers behave identically to $ref over $lines cases."

@@ -14991,7 +14991,8 @@ refind_file:
 			if(res == 2)
 			{
 				recents_view_active = 0;
-				page_num = NOR_list;
+				Launcher_CloseSystemBrowser();
+						page_num = NOR_list;
 			}
 			goto refind_file;
 		}
@@ -15009,7 +15010,8 @@ refind_file:
 			if(res == 2)
 			{
 				recents_view_active = 0;
-				page_num = NOR_list;
+				Launcher_CloseSystemBrowser();
+						page_num = NOR_list;
 			}
 			goto refind_file;
 		}
@@ -15033,7 +15035,8 @@ refind_file:
 		if(launcher_boot_target == LAUNCHER_BOOT_TO_NOR)
 		{
 			recents_view_active = 0;
-			page_num = NOR_list;
+			Launcher_CloseSystemBrowser();
+						page_num = NOR_list;
 			launcher_start_selected = 2;
 			launcher_force_full_redraw = 1;
 		}
@@ -15279,7 +15282,8 @@ re_showfile:
 									if(menu_res == 2)
 									{
 										recents_view_active = 0;
-										page_num = NOR_list;
+										Launcher_CloseSystemBrowser();
+						page_num = NOR_list;
 									}
 									goto refind_file;
 								}
@@ -15326,6 +15330,7 @@ re_showfile:
 					}
 					else if(res == 2){
 						recents_view_active = 0;
+						Launcher_CloseSystemBrowser();
 						page_num = NOR_list;
 						launcher_force_full_redraw = 1;
 					}
@@ -15365,6 +15370,7 @@ re_showfile:
 					else if(res == 2)
 					{
 						recents_view_active = 0;
+						Launcher_CloseSystemBrowser();
 						page_num = NOR_list;
 						launcher_start_selected = 2;
 						launcher_force_full_redraw = 1;
@@ -15531,6 +15537,7 @@ re_showfile:
 					if(res == 2)
 					{
 						recents_view_active = 0;
+						Launcher_CloseSystemBrowser();
 						page_num = NOR_list;
 					}
 					goto refind_file;
@@ -16195,7 +16202,8 @@ re_showfile:
                     Launcher_CloseSystemBrowser();
 					launcher_start_selected = 2;
 					recents_view_active = 0;
-					page_num = NOR_list;
+					Launcher_CloseSystemBrowser();
+						page_num = NOR_list;
 					launcher_vertical_folder_label_dirty = 1;
 					goto refind_file;
 				}
@@ -16345,9 +16353,9 @@ re_showfile:
 						if(res){
 							launcher_force_full_redraw = 1;
 							if(res==2){
-                                Launcher_CloseSystemBrowser();
-								recents_view_active = 0;
-								page_num = NOR_list;
+                                recents_view_active = 0;
+								Launcher_CloseSystemBrowser();
+						page_num = NOR_list;
 							}
 							goto refind_file ;
 						}
