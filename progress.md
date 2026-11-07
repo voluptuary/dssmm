@@ -1,5 +1,11 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-07 — Verify FrankieT19 v8.0 attribution for 8.3.0
+
+- Compared tags and ancestry: FrankieT19 `v8.0` resolves to authored commit `6d6084e`; Merkin Mix `v8.0.0` resolves to `ed0f530`, on a separate history from common v7.5 base `df346b5`.
+- FrankieT19's v8.0 changelog identifies UI changes selectively integrated into Merkin Mix and explicitly credits Merkin for splash-screen and system-icon contributions. Updated release notes and CREDITS to credit Frankie for the distinct v7.5/v8.0 work while excluding Merkin-origin changes.
+- No PR is open yet. Release branch commit `feb54c4` is pushed and will receive this attribution correction before PR creation.
+
 ## 2026-11-07 — Prepare 8.3.0 release
 
 - **Objective:** Publish the integrated final build as stable v8.3.0, with a kernel binary and source ZIP, after a PR merge.

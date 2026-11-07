@@ -4,12 +4,12 @@
 
 ### New features and improvements
 
-- Refined the Start screen, startup presentation, menu sounds and pop-ups. Added eased selection markers, a loading ring and theme-matched launch fade.
-- Added a clock-based Auto theme, grouped artwork controls under View, Open SYSTEM access, default wrap-around with saved preferences preserved, and Boot to controls. Added double-tap Select to toggle favourites without a confirmation pop-up.
+- Integrated FrankieT19's separate v8.0 Start-screen and interface work: eased selection markers, refined menu sounds and pop-ups, a loading ring, and a theme-matched launch fade.
+- Integrated FrankieT19's v8.0 Auto theme, grouped artwork controls under View, Open SYSTEM access, default wrap-around while preserving saved Off preferences, Boot to controls, and double-tap Select for favourites.
 - Highly optimized menu artwork rendering by skipping redundant transparency scans for opaque artwork, while retaining compatibility with marked transparent thumbnails.
 - Improved header-code artwork lookup in large folders with a validated FAT/FAT32 directory-entry fast path. Unsupported filesystems and stale directory hints safely fall back to normal path lookup.
 - Added nested-folder artwork support for NOR titles and clearer NOR erase, program, source-file and catalog-save failure messages.
-- Added selected-game artwork and clearer status text to the Saving Game Data presentation.
+- Added selected-game artwork and clearer status text to the Saving Game Data presentation, based on FrankieT19's v8.0 work.
 
 ### Fixes
 
@@ -40,4 +40,4 @@
 - Corrected save-type labels, language/settings values, game-launch behavior with BIOS disabled, and ROM/save-state fragmentation checks.
 - Earlier DS Style releases also added safer file-copy, backup, thumbnail-read, directory-bound and cheat-entry limits, and kept the Omega DE and Original Omega source lines aligned where features overlap.
 
-Thanks to **Copilot**, **exploitz86**, **SkillerCMP**, **Sterophonick**, and the EZ-FLASH team for their contributions to this project and its lineage. FrankieT19 is credited for the DS Style v7.5 foundation only; no later Merkin Mix changes are attributed to him. **aidiadayo** contributed Thai language support. See [CREDITS.md](CREDITS.md) for provenance. These changes were developed with AI assistance.
+Thanks to **FrankieT19** for the v7.5 foundation and the separately authored v8.0 UI features identified above; to **Copilot**, **exploitz86**, **SkillerCMP**, **Sterophonick**, and the EZ-FLASH team for their contributions to this project and its lineage. FrankieT19 is not credited for changes originating in Merkin Mix; the v8.0 source changelog specifically identifies splash-screen and system-icon contributions by Merkin. **aidiadayo** contributed Thai language support. See [CREDITS.md](CREDITS.md) for provenance. These changes were developed with AI assistance.
