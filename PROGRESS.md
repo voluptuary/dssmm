@@ -1,12 +1,14 @@
 # DS Style Kernel Audit Progress
 
-## 2026-11-07 — 8.3.0 save/settings follow-up and repository cleanup in progress
+## 2026-11-07 — 8.3.0 save/settings follow-up published
 
 - This is a follow-up to the already integrated Merkin fork work. Publication target remains this repository's `origin`, `voluptuary/ezfode-dssmm-kernel`; keep version 8.3.0 and do not update `merkin-agent/ezfode-dssmm-kernel`.
 - The current changes add staged save/settings replacement (`source/file_transaction.h`, `source/ezkernelnew.c`) and regression coverage (`tests/savefile-host.c`), document the user-reported hardware result, and add the user-facing fix to `CHANGELOG.md`. The current candidate hash is `bf5e34f5d26d6bad846fbce67704414238f38f3d90f68d3196133f780264a92f` at 2,014,248 bytes; owner reports boot, saves, and settings persistence are good.
 - Ledger filename case, current cross-references, audit preflight and review/archive cleanup are updated. Root `AGENTS.md` is active; duplicate `files/AGENTS.md` is intentionally absent. The user authorized removal of `files/claude-audit.tar.gz`; no live build or test workflow consumes it, and useful findings remain summarized.
 - `scripts/rebuild-and-verify-audit.sh` passed all 31 host suites, browser installer scenarios, JS syntax, whitespace and configured Cppcheck. A separate forced `make -B` passed at 2,014,248 bytes. Refreshed `files/candidate/8.3.0/ezkernelnew.bin` matches the build exactly (SHA-256 `bf5e34f5d26d6bad846fbce67704414238f38f3d90f68d3196133f780264a92f`) and embeds version 8.3.0.
-- Next: final diff/reference review; source ZIP from final commit; commit and push to origin; open and merge PR to origin/main subject to enforced rules; update and verify this repository's existing v8.3.0 release assets and notes.
+- Commit `eacad700e8db4d75398d4324138947aa576f68af` was pushed and merged via PR [#6](https://github.com/voluptuary/ezfode-dssmm-kernel/pull/6), producing `58d6a789624f004c130756f7587515fb414ccce2`. The existing `v8.3.0` tag was updated to peel to this commit. The existing GitHub release was refreshed with the 2,014,248-byte kernel (SHA-256 `bf5e34f5d26d6bad846fbce67704414238f38f3d90f68d3196133f780264a92f`) and source ZIP (17,765,760 bytes; SHA-256 `1a45df88daecca2b5887571262e0e9b01114abf7a54ee0538555fbc12cd03f2f`). Both remote assets were downloaded and byte-compared; source ZIP integrity passed.
+- The release body uses `CHANGELOG.md`; it lists only user-facing final-build features and fixes. Repository maintenance and cleanup are not included in release notes.
+- PR #7 is being prepared to record the final release state in `HANDOFF.md` and `PROGRESS.md`; this documentation-only correction does not alter firmware or assets.
 - F-036 remains limited by unverified interruption during FatFs rename; F-022/F-032 remain open for missing hardware-part/timing and sector-map evidence. No changes are claimed for F-022/F-032.
 
 ## 2026-11-07 — Verify FrankieT19 v8.0 attribution for 8.3.0
