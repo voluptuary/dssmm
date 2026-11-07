@@ -7,17 +7,16 @@
 - Integrated FrankieT19's separate v8.0 Start-screen and interface work: eased selection markers, refined menu sounds and pop-ups, a loading ring, and a theme-matched launch fade.
 - Integrated FrankieT19's v8.0 Auto theme, grouped artwork controls under View, Open SYSTEM access, default wrap-around while preserving saved Off preferences, Boot to controls, and double-tap Select for favourites.
 - Highly optimized menu artwork rendering by skipping redundant transparency scans for opaque artwork, while retaining compatibility with marked transparent thumbnails.
-- Improved header-code artwork lookup in large folders with a validated FAT/FAT32 directory-entry fast path. Unsupported filesystems and stale directory hints safely fall back to normal path lookup.
-- Added nested-folder artwork support for NOR titles and clearer NOR erase, program, source-file and catalog-save failure messages.
+- Made header-code artwork appear faster in large game folders, with a safe fallback when the fast lookup is unavailable.
+- Added artwork support for NOR games in nested folders and clearer messages when NOR installation, erasing or catalog updates fail.
 - Added selected-game artwork and clearer status text to the Saving Game Data presentation, based on FrankieT19's v8.0 work.
 
 ### Fixes
 
-- Corrected save-recovery artwork style selection and Box-art cropping; added support for valid 16-bit title BMPs whose planes field is zero.
-- Restored NOR menu button hints, corrected format confirmation and cancellation behavior, added erase progress feedback, and erased the full allocated range when deleting the newest NOR title.
-- Fixed Clean list Off display behavior, aligned help headings and LED values, and improved root-level GBA header-art fallback.
-- Reduced IWRAM pressure by relocating scale maps and moved infrequently used path buffers to EWRAM, with a checked IRQ-stack margin.
-- Improved handling of longer translated NOR errors without overflowing a fixed message buffer.
+- Corrected artwork selection and alignment in the startup save-recovery screen, and improved compatibility with valid title artwork from more image tools.
+- Restored NOR menu button hints; improved format confirmation, cancellation and progress feedback; and ensured deleting the newest NOR game clears its saved data.
+- Fixed Clean list Off display behavior, aligned help headings and LED values, and restored header-code artwork for games in the SD-card root.
+- Improved display of longer translated NOR error messages.
 
 ### Earlier features
 
@@ -33,11 +32,11 @@
 ### Earlier fixes
 
 - Preserved marked-art transparency and corrected animated carousel wrap transitions; fixed collapsed-cheat selection, visible-row scrolling and stale-row behavior (including fixes by **exploitz86**).
-- Improved SD save and save-state read/write checks, save recovery, long-filename and folder handling, malformed cheat-file bounds, ROM patching across PSRAM banks, and NOR installation/deletion error handling.
-- Added checks for oversized fragmented ROM tables, 512-file folders and empty-list navigation; reduced launcher RAM pressure and corrected recent-list limits and software-boot memory state.
+- Improved SD save and save-state handling, save recovery, long filenames and folders, malformed cheat-file handling, ROM patching and NOR installation/deletion feedback.
+- Improved compatibility with large or fragmented SD folders, corrected recent-list limits and empty-list navigation, reduced menu memory use, and fixed software-boot behavior.
 - Fixed translated text and settings handling, Chinese and accented-character rendering, custom-background scrolling, help/clock redraws, cheat-screen redraws and carousel border flicker.
 - Improved thumbnail loading/redraw, file browsing, menu navigation, startup timing, and settings migration; optimized artwork drawing while retaining marked transparency.
-- Corrected save-type labels, language/settings values, game-launch behavior with BIOS disabled, and ROM/save-state fragmentation checks.
-- Earlier DS Style releases also added safer file-copy, backup, thumbnail-read, directory-bound and cheat-entry limits, and kept the Omega DE and Original Omega source lines aligned where features overlap.
+- Corrected save-type labels, translated settings, game launching with BIOS disabled, and handling of fragmented game and save-state files.
+- Earlier DS Style releases also improved file copy, backups, thumbnail loading, folder browsing and cheat-file stability across supported kernel variants.
 
 Thanks to **FrankieT19** for the v7.5 foundation and the separately authored v8.0 UI features identified above; to **Copilot**, **exploitz86**, **SkillerCMP**, **Sterophonick**, and the EZ-FLASH team for their contributions to this project and its lineage. FrankieT19 is not credited for changes originating in Merkin Mix; the v8.0 source changelog specifically identifies splash-screen and system-icon contributions by Merkin. **aidiadayo** contributed Thai language support. See [CREDITS.md](CREDITS.md) for provenance. These changes were developed with AI assistance.
