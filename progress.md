@@ -4,14 +4,14 @@
 
 - Compared tags and ancestry: FrankieT19 `v8.0` resolves to authored commit `6d6084e`; Merkin Mix `v8.0.0` resolves to `ed0f530`, on a separate history from common v7.5 base `df346b5`.
 - FrankieT19's v8.0 changelog identifies UI changes selectively integrated into Merkin Mix and explicitly credits Merkin for splash-screen and system-icon contributions. Updated release notes and CREDITS to credit Frankie for the distinct v7.5/v8.0 work while excluding Merkin-origin changes.
-- No PR is open yet. Release branch commit `feb54c4` is pushed and will receive this attribution correction before PR creation.
+- The attribution correction was included in release branch commit `43a323d` and merged through PR #3.
 
 ## 2026-11-07 — Prepare 8.3.0 release
 
-- **Objective:** Publish the integrated final build as stable v8.3.0, with a kernel binary and source ZIP, after a PR merge.
-- **Repository state:** branch `release/8.3.0` created from `main` at `87af569`; upstream release list ends at v8.2.0 and `git ls-remote` found no `v8.3.0` tag. Current working changes include the artwork scan optimization, warning fixes, audit runner, cleanup, docs and release notes.
-- **Release note constraints:** list only changes present in the final build, no reverted test-build experiments or transient defects; describe artwork rendering as highly optimized while retaining transparency compatibility; explicitly credit non-Merkin contributors. Known F-036 save overwrite, F-011 settings write, and NOR metadata/timing risks remain next audit focus.
-- **Next:** complete full audit; review diff; commit/push; open and merge PR; build merged main; verify binary size/version and source ZIP; publish v8.3.0 with both assets and verify remote release. No hardware validation claim without user evidence.
+- **Complete:** PR [#3](https://github.com/voluptuary/ezfode-dssmm-kernel/pull/3) merged as `6c01d812d38d8075608ca4e2dd4db5240edae397`; stable [v8.3.0](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.0) published with the kernel and source ZIP. The release tag points to the merge commit.
+- Forced build from merged `main` contains `DS Style Merkin Mix 8.3.0`, is 2,012,736 bytes, and has SHA-256 `19614e9010dde66364f69d264e9203edcd54481271ae913d413c109621ccda54`. Local candidate: `files/candidate/8.3.0/ezkernelnew.bin`. Source ZIP: 18,140,687 bytes, SHA-256 `9a402d98f3c829a68bb7cfe0beb04942dd9a36c7060f172fc97b907d128b35e7`. Both remote downloads match local assets byte-for-byte; ZIP integrity passed.
+- The full audit passed before the docs-only attribution correction; no GitHub CI checks are configured. This exact final build has not been hardware-verified in this workspace.
+- **Next focus:** resolve F-036 save overwrite data loss safely, then address F-011 unchecked settings writes and NOR metadata interruption/timing risks. Do not describe these as fixed.
 ## 2026-11-07 — Candidate and review-file cleanup
 
 - **Objective:** Remove superseded local builds and orphaned review Markdown while retaining the active hardware-test binary and audit history.

@@ -1,66 +1,59 @@
 # DS Style Merkin Mix
 
-A custom kernel for the **EZ-FLASH OMEGA Definitive Edition**, maintained by Merkin ([voluptuary](https://github.com/voluptuary)). This fork builds on [FrankieT19's DS Style](https://github.com/FrankieT19/omega-de-ds-style-kernel), Sterophonick's SimpleLight, and the official EZ-FLASH kernel.
+DS Style Merkin Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Edition**, maintained by [Merkin](https://github.com/voluptuary). It brings together a flexible game browser, configurable artwork, saved favourites and cheat selections, and practical updates to the cartridge's SD and NOR workflows.
 
 > [!WARNING]
-> **Definitive Edition only.** Do not install this kernel on the original EZ-FLASH OMEGA.
+> **For OMEGA Definitive Edition only.** Do not install this kernel on the original EZ-FLASH OMEGA.
 
-## Downloads and status
+## Download and install
 
-Download `ezkernelnew.bin` from [Merkin Mix releases](https://github.com/voluptuary/ezfode-dssmm-kernel/releases). Copy it to the SD-card root, then boot the cartridge while holding **R** to update the kernel. Back up saves before updating.
+Get the stable [DS Style Merkin Mix 8.3.0 release](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.0). Copy `ezkernelnew.bin` to the root of the SD card, then start the cartridge while holding **R** to install the kernel. Back up saves before updating.
 
-## What Merkin Mix changes
+## What it offers
 
-- **8.3.0:** Highly optimized menu artwork rendering while retaining marked-transparency compatibility; improved header-art lookup in large folders. Refined startup, menu feedback and Start-screen motion; added Auto theme, grouped artwork settings, Open SYSTEM, default wrap-around with saved preferences preserved, and Boot to. Clean list and Remember cheats remain optional. Thumbnail scale maps now reside in IWRAM.
-- Mirrored SD-card artwork lookup for multi-system libraries, with custom and built-in thumbnail fallbacks.
-- Selective transparency in marked thumbnails, including support in animated carousel frames. Enabled artwork borders use rectangular or rounded outlines.
-- Optional **Settings → Games → Remember cheats**, off by default, with localized labels (Thai uses English). Selections save when leaving the cheat editor and reload for the same game, including launch without reopening the editor. Collapsing a group preserves its selections, clamps the cursor and clears stale rows.
-- Refreshed startup artwork and system icons, plus Merkin Mix branding.
-- Optional browser wrapping; the v8.2.0 source accepts both upstream's `Wrap list` and the earlier fork's `Wrap around` setting.
-- A `CUSTOM Only` rounded-corner mode in v8.2.0 for artwork loaded from `/SYSTEM/IMGS/CUSTOM` or `/SYSTEM/IMGS2/CUSTOM`. Art borders remain independently configurable. This mode has owner-reported hardware confirmation on the prior candidate; the final rollback build has not been hardware-tested.
-- Long-filename/path fixes, defensive save and SD I/O checks, bounded cheat parsing, NOR-operation checks, and rejection of oversized fragmented-file tables.
-- A build-time 2 MiB kernel-size limit, plus carousel alignment and wrap-transition fixes in v8.2.0.
+- **Choose how to browse:** use list, List + Art, horizontal carousel or vertical carousel views, with favourites and recently played games.
+- **Make it yours:** choose themes, artwork style, borders, rounded corners, language, clock format and menu behavior. Auto theme changes between light and dark at set times.
+- **Find and view artwork:** use title or box images, mirrored and custom artwork, built-in fallbacks, and artwork for games in nested SD or NOR folders. Menu artwork rendering is highly optimized while marked transparent artwork remains supported.
+- **Get to games quickly:** use saved favourites, optional wrap-around, Boot to preferences, and double-tap **Select** to change a favourite.
+- **Keep cheat choices:** optional Remember cheats saves selections per game; collapsing cheat groups retains the selected choices.
+- **Manage the cartridge:** browse the SYSTEM folder from the menu, install supported kernels from `/SYSTEM/KERNELS`, and receive clearer feedback during NOR operations.
 
-The **inherited DS Style interface** includes list, List + Art, horizontal and vertical carousel views; title and box artwork; themes; favourites and recent games; multilingual text; UI sounds; a text/Markdown viewer; and readable `/SYSTEM/SETTINGS.TXT` settings. Smooth carousel animation, adjustable side previews, and the launch pulse come from **FrankieT19's v7.5**; additional v8 interface refinements are credited in the 8.3.0 changelog.
+### Changes in 8.3.0
 
-Host regressions and builds do not establish hardware compatibility or timing. The next audit focus includes failed overwrites that can lose an existing SD save, settings-file write/close failures, NOR catalog recovery, and NOR operation timing. See the [audit progress ledger](progress.md) for evidence and remaining limits.
+- Improved artwork responsiveness, including faster header-art lookup in large game folders, while preserving marked-thumbnail transparency.
+- Refined the Start screen, launch feedback, menu sounds and pop-ups; added Auto theme, Boot to controls and a shortcut for changing favourites.
+- Improved artwork and status feedback in the startup save-recovery screen, and made NOR operation errors clearer.
 
-Remembered selections use `/SYSTEM/CHEATSTATE/<hash>.cs2`, with full game-path identity and a cheat-content fingerprint. Changed cheat files invalidate the snapshot; legacy `CHS1`/`.cst` files are not imported. The snapshot supports up to 128 selected options, one per section; persistence is disabled for cheat files larger than 1 MiB. Failed writes are reported, but replacement is not atomic and can lose the prior snapshot.
+## Known issues
 
-## Artwork and documentation
+The next maintenance focus is safer recovery when replacing an existing save, clearer reporting of settings-file write failures, and more resilient NOR catalog updates if an operation is interrupted. Back up saves regularly and avoid powering off during NOR writes.
 
-[DS Style Card Companion](https://github.com/voluptuary/dsscc) is the separate artwork/scraper companion fork.
+## Custom artwork
 
-Transparent thumbnails must retain the `DST1` marker in BMP header bytes 6–9. The supported layout is an uncompressed, top-down 16-bit BMP: **120 × 80** for title artwork or **80 × 80** for box artwork. In marked images, RGB555 `0x0000` is transparent; use nonzero near-black for visible black. This is selective transparency, not a full alpha channel. Unmarked thumbnails remain opaque.
+Transparent thumbnails require the `DST1` marker in BMP header bytes 6–9. Use an uncompressed, top-down 16-bit BMP at **120 × 80** for title art or **80 × 80** for box art. In marked images, RGB555 `0x0000` is transparent; use a nonzero near-black value for visible black. Unmarked thumbnails are opaque.
 
-The [upstream user guide](https://frankiet19.github.io/omega-de-ds-style-kernel/) covers everyday use, artwork and customisation. The [upstream Manager](https://frankiet19.github.io/omega-de-ds-style-kernel/manager/) and Customiser belong to DS Style; their kernels and style packages should not be assumed to contain Merkin Mix changes.
+[DS Style Card Companion](https://github.com/voluptuary/dsscc) is a separate artwork and scraper companion.
 
 ## Build from source
 
-Use devkitPro with **devkitARM, GBA rules, libgba, Maxmod and Make**. The checked-in devcontainer uses `devkitpro/devkitarm:20260610`; rebuild the container when opening a fresh Codespace. The recorded audit toolchain is devkitARM 16.1.0.
+Build with devkitPro's **devkitARM, GBA rules, libgba, Maxmod and Make**. The checked-in devcontainer uses `devkitpro/devkitarm:20260610`.
 
-From the repository root, with the devkitPro environment loaded:
+From the repository root with the devkitPro environment loaded:
 
 ```sh
-make -B && cp "$(basename "$PWD").gba" ezkernelnew.bin
+make -B
 ```
 
-`make` names its `.gba` output after the checkout directory. The `.bin` is a copy of that raw image. The Makefile rejects images over **2,097,152 bytes**; do not bypass this limit. Only copy an image after a successful build.
+The output `.gba` file uses the checkout directory's name. The Makefile enforces the **2 MiB** kernel limit. Generated theme headers are checked in; after changing theme images, regenerate them with `Grit\Build Skin Files.bat`.
 
-On Windows, install devkitPro under `C:\devkitPro` and use its MSYS environment for the command above. The included `build.bat` sets those fixed paths, but its copy step expects `x.gba` (or a temporary drive-letter output for paths containing spaces). In an ordinary checkout, verify the actual directory-named `.gba` and copy it yourself; an existing `ezkernelnew.bin` is not proof that the wrapper produced a fresh build.
-
-Generated theme headers are checked in. If you change theme images, regenerate them with `Grit\Build Skin Files.bat` before building.
-
-For the broader build and regression checks, with the audit dependencies installed:
+For the build and regression checks, install the script's host dependencies and run:
 
 ```sh
 bash scripts/rebuild-and-verify-audit.sh
 ```
 
-The script also uses host test tools, Node and Cppcheck; consult the script for its checks. It does not publish a release or refresh the candidate directory automatically.
-
 ## Credits and license
 
-Thanks to **Sterophonick**, **FrankieT19**, **Copilot**, **exploitz86**, and **SkillerCMP** for DS Style and the related kernel contributions on which this work draws. See [CREDITS.md](CREDITS.md) for provenance.
+Merkin Mix is maintained by Merkin. It includes FrankieT19's DS Style v7.5 foundation and selected, separately authored v8.0 interface work. FrankieT19 is not credited for changes that originated in Merkin Mix. EZ-FLASH, Sterophonick, Copilot, exploitz86 and SkillerCMP also contributed to the project's foundations and features; [CREDITS.md](CREDITS.md) records the specific provenance.
 
-The repository includes the [Apache License 2.0](LICENSE). Retain the individual component licenses and attribution notices.
+The repository includes the [Apache License 2.0](LICENSE). Retain individual component licenses and attribution notices.
