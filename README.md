@@ -1,6 +1,6 @@
 # DS Style Merkin Mix
 
-DS Style Merkin Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Edition**, maintained by [Merkin](https://github.com/voluptuary). This Merkin Mix fork builds on [FrankieT19's DS Style fork](https://github.com/FrankieT19/omega-de-ds-style-kernel). Its main addition is name-matched game artwork with selective transparency, allowing artwork for games on all systems supported by the kernel rather than only the GBA game artwork in the original kernels. Merkin Mix also adds a flexible game browser, saved favorites and cheat selections, and updates to the cartridge's SD and NOR workflows.
+DS Style Merkin Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Edition**, maintained by [Merkin](https://github.com/voluptuary). This Merkin Mix fork builds on [FrankieT19's DS Style fork](https://github.com/FrankieT19/omega-de-ds-style-kernel). Its main addition is name-matched game artwork with selective transparency, allowing artwork for games on all systems supported by the kernel rather than only the GBA game artwork in the original kernels. Merkin Mix also contributes fixes and enhancements to the cheat system and updates to the cartridge's SD and NOR workflows and management.
 
 > [!WARNING]
 > **Supported hardware:** EZ-FLASH OMEGA Definitive Edition rev. A and rev. B only.
