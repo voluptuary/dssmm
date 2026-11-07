@@ -3,8 +3,6 @@
 The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
 (`https://github.com/voluptuary/ezfode-dssmm-kernel`). The Codespaces workspace
 may retain its original local directory name after the repository rename.
-The reviewed Claude patch bundle is preserved as `files/claude-audit.tar.gz`;
-extract it under `files/` to restore `files/claude/` when its contents are needed.
 
 ## 1. Mission and Role
 
