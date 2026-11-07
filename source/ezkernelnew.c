@@ -6253,21 +6253,18 @@ static u16 Launcher_ListArtTakeInput(void)
    intended to be transparent. We tag only zero-valued pixels in RAM using
    0x8000, which is outside the RGB555 colour range. The disk BMP stays a
    standard 16-bit file, and unmarked legacy/GBA/CUSTOM files are untouched. */
-static void Launcher_TagTransparentThumbnailPixels(u8 *dst, u32 read_size)
+static u32 Launcher_HasTransparentThumbnailMarker(const u8 *dst, u32 read_size)
 {
-	u32 pixel_count;
-	u32 i;
 	u32 expected_top_down_height;
-	u16 *pixels;
 
 	if(!dst || read_size != Launcher_ThumbnailReadSize() ||
 	read_size < LAUNCHER_THUMB_BMP_HEADER)
-		return;
+		return 0;
 	if(dst[LAUNCHER_THUMB_BMP_ALPHA_MARKER_OFFSET + 0] != LAUNCHER_THUMB_BMP_ALPHA_MARKER_0 ||
 	dst[LAUNCHER_THUMB_BMP_ALPHA_MARKER_OFFSET + 1] != LAUNCHER_THUMB_BMP_ALPHA_MARKER_1 ||
 	dst[LAUNCHER_THUMB_BMP_ALPHA_MARKER_OFFSET + 2] != LAUNCHER_THUMB_BMP_ALPHA_MARKER_2 ||
 	dst[LAUNCHER_THUMB_BMP_ALPHA_MARKER_OFFSET + 3] != LAUNCHER_THUMB_BMP_ALPHA_MARKER_3)
-		return;
+		return 0;
 	/* Do not transform a malformed or differently-sized BMP just because its
 	   reserved bytes happen to match. This loader supports 16-bit BI_RGB. */
 	/* The scraper writes top-down BMPs, whose signed height is negative. */
@@ -6281,6 +6278,17 @@ static void Launcher_TagTransparentThumbnailPixels(u8 *dst, u32 read_size)
 	dst[25] != (u8)((expected_top_down_height >> 24) & 0xFF) ||
 	dst[28] != 16 || dst[29] != 0 || dst[30] != 0 || dst[31] != 0 ||
 	dst[32] != 0 || dst[33] != 0)
+		return 0;
+	return 1;
+}
+
+static void Launcher_TagTransparentThumbnailPixels(u8 *dst, u32 read_size)
+{
+	u32 pixel_count;
+	u32 i;
+	u16 *pixels;
+
+	if(!Launcher_HasTransparentThumbnailMarker(dst, read_size))
 		return;
 
 	pixel_count = Launcher_ThumbnailSourceWidth() * Launcher_ThumbnailSourceHeight();
