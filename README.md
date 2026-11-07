@@ -20,12 +20,6 @@ Get the stable [DS Style Merkin Mix 8.3.0 release](https://github.com/voluptuary
 - **Keep cheat choices:** optional Remember cheats saves selections per game; collapsing cheat groups retains the selected choices.
 - **Manage the cartridge:** browse the SYSTEM folder from the menu, install supported kernels from `/SYSTEM/KERNELS`, and receive clearer feedback during NOR operations.
 
-### Changes in 8.3.0
-
-- Improved artwork responsiveness, including faster header-art lookup in large game folders, while preserving marked-thumbnail transparency.
-- Refined the Start screen, launch feedback, menu sounds and pop-ups; added Auto theme, Boot to controls and a shortcut for changing favorites.
-- Improved artwork and status feedback in the startup save-recovery screen, and made NOR operation errors clearer.
-
 ## Known issues
 
 The next maintenance focus is safer recovery when replacing an existing save, clearer reporting of settings-file write failures, and more resilient NOR catalog updates if an operation is interrupted. Back up saves regularly and avoid powering off during NOR writes.
