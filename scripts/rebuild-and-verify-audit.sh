@@ -63,53 +63,8 @@ printf 'GBA rules: %s/gba_rules\n' "$devkitarm"
 printf '\nRunning production Makefile build (without cleanup)...\n'
 make
 
-printf '\nChecking IWRAM scale-map placement and IRQ-stack margin...\n'
-bash scripts/test-launcher-iwram-placement.sh
-
-printf '\nRunning FAT-table capacity regression test...\n'
-scripts/test-fat-table-builder-host.sh
-
-printf '\nRunning launcher artwork drawing regression test...\n'
-scripts/test-launcher-artwork-draw-host.sh
-
-printf '\nRunning CUSTOM Only artwork style policy regression test...\n'
-scripts/test-launcher-art-style-policy-host.sh
-
-printf '\nRunning Clean list cache regression test...\n'
-scripts/test-launcher-clean-list-cache-host.sh
-
-printf '\nRunning save-popup artwork regression test...\n'
-scripts/test-save-popup-artwork-host.sh
-
-printf '\nRunning Wrap around SYSTEM-scope regression test...\n'
-scripts/test-launcher-wrap-system-host.sh
-
-printf '\nRunning popup button-hint regression test...\n'
-scripts/test-popup-button-hints-host.sh
-
-printf '\nRunning NOR filename-art fallback regression test...\n'
-scripts/test-nor-thumbnail-fallback-host.sh
-
-printf '\nRunning NOR format progress regression test...\n'
-scripts/test-nor-format-progress-host.sh
-
-printf '\nRunning NOR title deletion regression test...\n'
-scripts/test-nor-delete-title-host.sh
-
-printf '\nRunning NOR write failure classification regression test...\n'
-scripts/test-nor-write-result-host.sh
-
-printf '\nRunning settings readers regression test...\n'
-scripts/test-launcher-settings-readers-host.sh
-
-printf '\nRunning carousel memory and redraw regression test...\n'
-bash scripts/test-carousel-motion-host.sh
-
-printf '\nRunning artwork border rollback regression test...\n'
-bash scripts/test-launcher-art-border-host.sh
-
-printf '\nRunning remembered cheat state and collapsed-menu regression test...\n'
-bash scripts/test-cheat-state-host.sh
+printf '\nRunning complete host regression suite...\n'
+bash scripts/run-host-test-suite.sh
 
 printf '\nRunning browser installer regression scenarios...\n'
 node tests/browser-installer.mjs
@@ -124,7 +79,9 @@ git diff --check
 
 if command -v cppcheck >/dev/null 2>&1; then
 	printf '\nRunning Cppcheck on modified firmware files...\n'
+	# Bound preprocessor exploration to keep the audit duration predictable.
 	cppcheck --enable=warning,performance,portability \
+		--max-configs=1 -j 2 \
 		--suppress=missingIncludeSystem \
 		--suppress=arithOperationsOnVoidPointer \
 		--inline-suppr --template=gcc \

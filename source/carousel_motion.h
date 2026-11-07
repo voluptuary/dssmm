@@ -123,7 +123,16 @@ static LauncherMotionImage Launcher_MotionImage(const LauncherThumbCache *cache,
         image.w = 16; image.h = 14; image.icon = 1;
     }
     if(image.pixels && !image.icon)
-        image.transparent = Launcher_SpanHasTransparent(image.pixels, image.w * image.h);
+    {
+        if(cache && cache->valid && cache->has_thumbnail && cache->thumb_data)
+        {
+            const u8 *bmp = cache->thumb_data - LAUNCHER_THUMB_BMP_HEADER;
+            if(Launcher_HasTransparentThumbnailMarker(bmp, Launcher_ThumbnailReadSize()))
+                image.transparent = Launcher_SpanHasTransparent(image.pixels, image.w * image.h);
+        }
+        else
+            image.transparent = Launcher_SpanHasTransparent(image.pixels, image.w * image.h);
+    }
     return image;
 }
 

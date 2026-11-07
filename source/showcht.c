@@ -1004,7 +1004,7 @@ unsigned long str2hex( char*str)
 {
 	unsigned long sum=0;
 	unsigned long i;
-	int len = strlen(str);
+	size_t len = strlen(str);
 
 	if(len >8) return 0;
 	for(i=0;i<len;i++)
@@ -1061,7 +1061,7 @@ void Analyze_KEYVAL(FIL* file,u32 total)
 			if(((FM_CHT_LINE*)pCHTbuffer)[current_select].is_section != 1)
 				continue;
 			//DEBUG_printf("section %s  ", ((FM_CHT_LINE*)pCHTbuffer)[current_select].LINEname);
-					buflen= Get_CHT_val(&gfile,((FM_CHT_LINE*)pCHTbuffer)[current_select].LINEname,((FM_CHT_LINE*)pCHTbuffer)[tol].LINEname);
+					buflen= Get_CHT_val(file,((FM_CHT_LINE*)pCHTbuffer)[current_select].LINEname,((FM_CHT_LINE*)pCHTbuffer)[tol].LINEname);
 					if(buflen == 0)
 						continue;
 

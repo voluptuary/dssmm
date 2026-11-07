@@ -1,210 +1,43 @@
 # Changelog
 
-## DS Style Merkin Mix 8.4.1
-
-- Respect the configured Title or Box artwork style in the startup save-recovery popup. Corrected the Box image crop to use an eight-pixel offset rather than eight bytes, preserving the complete centered 32×32 art.
-- Allow GBA header-code artwork lookup when the matching recent entry is unavailable or points to a root-level title; preserve long save basenames for that lookup.
-- Accept 16-bit Title artwork with a zero BMP planes field in the startup save-recovery popup; confirmed on hardware with root-level AGS Aging Cartridge header art (`TCHK`).
-- Distinguish NOR source-file, device, erase, program, and catalog-save failures in the error display.
-- Use string pointers for error messages so longer UTF-8 translations cannot overflow a fixed stack buffer.
-
-## DS Style Merkin Mix 8.4.0
-
-### NOR flash improvements
-
-- Restored translated A/B button hints in NOR menus and confirmation pop-ups.
-- Fixed the format confirmation layout, cancellation flow, and progress display; formatting now shows a centered wait message and an active progress bar.
-- Added a centered wait message while deleting a NOR title and erase every allocated block of the newest title before clearing its catalog entry.
-- Preserved each NOR title's source directory so mirrored artwork works for games stored in nested folders. Filename artwork now falls back through custom art, game-code art, mirrored art, and root-level artwork.
-- Open NOR installation sources through their checked directory path, including games in the SD card root.
-
 ## DS Style Merkin Mix 8.3.0
 
-Stable release with the 8.3.0 interface refinements, startup updates, and validated launcher memory-placement improvements.
+### New features and improvements
 
-### Changes since 8.2.0
+- Refined the Start screen, startup presentation, menu sounds and pop-ups. Added eased selection markers, a loading ring and theme-matched launch fade.
+- Added a clock-based Auto theme, grouped artwork controls under View, Open SYSTEM access, default wrap-around with saved preferences preserved, and Boot to controls. Added double-tap Select to toggle favourites without a confirmation pop-up.
+- Highly optimized menu artwork rendering by skipping redundant transparency scans for opaque artwork, while retaining compatibility with marked transparent thumbnails.
+- Improved header-code artwork lookup in large folders with a validated FAT/FAT32 directory-entry fast path. Unsupported filesystems and stale directory hints safely fall back to normal path lookup.
+- Added nested-folder artwork support for NOR titles and clearer NOR erase, program, source-file and catalog-save failure messages.
+- Added selected-game artwork and clearer status text to the Saving Game Data presentation.
 
-- Added eased Start-screen corner markers, refined menu sounds and pop-ups, and launch feedback with a loading ring and theme-matched fade.
-- Refined startup so menu preparation can continue while startup audio finishes, without an artificial splash hold.
-- Added the clock-based Auto theme (dark from 20:00 to 08:00), grouped artwork controls under View options, and Open SYSTEM access to support files.
-- Enabled wrap-around browsing and menus by default while preserving saved Off preferences; added **On, Not SYSTEM** for SYSTEM browsing.
-- Added double-tap Select to add or remove a favourite without a confirmation pop-up, and added **Boot to** while keeping the Start screen available.
-- Updated the Saving Game Data popup to show the selected game's box artwork.
-- Fixed Clean list Off in browser titles, aligned help-page headings, and aligned LED setting values.
-- Moved the thumbnail scaling lookup maps into IWRAM and two infrequently used path buffers into EWRAM; preserved a conservative IWRAM-to-IRQ-stack layout margin.
-- Preserved the optional Clean list setting and Remember cheats support.
+### Fixes
 
-## DS Style Merkin Mix 8.3.0-rc3 — exploratory test candidate
+- Corrected save-recovery artwork style selection and Box-art cropping; added support for valid 16-bit title BMPs whose planes field is zero.
+- Restored NOR menu button hints, corrected format confirmation and cancellation behavior, added erase progress feedback, and erased the full allocated range when deleting the newest NOR title.
+- Fixed Clean list Off display behavior, aligned help headings and LED values, and improved root-level GBA header-art fallback.
+- Reduced IWRAM pressure by relocating scale maps and moved infrequently used path buffers to EWRAM, with a checked IRQ-stack margin.
+- Improved handling of longer translated NOR errors without overflowing a fixed message buffer.
 
-This is an exploratory test build, not a stable release.
+### Earlier features
 
-### Changes since 8.3.0-rc2
+- **DS Style v7.5 foundation (FrankieT19):** launcher, themes, artwork workflows, language support, animated carousels, side-preview options and launch pulse. This credit is limited to the v7.5 base documented in [CREDITS.md](CREDITS.md).
+- Added horizontal, vertical and List + Art views; favourites and recently played lists; title and box artwork; themes; configurable borders, rounded corners and carousel alignment; and a text/Markdown viewer.
+- Added mirrored artwork lookup, built-in and custom thumbnail fallbacks, marked-thumbnail transparency, console icons, wide and square system artwork, and the `CUSTOM Only` rounded-corner option.
+- Added optional Remember cheats with localized labels through **exploitz86**, and collapsible cheat groups based on **SkillerCMP's** work and adapted by **exploitz86**. Remember cheats is off by default.
+- Added browser wrap settings, Clean list and List folders controls, 12/24-hour clock options, Hide system files, and support for installing kernels from `/SYSTEM/KERNELS`.
+- Added Thai and Chinese language support, customizable launcher text and Start screen layouts, full-screen theme support, and the DS Style Merkin Mix branding/build number.
+- Added configurable Start screen sources and shortcuts, empty-folder/favourites messages, folder and file custom thumbnails, and built-in guidance for settings and menus.
+- Added multi-language settings/help categories, cheat-screen refinements, and improved menu, pop-up, carousel, list, sound and input behavior across the DS Style lineage.
 
-- Fixed Clean list Off in browser titles: original extensions and bracketed text now remain visible in horizontal and vertical views.
-- Reflowed the “Using DS Style” help topic so each page begins with its section heading and has up to eight description lines.
-- Aligned LED setting values by widening the label column one character.
+### Earlier fixes
 
-## DS Style Merkin Mix 8.3.0-rc2 — exploratory test candidate
+- Preserved marked-art transparency and corrected animated carousel wrap transitions; fixed collapsed-cheat selection, visible-row scrolling and stale-row behavior (including fixes by **exploitz86**).
+- Improved SD save and save-state read/write checks, save recovery, long-filename and folder handling, malformed cheat-file bounds, ROM patching across PSRAM banks, and NOR installation/deletion error handling.
+- Added checks for oversized fragmented ROM tables, 512-file folders and empty-list navigation; reduced launcher RAM pressure and corrected recent-list limits and software-boot memory state.
+- Fixed translated text and settings handling, Chinese and accented-character rendering, custom-background scrolling, help/clock redraws, cheat-screen redraws and carousel border flicker.
+- Improved thumbnail loading/redraw, file browsing, menu navigation, startup timing, and settings migration; optimized artwork drawing while retaining marked transparency.
+- Corrected save-type labels, language/settings values, game-launch behavior with BIOS disabled, and ROM/save-state fragmentation checks.
+- Earlier DS Style releases also added safer file-copy, backup, thumbnail-read, directory-bound and cheat-entry limits, and kept the Omega DE and Original Omega source lines aligned where features overlap.
 
-This is an exploratory test build, not a stable release.
-
-### Changes since 8.3.0-rc1
-
-- Changed the startup Saving Game Data popup to show matching square box artwork instead of title artwork.
-- Added **On, Not SYSTEM** to Wrap around, disabling wrap-around while browsing `/SYSTEM` and its subdirectories.
-- Fixed Clean list Off not taking effect immediately when list rows were cached.
-
-## DS Style Merkin Mix 8.3.0-rc1 — exploratory test candidate
-
-This is an exploratory test build, not a stable release.
-
-### New features since 8.2.0
-
-- Added FrankieT19's eased Start-screen corner-marker movement and refined menu sounds, pop-ups and launch feedback, including a loading ring over selected artwork and a theme-matched fade.
-- Refined FrankieT19's startup presentation so menu preparation can continue while startup audio finishes, without waiting for the full audio clip.
-- Added FrankieT19's clock-based Auto theme, dark from 20:00 to 08:00, grouped artwork controls under View options, and Open SYSTEM access to support files.
-- Enabled FrankieT19's wrap-around browsing and menu navigation defaults while continuing to honor saved Off preferences.
-- Added FrankieT19's double-tap Select shortcut to add or remove a favourite without a confirmation pop-up.
-- Added FrankieT19's Boot to control for the cartridge's startup destination while keeping the existing Start screen available.
-- Added FrankieT19's selected-game artwork to the Saving Game Data presentation.
-
-## DS Style Merkin Mix 8.2.0
-
-This build includes the v8.1.0 features and fixes, with new carousel and cheat-menu features.
-
-### New features since v8.1.0
-
-- Added FrankieT19's smooth carousel animations, enabled by default, with small or equal-size side previews and an option to turn animations off.
-- Added FrankieT19's selection pulse before directly launching from an animated carousel.
-- Added FrankieT19's completed square-corner artwork borders in animated carousel views.
-- Added a `CUSTOM Only` option to Rounded corners, which rounds only artwork from the `SYSTEM/IMGS/CUSTOM` or `SYSTEM/IMGS2/CUSTOM` folders. Art border remains independently configurable.
-- Added exploitz86's optional **Remember cheats** setting in Games, with localized labels. It is off by default and remembers selections for each game across restarts, including when launching without reopening the cheat editor.
-- Added SkillerCMP's collapsible cheat groups, adapted through exploitz86's fork. Collapsing a group preserves its selections.
-
-### New fixes since v8.1.0
-
-- Preserved marked artwork transparency during carousel animations.
-- Fixed animated carousel transitions when wrapping between the first and last titles.
-- Added exploitz86's cheat-group collapse fix so hidden cheats no longer appear at the bottom of the screen and scrolling stays within the visible list.
-
-### Features added through v8.1.0
-
-- **v8.0.0:** Renamed the About-screen branding to DS Style Merkin Mix and displayed the build number.
-- **v7.4.5:** Added an optional Wrap around setting for browser navigation.
-- **v7.4.3:** Added mirrored artwork lookup, custom and built-in thumbnail fallbacks, selective transparency for marked thumbnails, and refreshed console icons and startup artwork.
-
-### Fixes through v8.1.0
-
-- **v8.1.0:** Optimized transparent-artwork drawing. Hardware testing found menu responsiveness about the same as the previous build, with a possible marginal improvement.
-- **v8.0.0:** Added checks to reject ROM and save-state files whose SD-card fragmentation exceeds the cartridge's supported limits.
-- **v7.4.6b:** Improved save-file creation and error reporting, cartridge-flash error feedback, NOR formatting progress and confirmation screens, and cheat-file parsing. Restored the established settings-save behavior; subsequent hardware testing did not reproduce the reported settings-persistence issue.
-- **v7.4.5:** Fixed launching with Enable BIOS off, improved long-filename and folder handling, and reduced repeated directory reads while browsing thumbnails.
-- **v7.4.3:** Improved NOR installation and deletion checks, SD save and save-state error handling, malformed cheat-file handling, and ROM patching across cartridge memory banks.
-
-Thanks to **FrankieT19**, **exploitz86**, and **SkillerCMP** for their contributions. See [CREDITS.md](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/v8.2.0/CREDITS.md) for the project lineage and attribution.
-
-These changes and fixes were completed with the assistance of AI.
-
-## DS Style v7.4.1
-
-- Prevented failed SD reads from loading stale data into saves, save states, or sectors.
-- Checked save and RTS writes before reporting success, and kept pending save recovery available after a failed write.
-- Bounded malformed cheat data and filename handling before parsing or extension replacement.
-- Fixed ROM patch writes that cross an 8 MiB PSRAM page boundary.
-- Corrected bundled installer test expectations to match the delivered v7.4 style packages.
-
-## DS Style v7.4
-
-- Added a new DS Style text and Markdown viewer with a clean English interface, light and dark modes, faster navigation, and simple formatting for headings, bold text and dividers.
-- Added optional wide and square console folder artwork for every emulated system supported by DS Style.
-- Fixed a crash when pressing A in an empty Recently Played or Favourites view.
-- Restored support for up to 512 files in a folder while reducing launcher RAM usage.
-- Fixed compatibility with games that require a clean software-boot memory state on the Omega Definitive Edition.
-- Fixed `RECENT.txt` corruption when Recently Played reached its ten-game limit.
-
-## DS Style v7.3
-
-- Fixed translated save-type labels overlapping the detected save type in the game-launch menu, and limited save-type changes to the affected value.
-- Refined List + Art redraw handling when moving between entries with and without artwork or switching from List view.
-- Added source support for full-screen themes without a separate top bar.
-- Fixed the clock and page-number area not refreshing correctly on Help screens.
-- Refined cheat-screen redraw behaviour, including smoother list movement, clean counter changes and immediate updates to mutually exclusive selections.
-- Fixed artwork border flicker in the horizontal carousel.
-
-## DS Style v7.2
-
-- Fixed Chinese text rendering on the game loading screen.
-- Fixed custom backgrounds being shifted or repeated while scrolling in List and List + Art views.
-
-## DS Style v7.1
-
-- Added List + Art view, combining list navigation with a floating thumbnail at the top, centre or bottom of the screen.
-- Refined list, carousel and pop-up redraw behaviour for smoother menu navigation and less flicker.
-- Fixed translated text handling in game-launch pop-up menus, including Chinese text.
-- Improved input handling while artwork loads and when moving between Settings, SD Card and NOR Flash.
-- Kept the launcher clock independent from the In-game RTC option, matching the official kernel behaviour.
-- Added general menu refinements and updated the built-in guidance.
-
-## DS Style v7.0
-
-- Added a Hide system files setting for keeping kernel, system, and metadata files out of the root file browser.
-- Added Settings > Load style for installing `.bin` kernels from `SYSTEM/KERNELS`.
-- Added 12-hour and 24-hour clock format options.
-- Added an Art border option for drawing a one-pixel outline around the selected carousel artwork.
-- Added a Rounded corners option for carousel artwork and Start screen artwork.
-- Added Clean list and List folders options for simpler file browsing.
-- Added vertical and horizontal carousel side-art alignment options.
-- Added empty folder and empty favourites messages.
-- Added thumbnail artwork support for games written to NOR.
-- Added Thai language support.
-- Reworked the Settings and Help pages into clearer categories and in-kernel guidance screens.
-- Added built-in Using DS Style help pages with clear setting explanations.
-- Overhauled the cheat screen and cheat selection behaviour.
-- Added general user-interface refinements across menus, pop-ups and carousel views.
-- Refined splash-screen timing so boot waits for the startup sound without lingering longer than needed.
-- Refined settings tabbing so nested Settings pages are remembered when moving to SD Card or NOR Flash and back.
-
-## DS Style v6.9
-
-- Improved launcher stability by reducing RAM pressure in the menu.
-- Added a safety limit for cheat entries to match the space available in the in-game patch.
-- Refined list-view scrolling, redraw behaviour, and navigation consistency across launcher menus.
-- Refined the sound system for safer, more reliable audio playback during menu navigation.
-
-## DS Style v6.8
-
-- Fixed translated settings values resetting or loading incorrectly after restarting.
-- Improved accented character support for SD card filenames.
-- Corrected the language options written to SETTINGS.TXT.
-
-## DS Style v6.7
-
-- Split Start screen On/Off from the Last played/Favourites source setting.
-- Select on the Start screen now only switches between Last played and Favourites.
-- Start on the SD page now opens Recently Played, then cycles between Recently Played and Favourites.
-- L and R also switch between Recently Played and Favourites while inside those lists.
-
-## DS Style v6.6
-
-- Added custom thumbnail support for folders and all files. Improved thumbnail scraper integration.
-- Each CUSTOM folder supports up to 256 images due to the GBA's RAM limitations.
-- Replaced the hardcoded GBA-folder preview with an editable CUSTOM artwork example.
-- Cached the available custom artwork names so normal file browsing remains responsive.
-- Added support for both 120 x 80 title thumbnails and 80 x 80 box thumbnails in the CUSTOM folders.
-
-## DS Style v6.5
-
-- Added an Off option for the Start screen source, allowing startup to go straight to the SD browser.
-- Prevented B from returning to the Start screen when the Start screen is disabled.
-- Updated game launch menus to use held-button scrolling without wrapping at the top or bottom.
-- Continued parity fixes shared with the original OMEGA source where applicable.
-
-## DS Style v6.4
-
-- Added multi-language launcher support.
-- Added Chinese language handling while keeping Latin text on the DS Style font.
-- Added customisable launcher text through DS Style Customiser.
-- Added Start screen layout customisation support.
-- Added thumbnail border option support.
-- Added safer file copy, backup, thumbnail-read, and directory bounds handling.
-- Updated both Omega DE and Original Omega source lines to stay aligned where features overlap.
+Thanks to **Copilot**, **exploitz86**, **SkillerCMP**, **Sterophonick**, and the EZ-FLASH team for their contributions to this project and its lineage. FrankieT19 is credited for the DS Style v7.5 foundation only; no later Merkin Mix changes are attributed to him. **aidiadayo** contributed Thai language support. See [CREDITS.md](CREDITS.md) for provenance. These changes were developed with AI assistance.
