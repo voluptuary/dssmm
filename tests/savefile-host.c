@@ -13,6 +13,8 @@ typedef uint8_t u8;
 #define IWRAM_CODE
 static u8 pReadCache[0x20000];
 
+#include "file_transaction.h"
+
 /* The host test includes the exact SavefileWrite() body extracted from firmware. */
 #include SAVEFILEWRITE_IMPL
 
@@ -26,7 +28,7 @@ static long write_calls;
 static int injected_failure;
 static int inject_next_sram_write;
 static int failures;
-static const char long_save_path[] = "0:/Omega Definitive Save Creation Regression.sav";
+static const char long_save_path[] = "/SYSTEM/SAVER/Omega Definitive Save Creation Regression.sav";
 
 #define SRAMSaver 0U
 void SetRampage(uint16_t page) { (void)page; }
@@ -118,6 +120,8 @@ static void format_volume(void)
 	options.fmt = FM_FAT | FM_SFD;
 	check(f_mkfs("0:", &options, work, sizeof(work)), "format in-memory FAT volume");
 	check(f_mount(&fs, "0:", 1), "mount formatted volume");
+	check(f_mkdir("/SYSTEM"), "create system directory");
+	check(f_mkdir("/SYSTEM/SAVER"), "create save directory");
 	memcpy(formatted_disk, disk, sizeof(disk));
 }
 
@@ -138,12 +142,12 @@ static void test_new_save_creation(void)
 	CHECK(!SaveFileOpenMeansMissing(FR_DISK_ERR),
 		"disk I/O error is not mistaken for a missing save");
 
-	CHECK(SavefileWrite("0:/OK.SAV", sizeof(contents)) == 1,
+	CHECK(SavefileWrite("/SYSTEM/SAVER/OK.SAV", sizeof(contents)) == 1,
 		"successful first-time save returns success");
-	result = f_stat("0:/OK.SAV", &info);
+	result = f_stat("/SYSTEM/SAVER/OK.SAV", &info);
 	CHECK(result == FR_OK && info.fsize == sizeof(contents),
 		"successful save has the requested full size");
-	result = f_open(&file, "0:/OK.SAV", FA_READ);
+	result = f_open(&file, "/SYSTEM/SAVER/OK.SAV", FA_READ);
 	if(result == FR_OK)
 	{
 		result = f_read(&file, contents, sizeof(contents), &bytes_read);
@@ -203,9 +207,9 @@ static void test_full_card_cleanup(void)
 
 	mount_fresh_formatted_volume();
 	fill_card_leaving_clusters(20);
-	CHECK(SavefileWrite("0:/FULL.SAV", 0x8000) == 0,
+	CHECK(SavefileWrite("/SYSTEM/SAVER/FULL.SAV", 0x8000) == 0,
 		"full card causes first-time save creation to fail");
-	result = f_stat("0:/FULL.SAV", &info);
+	result = f_stat("/SYSTEM/SAVER/FULL.SAV", &info);
 	CHECK(result == FR_NO_FILE, "full-card failure leaves no partial save file");
 }
 
@@ -220,7 +224,7 @@ static void test_write_failure_cleanup(void)
 	write_calls = 0;
 	fail_at = -1;
 	injected_failure = 0;
-	CHECK(SavefileWrite("0:/COUNT.SAV", 0x8000) == 1,
+	CHECK(SavefileWrite("/SYSTEM/SAVER/COUNT.SAV", 0x8000) == 1,
 		"baseline save succeeds before write-failure sweep");
 	clean_write_count = write_calls;
 
@@ -241,12 +245,35 @@ static void test_write_failure_cleanup(void)
 		{
 			index = (UINT)position;
 			result = f_stat(long_save_path, &info);
-			if(result != FR_NO_FILE)
+			if(result == FR_OK)
 			{
-				printf("  FAIL  injected disk_write #%u left a %lu-byte save\n",
-					index, (unsigned long)info.fsize);
-				failures_with_partial_files++;
+				FIL file;
+				BYTE contents[0x8000];
+				UINT bytes_read = 0;
+				int complete = info.fsize == sizeof(contents) &&
+					f_open(&file, long_save_path, FA_READ) == FR_OK;
+				FRESULT content_result = FR_OK;
+				if(complete)
+				{
+					content_result = f_read(&file, contents, sizeof(contents), &bytes_read);
+					complete = content_result == FR_OK &&
+						bytes_read == sizeof(contents);
+					(void)f_close(&file);
+				}
+				if(complete)
+				{
+					size_t j;
+					for(j = 0; j < sizeof(contents); j++)
+						if(contents[j] != 0xFF) { complete = 0; break; }
+				}
+				if(!complete)
+				{
+					printf("  FAIL  injected disk_write #%u left an incomplete save (stat=%u size=%lu read=%u read_result=%u)\n", index, (unsigned)result, (unsigned long)info.fsize, (unsigned)bytes_read, (unsigned)content_result);
+					failures_with_partial_files++;
+				}
 			}
+			else if(result != FR_NO_FILE)
+				failures_with_partial_files++;
 		}
 	}
 	CHECK(clean_write_count > 0, "save operation performs disk writes");
@@ -255,7 +282,7 @@ static void test_write_failure_cleanup(void)
 		"each injected write error leaves no discoverable partial save");
 }
 
-/* Characterize the unresolved behavior: failed replacement removes the old file. */
+/* Failed replacement must preserve the complete prior save. */
 static void test_existing_save_overwrite_failure(void)
 {
 	FIL file;
@@ -284,11 +311,162 @@ static void test_existing_save_overwrite_failure(void)
 	save_result = Save_savefile((TCHAR*)long_save_path, sizeof(old_contents));
 	inject_next_sram_write = 0;
 	fail_at = -1;
-	CHECK(injected_failure, "overwrite fault is injected after Save_savefile opens the old path");
+	CHECK(injected_failure, "overwrite fault is injected while writing the staged replacement");
 	CHECK(save_result == 0, "failed overwrite is reported to the caller");
 	result = f_stat(long_save_path, &info);
-	CHECK(result == FR_NO_FILE,
-		"failed overwrite removes the replacement and leaves the previous save unavailable");
+	CHECK(result == FR_OK && info.fsize == sizeof(old_contents),
+		"failed overwrite keeps the original save and its full size");
+	if(result == FR_OK)
+	{
+		BYTE actual[sizeof(old_contents)];
+		UINT bytes_read = 0;
+		check(f_open(&file, long_save_path, FA_READ), "open preserved old save");
+		result = f_read(&file, actual, sizeof(actual), &bytes_read);
+		CHECK(result == FR_OK && bytes_read == sizeof(actual) &&
+			memcmp(actual, old_contents, sizeof(actual)) == 0,
+			"failed overwrite preserves every byte of the previous save");
+		check(f_close(&file), "close preserved old save");
+	}
+}
+
+static void test_transaction_recovery(void)
+{
+	FIL file;
+	BYTE old_contents[0x800];
+	BYTE new_contents[0x800];
+	BYTE actual[0x800];
+	UINT written;
+	UINT bytes_read;
+	FRESULT result;
+	const char *target = "/SYSTEM/SAVER/RECOVER.SAV";
+
+	mount_fresh_formatted_volume();
+	memset(old_contents, 0xA5, sizeof(old_contents));
+	memset(new_contents, 0x5A, sizeof(new_contents));
+	check(f_open(&file, target, FA_WRITE | FA_CREATE_ALWAYS), "create recovery fixture");
+	check(f_write(&file, old_contents, sizeof(old_contents), &written), "write recovery fixture");
+	check(f_close(&file), "close recovery fixture");
+	check(f_open(&file, FILE_TXN_DATA_PATH, FA_WRITE | FA_CREATE_NEW), "create staged recovery data");
+	check(f_write(&file, new_contents, sizeof(new_contents), &written), "write staged recovery data");
+	check(f_close(&file), "close staged recovery data");
+	file_txn_target_existed = 1;
+	CHECK(FileTxn_WriteJournal(target), "write recovery journal before moving original");
+	check(f_rename(target, FILE_TXN_BACKUP_PATH), "move old save to transaction backup");
+	file_txn_recovered = 0;
+	CHECK(FileTxn_Recover(), "recovery restores old save if promotion did not occur");
+	check(f_open(&file, target, FA_READ), "open restored old save");
+	result = f_read(&file, actual, sizeof(actual), &bytes_read);
+	CHECK(result == FR_OK && bytes_read == sizeof(actual) &&
+		memcmp(actual, old_contents, sizeof(actual)) == 0,
+		"interrupted replacement returns the complete original save");
+	check(f_close(&file), "close restored old save");
+
+	/* Model FatFs having registered the destination LFN but not yet removed
+	   the staged source when power is lost during rename. */
+	check(f_open(&file, target, FA_WRITE | FA_CREATE_ALWAYS), "recreate old save before partial rename case");
+	check(f_write(&file, old_contents, sizeof(old_contents), &written), "rewrite old save before partial rename case");
+	check(f_close(&file), "close old save before partial rename case");
+	check(f_open(&file, FILE_TXN_DATA_PATH, FA_WRITE | FA_CREATE_NEW), "create staged data for partial rename case");
+	check(f_write(&file, new_contents, sizeof(new_contents), &written), "write staged data for partial rename case");
+	check(f_close(&file), "close staged data for partial rename case");
+	file_txn_target_existed = 1;
+	CHECK(FileTxn_WriteJournal(target), "write journal for partial rename recovery");
+	check(f_rename(target, FILE_TXN_BACKUP_PATH), "move original before partial rename recovery");
+	check(f_open(&file, target, FA_WRITE | FA_CREATE_NEW), "simulate registered destination before source removal");
+	check(f_write(&file, new_contents, sizeof(new_contents), &written), "write partial-rename destination fixture");
+	check(f_close(&file), "close partial-rename destination fixture");
+	file_txn_recovered = 0;
+	CHECK(!FileTxn_Recover(), "recovery leaves ambiguous duplicate FAT entries untouched");
+	CHECK(FileTxn_PathState(target) == 1 && FileTxn_PathState(FILE_TXN_BACKUP_PATH) == 1 &&
+		FileTxn_PathState(FILE_TXN_DATA_PATH) == 1,
+		"ambiguous recovery preserves destination, backup and staged entries");
+	check(f_open(&file, FILE_TXN_BACKUP_PATH, FA_READ), "open preserved backup after ambiguous rename");
+	bytes_read = 0;
+	result = f_read(&file, actual, sizeof(actual), &bytes_read);
+	CHECK(result == FR_OK && bytes_read == sizeof(actual) &&
+		memcmp(actual, old_contents, sizeof(actual)) == 0,
+		"ambiguous rename retains the complete old save in its backup");
+	check(f_close(&file), "close preserved backup after ambiguous rename");
+
+	/* A first-time save has no backup; if an interrupted rename leaves both
+	   directory entries, recovery must preserve them for manual repair. */
+	mount_fresh_formatted_volume();
+	file_txn_recovered = 0;
+	check(f_open(&file, FILE_TXN_DATA_PATH, FA_WRITE | FA_CREATE_NEW), "create first-save staged data");
+	check(f_write(&file, new_contents, sizeof(new_contents), &written), "write first-save staged data");
+	check(f_close(&file), "close first-save staged data");
+	file_txn_target_existed = 0;
+	CHECK(FileTxn_WriteJournal(target), "write first-save recovery journal");
+	check(f_open(&file, target, FA_WRITE | FA_CREATE_NEW), "simulate partial first-save destination");
+	check(f_write(&file, new_contents, sizeof(new_contents), &written), "write partial first-save destination");
+	check(f_close(&file), "close partial first-save destination");
+	file_txn_recovered = 0;
+	CHECK(!FileTxn_Recover(), "recovery blocks on duplicate first-save FAT entries");
+	CHECK(FileTxn_PathState(target) == 1 && FileTxn_PathState(FILE_TXN_DATA_PATH) == 1,
+		"ambiguous first-save recovery preserves both staged names");
+
+	mount_fresh_formatted_volume();
+	file_txn_recovered = 0;
+	check(f_open(&file, target, FA_WRITE | FA_CREATE_ALWAYS), "create old save for completed promotion case");
+	check(f_write(&file, old_contents, sizeof(old_contents), &written), "write old save for completed promotion case");
+	check(f_close(&file), "close old save for completed promotion case");
+	check(f_open(&file, FILE_TXN_DATA_PATH, FA_WRITE | FA_CREATE_NEW), "create second staged data");
+	check(f_write(&file, new_contents, sizeof(new_contents), &written), "write second staged data");
+	check(f_close(&file), "close second staged data");
+	file_txn_target_existed = 1;
+	CHECK(FileTxn_WriteJournal(target), "write second recovery journal");
+	check(f_rename(target, FILE_TXN_BACKUP_PATH), "move old save before second promotion");
+	check(f_rename(FILE_TXN_DATA_PATH, target), "install complete replacement before simulated reset");
+	file_txn_recovered = 0;
+	CHECK(FileTxn_Recover(), "recovery finalizes a fully installed replacement");
+	check(f_open(&file, target, FA_READ), "open promoted save after recovery");
+	result = f_read(&file, actual, sizeof(actual), &bytes_read);
+	CHECK(result == FR_OK && bytes_read == sizeof(actual) &&
+		memcmp(actual, new_contents, sizeof(actual)) == 0,
+		"recovery keeps the fully written replacement");
+	check(f_close(&file), "close promoted save");
+}
+
+static void test_settings_transaction(void)
+{
+	static const char target[] = "/SYSTEM/SETTINGS.TXT";
+	static const BYTE old_contents[] = "old settings\n";
+	static const BYTE new_contents[] = "new settings\n";
+	BYTE actual[sizeof(old_contents)];
+	FIL file;
+	UINT written = 0;
+	UINT bytes_read = 0;
+	FRESULT result;
+
+	mount_fresh_formatted_volume();
+	file_txn_recovered = 0;
+	check(f_open(&file, target, FA_WRITE | FA_CREATE_ALWAYS), "create old settings fixture");
+	check(f_write(&file, old_contents, sizeof(old_contents), &written), "write old settings fixture");
+	check(f_close(&file), "close old settings fixture");
+
+	CHECK(FileTxn_Begin(target, &file), "begin staged unified-settings write");
+	fail_at = write_calls;
+	result = f_write(&file, new_contents, sizeof(new_contents), &written);
+	fail_at = -1;
+	CHECK(result != FR_OK || written != sizeof(new_contents), "inject settings staging write failure");
+	CHECK(!FileTxn_Commit(&file), "failed settings write is reported");
+	check(f_open(&file, target, FA_READ), "open preserved settings after failed write");
+	result = f_read(&file, actual, sizeof(actual), &bytes_read);
+	CHECK(result == FR_OK && bytes_read == sizeof(old_contents) &&
+		memcmp(actual, old_contents, sizeof(old_contents)) == 0,
+		"failed settings replacement preserves previous contents");
+	check(f_close(&file), "close preserved settings fixture");
+
+	CHECK(FileTxn_Begin(target, &file), "begin successful staged settings write");
+	check(f_write(&file, new_contents, sizeof(new_contents), &written), "write replacement settings");
+	CHECK(FileTxn_Commit(&file), "commit complete settings replacement");
+	check(f_open(&file, target, FA_READ), "open committed settings");
+	bytes_read = 0;
+	result = f_read(&file, actual, sizeof(new_contents), &bytes_read);
+	CHECK(result == FR_OK && bytes_read == sizeof(new_contents) &&
+		memcmp(actual, new_contents, sizeof(new_contents)) == 0,
+		"successful settings replacement contains the complete new data");
+	check(f_close(&file), "close committed settings");
 }
 
 int main(void)
@@ -299,6 +477,8 @@ int main(void)
 	test_full_card_cleanup();
 	test_write_failure_cleanup();
 	test_existing_save_overwrite_failure();
+	test_transaction_recovery();
+	test_settings_transaction();
 	printf("%s (%d failure%s)\n", failures ? "FAILED" : "PASSED",
 		failures, failures == 1 ? "" : "s");
 	return failures ? 1 : 0;

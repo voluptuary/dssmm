@@ -28,15 +28,15 @@ Do not merely look for superficial code-quality issues. Investigate whether the 
 
 Two files are the authoritative starting points for this assignment:
 
-- `handoff.md` — operational handoff instructions, current audit context, continuation instructions, important discoveries, known risks, and the exact next steps required to resume work.
-- `progress.md` — the persistent audit journal, including completed work, findings, evidence, validation results, unresolved issues, and current progress.
+- `HANDOFF.md` — operational handoff instructions, current audit context, continuation instructions, important discoveries, known risks, and the exact next steps required to resume work.
+- `PROGRESS.md` — the persistent audit journal, including completed work, findings, evidence, validation results, unresolved issues, and current progress.
 
 ### Read these files before doing anything else.
 
 At the beginning of the session:
 
-1. Read `handoff.md` in its entirety.
-2. Read `progress.md` in its entirety.
+1. Read `HANDOFF.md` in its entirety.
+2. Read `PROGRESS.md` in its entirety.
 3. Follow any additional repository-specific instructions discovered in those files.
 4. Inspect the repository's current state, including the Git branch, working tree, recent commits, relevant files, and any active changes.
 5. Compare the repository's actual state with the recorded audit state.
@@ -97,7 +97,7 @@ Also assume that the next agent will have absolutely no knowledge of this conver
 
 **The repository documentation is your persistent memory.**
 
-At all times, maintain enough accurate information in `handoff.md` and `progress.md` for a completely new agent to resume the audit without having to ask me to reconstruct the history.
+At all times, maintain enough accurate information in `HANDOFF.md` and `PROGRESS.md` for a completely new agent to resume the audit without having to ask me to reconstruct the history.
 
 ### Required checkpoint behavior
 
@@ -141,7 +141,7 @@ Keep updates concise enough to be maintainable but detailed enough to reproduce 
 
 Do not continuously rewrite the entire journal when a dated entry or targeted update will suffice.
 
-## 5. Required Structure of handoff.md
+## 5. Required Structure of HANDOFF.md
 
 Keep this file actionable. A future agent should be able to start working immediately after reading it.
 
@@ -204,7 +204,7 @@ Provide explicit instructions for a new agent to:
 
 Keep this section current whenever the continuation procedure changes.
 
-## 6. Required Structure of progress.md
+## 6. Required Structure of PROGRESS.md
 
 Maintain a chronological, evidence-based journal.
 
@@ -404,8 +404,8 @@ Depending on the project's scope, completion should include:
 - An explanation of untested behavior, unresolved defects, and environmental blockers.
 - A clear record of any changes that were committed or pushed.
 - A final audit summary with severity-ranked findings.
-- A current `handoff.md` that allows an unfamiliar agent to understand the final state and any remaining tasks.
-- A current `progress.md` with a complete, traceable record of the work.
+- A current `HANDOFF.md` that allows an unfamiliar agent to understand the final state and any remaining tasks.
+- A current `PROGRESS.md` with a complete, traceable record of the work.
 
 If any required portion cannot be completed, explicitly document the reason, evidence gathered, remaining risk, and exact next steps. Do not falsely declare the audit complete.
 
@@ -417,8 +417,8 @@ Begin now.
 
 Your first actions must be:
 
-1. Read `handoff.md`.
-2. Read `progress.md`.
+1. Read `HANDOFF.md`.
+2. Read `PROGRESS.md`.
 3. Inspect the current repository and Git state.
 4. Reconcile the documented state with the actual code.
 5. Record an initial checkpoint if the handoff or progress documentation needs correction.

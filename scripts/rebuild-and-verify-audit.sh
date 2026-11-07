@@ -5,8 +5,8 @@ script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd -- "${script_dir}/.." && pwd)"
 cd "$repo_root"
 
-if [[ ! -f progress.md ]]; then
-	printf 'Audit checkpoint is missing: %s/progress.md\n' "$repo_root" >&2
+if [[ ! -f PROGRESS.md ]]; then
+	printf 'Audit checkpoint is missing: %s/PROGRESS.md\n' "$repo_root" >&2
 	exit 1
 fi
 
