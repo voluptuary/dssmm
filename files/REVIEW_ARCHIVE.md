@@ -1,6 +1,6 @@
 # Archived Reviews and Candidate Notes
 
-This file consolidates the historical review notes and candidate summaries that were superseded by the integrated code and current audit ledgers. The chronological record and detailed validation history remain in `../handoff.md` and `../progress.md`.
+This file consolidates the historical review notes and candidate summaries that were superseded by the integrated code and current audit ledgers. The chronological record and detailed validation history remain in `../HANDOFF.md` and `../PROGRESS.md`.
 
 ## Carousel performance
 
@@ -27,5 +27,9 @@ This file consolidates the historical review notes and candidate summaries that 
 
 ## Artifact policy
 
-- Superseded release/test binaries were removed during repository cleanup. The active hardware-test image is `candidate/8.3.0-header-art-opaque-test/ezkernelnew.bin`; it is retained for the owner's current comparison.
-- No stable release artifact is replaced by this archive. Candidate hashes, build sizes and validation outcomes remain recorded in `../progress.md`.
+- Superseded release/test binaries were removed during repository cleanup. The active release candidate is `candidate/8.3.0/ezkernelnew.bin`; it is refreshed from the final 8.3.0 source build. Superseded carousel and upstream UI raw logs were retired after their findings and validation summaries were consolidated in this archive and the audit ledgers. Candidate hashes, build sizes and validation outcomes remain recorded in `../PROGRESS.md`.
+
+
+## Retired Claude patch archive
+
+- `files/claude-audit.tar.gz` was a historical review bundle. Its patch and finding disposition was reviewed and recorded in the audit ledgers; the integrated artwork optimization and applicable fixes remain in source and current regressions. The user authorized retiring the archive after integration. No active build, test or release workflow depends on it.

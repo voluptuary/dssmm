@@ -13,6 +13,7 @@
 
 #include "ez_define.h"
 #include "ff.h"
+#include "file_transaction.h"
 #include "draw.h"
 #include "ezkernel.h"
 #include "Ezcard_OP.h"
@@ -886,6 +887,8 @@ static u32 Launcher_SettingsReadValue(const char *key, char *out, u32 out_size)
 		return 0;
 
 	out[0] = '\0';
+	if(!FileTxn_Recover())
+		return 0;
 	if(f_open(&f, SETTINGS_FILE, FA_READ) != FR_OK)
 		return 0;
 
@@ -5084,79 +5087,62 @@ u32 IWRAM_CODE Save_savefile(TCHAR *filename,u32 savesize)
 {
 	FIL file;
 	FRESULT write_result = FR_OK;
-	FRESULT close_result;
 	UINT written;
 	u32 ok = 1;
+	int i;
+
 	if(savesize==0) return 0xff;
-	u32 ret=f_open(&file, filename, FA_WRITE | FA_CREATE_ALWAYS);
-	switch(ret)
+	if(!FileTxn_Begin(filename, &file))
+		return 0;
+	//memset(pReadCache,0xFF,0x200*4);
+	SetRampage(0x0);
+
+	if(savesize < 0x800)
 	{
-		case FR_OK:
+		ReadSram(SRAMSaver,pReadCache,savesize);
+		for(i=0;i<(savesize+0x1FF)/0x200 ;i++)
 		{
-			int i;
-			//memset(pReadCache,0xFF,0x200*4);
-			SetRampage(0x0);
-
-			if(savesize < 0x800)
-			{
-				ReadSram(SRAMSaver,pReadCache,savesize);
-				for(i=0;i<(savesize+0x1FF)/0x200 ;i++)
-				{
-					write_result = f_write(&file, pReadCache+0x200*i, 0x200, &written);
-					if(write_result != FR_OK || written != 0x200) { ok = 0; break; }
+			write_result = f_write(&file, pReadCache+0x200*i, 0x200, &written);
+			if(write_result != FR_OK || written != 0x200) { ok = 0; break; }
 		}
-			}
-			else
-			{
-				if(savesize>64*1024)
-				{
-					ReadSram(SRAMSaver, pReadCache , 64*1024 );
-
-					for(i=0;i<64*1024/0x800 ;i++)
-					{
-						write_result = f_write(&file, pReadCache+0x800*i, 0x200*4, &written);
-						if(write_result != FR_OK || written != 0x200*4) { ok = 0; break; }
-			}
-				if(ok) SetRampage(0x10);
-				if(ok)
-				{
-					ReadSram(SRAMSaver, pReadCache , 64*1024 );
-
-					for(i=0;i<64*1024/0x800 ;i++)
-					{
-						write_result = f_write(&file, pReadCache+0x800*i, 0x200*4, &written);
-						if(write_result != FR_OK || written != 0x200*4) { ok = 0; break; }
-			}
-				}
-				}
-				else
-				{
-					ReadSram(SRAMSaver, pReadCache, savesize );
-					for(i=0;i<savesize/0x800 ;i++)
-					{
-						write_result = f_write(&file, pReadCache+0x800*i, 0x200*4, &written);
-						if(write_result != FR_OK || written != 0x200*4) { ok = 0; break; }
-			}
-				}
+	}
+	else if(savesize > 64*1024)
+	{
+		ReadSram(SRAMSaver, pReadCache, 64*1024);
+		for(i=0;i<64*1024/0x800;i++)
+		{
+			write_result = f_write(&file, pReadCache+0x800*i, 0x200*4, &written);
+			if(write_result != FR_OK || written != 0x200*4) { ok = 0; break; }
 		}
-
-			SetRampage(0x0);
-			close_result = f_close(&file);
-			if(!ok || close_result != FR_OK)
+		if(ok) SetRampage(0x10);
+		if(ok)
+		{
+			ReadSram(SRAMSaver, pReadCache, 64*1024);
+			for(i=0;i<64*1024/0x800;i++)
 			{
-				/* FA_CREATE_ALWAYS discarded the previous contents before writing.
-				   Remove the incomplete replacement so a later launch does not accept
-				   its truncated length as a complete save. The old data cannot be
-				   restored here. */
-				f_unlink(filename);
-				return 0;
+				write_result = f_write(&file, pReadCache+0x800*i, 0x200*4, &written);
+				if(write_result != FR_OK || written != 0x200*4) { ok = 0; break; }
 			}
-			return 1;
-    }
-    break;
-    default:
-			return false;
-  }
+		}
+	}
+	else
+	{
+		ReadSram(SRAMSaver, pReadCache, savesize);
+		for(i=0;i<savesize/0x800;i++)
+		{
+			write_result = f_write(&file, pReadCache+0x800*i, 0x200*4, &written);
+			if(write_result != FR_OK || written != 0x200*4) { ok = 0; break; }
+		}
+	}
+
+	SetRampage(0x0);
+	if(!ok)
+	{
+		(void)f_close(&file);
+		FileTxn_Abort();
+		return 0;
+	}
+	return FileTxn_Commit(&file);
 }
 //---------------------------------------------------------------------------------
 u32 IWRAM_CODE LoadRTSfile(TCHAR *filename)
@@ -5202,50 +5188,38 @@ u32 SavefileWrite(TCHAR *filename,u32 savesize)
 {
 	FIL file;
 	FRESULT write_result = FR_OK;
-	FRESULT close_result;
 	UINT written;
 	u32 ok = 1;
+	int i;
+
 	if(savesize==0) return 0xff;
-	u32 ret=f_open(&file, filename, FA_WRITE | FA_CREATE_ALWAYS);
-	switch(ret)
+	if(!FileTxn_Begin(filename, &file))
+		return 0;
+	memset(pReadCache,0xFF,0x200*4);
+	if(savesize < 0x800)
 	{
-		case FR_OK:
+		for(i=0;i<(savesize+0x1FF)/0x200;i++)
 		{
-			int i;
-			memset(pReadCache,0xFF,0x200*4);
-
-			if(savesize < 0x800)
-			{
-				for(i=0;i<(savesize+0x1FF)/0x200 ;i++)
-				{
-					write_result = f_write(&file, pReadCache, 0x200, &written);
-					if(write_result != FR_OK || written != 0x200) { ok = 0; break; }
+			write_result = f_write(&file, pReadCache, 0x200, &written);
+			if(write_result != FR_OK || written != 0x200) { ok = 0; break; }
 		}
-			}
-			else
-			{
-				for(i=0;i<(savesize+0x1FF)/0x800 ;i++)
-				{
-					write_result = f_write(&file, pReadCache, 0x200*4, &written);
-					if(write_result != FR_OK || written != 0x200*4) { ok = 0; break; }
+	}
+	else
+	{
+		for(i=0;i<(savesize+0x1FF)/0x800;i++)
+		{
+			write_result = f_write(&file, pReadCache, 0x200*4, &written);
+			if(write_result != FR_OK || written != 0x200*4) { ok = 0; break; }
 		}
-		}
+	}
 
-			close_result = f_close(&file);
-
-			if(!ok || close_result != FR_OK)
-			{
-				/* This path creates a save that was not present. Remove any partial
-				   file so a later launch cannot mistake its size for a valid save. */
-				f_unlink(filename);
-				return 0;
-			}
-			return 1;
-    }
-    break;
-    default:
-			return false;
-  }
+	if(!ok)
+	{
+		(void)f_close(&file);
+		FileTxn_Abort();
+		return 0;
+	}
+	return FileTxn_Commit(&file);
 }
 //---------------------------------------------------------------
 u8 Check_saveMODE(u8 gamecode[])
@@ -9654,6 +9628,8 @@ u8 Process_savefile(u32 is_EMU,TCHAR *pfilename,u32 gamefilesize,BYTE saveMODE)
 	if(res != FR_OK){
 		return 2;
 	}
+	if(!FileTxn_Recover())
+		return 5;
 
 
 	/* Find the final period so save extensions also work for short emulator suffixes. */
@@ -11536,9 +11512,11 @@ static void Launcher_SaveUnifiedSettings(void)
 {
 	FIL f;
 
-    f_mkdir("/SYSTEM");
-    if(f_open(&f, SETTINGS_FILE, FA_WRITE | FA_CREATE_ALWAYS) == FR_OK)
+    if(!FileTxn_Begin(SETTINGS_FILE, &f))
     {
+        launcher_settings_migration_pending = 1;
+        return;
+    }
         f_printf(&f, "# DS Style settings\n");
         f_printf(&f, "# Edit the value after '='. Unknown lines are ignored.\n\n");
         f_printf(&f, "# Options: Light, Dark, Auto");
@@ -11627,14 +11605,17 @@ static void Launcher_SaveUnifiedSettings(void)
         f_printf(&f, "Last launch mode = %s\n", (launcher_last_launch_mode == LAST_LAUNCH_MODE_ADDON) ? "Addon" : "Clean");
         f_printf(&f, "\n# Options: 0 or higher. 0 is the first favourite.\n");
         f_printf(&f, "Favourite index = %lu\n", launcher_favourite_index);
-        f_close(&f);
+        if(!FileTxn_Commit(&f))
+        {
+            launcher_settings_migration_pending = 1;
+            return;
+        }
         f_unlink(THEME_FILE);
         f_unlink(FAVOURITE_INDEX_FILE);
         f_unlink(START_SOURCE_FILE);
         f_unlink(LAST_LAUNCH_MODE_FILE);
         f_unlink(AUTO_START_KEY_FILE);
         launcher_settings_migration_pending = 0;
-    }
 }
 
 static void Launcher_SaveMigratedSettingsIfNeeded(void)
@@ -16662,6 +16643,8 @@ u8 FRAM_save_op(u8 OP)
 	if(res != FR_OK){
 		return 2;
 	}
+	if(!FileTxn_Recover())
+		return 5;
 
 	pfilename = pNorFS[0].filename;
 	SAVEMODE = pNorFS[0].savemode;

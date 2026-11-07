@@ -13,6 +13,7 @@
 
 ### Fixes
 
+- Made settings updates and game-save exports safer by staging the new file first and retaining the previous complete file if an SD write fails.
 - Corrected artwork selection and alignment in the startup save-recovery screen, and improved compatibility with valid title artwork from more image tools.
 - Restored NOR menu button hints; improved format confirmation, cancellation and progress feedback; and ensured deleting the newest NOR game clears its saved data.
 - Fixed Clean list Off display behavior, aligned help headings and LED values, and restored header-code artwork for games in the SD-card root.
