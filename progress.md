@@ -3,8 +3,9 @@
 ## 2026-11-07 — Verify FrankieT19 v8.0 attribution for 8.3.0
 
 - Compared tags and ancestry: FrankieT19 `v8.0` resolves to authored commit `6d6084e`; Merkin Mix `v8.0.0` resolves to `ed0f530`, on a separate history from common v7.5 base `df346b5`.
-- FrankieT19's v8.0 changelog identifies UI changes selectively integrated into Merkin Mix and explicitly credits Merkin for splash-screen and system-icon contributions. Updated release notes and CREDITS to credit Frankie for the distinct v7.5/v8.0 work while excluding Merkin-origin changes.
+- FrankieT19's v8.0 changelog identifies UI changes selectively integrated into Merkin Mix and credits Merkin for splash-screen and system-icon contributions. Release notes and CREDITS list those v7.5/v8.0 contributions by Frankie and the Merkin contributions separately.
 - The attribution correction was included in release branch commit `43a323d` and merged through PR #3.
+- Owner requested positive-only attribution language and that README changes not go through PRs. The README now says Merkin Mix builds on FrankieT19's DS Style fork; current README and attribution edits will be committed directly to `main`. No PR is open; previously merged PR records remain in history.
 
 ## 2026-11-07 — Prepare 8.3.0 release
 

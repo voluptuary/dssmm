@@ -1,6 +1,6 @@
 # DS Style Merkin Mix
 
-DS Style Merkin Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Edition**, maintained by [Merkin](https://github.com/voluptuary). It brings together a flexible game browser, configurable artwork, saved favourites and cheat selections, and practical updates to the cartridge's SD and NOR workflows.
+DS Style Merkin Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Edition**, maintained by [Merkin](https://github.com/voluptuary). This Merkin Mix fork builds on [FrankieT19's DS Style fork](https://github.com/FrankieT19/omega-de-ds-style-kernel), with Merkin's artwork, branding, performance work and hardware-focused updates. It brings together a flexible game browser, configurable artwork, saved favourites and cheat selections, and practical updates to the cartridge's SD and NOR workflows.
 
 > [!WARNING]
 > **For OMEGA Definitive Edition only.** Do not install this kernel on the original EZ-FLASH OMEGA.
@@ -54,6 +54,6 @@ bash scripts/rebuild-and-verify-audit.sh
 
 ## Credits and license
 
-Merkin Mix is maintained by Merkin. It includes FrankieT19's DS Style v7.5 foundation and selected, separately authored v8.0 interface work. FrankieT19 is not credited for changes that originated in Merkin Mix. EZ-FLASH, Sterophonick, Copilot, exploitz86 and SkillerCMP also contributed to the project's foundations and features; [CREDITS.md](CREDITS.md) records the specific provenance.
+Merkin Mix is maintained by Merkin and builds on FrankieT19's DS Style v7.5 foundation and selected, separately authored v8.0 interface work. Merkin contributed the refreshed splash screens and system icons in the v8.0 lineage, along with the Merkin Mix artwork and kernel improvements. EZ-FLASH, Sterophonick, Copilot, exploitz86 and SkillerCMP also contributed to the project's foundations and features; [CREDITS.md](CREDITS.md) records the specific provenance.
 
 The repository includes the [Apache License 2.0](LICENSE). Retain individual component licenses and attribution notices.
