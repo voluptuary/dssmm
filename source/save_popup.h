@@ -3,7 +3,59 @@
 
 #include "save_popup_text.h"
 
-/* Title art is staged before save I/O, then painted once into VRAM. */
+static u32 Launcher_SaveArtworkFormatValid(const u8 *raw, u32 width, u32 height)
+{
+    u32 offset, dib, file_width, file_height, compression;
+
+    if(!raw)
+        return 0;
+    memcpy(&offset, raw + 10, 4);
+    memcpy(&dib, raw + 14, 4);
+    memcpy(&file_width, raw + 18, 4);
+    memcpy(&file_height, raw + 22, 4);
+    memcpy(&compression, raw + 30, 4);
+    return raw[0] == 'B' && raw[1] == 'M' && offset == 54 && dib == 40 &&
+        file_width == width &&
+        (file_height == height || file_height == (0u - height)) &&
+        (raw[26] == 0 || raw[26] == 1) && !raw[27] &&
+        raw[28] == 16 && !raw[29] && !compression;
+}
+
+/* Save recovery metadata keeps the ROM basename but not its directory. If the
+   recent-path index cannot resolve a root-level game, its conventional GBA
+   save basename still identifies the ROM beside the SD root. */
+static u32 Launcher_LoadRootHeaderArtworkForSave(const char *save_name,
+	const char *stem, u8 *dst)
+{
+	static const char *const extensions[] = {"gba", "agb"};
+	const char *save_extension;
+	u8 original_gamecode[4];
+	u32 i;
+	int written;
+
+	if(!save_name || !stem || !stem[0] || !dst)
+		return 0;
+	save_extension = strrchr(save_name, '.');
+	if(!save_extension || strcasecmp(save_extension, ".sav"))
+		return 0;
+	memcpy(original_gamecode, GAMECODE, sizeof(original_gamecode));
+	for(i = 0; i < sizeof(extensions) / sizeof(extensions[0]); i++)
+	{
+		written = snprintf(launcher_custom_thumb_path, sizeof(launcher_custom_thumb_path),
+			"%s.%s", stem, extensions[i]);
+		if(written > 0 && (u32)written < sizeof(launcher_custom_thumb_path) &&
+			Launcher_LoadThumbnailFromRomHeaderPath("/", launcher_custom_thumb_path, dst))
+		{
+			memcpy(GAMECODE, original_gamecode, sizeof(original_gamecode));
+			return 1;
+		}
+	}
+	memcpy(GAMECODE, original_gamecode, sizeof(original_gamecode));
+	return 0;
+}
+
+/* The selected thumbnail style is staged before save I/O, then painted once
+   into VRAM. */
 static u32 launcher_save_art_custom;
 static u32 Launcher_LoadSaveArtwork(const char *save_name)
 {
@@ -11,40 +63,39 @@ static u32 Launcher_LoadSaveArtwork(const char *save_name)
     char path[MAX_path_len], name[MAX_path_len];
     u8 *raw = pReadCache + 0x10002;
     u8 code[4];
-    u32 found, width, height, offset, compression, dib;
-    u16 old_style = launcher_thumbnail_style;
-    launcher_thumbnail_style = LAUNCHER_THUMB_STYLE_TITLE;
+    u32 found, recent_found, width, height;
+    width = Launcher_ThumbnailSourceWidth();
+    height = Launcher_ThumbnailSourceHeight();
     launcher_save_art_custom = 0;
     Launcher_CustomThumbFileName(save_name, stem, sizeof(stem));
     found = stem[0] && Launcher_LoadCustomThumbnailByName(stem, raw);
+    if(found && !Launcher_SaveArtworkFormatValid(raw, width, height))
+		found = 0;
     launcher_save_art_custom = found;
-    if(!found && Read_last_played_entry(path, sizeof(path), name, sizeof(name)))
+    recent_found = !found && Read_last_played_entry(path, sizeof(path), name, sizeof(name));
+    if(recent_found)
     {
         Launcher_CustomThumbFileName(name, recent_stem, sizeof(recent_stem));
+        memcpy(code, GAMECODE, 4);
         if(!strcasecmp(stem, recent_stem))
-        {
-            memcpy(code, GAMECODE, 4);
             found = Launcher_LoadMirroredThumbnail(path, name, raw);
-            if(!found && Launcher_IsGbaFilename(name))
-                found = Launcher_LoadThumbnailFromRomHeaderPath(path, name, raw);
-            memcpy(GAMECODE, code, 4);
-        }
+        if(found && !Launcher_SaveArtworkFormatValid(raw, width, height))
+			found = 0;
+        if(!found && Launcher_IsGbaFilename(name))
+            found = Launcher_LoadThumbnailFromRomHeaderPath(path, name, raw);
+        if(found && !Launcher_SaveArtworkFormatValid(raw, width, height))
+			found = 0;
+        memcpy(GAMECODE, code, 4);
     }
+    if(!found && (!recent_found || !strcmp(path, "/")))
+        found = Launcher_LoadRootHeaderArtworkForSave(save_name, stem, raw);
+    if(found && !Launcher_SaveArtworkFormatValid(raw, width, height))
+		found = 0;
     if(found)
     {
-        memcpy(&offset, raw + 10, 4);
-        memcpy(&dib, raw + 14, 4);
-        memcpy(&width, raw + 18, 4);
-        memcpy(&height, raw + 22, 4);
-        memcpy(&compression, raw + 30, 4);
-        found = raw[0] == 'B' && raw[1] == 'M' && offset == 54 && dib == 40 &&
-            width == 120 && (height == 80 || height == (u32)-80) &&
-            raw[26] == 1 && !raw[27] && raw[28] == 16 && !raw[29] && !compression;
-        if(found)
-            Launcher_ScaleThumbToBox((const u16*)(raw + 54), 120, 80,
-                (u16*)(pReadCache + 0x18000), 48, 32);
+		Launcher_ScaleThumbToBox((const u16*)(raw + 54), width, height,
+			(u16*)(pReadCache + 0x18000), 48, 32);
     }
-    launcher_thumbnail_style = old_style;
     return found;
 }
 
@@ -134,7 +185,10 @@ static void Launcher_DrawSavePopup(const char *name, u32 artwork, u32 writing)
     Clear(44, 56, 152, 1, edge, 1);
     if(artwork)
     {
-        Launcher_DrawSaveArtwork((const u16*)(pReadCache + 0x18000), 45, 62, 48);
+        if(launcher_thumbnail_style == LAUNCHER_THUMB_STYLE_BOX)
+            Launcher_DrawSaveArtwork(((const u16*)(pReadCache + 0x18000)) + 8, 53, 62, 32);
+        else
+            Launcher_DrawSaveArtwork((const u16*)(pReadCache + 0x18000), 45, 62, 48);
     }
     Launcher_SavePopupName(name, artwork);
     Launcher_SavePopupLine(Launcher_SavePopupText(2), 44, 97, 152, 1);

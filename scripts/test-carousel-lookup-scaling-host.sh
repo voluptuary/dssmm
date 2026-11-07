@@ -9,7 +9,7 @@ python3 - "$test_tmp/ff15/ff.c" <<'PY'
 from pathlib import Path
 import re, sys
 p=Path(sys.argv[1]); text=p.read_text()
-for name in ['dir_find','dir_next','f_open','f_read']:
+for name in ['dir_find','dir_next','f_open','f_open_by_dirent','f_read']:
     pattern=r'((?:static )?FRESULT '+name+r'\s*\([^;]*?\)\s*\{)'
     text,n=re.subn(pattern,lambda m:m[1]+'\n extern unsigned long metric_'+name+'; metric_'+name+'++;',text,count=1)
     assert n==1, name
