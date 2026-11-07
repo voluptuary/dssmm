@@ -16,6 +16,9 @@ typedef int PAGE_NUM;
 #define SETTINGS_CATEGORY_SYSTEM 3
 #define DSTEXT_ON "On"
 #define DSTEXT_OFF "Off"
+#define LAUNCHER_WRAP_OFF 0
+#define LAUNCHER_WRAP_ON 1
+#define LAUNCHER_WRAP_EXCEPT_SYSTEM 2
 static u16 launcher_wrap_around;
 static unsigned launcher_settings_migration_pending;
 static const char *canonical, *legacy;
