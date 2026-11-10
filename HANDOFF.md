@@ -1,5 +1,15 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 17:37 UTC — Final synchronized state
+
+- Local primary branch is `ezfode` at `0c32ce5de1e4c723ce41b586aefc92257155b3f7`, tracking `origin/ezfode`. Remote `main` points to the exact same commit; GitHub still reports `main` as default, and `origin/HEAD` correctly points to `origin/main`.
+- Source/test changes are in commit `9944dc7` and have been pushed, followed by ledger/branch status commits `90795aa`, `1b6f8f1`, and `0c32ce5`. All four commits are on both `main` and `ezfode` and no open PR exists. All remote merged project feature branches and local historical docs/release/fix branches were deleted. FrankieT19's `upstream/*` refs are preserved.
+- Both prior stashes were dropped after comparison showed all tracked edits were committed and their only untracked payloads were the generated RAM reports already removed. Stash list is empty. No root `.elf` or generated `.gba` remains; the seven tracked emulator plug-in `.gba` assets remain. Standard ignored `build/` was kept.
+- Tests: production build 2,014,664 bytes; all 33 host scripts, browser installer scenarios, JS syntax, layout guard and Cppcheck passed. Current source has not been tested on cartridge hardware. Release version remains 8.3.0; no candidate, release asset, or release note was changed. The Merkin fork's v8.4.1 build number was not used as source provenance.
+- **Remaining external operation:** GitHub default-branch PATCH and the official default-branch rename API both returned 403 `Resource not accessible by integration`. The endpoint requires repository admin/owner rights and `administration:write` for default-branch rename ([GitHub REST docs](https://docs.github.com/en/rest/branches/branches#rename-a-branch)). The current integration lacks that permission even though repository metadata identifies the owner as admin. When a suitably authorized integration/owner session is available, change GitHub's default to the existing `ezfode` ref, verify the API reports it, then delete remote `main` and update/prune `origin/HEAD`. Until then, keep both refs synchronized and do not claim the remote default rename is complete.
+- Only active project-file URL containing `/main` is the link to FrankieT19's separate upstream changelog in `docs/project/index.html`; retain it. Old `main` references in handoff/progress history describe the branch name used at those dates and remain factual.
+- Final verification still to execute: `git status --short --branch`, `git ls-remote --heads origin`, repository default metadata, and a search for generated `.elf`/`.gba` files. Then stop; the default-branch permission is the only remaining blocker for the requested remote rename.
+
 ## 2026-11-10 17:36 UTC — Merged project refs pruned; recovery stashes reviewed
 
 - Deleted remote merged project branches `docs/8.3.0-release-state`, `exploratory`, and `fix/save-and-settings-transactions`; no open PRs referenced them. Deleted local merged docs/release/exploratory/fix branches. Local project branches now contain only `ezfode`; the separate `upstream/main` and `upstream/experimental/enhanced-cheats-v7.2` refs remain untouched.

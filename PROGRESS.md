@@ -1,5 +1,15 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 17:37 UTC — Synchronized commits and cleanup complete; default setting pending
+
+- **Commits/pushes:** `9944dc7` contains the loader/cache implementation and regressions. Ledger commits `90795aa`, `1b6f8f1`, and `0c32ce5` record the branch transition and cleanup. All four commits were pushed to both `origin/main` and `origin/ezfode`; both remote refs currently resolve to `0c32ce5de1e4c723ce41b586aefc92257155b3f7`.
+- **Branch cleanup:** local active branch `ezfode` tracks `origin/ezfode`; all local historical docs/release/fix branches and merged remote project feature refs have been removed. GitHub reports `main` remains default; `origin/HEAD` points there. FrankieT19's separate `upstream/*` refs are untouched. No open PR was found.
+- **Stash/artifact cleanup:** compared both crash/pause stashes to the committed tree and verified tracked work was superseded/committed; untracked contents were only generated stack/callgraph report folders summarized in the logs. Dropped both stashes. Removed all root generated `.elf`/`.gba` outputs and `build-ram-*` reports. Seven tracked `.gba` plug-in assets remain; standard ignored `build/` remains.
+- **Validation record:** target production build 2,014,664 bytes; 33/33 host test scripts; browser installer tests; JS syntax; `git diff --check`; IWRAM/EWRAM layout guards; and Cppcheck all passed. No cartridge hardware test was run. No version/release/changelog update or test candidate was produced.
+- **Remaining blocker:** PATCH default branch and `POST .../branches/main/rename` each returned 403 `Resource not accessible by integration`. GitHub's docs require admin/owner permission and `administration:write` for a default-branch rename ([REST API docs](https://docs.github.com/en/rest/branches/branches#rename-a-branch)). The connected integration lacks that scope. Both refs are synchronized; when authorized, set `ezfode` as default, verify, then remove `main`. Do not remove it before the default changes.
+- **Reference audit:** no active project link to this repository's `main` branch remains; the only `/main` path found is the FrankieT19 upstream changelog link and must stay. Historical ledger entries retain old branch names accurately.
+- **Final action:** verify actual status, remote refs/default, and generated artifact search; if all match, stop with GitHub default change documented as the sole blocker.
+
 ## 2026-11-10 17:36 UTC — Merged branch cleanup and stash comparison
 
 - **Remote cleanup:** deleted `origin/docs/8.3.0-release-state`, `origin/exploratory`, and `origin/fix/save-and-settings-transactions`. Before deletion, each was proven an ancestor of the synchronized `main`/`ezfode` commit, and GitHub listed no open PRs. Local merged docs/release/exploratory/fix branches were deleted with `git branch -d`. Only local `ezfode` remains; upstream refs to FrankieT19's separate repository remain unchanged.
