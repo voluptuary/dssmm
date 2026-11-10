@@ -1,5 +1,12 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 20:40 UTC — Isolated BLUE vendor build and resource packer validated
+
+- Added targets/blue/source + vendor license and byte-identical resource input. Only missing declarations, HZK12 case and metadata input type changed from pinned source; all flash commands, reset assembly and firmware bytes preserved. Root make/batch scripts now select BLUE only; retained root source/images are excluded DS Style donor material, documented prominently.
+- Build passed at 703,752 raw bytes. Static EWRAM heap 7,316 bytes; IWRAM overlay-end-to-user-SP gap 3,712; no runtime peak claim. Eight inherited warning diagnostics remain and are not suppressed (directory overlap/overflow, format, unused locals and array-count expression).
+- scripts/pack-blue-kernel.py reproduces statically inspected recipe, rejects >1 MiB code overlap and modified resources, checks firmware CRC and refuses input/output replacement. Four packaging test groups passed including exact offsets/zeros/firmware slice, size boundaries, corruption and CLI non-destruction. Vendor Windows executable was not run; no physical update validation or public BLUE artifact.
+- Next: commit/push isolated baseline, then backport checked native PSRAM reads and stop-on-failure caller behavior with real-function host tests. Native BLUE capacity/page policy must remain 64 MiB/8 MiB selector stride, unlike Omega. Directory append overflow and caller header/trim reads remain next review items; DS Style resource relocation strategy remains unresolved.
+
 ## 2026-11-10 20:38 UTC — BLUE hardware and packaging inventory
 
 - Added docs/porting/BLUE_STATUS.md with exact registers/memory/metadata/64 MiB launch differences and phased feature/provenance matrix. Vendor reference refresh remains 109f1a0. No DE changes.

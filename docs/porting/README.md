@@ -1,6 +1,6 @@
 # Merkin Mix port exploration
 
-Preparation only. No target firmware implementation or compatibility claim exists yet.
+BLUE implementation has resumed on ezfblue. See [BLUE_STATUS.md](BLUE_STATUS.md) for the active baseline and validation limits. Omega has a separate hardware-untested prerelease; no cross-target hardware compatibility is implied.
 
 | Branch | Target | Reference repository | Pinned reference commit |
 | --- | --- | --- | --- |
@@ -8,7 +8,7 @@ Preparation only. No target firmware implementation or compatibility claim exist
 | ezfomega | Original EZ-FLASH OMEGA | https://github.com/FrankieT19/omega-ds-style-kernel | ef30b8ba78147943d95653dfa82f721b52096f67 |
 | ezfblue | Omega Definitive Edition BLUE, as named by vendor source | https://github.com/ezflash-team/blue-kernel | 109f1a050d9c35008379ce61ae40d05dc528c614 |
 
-Both exploration branches start from the same Merkin Mix baseline. Their inherited source and Makefile still target Omega DE Rev. A/B. Branch names do not make these sources suitable for other cartridges. Each branch adds TARGET.md with its own exploration plan.
+Both exploration branches began at the same Merkin Mix baseline. On ezfblue, root source/images remain DE donor material and the active root build now delegates only to targets/blue. Each branch maintains its own target plan; branch names alone do not establish compatibility.
 
 ## Resume procedure
 
@@ -17,7 +17,7 @@ Both exploration branches start from the same Merkin Mix baseline. Their inherit
 3. Inventory hardware mappings, storage/save behavior, launch and reset protocols, IRQ/DMA ownership, RAM layout, image size limits and update packaging before selecting a target source baseline.
 4. Compare final Merkin Mix behavior with the target baseline. Record features already present, actual missing changes, dependencies, original authors and licenses. Preserve FrankieT19 and other contributors' attribution.
 5. Plan small changes with host regression coverage and a target-specific hardware test matrix. Reuse pure policy/UI code only after checking dependencies. Keep hardware operations target-specific.
-6. Wait for the owner to resume actual porting before implementing changes, building target candidates, or publishing releases.
+6. BLUE porting is authorized. Implement and validate small target-specific changes; do not publish a BLUE release or claim hardware verification without supporting evidence.
 
 ## Initial feature inventory to reconcile
 
@@ -28,4 +28,4 @@ Both exploration branches start from the same Merkin Mix baseline. Their inherit
 
 ## Validation state
 
-Only reference README/build metadata and repository trees have been inspected. Both references advertise Apache-2.0 metadata; detailed file-level provenance remains to be reviewed. No feasibility conclusion, target build, hardware validation or port implementation has occurred.
+The initial preparation record is superseded for BLUE by BLUE_STATUS.md. Its vendor baseline builds after declaration/case fixes; portable resource packaging has host tests. The DS Style launcher still needs integration and no BLUE hardware validation has occurred. Component notices remain in the imported source.

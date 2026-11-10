@@ -20,7 +20,7 @@ The BLUE source is the vendor's classic menu, not DS Style. Establish it as the 
 | Area | Current status |
 | --- | --- |
 | Cartridge/SD/flash/reset/firmware | Vendor baseline; no hardware validation |
-| Portable BLUE resource linking | Recipe established statically; implement bounds/resource checks and host tests |
+| Portable BLUE resource linking | Implemented exact layout with 1 MiB overlap guard, pinned resource hash/firmware CRC, exclusive output; four host test groups pass |
 | DS Style launcher/themes/navigation | Root source/images retained as donor; not yet built for BLUE |
 | Name-matched/transparent artwork and cache | Pending launcher integration; do not claim present |
 | Saves/settings/remembered cheats | Vendor behavior initially; transactional/persistence changes pending target review |
@@ -29,3 +29,5 @@ The BLUE source is the vendor's classic menu, not DS Style. Establish it as the 
 | Hardware verification | No reports available; boot/save/NOR/64 MiB/plugin matrix all unverified |
 
 Next: commit inventory, introduce isolated vendor build and tested portable packer, then port native loader exact-I/O/bounds checks with failure propagation. Review SD directory append overflow and catalog enumeration separately. DE shared findings must be reproduced against current ezfode before queueing; do not assume vendor bugs exist there.
+
+Isolated build checkpoint: root make now delegates only to targets/blue. Full target build succeeds at 703,752 bytes; four packaging test groups pass. Raw ELF symbols: EWRAM heap start/end 0x0203E36C/0x02040000 (7,316 bytes); IWRAM overlay end 0x03007080 to user SP 0x03007F00 (3,712-byte gap). These are static reservations, not measured runtime peaks. Eight inherited warning diagnostics remain, including directory sprintf overlap/overflow; none suppressed. Windows batch changes are statically reviewed only. No packaged update distributed.

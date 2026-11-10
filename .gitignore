@@ -14,3 +14,8 @@ desktop.ini
 # Browser installer payloads are release data, not compiler output.
 !docs/manager/packages/current/**/*.gba
 !docs/manager/packages/current/**/*.bin
+
+# BLUE vendor resource is an input, not generated firmware.
+!targets/blue/resources/image.bin
+targets/blue/build/
+__pycache__/

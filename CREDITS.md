@@ -1,5 +1,9 @@
 # Credits and provenance
 
+## BLUE port hardware baseline
+
+The isolated ezfblue target uses EZ-FLASH's published BLUE kernel at 109f1a050d9c35008379ce61ae40d05dc528c614. Its vendor source/license and unchanged resource image are retained under targets/blue. The existing DS Style source/assets remain donor material attributed below; their presence does not imply BLUE feature integration. Linux header-case correction follows the existing HZK12 correction credited to Kekun in this project's lineage.
+
 - **EZ-FLASH** — original OMEGA Definitive Edition kernel source.
 - **Sterophonick** — SimpleLight custom kernel, part of DS Style's foundation.
 - **[FrankieT19](https://github.com/FrankieT19/omega-de-ds-style-kernel)** — DS Style v7.5 foundation ([commit](https://github.com/FrankieT19/omega-de-ds-style-kernel/commit/df346b5ee173ab47bb0c40305a682ce4f7f190e1)), including animated carousels and the launch pulse. His separately authored [v8.0 commit](https://github.com/FrankieT19/omega-de-ds-style-kernel/commit/6d6084e01d9410ddaae8ac69bb93a245c5edac28) supplied the Start-screen/UI refinements, Auto theme, View grouping, Open SYSTEM, wrap defaults, Boot to, double-tap favourites and save-presentation artwork integrated into Merkin Mix 8.3.0.
