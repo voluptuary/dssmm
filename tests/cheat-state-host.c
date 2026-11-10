@@ -9,7 +9,8 @@ typedef uint8_t u8;
 typedef unsigned UINT;
 typedef char TCHAR;
 typedef int FRESULT;
-typedef struct { unsigned size, pos; } FIL;
+typedef uint64_t FSIZE_t;
+typedef struct { FSIZE_t size; unsigned pos; } FIL;
 #define EWRAM_BSS
 #define MAX_path_len 256
 #define MAX_pReadCache_size 0x20000
@@ -32,7 +33,7 @@ static unsigned disk_size;
 static int short_read, short_write, read_error, write_error, close_error, open_error;
 static char last_path[64];
 static const char content[] = "abcd";
-static unsigned f_size(FIL *f) { return f->size; }
+static FSIZE_t f_size(FIL *f) { return f->size; }
 static int f_lseek(FIL *f, unsigned pos) { f->pos = pos; return 0; }
 static int f_open(FIL *f, const char *path, unsigned mode) {
  if(open_error) return 2;
@@ -81,6 +82,7 @@ static void setup(void) {
  assert(CheatStateSave()); rows[1].select=rows[4].select=0;
 }
 int main(void) {
+ gfile.size=((FSIZE_t)1<<32)+4; CheatContentHash(); assert(!cheat_hash_valid); gfile.size=4;
  setup(); assert(CheatStateApply(6)==2); assert(rows[1].select && rows[4].select);
  CheatSelectionForget(); assert(!CheatSelectionAppliesTo("Test.gba",0xffff));
  setup(); CheatSelectionRestore(6); assert(gl_cheat_selected_count==2);

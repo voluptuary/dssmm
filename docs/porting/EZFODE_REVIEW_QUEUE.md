@@ -17,3 +17,9 @@ At ezfode 5f700c9, FileTxn_IsAllowedTarget("/system/saver/lower.sav") returns 0,
 ## SAVE-PATH-02 — backslash separators allowed in save basename (verified policy behavior)
 
 Same function returns 1 for /SYSTEM/SAVER/..\..\game.gba because it rejects only forward slashes in basename, while FatFs recognizes backslashes as separators. Standalone extraction reproduced acceptance. This violates the intended single-basename restriction. Current caller reachability and any exploitable corruption are unverified; normal FAT directory entries cannot contain a backslash. Review API/journal-validation paths before assigning broader severity. Original Omega port rejects both separator forms and tests it; ezfode unchanged.
+
+## CHEAT-SIZE-01 — exFAT size narrowed before hash limit (verified arithmetic defect)
+
+At ezfode 5f700c9, CheatContentHash assigns 64-bit f_size to u32 before the 1 MiB limit check. A file of 4 GiB + 4 bytes becomes 4 and bypasses the intended bound, hashing only a prefix as though it were the complete input. Original Omega host regression now uses 64-bit FSIZE_t and tests rejection of that size before reading. Fixed only on ezfomega by checking FSIZE_t before narrowing. The GameID mapping reader has a similar size-narrowing site before its 64 KiB cap; reviewed/fixed only on the port. No claim of ordinary game impact or memory overflow; huge/malformed input behavior and hash identity checks need DE follow-up.
+
+Related review: Get_all_Section_val caps produced menu entries, but skipped comment/blank lines do not increase that count. A very large malformed file can still incur substantial parsing time even when hashing is disabled by its bound. Decide a compatibility-preserving total-byte/work budget separately; no such behavior change made during this port.

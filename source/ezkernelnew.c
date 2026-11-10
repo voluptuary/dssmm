@@ -567,6 +567,7 @@ u16 gl_Breathing_B;
 
 u16 gl_toggle_reset;
 u16 gl_toggle_backup;
+u16 gl_cheat_remember;
 
 u16 gl_SD_R;
 u16 gl_SD_G;
@@ -9836,6 +9837,15 @@ static int Launcher_HorizontalSideY(int custom_y)
     return main_y + ((main_h - visible_h) / 2);
 }
 
+static void Launcher_ReadRememberCheatsSetting(void)
+{
+    char value[32];
+    gl_cheat_remember = 0;
+    if(Launcher_SettingsReadValue("Remember cheats", value, sizeof(value)))
+        gl_cheat_remember = !strcasecmp(value, "On") || !strcasecmp(value, "Yes") ||
+            !strcasecmp(value, DSTEXT_ON) || !strcmp(value, "1");
+}
+
 static void Launcher_ReadSoundsSetting(void)
 {
     char buf[32];
@@ -10222,6 +10232,7 @@ typedef enum
     SETTINGS_ADDON_HOTKEY,
     SETTINGS_FULL_INTRO,
     SETTINGS_BACKUP_SAVES,
+    SETTINGS_REMEMBER_CHEATS,
     SETTINGS_HELP,
     SETTINGS_OPEN_SYSTEM,
     SETTINGS_ART_POSITION,
@@ -10269,6 +10280,7 @@ static void Launcher_SettingsGetLine(u32 item, char *out, u32 out_size)
         case SETTINGS_ADDON_HOTKEY: label = DSTEXT_SETTINGS_ADDON_HOTKEY; value = ">"; break;
         case SETTINGS_FULL_INTRO: label = DSTEXT_SETTINGS_ENABLE_BIOS; value = Launcher_OnOffText(gl_toggle_reset); break;
         case SETTINGS_BACKUP_SAVES: label = DSTEXT_SETTINGS_BACKUP_SAVES; value = Launcher_OnOffText(gl_toggle_backup); break;
+        case SETTINGS_REMEMBER_CHEATS: label = DSTEXT_SETTINGS_REMEMBER_CHEATS; value = Launcher_OnOffText(gl_cheat_remember); break;
         case SETTINGS_HELP: label = DSTEXT_SETTINGS_HELP; value = ">"; break;
         case SETTINGS_VIEW_OPTIONS: label = Launcher_SettingsText(SETTINGS_TEXT_VIEW_OPTIONS); value = ">"; break;
         case SETTINGS_ART_POSITION:
@@ -11121,6 +11133,7 @@ static void Launcher_SaveUnifiedSettings(void)
         return;
     }
         f_printf(&f, "# DS Style settings\n");
+        f_printf(&f, "Remember cheats = %s\n", gl_cheat_remember ? "On" : "Off");
         f_printf(&f, "# Edit the value after '='. Unknown lines are ignored.\n\n");
         f_printf(&f, "# Options: Light, Dark, Auto");
 #if LAUNCHER_CUSTOM_THEME_ENABLED
@@ -11837,6 +11850,10 @@ static void Launcher_SettingsToggle(u32 item, int dir)
         case SETTINGS_BACKUP_SAVES:
             gl_toggle_backup ^= 1;
             Launcher_SaveSettingsInfo();
+            break;
+        case SETTINGS_REMEMBER_CHEATS:
+            gl_cheat_remember ^= 1;
+            Launcher_SaveUnifiedSettings();
             break;
         case SETTINGS_ART_POSITION:
             if(gl_show_Thumbnail == LAUNCHER_VIEW_VERTICAL)
@@ -13898,7 +13915,7 @@ static const u32 launcher_settings_view_items[] = {
     SETTINGS_LIST_FOLDERS, SETTINGS_THUMBNAILS, SETTINGS_ART_POSITION, SETTINGS_ART_BORDER,
     SETTINGS_ROUNDED_CORNERS, SETTINGS_ANIMATIONS, SETTINGS_SIDE_SIZE };
 static u32 launcher_settings_visible_view[7];
-static const u32 launcher_settings_games_items[] = { SETTINGS_BOOT_ENGINE, SETTINGS_AUTO_SAVE, SETTINGS_AUTO_START, SETTINGS_ADDON_SETTINGS, SETTINGS_BOOT_MODE, SETTINGS_SLEEP_HOTKEY, SETTINGS_ADDON_HOTKEY, SETTINGS_FULL_INTRO, SETTINGS_BACKUP_SAVES };
+static const u32 launcher_settings_games_items[] = { SETTINGS_BOOT_ENGINE, SETTINGS_AUTO_SAVE, SETTINGS_AUTO_START, SETTINGS_ADDON_SETTINGS, SETTINGS_BOOT_MODE, SETTINGS_SLEEP_HOTKEY, SETTINGS_ADDON_HOTKEY, SETTINGS_FULL_INTRO, SETTINGS_BACKUP_SAVES, SETTINGS_REMEMBER_CHEATS };
 static const u32 launcher_settings_hardware_items[] = { SETTINGS_INGAME_RTC };
 
 static const u32 *launcher_settings_active_items = 0;
@@ -14430,6 +14447,7 @@ int main(void) {
 	Launcher_ReadSystemName();
 	Launcher_ReadThumbnailStyle();
 	Launcher_ReadSoundsSetting();
+	Launcher_ReadRememberCheatsSetting();
 	Launcher_ReadHideSystemFilesSetting();
 	Launcher_ReadListFoldersSetting();
 	Launcher_ReadWrapAroundSetting();
@@ -16729,7 +16747,15 @@ load_file:
 
 	UIAudio_StopForSharedBufferUse();
     if(MENU_line < 2) Launcher_BeginLaunchScreen();
-    else { Launcher_EndLaunchIndicator(); Clear(0, 0, 240, 160, gl_color_cheat_black, 1); }
+	Launcher_ResetThumbCache();
+	if(!is_EMU && havecht && gl_cheat_remember &&
+		!CheatSelectionAppliesTo(pfilename, havecht))
+	{
+		CheatStateLoadHeadless(pfilename, havecht);
+		f_chdir(currentpath);
+	}
+
+    if(MENU_line >= 2) { Launcher_EndLaunchIndicator(); Clear(0, 0, 240, 160, gl_color_cheat_black, 1); }
 	//DrawHZText12(gl_Loading,0,(240-strlen(gl_Loading)*6)/2,74, gl_color_text,1);
 
 	u32 gamefilesize=0;

@@ -1,5 +1,6 @@
 #include <gba_systemcalls.h>
 #include <stdio.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <gba_base.h>
@@ -20,10 +21,16 @@ ST_entry pCHEAT[MAX_CHEAT_ENTRIES]EWRAM_BSS;
 u32 gl_cheat_count;
 u32 gl_cheat_selected_count;
 
-#define CHEAT_SELECTION_CACHE_MAX 64
-static char cheat_selection_key[128];
-static char cheat_active_key[128];
-static u16 cheat_selection_index[CHEAT_SELECTION_CACHE_MAX];
+#define CHEAT_SELECTION_CACHE_MAX 128
+#define CHEAT_KEY_LEN (2 * MAX_path_len + 16)
+#define CHT_GROUP_EXPANDED 0
+#define CHT_GROUP_COLLAPSED 2
+#define MAX_CHEAT_MENU_ENTRIES ((MAX_pReadCache_size - 0x2000) / sizeof(FM_CHT_LINE))
+extern TCHAR currentpath[MAX_path_len];
+extern u16 gl_cheat_remember;
+static char cheat_selection_key[CHEAT_KEY_LEN] EWRAM_BSS;
+static char cheat_active_key[CHEAT_KEY_LEN] EWRAM_BSS;
+static u16 cheat_selection_index[CHEAT_SELECTION_CACHE_MAX] EWRAM_BSS;
 static u32 cheat_selection_cache_count;
 
 extern u16 gl_select_lang;
@@ -33,6 +40,7 @@ extern u16 gl_select_lang;
 
 
 extern FIL gfile;
+extern void Show_error_num(u8 error_num);
 char buf[MAX_BUF_LEN]EWRAM_BSS;
 char _paramv[MAX_BUF_LEN] EWRAM_BSS;
 extern void Draw_select_icon(u32 X,u32 Y,u32 mode);
@@ -51,17 +59,127 @@ extern void Launcher_UpdateCheatTitle(void);
 
 static u32 cheat_use_chinese_folder = 0;
 
+/* CHS2 intentionally does not import CHS1's truncated game identities.
+ * A bounded snapshot is accepted only for the exact game and cheat contents.
+ * Failed reads never delete files; failed writes cannot activate a partial file.
+ */
+#define CHEATSTATE_DIR "/SYSTEM/CHEATSTATE"
+#define CHEATSTATE_MAGIC 0x32534843u
+static u32 cheat_active_hash;
+static u32 cheat_selection_hash;
+static u32 cheat_hash_valid;
+typedef struct {
+    u32 magic, content_hash, count;
+    char key[CHEAT_KEY_LEN];
+    u16 indices[CHEAT_SELECTION_CACHE_MAX];
+    u32 checksum;
+} CheatState;
+static CheatState cheat_state EWRAM_BSS;
+static FIL cheat_state_file EWRAM_BSS;
+
+static u32 CheatHash(u32 hash, const void *data, u32 size)
+{
+    const u8 *bytes = data;
+    while(size--) { hash ^= *bytes++; hash *= 16777619u; }
+    return hash;
+}
+
+static void CheatStatePath(char *path, const char *key)
+{
+    snprintf(path, 64, CHEATSTATE_DIR "/%08lx.cs2",
+        (unsigned long)CheatHash(2166136261u, key, strlen(key)));
+}
+
+static void CheatContentHash(void)
+{
+    UINT count;
+    FSIZE_t file_size = f_size(&gfile);
+    u32 remaining;
+    cheat_hash_valid = 0;
+    cheat_active_hash = 2166136261u;
+    /* Bound work on damaged or unexpectedly large inputs. */
+    if(file_size > 1024 * 1024 || f_lseek(&gfile, 0) != FR_OK) return;
+    remaining = (u32)file_size;
+    while(remaining)
+    {
+        UINT size = remaining > 256 ? 256 : remaining;
+        if(f_read(&gfile, buf, size, &count) != FR_OK || count != size) return;
+        cheat_active_hash = CheatHash(cheat_active_hash, buf, count);
+        remaining -= count;
+    }
+    cheat_hash_valid = f_lseek(&gfile, 0) == FR_OK;
+}
+
+static u32 CheatStateApply(u32 total)
+{
+    char path[64];
+    UINT count;
+    u32 i, previous = 0;
+    FRESULT result, closed;
+    FM_CHT_LINE *entries = (FM_CHT_LINE*)pCHTbuffer;
+    if(!cheat_hash_valid || !cheat_active_key[0]) return 0;
+    CheatStatePath(path, cheat_active_key);
+    if(f_open(&cheat_state_file, path, FA_READ) != FR_OK) return 0;
+    result = f_read(&cheat_state_file, &cheat_state, sizeof(cheat_state), &count);
+    closed = f_close(&cheat_state_file);
+    if(result != FR_OK || closed != FR_OK || count != sizeof(cheat_state) ||
+        cheat_state.magic != CHEATSTATE_MAGIC ||
+        cheat_state.content_hash != cheat_active_hash ||
+        cheat_state.count > CHEAT_SELECTION_CACHE_MAX ||
+        memcmp(cheat_state.key, cheat_active_key, sizeof(cheat_state.key)) ||
+        cheat_state.checksum != CheatHash(2166136261u, &cheat_state,
+            offsetof(CheatState, checksum))) return 0;
+    /* Validate every index and section before applying anything. */
+    for(i = 0; i < cheat_state.count; i++)
+    {
+        u32 index = cheat_state.indices[i], section;
+        if(index >= total || entries[index].is_section || (i && index <= previous)) return 0;
+        section = index;
+        while(section && !entries[section].is_section) section--;
+        if(!entries[section].is_section || (i && previous > section)) return 0;
+        previous = index;
+    }
+    for(i = 0; i < cheat_state.count; i++) entries[cheat_state.indices[i]].select = 1;
+    return cheat_state.count;
+}
+
+static u32 CheatStateSave(void)
+{
+    char path[64];
+    UINT written;
+    FRESULT result, closed;
+    if(!cheat_hash_valid || !cheat_active_key[0]) return 0;
+    memset(&cheat_state, 0, sizeof(cheat_state));
+    cheat_state.magic = CHEATSTATE_MAGIC;
+    cheat_state.content_hash = cheat_active_hash;
+    cheat_state.count = cheat_selection_cache_count;
+    memcpy(cheat_state.key, cheat_active_key, sizeof(cheat_state.key));
+    memcpy(cheat_state.indices, cheat_selection_index,
+        cheat_selection_cache_count * sizeof(cheat_selection_index[0]));
+    cheat_state.checksum = CheatHash(2166136261u, &cheat_state, offsetof(CheatState, checksum));
+    result = f_mkdir(CHEATSTATE_DIR);
+    if(result != FR_OK && result != FR_EXIST) return 0;
+    CheatStatePath(path, cheat_active_key);
+    if(f_open(&cheat_state_file, path, FA_WRITE | FA_CREATE_ALWAYS) != FR_OK) return 0;
+    result = f_write(&cheat_state_file, &cheat_state, sizeof(cheat_state), &written);
+    closed = f_close(&cheat_state_file);
+    return result == FR_OK && closed == FR_OK && written == sizeof(cheat_state);
+}
+
 static void CheatSelectionMakeKey(char *dst, u32 dst_len, const TCHAR *gamefilename, u32 havecht)
 {
-    snprintf(dst, dst_len, "%08lx:%s", havecht, gamefilename ? gamefilename : "");
-    dst[dst_len - 1] = '\0';
+    memset(dst, 0, dst_len);
+    int n = snprintf(dst, dst_len, "%08lx:%s/%s", (unsigned long)havecht,
+        currentpath, gamefilename ? gamefilename : "");
+    /* Never use a truncated identity for a different game. */
+    if(n < 0 || (u32)n >= dst_len) dst[0] = '\0';
 }
 
 u32 CheatSelectionAppliesTo(TCHAR *gamefilename, u32 havecht)
 {
-    char key[128];
+    char key[CHEAT_KEY_LEN];
     CheatSelectionMakeKey(key, sizeof(key), gamefilename, havecht);
-    return (cheat_selection_cache_count && !strcmp(cheat_selection_key, key)) ? 1 : 0;
+    return (key[0] && !strcmp(cheat_selection_key, key)) ? 1 : 0;
 }
 
 void CheatSelectionForget(void)
@@ -75,17 +193,21 @@ void CheatSelectionForget(void)
 static void CheatSelectionRestore(u32 total)
 {
     u32 i;
-    if(strcmp(cheat_selection_key, cheat_active_key))
+    if(!cheat_hash_valid || !cheat_active_key[0] || cheat_selection_hash != cheat_active_hash || strcmp(cheat_selection_key, cheat_active_key))
     {
         gl_cheat_selected_count = 0;
         return;
     }
 
-    gl_cheat_selected_count = cheat_selection_cache_count;
+    gl_cheat_selected_count = 0;
     for(i=0;i<cheat_selection_cache_count;i++)
     {
-        if(cheat_selection_index[i] < total)
+        if(cheat_selection_index[i] < total &&
+            !((FM_CHT_LINE*)pCHTbuffer)[cheat_selection_index[i]].is_section)
+        {
             ((FM_CHT_LINE*)pCHTbuffer)[cheat_selection_index[i]].select = 1;
+            gl_cheat_selected_count++;
+        }
     }
 }
 
@@ -94,12 +216,13 @@ static void CheatSelectionRemember(u32 total)
     u32 i;
 
     cheat_selection_cache_count = 0;
+    cheat_selection_hash = cheat_active_hash;
     strncpy(cheat_selection_key, cheat_active_key, sizeof(cheat_selection_key) - 1);
     cheat_selection_key[sizeof(cheat_selection_key) - 1] = '\0';
 
     for(i=0;i<total;i++)
     {
-        if(((FM_CHT_LINE*)pCHTbuffer)[i].select == 1)
+        if(!((FM_CHT_LINE*)pCHTbuffer)[i].is_section && ((FM_CHT_LINE*)pCHTbuffer)[i].select == 1)
         {
             if(cheat_selection_cache_count < CHEAT_SELECTION_CACHE_MAX)
                 cheat_selection_index[cheat_selection_cache_count++] = i;
@@ -556,7 +679,7 @@ u32 Get_all_Section_val(FIL* file)
 
     //fseek(file,0x0,SEEK_SET);
     f_lseek(&gfile, 0x0);
-    while(f_gets(buf, MAX_sectionVAL_LEN, &gfile) != NULL)
+    while(Line < MAX_CHEAT_MENU_ENTRIES && f_gets(buf, MAX_sectionVAL_LEN, &gfile) != NULL)
     {
         memset(tmpCHTFS.LINEname,0x00,MAX_KEY_LEN);
         Trim(buf);
@@ -683,7 +806,83 @@ u32 Get_all_Section_val(FIL* file)
     return Line;
 }
 //------------------------------------------------------------------
-static void Show_KEY_line(u32 line,u32 Select,u32 showoffset)
+/* Scan once: no per-row walk back through a potentially large group. */
+u32 GetVisibleCheatMenuCount(u32 total_entries)
+{
+    FM_CHT_LINE *entries = (FM_CHT_LINE*)pCHTbuffer;
+    u32 index, count = 0, expanded = 1;
+    for(index = 0; index < total_entries; index++)
+    {
+        if(entries[index].is_section)
+        {
+            expanded = entries[index].select == CHT_GROUP_EXPANDED;
+            count++;
+        }
+        else if(expanded) count++;
+    }
+    return count;
+}
+
+u32 GetVisibleCheatMenuEntryIndex(u32 total_entries, u32 visible_index)
+{
+    FM_CHT_LINE *entries = (FM_CHT_LINE*)pCHTbuffer;
+    u32 index, count = 0, expanded = 1;
+    for(index = 0; index < total_entries; index++)
+    {
+        if(entries[index].is_section)
+            expanded = entries[index].select == CHT_GROUP_EXPANDED;
+        if(entries[index].is_section || expanded)
+        {
+            if(count++ == visible_index) return index;
+        }
+    }
+    return total_entries;
+}
+
+u32 SetCheatGroupExpanded(u32 entry_index, u32 total_entries, u32 expanded)
+{
+    FM_CHT_LINE *entries = (FM_CHT_LINE*)pCHTbuffer;
+    u8 new_state;
+
+    if (entry_index >= total_entries || entries[entry_index].is_section != 1)
+        return 0;
+    new_state = expanded ? CHT_GROUP_EXPANDED : CHT_GROUP_COLLAPSED;
+    if (entries[entry_index].select == new_state)
+        return 0;
+    entries[entry_index].select = new_state;
+    return 1;
+}
+
+static u32 CountSelectedCheatMenuEntries(u32 total_entries)
+{
+    u32 index;
+    u32 count = 0;
+    FM_CHT_LINE *entries = (FM_CHT_LINE*)pCHTbuffer;
+
+    for (index = 0; index < total_entries; index++)
+    {
+        if (entries[index].is_section == 0 && entries[index].select == 1)
+            count++;
+    }
+    return count;
+}
+
+void ToggleCheatMenuEntry(u32 entry_index, u32 total_entries)
+{
+    FM_CHT_LINE *entries = (FM_CHT_LINE*)pCHTbuffer;
+    u32 first = entry_index, end = entry_index, i;
+    u8 selected;
+    if(entry_index >= total_entries || entries[entry_index].is_section) return;
+    selected = entries[entry_index].select;
+    while(first > 0 && !entries[first - 1].is_section) first--;
+    while(end + 1 < total_entries && !entries[end + 1].is_section) end++;
+    /* Preserve this fork's one-option-per-section semantics. */
+    for(i = first; i <= end; i++) entries[i].select = 0;
+    if(!selected && CountSelectedCheatMenuEntries(total_entries) < CHEAT_SELECTION_CACHE_MAX)
+        entries[entry_index].select = 1;
+}
+//------------------------------------------------------------------
+static void Show_KEY_line(u32 line, u32 Select, u32 showoffset, u32 total_entries)
 {
     char msg[256];
     u32 X_offset=15;
@@ -693,37 +892,39 @@ static void Show_KEY_line(u32 line,u32 Select,u32 showoffset)
     u32 row_y = Y_offset+line*line_x;
     u32 msg_len;
     u32 highlight_w;
+    u32 visible_index = showoffset + line;
+    u32 entry_index = GetVisibleCheatMenuEntryIndex(total_entries, visible_index);
     u8 select;
+    FM_CHT_LINE *entry;
 
     Launcher_ClearCheatRegion(X_offset, row_y, 220, 13);
-    if(line== Select)
-        name_color = gl_color_selected;
-    else
-        name_color = gl_color_text;
+    if (entry_index >= total_entries)
+        return;
+    entry = &((FM_CHT_LINE*)pCHTbuffer)[entry_index];
+    name_color = (line == Select) ? gl_color_selected : gl_color_text;
+    select = entry->select;
 
-    select = ((FM_CHT_LINE*)pCHTbuffer)[showoffset+line].select;
-
-    if( ((FM_CHT_LINE*)pCHTbuffer)[showoffset+line].is_section==1)
+    if(entry->is_section == 1)
     {
-        Clear(X_offset+3, row_y+4, 4, 4, name_color, 1);//section flag
-        sprintf(msg,"%s",((FM_CHT_LINE*)pCHTbuffer)[showoffset+line].LINEname);
-        if(line== Select)
+        snprintf(msg, sizeof(msg),"[%c] %s", select == CHT_GROUP_EXPANDED ? '-' : '+',
+            entry->LINEname);
+        if(line == Select)
         {
             msg_len = CheatTextVisibleColumns(msg);
             if(msg_len > 30) msg_len = 30;
             highlight_w = msg_len * 6 + 8;
-            if(highlight_w < 24) highlight_w = 24;
-            Clear(X_offset+10, row_y, highlight_w, 13, gl_color_selectBG_sd, 1);
+            if(highlight_w < 30) highlight_w = 30;
+            Clear(X_offset+1, row_y, highlight_w, 13, gl_color_selectBG_sd, 1);
         }
-        DrawCheatText12(msg,30,X_offset+13,row_y, name_color,1);
+        DrawCheatText12(msg,30,X_offset+4,row_y,name_color,1);
     }
     else
     {
         Draw_select_icon(X_offset+13,row_y,select);
-        sprintf(msg,"%s",((FM_CHT_LINE*)pCHTbuffer)[showoffset+line].LINEname);
+        snprintf(msg, sizeof(msg),"%s",entry->LINEname);
         if(!strcasecmp(msg, "ON"))
-            sprintf(msg, "%s", Launcher_OnOffText(select));
-        if(line== Select)
+            snprintf(msg, sizeof(msg), "%s", Launcher_OnOffText(select));
+        if(line == Select)
         {
             msg_len = CheatTextVisibleColumns(msg);
             if(msg_len > 30) msg_len = 30;
@@ -733,52 +934,71 @@ static void Show_KEY_line(u32 line,u32 Select,u32 showoffset)
             Clear(X_offset+10, row_y, highlight_w, 13, gl_color_selectBG_sd, 1);
             Draw_select_icon(X_offset+13,row_y,select);
         }
-        DrawCheatText12(msg,30,X_offset+15+13,row_y,name_color,1);
+        DrawCheatText12(msg,30,X_offset+28,row_y,name_color,1);
     }
 }
 
-void Show_KEY_val(u32 total,u32 Select,u32 showoffset)
+void Show_KEY_val(u32 total_entries, u32 visible_total, u32 Select, u32 showoffset)
 {
-    u32 need_show;
     u32 line;
 
-    if(total<10)
-        need_show = total;
-    else
-        need_show = 10;
-
-    for(line=0;line<need_show;line++)
-        Show_KEY_line(line, Select, showoffset);
+    /* Always visit all 10 rows so rows left over from a collapsed group are cleared. */
+    (void)visible_total;
+    for(line=0; line<10; line++)
+        Show_KEY_line(line, Select, showoffset, total_entries);
 }
 
-static u16 CheatVisibleSelectionMask(u32 total,u32 showoffset)
+static void ClampCheatViewport(u32 visible_count, u32 *Select, u32 *showoffset)
+{
+    u32 cursor = *showoffset + *Select;
+    u32 max_offset = visible_count > 10 ? visible_count - 10 : 0;
+
+    if (visible_count == 0)
+        cursor = 0;
+    else if (cursor >= visible_count)
+        cursor = visible_count - 1;
+    if (*showoffset > max_offset)
+        *showoffset = max_offset;
+    if (cursor < *showoffset)
+        *showoffset = cursor;
+    *Select = cursor - *showoffset;
+}
+
+static u16 CheatVisibleSelectionMask(u32 total_entries, u32 visible_total,
+    u32 showoffset)
 {
     u16 mask = 0;
     u32 line;
-    u32 visible = (total > showoffset) ? total - showoffset : 0;
+    u32 visible = (visible_total > showoffset) ? visible_total - showoffset : 0;
 
-    if(visible > 10)
+    if (visible > 10)
         visible = 10;
-    for(line=0;line<visible;line++)
+    for (line = 0; line < visible; line++)
     {
-        FM_CHT_LINE *entry = &((FM_CHT_LINE*)pCHTbuffer)[showoffset+line];
-        if(entry->is_section != 1 && entry->select)
-            mask |= (u16)(1u << line);
+        u32 entry_index = GetVisibleCheatMenuEntryIndex(total_entries,
+            showoffset + line);
+        if (entry_index < total_entries)
+        {
+            FM_CHT_LINE *entry = &((FM_CHT_LINE*)pCHTbuffer)[entry_index];
+            if (entry->is_section != 1 && entry->select)
+                mask |= (u16)(1u << line);
+        }
     }
     return mask;
 }
 
-static void RedrawChangedCheatSelections(u16 changed,u32 total,u32 Select,u32 showoffset)
+static void RedrawChangedCheatSelections(u16 changed, u32 total_entries,
+    u32 visible_total, u32 Select, u32 showoffset)
 {
     u32 line;
-    u32 visible = (total > showoffset) ? total - showoffset : 0;
+    u32 visible = (visible_total > showoffset) ? visible_total - showoffset : 0;
 
-    if(visible > 10)
+    if (visible > 10)
         visible = 10;
-    for(line=0;line<visible;line++)
+    for (line = 0; line < visible; line++)
     {
-        if(changed & (u16)(1u << line))
-            Show_KEY_line(line, Select, showoffset);
+        if (changed & (u16)(1u << line))
+            Show_KEY_line(line, Select, showoffset, total_entries);
     }
 }
 //------------------------------------------------------------------
@@ -786,7 +1006,7 @@ unsigned long str2hex( char*str)
 {
     unsigned long sum=0;
     unsigned long i;
-    int len = strlen(str);
+    size_t len = strlen(str);
 
     if(len >8) return 0;
     for(i=0;i<len;i++)
@@ -829,7 +1049,7 @@ void Analyze_KEYVAL(FIL* file,u32 total)
     for(tol=0;tol<total;tol++)
     {
 
-        if( ((FM_CHT_LINE*)pCHTbuffer)[tol].select == 1)
+        if(!((FM_CHT_LINE*)pCHTbuffer)[tol].is_section && ((FM_CHT_LINE*)pCHTbuffer)[tol].select == 1)
         {
             gl_cheat_selected_count++;
             cheat_start_count = gl_cheat_count;
@@ -843,7 +1063,7 @@ void Analyze_KEYVAL(FIL* file,u32 total)
             if(((FM_CHT_LINE*)pCHTbuffer)[current_select].is_section != 1)
                 continue;
             //DEBUG_printf("section %s  ", ((FM_CHT_LINE*)pCHTbuffer)[current_select].LINEname);
-                    buflen= Get_CHT_val(&gfile,((FM_CHT_LINE*)pCHTbuffer)[current_select].LINEname,((FM_CHT_LINE*)pCHTbuffer)[tol].LINEname);
+                    buflen= Get_CHT_val(file,((FM_CHT_LINE*)pCHTbuffer)[current_select].LINEname,((FM_CHT_LINE*)pCHTbuffer)[tol].LINEname);
                     if(buflen == 0)
                         continue;
 
@@ -1026,13 +1246,13 @@ u32 Check_cheat_file(TCHAR *gamefilename)
 {
     u32 res;
     UINT ret;
-    TCHAR chtnamebuf[200];
+    TCHAR chtnamebuf[MAX_path_len];
     u32 filesize;
     u32 GAMEID=0;
     u32 i;
     u32 len;
     cheat_use_chinese_folder = (gl_select_lang == 0xE2E2);
-    if(!gamefilename)
+    if(!gamefilename || strlen(gamefilename) >= sizeof(chtnamebuf))
         return 0;
 
     res = f_open(&gfile, gamefilename, FA_READ);
@@ -1071,8 +1291,8 @@ u32 Check_cheat_file(TCHAR *gamefilename)
         u32* tempbuff = (u32*)(pReadCache);
         if(res == FR_OK)//have a file
         {
-            filesize = f_size(&gfile);
-            if(filesize > 0x10000) filesize=0x10000;
+            FSIZE_t file_size = f_size(&gfile);
+            filesize = file_size > 0x10000 ? 0x10000 : (u32)file_size;
             f_lseek(&gfile, 0x0);
             res = f_read(&gfile, tempbuff, filesize, &ret);//pReadCache max 0x20000 Byte
             if(res != FR_OK)
@@ -1148,37 +1368,63 @@ void Show_num(u32 totalcount,u32 select)
     Launcher_DrawCheatCounter(total_sections, selected_section);
 }
 //------------------------------------------------------------------
-void Open_cht_file(TCHAR *gamefilename,u32 havecht)
+static u32 CheatOpenFile(TCHAR *gamefilename, u32 havecht)
 {
     u32 res;
-    char msg[128];
-    TCHAR chtnamebuf[100];
-
-    char buffer[127]={0};
+    TCHAR chtnamebuf[MAX_path_len];
 
     if(havecht == 0x0000FFFF)
     {
         res=f_chdir("/SYSTEM/CHEAT");
         if(res != FR_OK){
-            return;
+            return FR_NO_PATH;
         }
-        memcpy(chtnamebuf,gamefilename,100);
-        u32 len=strlen(chtnamebuf);
+        u32 len = gamefilename ? strlen(gamefilename) : 0;
+        if(len < 3 || len >= sizeof(chtnamebuf)) return FR_INVALID_NAME;
+        memcpy(chtnamebuf, gamefilename, len + 1);
         chtnamebuf[len-3] = 'c';
         chtnamebuf[len-2] = 'h';
         chtnamebuf[len-1] = 't';
     }
     else
     {
-        Change2cht_folder(havecht);
+        if(Change2cht_folder(havecht) != FR_OK) return FR_NO_PATH;
         u8* chtmode;
         chtmode = (u8*)&havecht;
         sprintf(chtnamebuf,"%d%d%d%d.cht",HexToChar(chtmode[0]),HexToChar(chtmode[1]),HexToChar(chtmode[2]),HexToChar(chtmode[3]));
     }
-    res = f_open(&gfile,chtnamebuf, FA_READ);
+    return f_open(&gfile,chtnamebuf, FA_READ);
+
+}
+
+void CheatStateLoadHeadless(TCHAR *gamefilename, u32 havecht)
+{
+    u32 total;
+    gl_cheat_count = 0;
+    gl_cheat_selected_count = 0;
+    if(!havecht || CheatOpenFile(gamefilename, havecht) != FR_OK) return;
+    CheatContentHash();
+    CheatSelectionMakeKey(cheat_active_key, sizeof(cheat_active_key), gamefilename, havecht);
+    total = Check_count(Get_all_Section_val(&gfile));
+    CheatSelectionRestore(total);
+    if(gl_cheat_remember && (cheat_selection_hash != cheat_active_hash ||
+        strcmp(cheat_selection_key, cheat_active_key))) CheatStateApply(total);
+    Analyze_KEYVAL(&gfile, total);
+    f_close(&gfile);
+}
+
+void Open_cht_file(TCHAR *gamefilename,u32 havecht)
+{
+    u32 res;
+    char msg[128];
+
+    char buffer[127]={0};
+
+    res = CheatOpenFile(gamefilename, havecht);
 
     if(res == FR_OK)//have a cht file
     {
+        CheatContentHash();
         CheatSelectionMakeKey(cheat_active_key, sizeof(cheat_active_key), gamefilename, havecht);
         if(strcmp(cheat_selection_key, cheat_active_key))
             gl_cheat_selected_count = 0;
@@ -1186,24 +1432,35 @@ void Open_cht_file(TCHAR *gamefilename,u32 havecht)
         strncpy(buffer, gamefilename, sizeof(buffer) - 1);
         buffer[sizeof(buffer) - 1] = '\0';
         Clean_cheat_title(buffer);
-        sprintf(msg,"%s",buffer);
+        snprintf(msg, sizeof(msg),"%s",buffer);
 
         Launcher_DrawCheatBackground(msg);
 
         u32 all_count = Get_all_Section_val(&gfile);
-        u32 Select = 1;
+        u32 Select = 0;
         u32 showoffset = 0;
         u32 re_show = 2;
         u32 old_select = 1;
         u32 old_showoffset = 0;
         u32 cheat_scroll_delay = 0;
+        u32 visible_count;
         u16 selection_redraw_mask = 0;
 
+        all_count = Check_count(all_count);
         CheatSelectionRestore(all_count);
 
         if(all_count)
         {
             all_count = Check_count(all_count);//cut from "GameInfo"
+            if(gl_cheat_remember && (cheat_selection_hash != cheat_active_hash || strcmp(cheat_selection_key, cheat_active_key)))
+                gl_cheat_selected_count = CheatStateApply(all_count);
+            visible_count = GetVisibleCheatMenuCount(all_count);
+            if (visible_count == 0)
+            {
+                f_close(&gfile);
+                Launcher_MarkTopbarNameDirty();
+                return;
+            }
             setRepeat(15,1);
             while(1)//3
             {
@@ -1212,7 +1469,8 @@ void Open_cht_file(TCHAR *gamefilename,u32 havecht)
                 UIAudio_UpdateExport();
                 if(selection_redraw_mask)
                 {
-                    RedrawChangedCheatSelections(selection_redraw_mask, all_count, Select, showoffset);
+                    RedrawChangedCheatSelections(selection_redraw_mask, all_count,
+                        visible_count, Select, showoffset);
                     selection_redraw_mask = 0;
                 }
                 else if(re_show)
@@ -1220,19 +1478,21 @@ void Open_cht_file(TCHAR *gamefilename,u32 havecht)
                     if(re_show>1)
                     {
                         /* Each row restores its own exact background before drawing.
-                           Clearing the whole body first made page movement visibly
-                           flash and did no useful work. */
-                        Show_KEY_val(all_count,Select,showoffset);
+                           Avoid clearing the whole body to preserve v7.3's flicker-free redraw. */
+                        Show_KEY_val(all_count, visible_count, Select, showoffset);
                     }
                     else if(old_showoffset == showoffset)
                     {
-                        Show_KEY_line(old_select, Select, showoffset);
+                        Show_KEY_line(old_select, Select, showoffset, all_count);
                         if(old_select != Select)
-                            Show_KEY_line(Select, Select, showoffset);
+                            Show_KEY_line(Select, Select, showoffset, all_count);
                     }
                     else
-                        Show_KEY_val(all_count,Select,showoffset);
-                    Show_num(all_count,Select+showoffset+1);
+                        Show_KEY_val(all_count, visible_count, Select, showoffset);
+                    {
+                    u32 selected_entry = GetVisibleCheatMenuEntryIndex(all_count, showoffset + Select);
+                    Show_num(all_count, selected_entry < all_count ? selected_entry + 1 : 1);
+                }
                     old_select = Select;
                     old_showoffset = showoffset;
                     re_show = 0;
@@ -1248,160 +1508,128 @@ void Open_cht_file(TCHAR *gamefilename,u32 havecht)
                 u16 keysup = keysUp();
                 u16 keysrepeat = keysDownRepeat();
 
-                if ((keysdown & KEY_DOWN) || ((keysrepeat & KEY_DOWN) && cheat_scroll_delay == 0)) {
-                    u32 prev_select = Select;
-                    u32 prev_showoffset = showoffset;
+                if ((keysdown & KEY_DOWN) || ((keysrepeat & KEY_DOWN) && cheat_scroll_delay == 0))
+                {
+                    u32 cursor = showoffset + Select;
                     u32 first_press = (keysdown & KEY_DOWN) ? 1 : 0;
-                    if (Select + showoffset+1 < (all_count )) {
-                if ( Select > 8 ){
-                  if ( Select == 9 ) {
-                    showoffset++;
-                    if( ((FM_CHT_LINE*)pCHTbuffer)[showoffset+Select].is_section==1){
-                        showoffset++;
-                    }
-                    re_show=2;
-                  }
-                }else{
-                  Select++;
-                  re_show=1;
-                  if( ((FM_CHT_LINE*)pCHTbuffer)[showoffset+Select].is_section==1){
-                    Select++;
-                        if ( Select > 9 ){
-                                Select--;
-                            showoffset++;
-
-
-                            re_show=2;
-                        }
-                  }
-                }
-
-                    }
-                    if((Select != prev_select) || (showoffset != prev_showoffset))
+                    if (cursor + 1 < visible_count)
                     {
+                        cursor++;
+                        if (cursor >= showoffset + 10)
+                        {
+                            showoffset = cursor - 9;
+                            Select = 9;
+                            re_show = 2;
+                        }
+                        else
+                        {
+                            Select++;
+                            re_show = 1;
+                        }
                         UIAudio_PlayMove();
                         cheat_scroll_delay = first_press ? 6 : 3;
                     }
-
                 }
                 else if((keysdown & KEY_UP) || ((keysrepeat & KEY_UP) && cheat_scroll_delay == 0))
                 {
-                    u32 prev_select = Select;
-                    u32 prev_showoffset = showoffset;
+                    u32 cursor = showoffset + Select;
                     u32 first_press = (keysdown & KEY_UP) ? 1 : 0;
-                    if (Select ) {
-                        Select--;
-                    if((showoffset==0)&& (Select==0)){
-                        if( ((FM_CHT_LINE*)pCHTbuffer)[Select].is_section==1){
-                            Select=1;
-                        }
-                    }
-
-                        if( ((FM_CHT_LINE*)pCHTbuffer)[showoffset+Select].is_section==1){
-                            if(Select)
-                    Select--;
-              }
-                        re_show=1;
-                    }else{
-                        if (showoffset){
-                            showoffset--;
-                        if(showoffset==0){
-                            if( ((FM_CHT_LINE*)pCHTbuffer)[0].is_section==1){
-                                Select=1;
-                            }
-                        }
-
-                    if( ((FM_CHT_LINE*)pCHTbuffer)[showoffset+Select].is_section==1){
-                        if(showoffset){
-                            showoffset--;
-                            if(showoffset==0){
-                                if( ((FM_CHT_LINE*)pCHTbuffer)[0].is_section==1){
-                                    Select=1;
-                                }
-                            }
-                        }
-                    }
-                            re_show=2;
-                        }
-                    }
-                    if((Select != prev_select) || (showoffset != prev_showoffset))
+                    if (cursor > 0)
                     {
+                        cursor--;
+                        if (cursor < showoffset)
+                        {
+                            showoffset = cursor;
+                            Select = 0;
+                            re_show = 2;
+                        }
+                        else
+                        {
+                            Select--;
+                            re_show = 1;
+                        }
                         UIAudio_PlayMove();
                         cheat_scroll_delay = first_press ? 6 : 3;
                     }
                 }
                 else if((keysdown & KEY_LEFT) || ((keysrepeat & KEY_LEFT) && cheat_scroll_delay == 0))
                 {
-                u32 prev_select = Select;
-                u32 prev_showoffset = showoffset;
-                u32 first_press = (keysdown & KEY_LEFT) ? 1 : 0;
-                if ( showoffset )
-                {
-                  if ( showoffset > 9 )
-                    showoffset -= 10;
-                  else
-                    showoffset = 0;
-
-                        if( ((FM_CHT_LINE*)pCHTbuffer)[showoffset+Select].is_section==1){
-                            Select--;
+                    u32 entry_index = GetVisibleCheatMenuEntryIndex(all_count, showoffset + Select);
+                    u32 first_press = (keysdown & KEY_LEFT) ? 1 : 0;
+                    if (entry_index < all_count &&
+                        ((FM_CHT_LINE*)pCHTbuffer)[entry_index].is_section == 1)
+                    {
+                        if (SetCheatGroupExpanded(entry_index, all_count, 0))
+                        {
+                            visible_count = GetVisibleCheatMenuCount(all_count);
+                            ClampCheatViewport(visible_count, &Select, &showoffset);
+                            UIAudio_PlayAcceptExport();
+                            re_show = 2;
                         }
-                  re_show=2;
-                }
-                else{
-                    if(Select>1){
-                        Select=1;
-                        re_show=1;
                     }
-                }
-                if((Select != prev_select) || (showoffset != prev_showoffset))
-                {
-                    UIAudio_PlayMove();
-                    cheat_scroll_delay = first_press ? 6 : 3;
-                }
+                    else if (showoffset > 0)
+                    {
+                        u32 cursor = showoffset + Select;
+                        showoffset = showoffset > 10 ? showoffset - 10 : 0;
+                        if (cursor < showoffset) cursor = showoffset;
+                        Select = cursor - showoffset;
+                        if (Select > 9) Select = 9;
+                        UIAudio_PlayMove();
+                        re_show = 2;
+                        cheat_scroll_delay = first_press ? 6 : 3;
+                    }
                 }
                 else if((keysdown & KEY_RIGHT) || ((keysrepeat & KEY_RIGHT) && cheat_scroll_delay == 0))
                 {
-              u32 prev_showoffset = showoffset;
-              u32 first_press = (keysdown & KEY_RIGHT) ? 1 : 0;
-              if ( showoffset + 10 < all_count )
-              {
-                if ( showoffset + 20 <= all_count )
-                  showoffset += 10;
-                else
-                  showoffset = all_count - 10;
-
-                        if( ((FM_CHT_LINE*)pCHTbuffer)[showoffset+Select].is_section==1){
-                            showoffset--;
+                    u32 entry_index = GetVisibleCheatMenuEntryIndex(all_count, showoffset + Select);
+                    u32 first_press = (keysdown & KEY_RIGHT) ? 1 : 0;
+                    if (entry_index < all_count &&
+                        ((FM_CHT_LINE*)pCHTbuffer)[entry_index].is_section == 1)
+                    {
+                        if (SetCheatGroupExpanded(entry_index, all_count, 1))
+                        {
+                            visible_count = GetVisibleCheatMenuCount(all_count);
+                            ClampCheatViewport(visible_count, &Select, &showoffset);
+                            UIAudio_PlayAcceptExport();
+                            re_show = 2;
                         }
-                        re_show=2;
-              }
-              if(showoffset != prev_showoffset)
-              {
-                UIAudio_PlayMove();
-                cheat_scroll_delay = first_press ? 6 : 3;
-              }
+                    }
+                    else if (showoffset + 10 < visible_count)
+                    {
+                        u32 cursor = showoffset + Select;
+                        u32 max_offset = visible_count > 10 ? visible_count - 10 : 0;
+                        showoffset += 10;
+                        if (showoffset > max_offset) showoffset = max_offset;
+                        if (cursor < showoffset) cursor = showoffset;
+                        Select = cursor - showoffset;
+                        if (Select > 9) Select = 9;
+                        UIAudio_PlayMove();
+                        re_show = 2;
+                        cheat_scroll_delay = first_press ? 6 : 3;
+                    }
                 }
                 else if(keysdown & KEY_A)
                 {
-                    if(((FM_CHT_LINE*)pCHTbuffer)[showoffset+Select].is_section != 1)
+                    u32 entry_index = GetVisibleCheatMenuEntryIndex(all_count, showoffset + Select);
+                    if (entry_index < all_count &&
+                        ((FM_CHT_LINE*)pCHTbuffer)[entry_index].is_section == 1)
                     {
-                        u16 old_selection_mask = CheatVisibleSelectionMask(all_count, showoffset);
-                        u32 current_select = showoffset+Select-1;
-                        while(((FM_CHT_LINE*)pCHTbuffer)[current_select].is_section != 1)
-                        {
-                            ((FM_CHT_LINE*)pCHTbuffer)[current_select--].select = 0;
-                        }
-                        current_select = showoffset+Select+1;
-                        while(((FM_CHT_LINE*)pCHTbuffer)[current_select].is_section != 1)
-                        {
-                            ((FM_CHT_LINE*)pCHTbuffer)[current_select++].select = 0;
-                        }
-
-                        u8 select	= ((FM_CHT_LINE*)pCHTbuffer)[showoffset+Select].select;
-                        ((FM_CHT_LINE*)pCHTbuffer)[showoffset+Select].select = !select;
-                        selection_redraw_mask = old_selection_mask ^ CheatVisibleSelectionMask(all_count, showoffset);
-                        UIAudio_PlayAcceptExport();
+                        SetCheatGroupExpanded(entry_index, all_count,
+                            ((FM_CHT_LINE*)pCHTbuffer)[entry_index].select == CHT_GROUP_COLLAPSED);
+                        visible_count = GetVisibleCheatMenuCount(all_count);
+                        ClampCheatViewport(visible_count, &Select, &showoffset);
+                        re_show = 2;
                     }
+                    else if (entry_index < all_count)
+                    {
+                        u16 old_selection_mask = CheatVisibleSelectionMask(all_count,
+                            visible_count, showoffset);
+                        ToggleCheatMenuEntry(entry_index, all_count);
+                        selection_redraw_mask = old_selection_mask ^
+                            CheatVisibleSelectionMask(all_count, visible_count,
+                            showoffset);
+                    }
+                    UIAudio_PlayAcceptExport();
                 }
                 else if(keysup & KEY_B)
                 {
@@ -1409,6 +1637,8 @@ void Open_cht_file(TCHAR *gamefilename,u32 havecht)
                     UIAudio_WaitForCurrentClipExport(60);
                     UIAudio_CutOffTrailingClipExport();
                     Analyze_KEYVAL(&gfile,all_count);
+                    if(gl_cheat_remember && !CheatStateSave())
+                        Show_error_num(3); /* Existing localized Save error. */
                     break;
                 }
             }

@@ -2,7 +2,7 @@
 
 ## Original Omega development branch
 
-The ezfomega backport builds on FrankieT19’s Original Omega DS Style v8.0 adaptation (ef30b8b), which builds on EZ-FLASH and Sterophonick’s work. Merkin Mix artwork and safety improvements are being selectively adapted for this hardware. See docs/porting/OMEGA_STATUS.md for provenance and validation status.
+The ezfomega backport builds on FrankieT19’s Original Omega DS Style v8.0 adaptation (ef30b8b), which builds on EZ-FLASH and Sterophonick’s work. Merkin Mix artwork and safety improvements are being selectively adapted for this hardware. The port includes remembered-cheat work from exploitz86 and collapsible groups based on SkillerCMP’s work, as integrated into Merkin Mix. See docs/porting/OMEGA_STATUS.md for provenance and validation status.
 
 - **EZ-FLASH** — original OMEGA Definitive Edition kernel source.
 - **Sterophonick** — SimpleLight custom kernel, part of DS Style's foundation.

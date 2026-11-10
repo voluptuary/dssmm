@@ -3,6 +3,8 @@ set -euo pipefail
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 # Keep target validation separate from the inherited DE audit wrapper.
+bash scripts/test-cheat-state-host.sh
+bash scripts/test-cheat-row-host.sh
 bash scripts/test-savefile-host.sh
 bash scripts/test-psram-load-policy.sh
 bash scripts/test-omega-artwork-host.sh

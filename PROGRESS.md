@@ -1,5 +1,21 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 19:39 UTC — Isolated Omega backport checkpoint validated
+
+- Current branch ezfomega only. Target verifier passes PSRAM bounds/I/O policy, staged-save/settings fault injection and new path-policy regressions, filename/mirrored LFN fallback, marker conversion, framebuffer differential/766,800 span cases, cheat persistence/collapse/viewport/failure/identity tests, target production build and target layout guard. Final image 2,033,904 bytes, 63,248 headroom. Three inherited original-launcher warnings remain; no new compiler warnings introduced. No Original Omega hardware is available per owner, so validation remains source/build/host only.
+- Development image updated at `files/candidate/omega-8.3.1-dev1/ezkernel.bin`, SHA-256 `91bb210e156bac6e199b6c00b4a3e2159a96c85e5932573e4e67dea3adee6186`; do not publish as hardware-qualified firmware. No DE/BLUE image, release or source archive was changed. Verified origin/ezfode is still exactly 5f700c9a89768309f06993984bb6c3a3190d04ef.
+- Remember cheats defaults Off; translated label inserted consistently into all language packs without replacing other target translations. Legacy target cheat runtime/128-entry table preserved. CHS2 snapshot replacement retains its known non-atomic limitation. Credits for exploitz86/SkillerCMP retained. Backslash/case and exFAT cheat-size fixes are Omega-only; deferred DE queue records evidence.
+- Pre-cheat compiler stack frames are summarized in OMEGA_STATUS.md; generated stack build/reports and root ELF/GBA outputs removed after recording evidence. Frame sizes/static margins do not prove runtime stack bounds.
+- Remaining port work: NOR game artwork/themed progress/error handling and target read/trim safeguards; indexed LFN/fast-open performance work; source-specific UI/settings/navigation fixes from DE. NOR review found reference Loadfile2NOR returns success on f_open failure, ignores I/O counts and publishes RAM catalog before completing the write. These are target-reference issues; do not label them ezfode defects (DE has different code). Before modifying NOR, reproduce with mocked flash/actual target FatFs, preserve target command protocol and avoid claiming hardware failure detection while backend functions return void.
+- Next ordered actions: commit/push current cheat/tooling/docs checkpoint to ezfomega only; inspect actual production Loadfile2NOR with injected file errors; implement generic I/O/bounds/caller protections before themed progress; update status matrix and logs. Never merge to or push ezfode. Main-branch review candidates are in docs/porting/EZFODE_REVIEW_QUEUE.md for a separate later task.
+
+## 2026-11-10 19:36 UTC — Remembered/collapsible cheats port in progress
+
+- Ported Merkin CHS2 persistence and collapsed-group UI while retaining Original Omega cheat execution assembly and 128-entry runtime capacity. Remember cheats defaults Off, persists in target settings and is exposed in Games. Added only the Remember cheats enum/translated row to each language pack; retained other Omega translations. Headless restore runs after launch/cache reset and before pool reuse.
+- Cheat-state and row host tests passed; initial target build 2,033,880 bytes with 63,272 headroom; EWRAM heap 21,936 bytes and IWRAM gap 8,048. Target hardware remains untested. Credits remain exploitation/SkillerCMP lineage as recorded in project CREDITS/history; no DE updates.
+- Found exFAT truncation before cheat hash bound during port. Fixed only on Omega and expanded host fixture to 64-bit FSIZE_t with a 4 GiB+4 rejection regression; similar GameID map size clamp now validates before narrowing. Recorded precise deferred ezfode review and related unbounded skipped-line parser concern.
+- Next: run updated cheat tests and target verifier, inspect stack report (generated build-omega-stack), record evidence/remove generated reports, commit/push only ezfomega.
+
 ## 2026-11-10 19:31 UTC — SD save/settings transactions validated
 
 - Ported shared FileTxn staging/recovery to Save_savefile/SavefileWrite and target-specific settings serialization. Preserve Omega SRAM read/bank order and boot settings cache; recovery occurs before cache fill, streaming reads and save processing. Target path policy folds fixed ASCII directory names and rejects both slash forms.

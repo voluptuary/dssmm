@@ -9,7 +9,7 @@ DS Style is a custom kernel for the **original EZ-FLASH OMEGA**. It is based on 
 
 This branch backports Merkin Mix onto FrankieT19's Original Omega DS Style v8.0 implementation. It is hardware-untested development code. There is no published Original Omega Merkin Mix release yet.
 
-First additions: filename-matched artwork fallback in SYSTEM/IMGS or SYSTEM/IMGS2 for supported systems, and clean themed external-plugin launch transitions. Marked artwork transparency is now implemented and host-tested; further Merkin Mix fixes are still being ported; see docs/porting/OMEGA_STATUS.md.
+Backported so far: filename/mirrored-LFN artwork in SYSTEM/IMGS or SYSTEM/IMGS2, marked transparency, clean external-plugin launch transitions, checked PSRAM loading, staged SD save/settings replacement, and optional remembered cheats with collapsible groups. Marked artwork transparency is now implemented and host-tested; further Merkin Mix fixes are still being ported; see docs/porting/OMEGA_STATUS.md.
 
 Build: `make BUILD=build-omega TARGET=omega-port`. Original Omega uses `ezkernel.bin`, not the DE filename. Do not install this branch on DE/BLUE hardware.
 

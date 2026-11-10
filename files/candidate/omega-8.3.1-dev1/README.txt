@@ -1,10 +1,8 @@
-DS Style Merkin Mix Original Omega development 1
+DS Style Merkin Mix Original Omega development checkpoint
 
-ORIGINAL EZ-FLASH OMEGA ONLY. This is a hardware-untested development image, not an official release. Do not use on Omega DE/BLUE.
+ORIGINAL OMEGA ONLY; hardware untested, no release. Do not use on DE/BLUE.
 
-Includes marked transparency, filename artwork fallback, plugin launch-bar suppression and PSRAM loader safety checks, based on FrankieT19 Original Omega v8.0 hardware implementation.
+Includes marked transparency, mirrored/filename artwork, checked PSRAM loaders, staged SD save/settings updates, clean plugin transitions, and optional remembered/collapsible cheats. Remember cheats defaults Off. Source/build/host validation only; no original hardware available. NOR protocol/catalog improvements and target-specific installer work remain pending. See docs/porting/OMEGA_STATUS.md.
 
-Test initial boot/menu/input, themes/list/carousels, unmarked/marked title+box artwork, .gba/.gbc/.nes/.gg loading and existing save/export behavior. Keep backups; save transactions and further compatibility fixes are not yet ported.
-
-Size: 2029736 bytes
-SHA-256: 3377d8ffa9a1c78f416dff0be970a6ea625cd30c1c70cd9799fc3b93d1b0f123
+Size: 2033904 bytes
+SHA-256: 91bb210e156bac6e199b6c00b4a3e2159a96c85e5932573e4e67dea3adee6186
