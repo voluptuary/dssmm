@@ -131,6 +131,12 @@ static u32 launcher_start_title_scroll_frame = 0;
 #define LAUNCHER_LIST_ART_INPUT_QUEUE_SIZE 4
 #define LAUNCHER_LIST_ART_BUFFERABLE_KEYS (KEY_A | KEY_B)
 #define LAUNCHER_THUMB_BMP_HEADER 0x36
+#define LAUNCHER_THUMB_BMP_ALPHA_MARKER_OFFSET 6
+#define LAUNCHER_THUMB_BMP_ALPHA_MARKER_0 'D'
+#define LAUNCHER_THUMB_BMP_ALPHA_MARKER_1 'S'
+#define LAUNCHER_THUMB_BMP_ALPHA_MARKER_2 'T'
+#define LAUNCHER_THUMB_BMP_ALPHA_MARKER_3 '1'
+#define LAUNCHER_THUMB_TRANSPARENT_SENTINEL 0x8000
 #define LAUNCHER_CUSTOM_THUMB_MANIFEST_MAX 256
 #define LAUNCHER_SYSTEM_NAME_DISPLAY_MAX 11
 #define LAUNCHER_THEME_MODE_LIGHT 0
@@ -2864,6 +2870,9 @@ static void Launcher_DrawListArtSelectionChange(u32 show_offset, u32 file_select
 		return;
 	}
 
+	if(old_screen_has_art && art_ready)
+		Launcher_CopyCachedRowsBehindArt();
+
 	if(old_screen_has_art && !selected_has_art)
 	{
 		Launcher_CopyCachedRowsBehindArt();
@@ -2928,7 +2937,7 @@ static void Launcher_DrawListArtScrolledBody(u32 show_offset, u32 file_select, i
 	   visible row from its absolute background slice instead of moving pixels
 	   already drawn in VRAM. Keep the old artwork overlay only while a pending
 	   thumbnail is resolved, then replace it as the final drawing operation. */
-	preserve_art = old_screen_has_art && selected_has_art;
+	preserve_art = old_screen_has_art && selected_has_art && !art_ready;
 	Launcher_BuildAllCachedListRows(show_offset, file_select, selected_has_art);
 	Launcher_BuildSelectedListRowScratch(show_offset, file_select, selected_has_art);
 	Launcher_CopyAllCachedListRows(preserve_art, file_select);
@@ -5920,13 +5929,65 @@ static u16 Launcher_ListArtTakeInput(void)
 	return key;
 }
 
+static u32 Launcher_HasTransparentThumbnailMarker(const u8 *dst, u32 read_size)
+{
+	u32 expected_top_down_height;
+
+	if(!dst || read_size != Launcher_ThumbnailReadSize() ||
+	read_size < LAUNCHER_THUMB_BMP_HEADER)
+		return 0;
+	if(dst[LAUNCHER_THUMB_BMP_ALPHA_MARKER_OFFSET + 0] != LAUNCHER_THUMB_BMP_ALPHA_MARKER_0 ||
+	dst[LAUNCHER_THUMB_BMP_ALPHA_MARKER_OFFSET + 1] != LAUNCHER_THUMB_BMP_ALPHA_MARKER_1 ||
+	dst[LAUNCHER_THUMB_BMP_ALPHA_MARKER_OFFSET + 2] != LAUNCHER_THUMB_BMP_ALPHA_MARKER_2 ||
+	dst[LAUNCHER_THUMB_BMP_ALPHA_MARKER_OFFSET + 3] != LAUNCHER_THUMB_BMP_ALPHA_MARKER_3)
+		return 0;
+	/* Do not transform a malformed or differently-sized BMP just because its
+	   reserved bytes happen to match. This loader supports 16-bit BI_RGB. */
+	/* The scraper writes top-down BMPs, whose signed height is negative. */
+	expected_top_down_height = (u32)(-(s32)Launcher_ThumbnailSourceHeight());
+	if(dst[18] != (u8)(Launcher_ThumbnailSourceWidth() & 0xFF) ||
+	dst[19] != (u8)((Launcher_ThumbnailSourceWidth() >> 8) & 0xFF) ||
+	dst[20] != 0 || dst[21] != 0 ||
+	dst[22] != (u8)(expected_top_down_height & 0xFF) ||
+	dst[23] != (u8)((expected_top_down_height >> 8) & 0xFF) ||
+	dst[24] != (u8)((expected_top_down_height >> 16) & 0xFF) ||
+	dst[25] != (u8)((expected_top_down_height >> 24) & 0xFF) ||
+	dst[28] != 16 || dst[29] != 0 || dst[30] != 0 || dst[31] != 0 ||
+	dst[32] != 0 || dst[33] != 0)
+		return 0;
+	return 1;
+}
+
+static void Launcher_TagTransparentThumbnailPixels(u8 *dst, u32 read_size)
+{
+	u32 pixel_count;
+	u32 i;
+	u16 *pixels;
+
+	if(!Launcher_HasTransparentThumbnailMarker(dst, read_size))
+		return;
+
+	pixel_count = Launcher_ThumbnailSourceWidth() * Launcher_ThumbnailSourceHeight();
+	pixels = (u16*)(dst + LAUNCHER_THUMB_BMP_HEADER);
+	for(i = 0; i < pixel_count; i++)
+	{
+		if(pixels[i] == 0)
+			pixels[i] = LAUNCHER_THUMB_TRANSPARENT_SENTINEL;
+	}
+}
+
 static u32 Launcher_ReadThumbnailBytes(FIL *file, u8 *dst, u32 read_size, UINT *read_out)
 {
 	u32 res = FR_OK;
 	u32 total = 0;
 
 	if(!launcher_list_art_input_capture)
-		return f_read(file, dst, read_size, read_out);
+	{
+		res = f_read(file, dst, read_size, read_out);
+		if(res == FR_OK && read_out && *read_out == read_size)
+			Launcher_TagTransparentThumbnailPixels(dst, read_size);
+		return res;
+	}
 
 	while(total < read_size)
 	{
@@ -5943,6 +6004,8 @@ static u32 Launcher_ReadThumbnailBytes(FIL *file, u8 *dst, u32 read_size, UINT *
 	}
 	if(read_out)
 		*read_out = (UINT)total;
+	if(res == FR_OK && total == read_size)
+		Launcher_TagTransparentThumbnailPixels(dst, read_size);
 	return res;
 }
 
@@ -6364,6 +6427,60 @@ static void Launcher_ClearListBodyBackground(void)
 	Launcher_ClearWithThemeBG((const u16*)gImage_SD_LIST, 0, 19, 240, 160 - 19);
 }
 
+typedef u32 __attribute__((may_alias)) Launcher_PixelPair;
+
+static int Launcher_SpanHasTransparent(const u16 *span, int count)
+{
+	const u16 *p = span;
+	const u16 *end;
+
+	if(!span || count <= 0)
+		return 0;
+	end = span + count;
+	if((unsigned long)p & 2u)
+	{
+		if(*p++ == LAUNCHER_THUMB_TRANSPARENT_SENTINEL)
+			return 1;
+	}
+	for(; end - p >= 8; p += 8)
+	{
+		const Launcher_PixelPair *pairs = (const Launcher_PixelPair*)p;
+		u32 pair0 = pairs[0];
+		u32 pair1 = pairs[1];
+		u32 pair2 = pairs[2];
+		u32 pair3 = pairs[3];
+
+		if((pair0 | pair1 | pair2 | pair3) & 0x80008000u)
+		{
+			if((pair0 & 0x80008000u) &&
+				(p[0] == LAUNCHER_THUMB_TRANSPARENT_SENTINEL ||
+				 p[1] == LAUNCHER_THUMB_TRANSPARENT_SENTINEL))
+				return 1;
+			if((pair1 & 0x80008000u) &&
+				(p[2] == LAUNCHER_THUMB_TRANSPARENT_SENTINEL ||
+				 p[3] == LAUNCHER_THUMB_TRANSPARENT_SENTINEL))
+				return 1;
+			if((pair2 & 0x80008000u) &&
+				(p[4] == LAUNCHER_THUMB_TRANSPARENT_SENTINEL ||
+				 p[5] == LAUNCHER_THUMB_TRANSPARENT_SENTINEL))
+				return 1;
+			if((pair3 & 0x80008000u) &&
+				(p[6] == LAUNCHER_THUMB_TRANSPARENT_SENTINEL ||
+				 p[7] == LAUNCHER_THUMB_TRANSPARENT_SENTINEL))
+				return 1;
+		}
+	}
+	for(; end - p >= 2; p += 2)
+	{
+		u32 pair = *(const Launcher_PixelPair*)p;
+		if((pair & 0x80008000u) &&
+			(p[0] == LAUNCHER_THUMB_TRANSPARENT_SENTINEL ||
+			 p[1] == LAUNCHER_THUMB_TRANSPARENT_SENTINEL))
+			return 1;
+	}
+	return p < end && *p == LAUNCHER_THUMB_TRANSPARENT_SENTINEL;
+}
+
 static void Launcher_DrawPicClipStride(const u16 *src, int src_stride, int x, int y, int w, int h)
 {
 	int src_x = 0;
@@ -6395,9 +6512,27 @@ static void Launcher_DrawPicClipStride(const u16 *src, int src_stride, int x, in
 
 	for(row = 0; row < draw_h; row++)
 	{
-		dmaCopy((void*)(src + ((src_y + row) * src_stride) + src_x),
-		(void*)(dst_base + ((y + row) * 240) + x),
-		draw_w * 2);
+		const u16 *src_row = src + ((src_y + row) * src_stride) + src_x;
+		vu16 *dst_row = dst_base + ((y + row) * 240) + x;
+		int col;
+		u32 has_transparent_pixels;
+
+		/* Keep the fast DMA path for ordinary art. Only marked thumbnails
+		   contain the 0x8000 transparent sentinel after loading. */
+		has_transparent_pixels = Launcher_SpanHasTransparent(src_row, draw_w);
+		if(!has_transparent_pixels)
+		{
+			dmaCopy((void*)src_row, (void*)dst_row, draw_w * 2);
+		}
+		else
+		{
+			for(col = 0; col < draw_w; col++)
+			{
+				u16 pixel = src_row[col];
+				if(pixel != LAUNCHER_THUMB_TRANSPARENT_SENTINEL)
+					dst_row[col] = pixel;
+			}
+		}
 	}
 }
 
@@ -6438,9 +6573,12 @@ static void Launcher_DrawScaledThumbClip(const u16 *src, int src_w, int src_h, i
 		{
 			int screen_x = x + dst_x;
 			int src_x = (dst_x * src_w) / w;
+			u16 pixel;
 			if(screen_x < 0 || screen_x >= 240)
 				continue;
-			dst_base[screen_y * 240 + screen_x] = src[src_y * src_w + src_x];
+			pixel = src[src_y * src_w + src_x];
+			if(pixel != LAUNCHER_THUMB_TRANSPARENT_SENTINEL)
+				dst_base[screen_y * 240 + screen_x] = pixel;
 		}
 	}
 }
@@ -6499,9 +6637,28 @@ static void Launcher_DrawPreparedThumbMasked(const u16 *src, int src_stride, int
 		if(start_x >= end_x)
 			continue;
 
-		dmaCopy((void*)(src + row * src_stride + start_x),
-		(void*)(dst_base + screen_y * 240 + x + start_x),
-		(end_x - start_x) * 2);
+		{
+			const u16 *src_row = src + row * src_stride + start_x;
+			vu16 *dst_row = dst_base + screen_y * 240 + x + start_x;
+			int col;
+			u32 has_transparent_pixels;
+			int span = end_x - start_x;
+
+			has_transparent_pixels = Launcher_SpanHasTransparent(src_row, span);
+			if(!has_transparent_pixels)
+			{
+				dmaCopy((void*)src_row, (void*)dst_row, span * 2);
+			}
+			else
+			{
+				for(col = 0; col < span; col++)
+				{
+					u16 pixel = src_row[col];
+					if(pixel != LAUNCHER_THUMB_TRANSPARENT_SENTINEL)
+						dst_row[col] = pixel;
+				}
+			}
+		}
 	}
 }
 
@@ -6929,6 +7086,8 @@ static void Launcher_DrawHorizontalSelectedPreview(const u16 *src, int src_w, in
 			Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), draw_x + draw_w, y, (x + w) - (draw_x + draw_w), h);
 		}
 	}
+
+	Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), draw_x - 1, draw_y - 1, draw_w + 2, draw_h + 2);
 
 	if((src_w == draw_w) && (src_h == draw_h))
 		Launcher_DrawPreparedHorizontalArtwork(src, src_w, draw_x, draw_y, draw_w, draw_h, 1);
@@ -7511,11 +7670,8 @@ static void Launcher_GetEntryInfo(u32 absolute_index, LauncherEntryInfo *info)
 	info->name = pFilename_buffer[file_index].filename;
 }
 
-static void Launcher_ResetThumbCache(void)
+static void Launcher_InvalidateThumbCacheEntries(void)
 {
-    launcher_motion_finished = 0xFFFFFFFF;
-    launcher_motion_incoming_ready = 0;
-	Launcher_SetThumbCachePointers();
 	launcher_cache_center_index = 0xFFFFFFFF;
 	launcher_cache_prev.valid = 0;
 	launcher_cache_selected.valid = 0;
@@ -7526,6 +7682,14 @@ static void Launcher_ResetThumbCache(void)
 	launcher_cache_prev.has_thumbnail = 0;
 	launcher_cache_selected.has_thumbnail = 0;
 	launcher_cache_next.has_thumbnail = 0;
+}
+
+static void Launcher_ResetThumbCache(void)
+{
+    launcher_motion_finished = 0xFFFFFFFF;
+    launcher_motion_incoming_ready = 0;
+	Launcher_SetThumbCachePointers();
+	Launcher_InvalidateThumbCacheEntries();
 	Launcher_InitScaleMaps();
 	memset(&launcher_thumbnail_workspace, 0, sizeof(launcher_thumbnail_workspace));
 	Launcher_InvalidateListArtScaledCache();
@@ -8003,7 +8167,7 @@ static u32 Launcher_ServicePendingListArt(u32 show_offset, u32 file_select)
 		return 1;
 	}
 
-	if(old_screen_has_art && !selected_has_art)
+	if(old_screen_has_art)
 		Launcher_CopyCachedRowsBehindArt();
 	Launcher_BuildSelectedListRowScratch(show_offset, file_select, selected_has_art);
 	Launcher_CopySelectedListRowScratch(file_select, selected_has_art);
@@ -8747,6 +8911,7 @@ static void Draw_ModernLauncher_SD_Vertical_State(u32 show_offset, u32 file_sele
 			Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), thumb_x + thumb_w, thumb_y - 1, 1, thumb_h + 2);
 			Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), thumb_x, thumb_y, 14, thumb_h);
 			Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), thumb_x + 70, thumb_y, 14, thumb_h);
+			Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), thumb_x + 14, thumb_y, 56, 56);
 			Launcher_DrawPicClipStride(launcher_vert_selected_scaled + 14, 84, thumb_x + 14, thumb_y, 56, 56);
 			Launcher_FinishCarouselArtwork(thumb_x + 14, thumb_y, 56, 56);
 		}
@@ -8756,6 +8921,7 @@ static void Draw_ModernLauncher_SD_Vertical_State(u32 show_offset, u32 file_sele
 			Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), thumb_x - 1, thumb_y + thumb_h, thumb_w + 2, 1);
 			Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), thumb_x - 1, thumb_y - 1, 1, thumb_h + 2);
 			Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), thumb_x + thumb_w, thumb_y - 1, 1, thumb_h + 2);
+			Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), thumb_x, thumb_y, thumb_w, thumb_h);
 			Launcher_DrawPicClipStride(launcher_vert_selected_scaled, 84, thumb_x, thumb_y, thumb_w, thumb_h);
 			Launcher_FinishCarouselArtwork(thumb_x, thumb_y, thumb_w, thumb_h);
 		}
@@ -8863,6 +9029,9 @@ static void Launcher_CycleViewModeAndRedraw(u32 page_num, u32 *show_offset_ptr, 
 	launcher_active_page = page_num;
 	Launcher_UpdateEffectiveViewMode();
 	new_view = Launcher_ActiveViewMode();
+	/* List-row scratch overlaps the previous carousel image in pReadCache. */
+	if(new_view == LAUNCHER_VIEW_LIST || new_view == LAUNCHER_VIEW_LIST_ART)
+		Launcher_InvalidateThumbCacheEntries();
 	if((old_view == LAUNCHER_VIEW_LIST || old_view == LAUNCHER_VIEW_LIST_ART) &&
 	(new_view != LAUNCHER_VIEW_LIST && new_view != LAUNCHER_VIEW_LIST_ART) && total)
 	{

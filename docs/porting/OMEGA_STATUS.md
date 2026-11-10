@@ -12,7 +12,8 @@ Work only on ezfomega. Do not merge into ezfode, change DE release tags/assets, 
 | Existing DS Style v8 UI / themes / carousels / sound | Reference implementation retained; built with its launcher -Os policy |
 | Filename artwork | First batch: custom priority, legacy GBA header lookup, then filename BMP fallback at active artwork root; non-GBA no longer probes arbitrary bytes as GBA header. Bounds/exact reads/closes checked. Mirrored directories and indexed LFN enhancements remain pending |
 | Plugin transitions | Merkin guard ported around external-plugin progress strip |
-| Marked transparency / opaque-art acceleration | Next: audit decode, scaling and masked blits before integrating |
+| Marked transparency | Ported DST1 tagging, exact-sentinel blits/scaling, aligned row scan, backing restoration and pool metadata invalidation; host differential passed; hardware pending |
+| Opaque/header-art acceleration | Correctness-compatible transparency scan ported; specialized no-scan header path/fast-open remain pending |
 | Remembered/collapsible cheats | Pending target source/storage/runtime comparison |
 | File identity / FatFs fast-open | Pending; do not replace Omega filesystem/storage paths wholesale |
 | Save/settings transactions | Pending; retain target recovery behavior until storage path and buffer ownership review |
@@ -28,3 +29,5 @@ Use make BUILD=build-omega TARGET=omega-port and bash scripts/test-omega-artwork
 First clean forced build: 2,028,640 bytes, 68,512 below 2 MiB. Layout: EWRAM static end/heap start 0x02039628, heap end 0x02040000; user stack is in IWRAM at 0x03007F00, unlike DE's EWRAM stack policy. This is not a runtime stack bound. Three inherited compiler warnings: two misleading indentation sites and favorite-name suffix truncation; track separately. New filename harness tests actual extracted production functions and passes paths/priority/bounds/read/close failures. Initial host assertion failure was a fixture counter-reset defect, corrected before passing.
 
 No Original Omega hardware tested. Build results do not prove compatibility. Next work: transparency pipeline with differential rendering tests, then target-specific save/loader safeguards and hardware boot/save matrix. Main ezfode remains untouched.
+
+Transparency milestone: production image 2,029,336 bytes (67,816 bytes headroom). Draw output/DMA identical to pinned DE 5f700c9 over the existing differential suite; 766,800 helper cases, zero mismatches. Marker tests cover title/box, malformed/short headers and preserving unmarked black. Low-level hardware files still match reference byte-for-byte. Background restoration call paths were reviewed but still need visual hardware validation. No flash/save tests claimed.

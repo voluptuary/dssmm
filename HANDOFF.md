@@ -1,5 +1,11 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 19:18 UTC — Omega transparency pipeline implementation
+
+- First checkpoint committed/pushed only to ezfomega as 8fb20bb. Owner reiterated isolation: ezfode remote was verified at 5f700c9 and must remain there unless a separately authorized DE task changes it.
+- Ported Merkin marked-DST1 RGB555 loader tagging, exact 0x8000 masked blits, scaled drawing, and aligned pair transparency scan. Unmarked art stays byte-for-byte unchanged. Added complete backing restoration for selected horizontal/vertical images and list-art replacement to prevent ghost pixels. Metadata-only cache invalidation now handles selected-row/carousel pool overlap on list-view entry.
+- Draw differential against DE passed 766,800 helper cases and identical framebuffer/DMA results. Additional title/box marker tests passed (unmarked black preservation, exact sentinel and malformed/short headers); final image 2,029,336 bytes with 67,816-byte margin. Filename tests passed; low-level hardware files remain byte-identical to reference. No cartridge, flash, save or reset protocol changes. Next: finish target build, tests and review; update port matrix and commit/push only ezfomega. Hardware validation still absent.
+
 ## 2026-11-10 19:12 UTC — Original Omega port implementation resumed
 
 - Owner explicitly resumed actual backporting on ezfomega. Reference remains FrankieT19 ef30b8ba78147943d95653dfa82f721b52096f67. Branch was c8712f1, clean, still inherited DE firmware; that is not an Original Omega implementation.
