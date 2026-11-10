@@ -1,5 +1,14 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 18:07 UTC — 8.3.1 release preparation authorized
+
+- Owner reports latest PSRAM audit candidate works normally on both Rev. A and Rev. B. This covers owner-observed behavior, not every launch mode or injected hardware fault. Tested candidate SHA-256: `9a5e78f69fdddc4c7556b0521702765b0b2a99a7e87e76ba0980b7771eb9952c`.
+- Preparing 8.3.1 from `ezfode`: version label, README release link and cumulative user-facing notes. Notes retain prior credits and separate this release's loader/cache fixes from earlier features/fixes. Port branches remain preparation only.
+- Next: production build/full audit, compare the release image with the tested candidate for version-label-only changes, commit/push, tag and publish stable v8.3.1 with kernel and source ZIP, verify downloaded assets, and remove temporary source ZIP. No repository maintenance belongs in release notes.
+- Build milestone: production image 2,014,664 bytes, SHA-256 `b32d4ad1a634ac6a7e2cca92c7f4d889dfa3b845db9837ee317e8f015b8f7e9e`. Comparison with owner-tested audit image found exactly five changed bytes: version digit at 0x648B1 and two string-pointer relocations (0x14C80 and 0x22E80) verified to reference identical NUL-terminated `1` and `0` strings. Normalizing those differences reproduces the entire release image exactly; this is equivalent firmware behavior, not literal label-only byte identity.
+- Candidate staged locally at `files/candidate/8.3.1/ezkernelnew.bin`; source ZIP will be temporary and attached only to the release. Full `scripts/rebuild-and-verify-audit.sh` completed with exit 0: production build, all 33 host scripts, browser/JS/layout/whitespace checks, and Cppcheck passed without diagnostics. Ready for source commit/tag/publication after final diff review.
+
+
 ## 2026-11-10 18:04 UTC — GitHub branch rename verified
 
 - Owner completed deletion/rename through GitHub. Remote HEAD now points to `refs/heads/ezfode`; remote `main` is absent. `git fetch origin --prune` removed `origin/main`, and `git remote set-head origin -a` set `origin/HEAD` to `origin/ezfode`. The earlier permission blocker is resolved by the owner action; old synchronization instructions below are historical and superseded. Do not recreate `main`.

@@ -9,7 +9,7 @@ DS Style Merkin Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Editi
 
 ## Download and install
 
-Get the stable [DS Style Merkin Mix 8.3.0 release](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.0). Copy `ezkernelnew.bin` to the root of the SD card, then start the cartridge while holding **R** to install the kernel. Back up saves before updating.
+Get the stable [DS Style Merkin Mix 8.3.1 release](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1). Copy `ezkernelnew.bin` to the root of the SD card, then start the cartridge while holding **R** to install the kernel. Back up saves before updating.
 
 ## What it offers
 
