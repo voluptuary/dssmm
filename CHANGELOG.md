@@ -2,13 +2,19 @@
 
 ## DS Style Merkin Mix 8.3.1
 
+### New features and improvements
+
+- Gave NOR game writing a DS Style progress window with a percentage and progress bar, a dedicated background, and the usual username and clock on the top bar.
+
 ### Fixes
+
+- Removed the brief black progress strip during external-plugin launches, giving games such as NES and Game Gear titles the same clean themed transition as GB/GBC launches.
 
 - Made PSRAM game and emulator loading safer: oversized files and combinations that exceed available memory are rejected, and incomplete or failed SD reads stop the launch instead of starting a partial image.
 - Corrected loading across PSRAM memory boundaries, including games placed after emulator plugins, and cleared unused space at the end of partial loading blocks for consistent results.
 - Fixed thumbnail cache handling when switching to list views, preventing artwork overwritten by list drawing from being reused as a valid cached image.
 
-The PSRAM audit build was tested by the owner on both supported Omega Definitive Edition Rev. A and Rev. B cartridges and reported to work normally.
+The PSRAM audit build was tested by the owner on both supported Omega Definitive Edition Rev. A and Rev. B cartridges and reported to work normally. The owner also tested the updated plugin transitions and NOR writing presentation and reports that they work well.
 
 ### Earlier features
 

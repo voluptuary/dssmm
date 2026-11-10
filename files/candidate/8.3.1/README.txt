@@ -1,6 +1,6 @@
-DS Style Merkin Mix 8.3.1
+DS Style Merkin Mix 8.3.1 refreshed release
 
-The owner reports normal operation of the PSRAM audit candidate on Rev. A and Rev. B. Release image changes are the version digit and two compiler-pooled string pointers with identical text.
+Owner-tested PSRAM safeguards, clean plugin transitions, themed NOR writing progress with NOR.bmp background, username and clock. Release image exactly matches tested NOR artwork candidate.
 
-Size: 2014664 bytes
-SHA-256: b32d4ad1a634ac6a7e2cca92c7f4d889dfa3b845db9837ee317e8f015b8f7e9e
+Size: 2092064 bytes (5088 below 2 MiB)
+SHA-256: 2d0093f12f7f81125373bfdbe4f60712b3ba9b94d6818b5eb5c3f87e7be5c8c9

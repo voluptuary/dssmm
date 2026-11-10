@@ -1,5 +1,11 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:46 UTC — Owner-tested 8.3.1 loading UI release refresh
+
+- Owner reports the latest plugin/NOR UI changes work well and authorizes rolling them into existing 8.3.1. Latest tested artifact is `files/candidate/8.3.1-nor-bmp/ezkernelnew.bin`, SHA-256 `2d0093f12f7f81125373bfdbe4f60712b3ba9b94d6818b5eb5c3f87e7be5c8c9`. Hardware revisions/mode-by-mode results for this UI follow-up were not specified; prior PSRAM audit testing covered Rev. A/B.
+- Notes now include themed NOR writing/background/username/clock and removal of the external-plugin progress strip, preserving cumulative credits/style. No maintenance or port-preparation claims added.
+- Validation passed: production build exactly matches the tested candidate (`cmp`), PSRAM policy and NOR format/write-result host tests, layout guard (IWRAM gap 1,080 bytes; heap 7,112 bytes; stack reserve 12,288 bytes), and whitespace review. Image is 2,092,064 bytes, 5,088 below 2 MiB. Refreshed local release candidate. Next: commit/push, move v8.3.1 tag, replace release assets/notes, verify downloads and clean temporary outputs.
+
 ## 2026-11-10 18:42 UTC — NOR artwork normalized to blank image assets
 
 - Owner requested the same format/location as existing backgrounds. Moved source BMP to `images/blank/NOR.bmp`; added `images/blank/NOR.h` as aligned 76,800-byte RGB555 unsigned-char array matching SET/MENU conventions. Replaced compressed source/header with direct ROM artwork draw. Username/clock/theme top bar and NOR panel remain intact.
