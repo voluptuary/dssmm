@@ -1,5 +1,10 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 18:42 UTC — NOR artwork normalized to blank image assets
+
+- Owner requested the same format/location as existing backgrounds. Moved source BMP to `images/blank/NOR.bmp`; added `images/blank/NOR.h` as aligned 76,800-byte RGB555 unsigned-char array matching SET/MENU conventions. Replaced compressed source/header with direct ROM artwork draw. Username/clock/theme top bar and NOR panel remain intact.
+- Validation passed: production build 2092064 bytes (only 5,088 bytes below 2 MiB; monitor this margin for future changes), layout guard (IWRAM gap 1,080 bytes; heap 7,112 bytes; stack reserve 12,288 bytes), and diff/whitespace check. No new RAM framebuffer. Refreshed `files/candidate/8.3.1-nor-bmp/ezkernelnew.bin`, SHA-256 `2d0093f12f7f81125373bfdbe4f60712b3ba9b94d6818b5eb5c3f87e7be5c8c9`. Commit/push and await hardware visual check; stable release unchanged.
+
 ## 2026-11-10 18:40 UTC — User NOR.bmp background and normal top-bar content
 
 - Owner requested `files/NOR.bmp` as the NOR writing background plus username/time. Validated 240x160 uncompressed indexed BMP; grit converts to RGB555 LZ77 (9,096 bytes). Generated source/header include regeneration command; original user image is preserved and tracked.

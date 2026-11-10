@@ -15,7 +15,7 @@
 #include "ff.h"
 #include "file_transaction.h"
 #include "psram_load_policy.h"
-#include "nor_write_background.h"
+#include "blank/NOR.h"
 #include "draw.h"
 #include "ezkernel.h"
 #include "Ezcard_OP.h"
@@ -1372,9 +1372,9 @@ void Launcher_DrawNORWriteBackground(void)
 {
 	const u16 *base = (const u16*)gImage_SD_LIST;
 	const u16 *top = Launcher_GetThemeTopForBase(base);
-	/* Decode into VRAM; the file-transfer pool remains available to the loader. */
+	/* Draw from ROM; the file-transfer pool remains available to the loader. */
 	Launcher_EndLaunchIndicator();
-	LZ77UnCompVram(nor_write_backgroundBitmap, (void*)0x06000000);
+	DrawPic((u16*)gImage_NOR_WRITE_BLANK, 0, 0, 240, 160, 0, 0, 1);
 	DrawPic((u16*)(top ? top : base), 0, 0, 240, LAUNCHER_TOP_BAR_HEIGHT, 0, 0, 1);
 	/* This screen has its own background, so invalidate ordinary menu caches. */
 	launcher_current_topbar_bg = 0;

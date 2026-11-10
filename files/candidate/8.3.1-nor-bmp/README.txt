@@ -1,6 +1,6 @@
 DS Style Merkin Mix 8.3.1 NOR artwork test
 
-Uses supplied NOR.bmp with normal themed top bar, configured username and clock. Clock refreshes between progress updates, not during a flash operation. Includes prior plugin/progress fixes. Please verify NOR installs and light/dark/custom top bars. Stable release unchanged.
+Uses images/blank/NOR.bmp and matching RGB555 NOR.h asset, with themed top bar, username and clock. Includes prior loading UI fixes. Stable release unchanged.
 
-Size: 2024344 bytes
-SHA-256: 2cc78f6eede92bbd395960710154e76a8ed3cceb8db313b4004b1da03fe8c651
+Size: 2092064 bytes (5088 below 2 MiB)
+SHA-256: 2d0093f12f7f81125373bfdbe4f60712b3ba9b94d6818b5eb5c3f87e7be5c8c9
