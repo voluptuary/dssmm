@@ -1,5 +1,17 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 19:50 UTC — DE candidate artifacts removed from Omega branch
+
+- Owner identified unnecessary inherited DE candidates. Removed folders 8.3.0, 8.3.0-psram-loader-audit, 8.3.1-size-audit, 8.3.1 from the workspace, including ignored DE binaries and tracked DE candidate READMEs. Retained only Original Omega candidate folders. Published releases and ezfode branch remain untouched; candidate paths elsewhere in older history are historical.
+- NOR implementation remains in progress/uncommitted: extracted production test reproduced open failure returning success, then passed size/offset/catalog limits, short/error reads, close/seek failures and final FF padding after targeted input checks. Build 2,034,088 bytes; layout unchanged (heap 21,936; IWRAM gap 8,048). Flash is mocked; backend success remains unverifiable because target APIs return void. Do not stage unrelated pending NOR source in this cleanup commit.
+- Next: push cleanup only on ezfomega, finish NOR source/test review and add themed progress after safety checkpoint. No ezfode/release mutation.
+
+## 2026-11-10 19:49 UTC — NOR backport resumed
+
+- Clean ezfomega at 870d9f4; origin/ezfode verified unchanged at 5f700c9a89768309f06993984bb6c3a3190d04ef. Owner requests continued source/build-only work; Original Omega hardware unavailable. Maintain branch isolation and deferred DE review queue.
+- Immediate task: reproduce Original Omega Loadfile2NOR open-failure success and unchecked-I/O/catalog ordering with extracted production-function tests and mocked flash. Then add bounded sizes/exact reads/deterministic padding, defer catalog publication until completed file I/O, and propagate failures to both launch callers. Preserve target PPB/erase/program command sequences and their existing void return semantics. Themed progress follows only after these checks pass.
+- No NOR hardware-error detection/atomicity claim is possible from void backend APIs or host tests. No changes to ezfode, releases or BLUE branch.
+
 ## 2026-11-10 19:39 UTC — Isolated Omega backport checkpoint validated
 
 - Current branch ezfomega only. Target verifier passes PSRAM bounds/I/O policy, staged-save/settings fault injection and new path-policy regressions, filename/mirrored LFN fallback, marker conversion, framebuffer differential/766,800 span cases, cheat persistence/collapse/viewport/failure/identity tests, target production build and target layout guard. Final image 2,033,904 bytes, 63,248 headroom. Three inherited original-launcher warnings remain; no new compiler warnings introduced. No Original Omega hardware is available per owner, so validation remains source/build/host only.
