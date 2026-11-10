@@ -1,5 +1,11 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 20:32 UTC — Original Omega Test 1 published and verified
+
+- Published https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test1 as a public prerelease, not latest. Annotated tag points to 60a4f4e, a documentation-only descendant of validated code 33e733a. Only uploaded asset is ezkernel.bin (2,044,264 bytes); GitHub supplies automatic source archives.
+- Downloaded release asset and independently verified SHA-256 bb7a5302d7711b4340d595856e2e5eaf433bc6cad45c20fb0850f5dfc678c336. API confirms prerelease=true, draft=false. Stable latest remains v8.3.1; origin/ezfode unchanged at 5f700c9a89768309f06993984bb6c3a3190d04ef. Prominent notes/title identify Original Omega only, hardware untested; do not reinterpret this as hardware qualification.
+- Committing/pushing this publication record on ezfomega, then switching to ezfblue per owner request to begin its isolated port. Omega follow-up work remains listed below and is paused for BLUE work. No DE changes authorized by that switch; carry relevant DE findings as deferred review evidence.
+
 ## 2026-11-10 20:30 UTC — Original Omega test publication checkpoint
 
 - Owner explicitly authorized publishing this checkpoint as a hardware-untested Original Omega test build. Prepared docs/releases/omega-test1.md in the established changelog style with positive contributor attribution, original-hardware-only warning, actual backports and known limitations. Kernel-only asset; automatic GitHub source archives only.
