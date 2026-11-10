@@ -1,5 +1,13 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:57 UTC — Smaller 8.3.1 release verified
+
+- Replaced existing stable/latest v8.3.1 kernel and source ZIP; annotated tag now targets `c04757da2505beb82cf19fbbc6213e6b20a344a4`. Owner-tested exact smaller image published. Downloaded both assets and verified byte identity plus ZIP integrity; release remains stable/latest. API release body matches the pre-operation body exactly: notes unchanged as requested.
+- ezkernelnew.bin: 2024344 bytes; SHA-256 `8fb4cd6054679680d4b774275f114a885e66b00b07ebc9cbe98837726f1c9bf8`
+- ezfode-dssmm-kernel-8.3.1-source.zip: 17828044 bytes; SHA-256 `d5886dabfc9cfc95598cd255ee93c67916d6c57a70d8360960cf71dc28eb0f96`
+- Kernel saves 67,720 bytes; headroom is 72,808 bytes. Temporary source ZIP and download copies removed; local release binary retained. No repeated build/tests: prior full software validation and new owner hardware confirmation cover this exact artifact.
+- Next: commit/push publication verification; leave clean ezfode. Port branches remain preparation only. Further size opportunities are documented in docs/audits/kernel-size.md and require separate evidence before implementation.
+
 ## 2026-11-10 18:57 UTC — Smaller 8.3.1 replacement authorized
 
 - Owner reports size-audit candidate works and authorizes replacing 8.3.1 with that exact image. No additional hardware revision/mode details were specified. Kernel is 2,024,344 bytes, SHA-256 `8fb4cd6054679680d4b774275f114a885e66b00b07ebc9cbe98837726f1c9bf8`; prior full 34-host/build/static/pixel validation applies to this exact source/image. Local release binary refreshed.
