@@ -16472,6 +16472,38 @@ u8 NOR_list_MENU(u32 show_offset,	u32 file_select)
 	return 0;
 }
 //---------------------------------------------------------------
+static u32 Launcher_LoadTrimSize(TCHAR *filename, u32 romsize, u32 mode, BYTE save_mode)
+{
+	FRESULT result;
+	FRESULT close_result;
+	UINT read_count = 0;
+	u32 max_size;
+	u32 read_offset;
+	u32 read_size;
+
+	max_size = (mode == 0) ? 0x02000000UL : 0x04000000UL;
+	if(filename == NULL || mode > 1 || romsize < 0xB4 || romsize > max_size)
+		return 0;
+
+	read_offset = (romsize - 1) & 0xFFFE0000UL;
+	read_size = romsize - read_offset;
+	result = f_open(&gfile, filename, FA_READ);
+	if(result != FR_OK)
+		return 0;
+	if(f_size(&gfile) != romsize)
+		result = FR_INT_ERR;
+	if(result == FR_OK)
+		result = f_lseek(&gfile, read_offset);
+	if(result == FR_OK)
+		result = f_read(&gfile, pReadCache, (UINT)read_size, &read_count);
+	close_result = f_close(&gfile);
+	if(result != FR_OK || read_count != read_size || close_result != FR_OK)
+		return 0;
+
+	SetTrimSize(pReadCache, romsize, MAX_pReadCache_size, mode, save_mode);
+	return 1;
+}
+
 u8 SD_list_MENU(u32 show_offset,	u32 file_select,u32 play_re )
 {
 	u32 res;
@@ -16952,11 +16984,11 @@ load_file:
 						f_chdir(currentpath);//return to game folder
 						//get the location for the patch
 						UIAudio_StopForSharedBufferUse();
-						res = f_open(&gfile,pfilename, FA_READ);
-						f_lseek(&gfile, (gamefilesize-1)&0xFFFE0000);
-						f_read(&gfile, pReadCache, 0x20000, (UINT*)&ret);
-						f_close(&gfile);
-						SetTrimSize(pReadCache,gamefilesize,0x20000,0x0,SAVEMODE);
+                        if(!Launcher_LoadTrimSize(pfilename,gamefilesize,0,SAVEMODE))
+                        {
+                            Show_error_num(1);
+                            return 0;
+                        }
 
 						if((gl_engine_sel==0) || (gl_select_lang == 0xE2E2))
 						{
@@ -17037,14 +17069,12 @@ load_file:
 
 					//get the location of the patch
 					UIAudio_StopForSharedBufferUse();
-					res = f_open(&gfile,pfilename, FA_READ);
-					if(res==FR_OK){
-						f_lseek(&gfile, (gamefilesize-1)&0xFFFE0000);
-						f_read(&gfile, pReadCache, 0x20000, (UINT*)&ret);
-						f_close(&gfile);
-						SetTrimSize(pReadCache,gamefilesize,0x20000,0x1,SAVEMODE);
-					}
-					needpatch = 1;
+                    if(!Launcher_LoadTrimSize(pfilename,gamefilesize,1,SAVEMODE))
+                    {
+                        Show_error_num(1);
+                        return 0;
+                    }
+                    needpatch = 1;
 				}
 				res = Loadfile2NOR(pfilename, gl_norOffset,needpatch);
 				//wait_btn();

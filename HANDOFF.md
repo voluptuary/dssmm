@@ -1,5 +1,11 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 20:02 UTC — Patch-window and trim-boundary safeguards
+
+- Reproduced Original Omega PSRAM Write failing a cross-8-MiB patch in banked-aperture simulation. Ported DE page splitting and odd-address guard; trim analysis now guards null/zero inputs and avoids unsigned underflow on one-byte final blocks/short padding scans. Retains target per-game trim hook.
+- Reproduced a shared DE NOR Write helper overrun: six bytes at window+0x1FFFE modify guard bytes outside 128 KiB. Fixed Omega-only by intersecting patch range with staged window (and copying the remainder when invoked for next window). Host tests cover both slices, off-window patches and guards. Deferred DE review queue records exact evidence and caller-reachability caveat.
+- Native PSRAM/NOR addon trim probes now share checked size/seek/read/close helper and abort on failure, before using stale data or writing NOR. New extracted-helper tests cover one-byte tail, exact block, size mismatch including 64-bit wrap, all I/O failures and invalid arguments. Full target verifier passed; image 2,044,000 bytes with 53,152 headroom and unchanged layout. No hardware claims or ezfode writes.
+
 ## 2026-11-10 19:55 UTC — NOR themed progress integration
 
 - Added compressed NOR.bmp presentation, themed panel, percentage/bar, username and normal clock to Original Omega writing path. Canonical BMP/RGB555 header retained under images/blank; linked compressed data is 9,096 bytes and all source pixels/VRAM backreferences verified by asset regression. No shared transfer-pool allocation.

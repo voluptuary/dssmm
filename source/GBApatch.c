@@ -43,30 +43,60 @@ void Write(u32 romaddress, const u8* buffer, u32 size)
 	u32 x;
 	if(is_NORpatch)
 	{
-		if((romaddress >= windows_offset) && (romaddress < windows_offset+0x20000))
+		u32 source_word = 0;
+		u32 offset;
+		u32 bytes_to_copy;
+		/* Intersect the patch with this staged block, including a patch that
+		   began in the preceding block. Never write beyond the shared pool. */
+		if((romaddress | windows_offset) & 1) return;
+		if(romaddress < windows_offset)
 		{
-			for(x=0;x<size/2;x++){
-				((vu16*)(pReadCache+romaddress-windows_offset))[x] = ((vu16*)buffer)[x];
-			}
-			//DEBUG_printf("NORaddress{%x}:%x %x", romaddress,size ,((vu32*)buffer)[0]);
+			u32 skip = windows_offset - romaddress;
+			if(skip >= size) return;
+			source_word = skip / 2;
+			size -= skip;
+			romaddress = windows_offset;
 		}
+		offset = romaddress - windows_offset;
+		if(offset >= 0x20000) return;
+		bytes_to_copy = size & ~1UL;
+		if(bytes_to_copy > 0x20000 - offset)
+			bytes_to_copy = 0x20000 - offset;
+		for(x = 0; x < bytes_to_copy / 2; x++)
+			((vu16*)(pReadCache + offset))[x] = ((const u16*)buffer)[source_word + x];
 	}
 	else
 	{
-		u32 Address;
-		vu16 page=0;
-		Address=romaddress;
-		while(Address>=0x800000)
+		u32 address = romaddress;
+		u32 source_word = 0;
+		u32 words_remaining = size / 2;
+		if(address & 1)
 		{
-			Address-=0x800000;
-			page+=0x1000;
+			/* PSRAM patch writes use halfwords and require an even address. */
+			SetPSRampage(0);
+			return;
 		}
-		SetPSRampage(page);
 
-		for(x=0;x<size/2;x++)
-			((vu16*)(PSRAMBase_S98 + Address))[x] = ((vu16*)buffer)[x];//todo ��Ҫ����psram page
+		/* PSRAM exposes one 8 MiB page at a time. Split patch copies that
+		   cross a page boundary and select the matching page for each chunk. */
+		while(words_remaining > 0)
+		{
+			u32 page_offset = address % 0x800000;
+			u32 words_to_boundary = (0x800000 - page_offset) / 2;
+			u32 words_this_page = words_remaining;
+			u16 page = (u16)((address / 0x800000) * 0x1000);
+			if(words_this_page > words_to_boundary)
+				words_this_page = words_to_boundary;
 
-		//DEBUG_printf("address{%x}:%x %x %x %x", romaddress,page,Address,size ,((vu32*)buffer)[0]);
+			SetPSRampage(page);
+			for(x = 0; x < words_this_page; x++)
+				((vu16*)(PSRAMBase_S98 + page_offset))[x] = ((const u16*)buffer)[source_word + x];
+
+			address += words_this_page * 2;
+			source_word += words_this_page;
+			words_remaining -= words_this_page;
+		}
+
 		SetPSRampage(0);
 	}
 }
@@ -305,6 +335,8 @@ void SetTrimSize(u8* buffer,u32 romsize,u32 iSize,u32 mode,BYTE saveMODE)
 	if(gl_cheat_on==1){
 		PATCH_LENGTH = 0x2000;
 	}
+	if(buffer == NULL || romsize == 0 || iSize == 0)
+		return;
 
   if(0)
   {
@@ -312,9 +344,11 @@ void SetTrimSize(u8* buffer,u32 romsize,u32 iSize,u32 mode,BYTE saveMODE)
   }
   else
   {
-	  byte=buffer[(romsize-1)%iSize-1];
-	  bottom=(romsize-1)%iSize-1;
-	  if(bottom-16 > PATCH_LENGTH){
+	  bottom=(romsize-1)%iSize;
+	  if(bottom > 0)
+		  bottom--;
+	  byte=buffer[bottom];
+	  if(bottom > PATCH_LENGTH+16){
 			top=bottom-PATCH_LENGTH-16;
 		}
 		else{

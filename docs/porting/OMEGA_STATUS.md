@@ -8,7 +8,7 @@ Work only on ezfomega. Do not merge into ezfode, change DE release tags/assets, 
 
 | Area | Status / next action |
 | --- | --- |
-| Omega cartridge, save-chip, reset and SD bus code | Reference preserved byte-for-byte in Ezcard_OP.c, GBApatch.c, NORflash_OP.c, reset.s, ff15/ff.c, ez_define.h; no DE protocols copied |
+| Omega cartridge, save-chip, reset and SD bus code | Ezcard_OP.c, reset.s and ff15/ff.c remain reference code. GBApatch.c has software window/trim corrections; NORflash_OP.c has checked input/UI changes, with erase/program/enumeration routines retained. ez_define.h gains constants/UI declarations; no DE flash protocol copied |
 | Existing DS Style v8 UI / themes / carousels / sound | Reference implementation retained; built with its launcher -Os policy |
 | Filename artwork | First batch: custom priority, legacy GBA header lookup, then filename BMP fallback at active artwork root; non-GBA no longer probes arbitrary bytes as GBA header. Bounds/exact reads/closes checked. Mirrored directory/LFN alias resolution is now implemented and host-tested; indexed fast-open remains pending |
 | Plugin transitions | Merkin guard ported around external-plugin progress strip |
@@ -45,3 +45,5 @@ Cheat milestone final build: 2,033,904 bytes; 63,248 headroom; EWRAM heap 21,936
 NOR input milestone: open failure no longer reports success, both callers handle file error, file size/range/catalog slot/name bounds checked, read/seek/close failures abort, final block FF padded, and RAM catalog publication follows complete SD I/O. The Original Omega PPB sequence/erase/program routines remain unchanged; no generic timeout/status protocol copied. Mocked flash tests establish file-I/O ordering, not chip correctness or power-loss safety.
 
 NOR presentation checkpoint: target verifier passes all existing Omega checks plus actual-helper NOR progress bounds/cadence (1..512-block spans) and compressed asset equality. Image 2,043,816 bytes, 53,336 headroom; EWRAM heap 21,936 bytes, IWRAM gap 8,048. Original reset.s exports a VRAM SWI 0x12 wrapper under the legacy name LZ77UnCompWram; reuse avoids pulling libgba Compression.o and duplicate-symbol failure. No reset assembly changed.
+
+Patch/trim checkpoint: PSRAM banked-copy regression first reproduced failure, then passed with splitting. NOR staging guard test reproduced a shared DE helper overflow and now passes clipped/intersected copies across current/next staging windows. Trim tests cover 1/2-byte tails, zero/null guards, exact final reads and all file-operation failures. Full target verifier passes; image 2,044,000 bytes with 53,152 headroom. No flash protocol change. Per-game trim hook retained; tests stub that hook and do not prove all game-specific patches.
