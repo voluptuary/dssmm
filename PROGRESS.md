@@ -1,5 +1,10 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:59 UTC — Historical release source-archive cleanup check
+
+- Owner authorized removing redundant manually uploaded source archives from past releases. Enumerated all nine releases with paginated GitHub API (v7.4.2-fallback through v8.3.1): each has exactly one uploaded asset, `ezkernelnew.bin`; no custom source ZIP/tarball remains. No deletion necessary and no release/tag/note changed. Automatic GitHub source archives remain available.
+- Read-only release inventory verified; no firmware tests needed. Existing no-custom-source-ZIP preference remains recorded in AGENTS.md.
+
 ## 2026-11-10 18:59 UTC — Source archive packaging preference updated
 
 - Owner clarified automatic GitHub source archives are sufficient. Future releases must not generate/upload a separate source ZIP unless explicitly requested; AGENTS.md now records this preference, superseding historical packaging steps below.
