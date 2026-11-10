@@ -1,6 +1,6 @@
 # DS Style Kernel Audit Progress
 
-## 2026-11-10 17:47 UTC — Loader software verification complete; hardware check pending
+## 2026-11-10 17:49 UTC — Loader candidate pushed; hardware check pending
 
 - **Objective:** finish the previously implemented PSRAM loader work and verify if any remaining code-level issue can be fixed safely without hardware-revision assumptions.
 - **Repository check:** follow-up began on branch `ezfode` at `b2c454c7279341fe898946137a42e6085cd8c94a`; `git ls-remote` verified `origin/main` and `origin/ezfode` both at that commit. The 17:37 handoff/progress entries identify `0c32ce5` although a later documentation-only commit is already at HEAD; this was stale checkpoint metadata, not code divergence. Loader source changes remain in pushed commit `9944dc7`.
@@ -10,7 +10,9 @@
 - **Hardware artifact:** copied the exact validated image to `files/candidate/8.3.0-psram-loader-audit/ezkernelnew.bin`; `cmp` passed. Size 2,014,664 bytes; SHA-256 `9a5e78f69fdddc4c7556b0521702765b0b2a99a7e87e76ba0980b7771eb9952c`; embedded label remains `DS Style Merkin Mix 8.3.0`. Added a README with the validation scope and requested Rev. A/B scenarios. Preserved the pre-existing `files/candidate/8.3.0/` artifact and README. Removed the newly generated root `.elf`/`.gba`; only the seven tracked plugin `.gba` assets remain.
 - **Code changes:** none in this follow-up; the loader implementation and tests are already pushed in `9944dc7`. No physical cartridge test was run. No release, tag, version, or changelog was changed.
 - **Review/cleanup:** `git diff --check` passed and the final audit-log/candidate README diff was reviewed. Removed the temporary root production `.elf`/`.gba` after copying the candidate; repository-wide artifact search now finds only seven tracked emulator-plugin `.gba` inputs. The existing 8.3.0 candidate was not modified.
-- **Next:** commit/push the reviewed log and candidate README changes to `ezfode` and synchronized legacy `main`, then recheck remote refs and worktree. Keep `main` until GitHub confirms `ezfode` as default. Hardware verification remains the only loader-specific open item.
+- **Commit/push:** committed the audit checkpoint and candidate instructions as `21d3ec89e4a2660d92f49b7f7824fdd0b3b01429` (`Document PSRAM loader verification candidate`) and pushed to both `origin/ezfode` and `origin/main`. `git ls-remote --symref origin HEAD` confirms remote HEAD still resolves to `main`; both branch refs resolve to the new commit. The new local binary remains ignored, while its README is tracked.
+- **Remaining:** hardware test the candidate on supported Rev. A and Rev. B cartridges; report direct GBA, addon/patch, and emulator-plugin behavior. The software work is complete but selector behavior is not hardware-verified. The separate requested GitHub default-branch rename remains blocked by the previously documented integration 403; keep `main` synchronized and do not delete it.
+- **Next:** push this final status-log update to both synchronized refs and verify clean status. No further loader code changes are indicated unless hardware testing exposes a reproducible failure.
 
 ## 2026-11-10 17:37 UTC — Synchronized commits and cleanup complete; default setting pending
 
