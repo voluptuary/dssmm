@@ -1,5 +1,14 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:46 UTC — Refreshed 8.3.1 release verified
+
+- Updated existing stable/latest [8.3.1 release](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1) and annotated tag to `06899427220edebaaabf751c1109ea959f41ddec` on `ezfode`, as authorized. Includes owner-tested plugin transition and NOR progress/background/username/clock changes, plus earlier PSRAM fixes. Notes retain cumulative style/credits and add only final user-facing changes.
+- Replaced both kernel and source ZIP assets. Downloaded copies exactly matched upload inputs; ZIP integrity passed; latest API confirms v8.3.1 is stable, published and contains refreshed notes.
+- ezkernelnew.bin: 2092064 bytes, SHA-256 `2d0093f12f7f81125373bfdbe4f60712b3ba9b94d6818b5eb5c3f87e7be5c8c9`
+- ezfode-dssmm-kernel-8.3.1-source.zip: 17821189 bytes, SHA-256 `dff3ab86305cb58130436097b608e0098cf3a44193243f9ceb1f6e12ff282d0d`
+- Removed temporary source ZIP/downloads and generated root ELF/GBA. Local release binary is `files/candidate/8.3.1/ezkernelnew.bin`. Only 5,088 bytes remain below 2 MiB; preserve size guard for future changes.
+- Validation and owner hardware evidence are recorded below. Port branches remain preparation only. Next: commit/push this verification record and leave clean `ezfode`; await further work.
+
 ## 2026-11-10 18:46 UTC — Owner-tested 8.3.1 loading UI release refresh
 
 - Owner reports the latest plugin/NOR UI changes work well and authorizes rolling them into existing 8.3.1. Latest tested artifact is `files/candidate/8.3.1-nor-bmp/ezkernelnew.bin`, SHA-256 `2d0093f12f7f81125373bfdbe4f60712b3ba9b94d6818b5eb5c3f87e7be5c8c9`. Hardware revisions/mode-by-mode results for this UI follow-up were not specified; prior PSRAM audit testing covered Rev. A/B.
