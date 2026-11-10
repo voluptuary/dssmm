@@ -1,5 +1,13 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 17:31 UTC — Local branch renamed; GitHub default change blocked
+
+- **Commit and push:** validated RAM/loader/cache work is committed as `9944dc76f60c17f53de4645a477484ac18e85f65` (`Harden PSRAM loader bounds and cache lifetimes`) and pushed to both `origin/main` and `origin/ezfode` at that same SHA.
+- **Local branch:** renamed local `main` to `ezfode`; it tracks `origin/ezfode`. Repository refs show the owner-requested branch name is active locally and remotely.
+- **GitHub default:** GitHub still reports `main` as default. `gh api -X PATCH repos/voluptuary/ezfode-dssmm-kernel -f default_branch=ezfode` returned HTTP 403, `Resource not accessible by integration`. The GitHub connector identifies `voluptuary` as repository admin, but this session's API integration cannot mutate repository settings. Keep remote `main` and do not claim the remote rename is complete or attempt to delete the default ref. Both branch refs are currently synchronized at `9944dc7`.
+- **Merge/PR audit:** all project branches previously on `origin` and local release/docs branches are ancestors of the pre-rename `main`; no open pull requests were found. The only `main` URL in active project files is a link to FrankieT19's separate upstream changelog and must remain. Historical audit entries naming the old branch remain accurate.
+- **Next:** commit/push the current status documentation on `ezfode`, then fast-forward `origin/main` to the same documentation commit. Try GitHub's documented branch-rename endpoint to rename the default `main` directly to `ezfode`; the endpoint requires push access and admin/owner permission for the default branch ([GitHub REST branch rename](https://docs.github.com/en/rest/branches/branches#rename-a-branch)). If it also returns 403, restore `origin/ezfode` and retain both synchronized refs. Delete verified-merged remote feature branches and local historical branches, compare remaining stashes with committed changes, and verify refs/tree.
+
 ## 2026-11-10 17:27 UTC — Generated RAM and firmware artifacts cleaned
 
 - Removed the generated root files `omega-de-ds-style-multisystem-kernel.{elf,gba}`, `ram-audit.{elf,gba}`, and `ram-callgraph.{elf,gba}`, plus `build-ram-audit/`, `build-ram-callgraph/`, and `build-ram-current/` after recording their measurements. No `.elf` or `.gba` remains at repository root. Tracked emulator `.gba` assets under `docs/manager/packages/current/common/SYSTEM/PLUG/` were retained; standard ignored `build/` remains.
