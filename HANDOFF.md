@@ -1,5 +1,13 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 18:11 UTC — Published stable 8.3.1; future NOR progress presentation
+
+- Published [DS Style Merkin Mix 8.3.1](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1), stable/latest, from annotated tag `v8.3.1` at `997073e9782a5c88112d4cd16bf9b8b751acfaf3` on `ezfode`. Release notes match the prior cumulative style, with current loader/cache fixes first and earlier features/fixes and credits retained. README points to 8.3.1. No PR was created for README changes.
+- Kernel asset: 2,014,664 bytes, SHA-256 `b32d4ad1a634ac6a7e2cca92c7f4d889dfa3b845db9837ee317e8f015b8f7e9e`. Source ZIP asset: 17,807,093 bytes, SHA-256 `f5b4ed9085f402c98b5a9fe81c4ec9bd696376636d7fe8080726004a22dc4092`. Downloaded both assets and verified byte identity; ZIP integrity passed; GitHub latest endpoint returns v8.3.1, not draft/prerelease. Temporary ZIP/downloads and generated root ELF/GBA were removed. Local kernel remains in `files/candidate/8.3.1/`; no source ZIP retained locally.
+- Full production audit passed (33 host scripts, browser, JS, whitespace, layout and Cppcheck). Owner tested the preceding PSRAM audit candidate on both Rev. A/B and reports normal behavior. Final image differs only in the version digit and two verified equivalent pooled-string pointers; detailed evidence is recorded below. Fault coverage and physical testing of every launch mode are not claimed. F-022/F-032 and SD rename-interruption limitations remain as previously documented.
+- **Future feature requested by owner:** explore making the NOR game-writing progress display match the DS Style theme. Current owner-observed presentation is a black screen with white MB-transfer progress at the bottom. Consider reusing the existing NOR-format progress window layout/theme for a consistent writing dialog. Start by reviewing `Loadfile2NOR()` and NOR-format UI/progress helpers in `source/ezkernelnew.c`; preserve transfer cadence, cancel/error behavior, buffer ownership and flash timing. This is a recorded future task only; no implementation or release-note claim was added.
+- Port branches `ezfomega` and `ezfblue` remain preparation only. Next: commit/push this publication checkpoint, verify clean state, then await owner resumption before implementing the future NOR UI or either port.
+
 ## 2026-11-10 18:07 UTC — 8.3.1 release preparation authorized
 
 - Owner reports latest PSRAM audit candidate works normally on both Rev. A and Rev. B. This covers owner-observed behavior, not every launch mode or injected hardware fault. Tested candidate SHA-256: `9a5e78f69fdddc4c7556b0521702765b0b2a99a7e87e76ba0980b7771eb9952c`.
