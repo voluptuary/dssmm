@@ -1,5 +1,22 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:54 UTC — ROM-size audit completed in software
+
+- Implemented NOR-only lossless asset packing. Production kernel is 2,024,344 bytes versus baseline 2,092,064: saves 67,720 bytes (3.24%); restores 72,808 bytes of headroom, about 14.3x the prior margin. Original BMP and standard raw NOR.h remain in images/blank; only generated NOR_lz.h is linked. No features/formats/languages removed and no rendering hot-loop/compiler/flash-policy changes.
+- Full audit passed: 34 host scripts, production build/size guard, browser/JS/whitespace, layout guard, Cppcheck. Exact pixel/BMP/decompression and VRAM-reference checks passed; generator is deterministic; 40 other linked asset payloads match baseline. Layout margins unchanged (IWRAM 1,080 bytes; heap 7,112; user-stack reserve 12,288). See `docs/audits/kernel-size.md` for inventory, deferred options and risk reasoning.
+- Candidate: `files/candidate/8.3.1-size-audit/ezkernelnew.bin`, SHA-256 `8fb4cd6054679680d4b774275f114a885e66b00b07ebc9cbe98837726f1c9bf8`. Published 8.3.1 unchanged; local release candidate retained. Physical one-time decode latency/visual transition still needs hardware testing; software equivalence does not prove all hardware behavior. Do not claim unconditional regression-free runtime.
+- Next: commit/push audit changes, verify clean tree, hardware-test NOR write background/progress/top bar and transition on Rev. A/B before publication. Integer-only libc formatting is a separate possible follow-up requiring complete format/locale/error-path audit; do not automatically implement deferred compiler/font/renderer changes.
+
+## 2026-11-10 18:52 UTC — ROM audit milestone: lossless NOR asset packing
+
+- Baseline 2,092,064 bytes. Linked-object hashing found no exact large duplicates. Main ROM consumers and regression-sensitive alternatives are inventoried in `docs/audits/kernel-size.md`.
+- Implemented lossless NOR background packing only: original BMP and standard RGB555 header remain in images/blank; generated NOR_lz.h stores 9,096 compressed bytes. BIOS decodes directly to VRAM once, preserving artwork exactly without shared-pool/heap allocation. Added reproducible generator and regression checking all BMP/header pixels, LZ bounds and VRAM-safe references.
+- Target build: 2,024,344 bytes, saving 67,720, margin 72,808. Full audit and linked-data differential pending. No format/language/emulator removal, compiler-policy changes, or release publication. Next: validate, stage candidate, record remaining hardware limits and commit/push.
+
+## 2026-11-10 18:50 UTC — ROM size audit started
+
+- Objective: reduce the 2,092,064-byte kernel without changing behavior or artwork. Prioritize exact duplicate assets and unused linked data/code; assess compression only where buffer lifetimes and display latency are safe. Keep release untouched. Next: baseline ELF/map and symbol inventory, byte-level asset comparisons, narrow implementation with differential validation and full audit.
+
 ## 2026-11-10 18:47 UTC — Superseded build candidates cleaned
 
 - Owner requested candidate cleanup. Removed six superseded candidate folders (8.3.0, PSRAM audit, plugin launch, loading UI, loading UI background and NOR BMP tests), including ignored binaries and tracked candidate READMEs. Reclaimed 12,168,519 bytes.
