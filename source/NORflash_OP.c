@@ -542,6 +542,7 @@ u32 Loadfile2NOR(TCHAR *filename, const TCHAR *rom_dir, u32 NORaddress,
 		goto close_file;
 	}
 
+	Launcher_DrawNORWriteBackground();
 	progress_blocks = fileneedsize / NOR_BLOCK_SIZE;
 	DrawPic((u16*)gImage_MENU, 36, 25, NOR_MENU_WIDTH, 110, 0, 0, 1);
 	{

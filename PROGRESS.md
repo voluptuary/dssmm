@@ -1,5 +1,10 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:28 UTC — NOR writing themed background follow-up
+
+- Owner hardware feedback: themed progress panel works, but surrounding screen is black. Added `Launcher_DrawNORWriteBackground()` using the existing full theme renderer before drawing the NOR progress panel. Explicitly invalidates background caches because the launch fade can clear pixels while cached theme identity remains set. Includes active light/dark/custom background and theme top bar; no shared buffer use or flash operation changes.
+- Validation passed: production build (2014976 bytes), NOR progress/write-result regressions, layout guard (IWRAM gap 1,088 bytes; heap 7,112 bytes; stack reserve 12,288 bytes), and diff/whitespace review. Combined candidate: `files/candidate/8.3.1-loading-ui-background/ezkernelnew.bin`, SHA-256 `8b6f98e2b99ee073701ac66312627602c108038c27a7c766a6df1fbb3e5e94ee`. Includes plugin-bar suppression, NOR progress panel and full themed background. Commit/push and await visual checks for light/dark/custom themes and clean/addon NOR writes. Published 8.3.1 unchanged.
+
 ## 2026-11-10 18:20 UTC — NOR writing themed progress implementation
 
 - Owner authorized a small NOR writing-screen change. Reused existing MENU panel, themed colors and progress coordinates in `Loadfile2NOR()`, with localized writing title and a determinate percentage/bar. Redraw only when integer percent changes; block-based arithmetic is bounded by 512 blocks. Includes optional patch block and reports 100% only after catalog persistence succeeds.

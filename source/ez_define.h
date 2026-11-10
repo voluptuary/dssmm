@@ -1,6 +1,8 @@
 #ifndef EZ_DEFINE_HEADER
 #define EZ_DEFINE_HEADER
 
+void Launcher_DrawNORWriteBackground(void);
+
 #include "fat_table_builder.h"
 
 #define MAX_pReadCache_size 0x20000

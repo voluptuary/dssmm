@@ -1342,6 +1342,14 @@ static void Launcher_DrawThemeBGFull(const u16 *base)
 	launcher_counter_valid = 0;
 }
 
+void Launcher_DrawNORWriteBackground(void)
+{
+	/* Launch fade may have cleared the framebuffer; force a full theme redraw. */
+	launcher_current_topbar_bg = 0;
+	launcher_current_theme_bg = 0;
+	Launcher_DrawThemeBGFull((const u16*)gImage_SD_LIST);
+}
+
 static void Launcher_ClearWithThemeBG(const u16 *base, u16 x, u16 y, u16 w, u16 h)
 {
 	const u16 *top = Launcher_GetThemeTopForBase(base);
