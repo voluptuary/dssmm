@@ -133,6 +133,29 @@ static void NOR_DrawProgress(u32 count)
 				NOR_PROGRESS_H, gl_color_text, 1);
 }
 
+/* Counts are 128 KiB blocks, keeping percentage arithmetic bounded. */
+static void NOR_DrawWriteProgress(u32 completed, u32 total, u32 *last_percent)
+{
+	u32 percent = completed * 100 / total;
+	u32 filled = completed * NOR_PROGRESS_W / total;
+	u32 row;
+	char text[12];
+	const u16 *menu = (const u16*)gImage_MENU;
+	if(percent == *last_percent)
+		return;
+	*last_percent = percent;
+	for(row = 57; row < 69; row++)
+		DrawPic((u16*)(menu + row * NOR_MENU_WIDTH), 36, 25 + row,
+			NOR_MENU_WIDTH, 1, 0, 0, 1);
+	snprintf(text, sizeof(text), "%lu%%", percent);
+	DrawHZText12(text, 0, (240 - strlen(text) * 6) / 2, 82, gl_color_text, 1);
+	Clear(NOR_PROGRESS_X, NOR_PROGRESS_Y, NOR_PROGRESS_W, NOR_PROGRESS_H,
+		gl_color_selectBG_sd, 1);
+	if(filled)
+		Clear(NOR_PROGRESS_X, NOR_PROGRESS_Y, filled, NOR_PROGRESS_H,
+			gl_color_text, 1);
+}
+
 static u32 NOR_ShouldReportEraseProgress(u32 byte_offset)
 {
 	return (byte_offset & (NOR_VERIFY_PROGRESS_INTERVAL - 1)) ==
@@ -424,7 +447,8 @@ u32 Loadfile2NOR(TCHAR *filename, const TCHAR *rom_dir, u32 NORaddress,
 	u32 blocknum;
 	u32 read_size;
 	u32 file_open;
-	char msg[128];
+	u32 last_progress_percent = 101;
+	u32 progress_blocks;
 	char source_path[MAX_path_len * 2 + 2];
 	FM_NOR_FS tmpNorFS;
 	FM_NOR_FS previousNorFS;
@@ -518,13 +542,18 @@ u32 Loadfile2NOR(TCHAR *filename, const TCHAR *rom_dir, u32 NORaddress,
 		goto close_file;
 	}
 
-	Clear(60,160-15,120,15,gl_color_cheat_black,1);
-	DrawHZText12(gl_writing,0,70,160-15,0x7fff,1);
+	progress_blocks = fileneedsize / NOR_BLOCK_SIZE;
+	DrawPic((u16*)gImage_MENU, 36, 25, NOR_MENU_WIDTH, 110, 0, 0, 1);
+	{
+		u16 title_length = DrawText12VisibleLength(gl_writing);
+		if(title_length > 26) title_length = 26;
+		DrawHZText12(gl_writing, title_length, (240 - title_length * 6) / 2,
+			60, gl_color_text, 1);
+	}
 	for(blocknum=0;blocknum<filesize;blocknum+=NOR_BLOCK_SIZE)
 	{
-		sprintf(msg,"%luMb/%luMb",(blocknum)/NOR_BLOCK_SIZE,filesize/NOR_BLOCK_SIZE);
-		Clear(70+54,160-15,100,15,gl_color_cheat_black,1);
-		DrawHZText12(msg,0,70+54,160-15,0x7fff,1);
+		NOR_DrawWriteProgress(blocknum / NOR_BLOCK_SIZE, progress_blocks,
+			&last_progress_percent);
 
 		read_size = filesize - blocknum;
 		if(read_size > NOR_BLOCK_SIZE)
@@ -567,6 +596,8 @@ u32 Loadfile2NOR(TCHAR *filename, const TCHAR *rom_dir, u32 NORaddress,
 
 	if(have_patch && add_patch)
 	{
+		NOR_DrawWriteProgress(blocknum / NOR_BLOCK_SIZE, progress_blocks,
+			&last_progress_percent);
 		if(!Block_Erase(blocknum+NORaddress))
 			return NOR_WRITE_RESULT_ERASE_ERROR;
 		GBApatch_NOR((u32*)pReadCache,NOR_BLOCK_SIZE,blocknum);
@@ -581,6 +612,7 @@ u32 Loadfile2NOR(TCHAR *filename, const TCHAR *rom_dir, u32 NORaddress,
 	if(!NOR_CommitCatalogSlot(&pNorFS[game_total_NOR], &tmpNorFS, &previousNorFS,
 		sizeof(FM_NOR_FS), NOR_PersistCatalog, &persist_context))
 		return NOR_WRITE_RESULT_CATALOG_ERROR;
+	NOR_DrawWriteProgress(progress_blocks, progress_blocks, &last_progress_percent);
 	return NOR_WRITE_RESULT_OK;
 
 close_file:

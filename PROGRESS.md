@@ -1,5 +1,10 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:20 UTC — NOR writing themed progress implementation
+
+- Owner authorized a small NOR writing-screen change. Reused existing MENU panel, themed colors and progress coordinates in `Loadfile2NOR()`, with localized writing title and a determinate percentage/bar. Redraw only when integer percent changes; block-based arithmetic is bounded by 512 blocks. Includes optional patch block and reports 100% only after catalog persistence succeeds.
+- Erase/write/patch/catalog operations, return values, IRQ behavior and buffer ownership unchanged. No shared-cache scratch added. Validation passed: NOR format-progress and write-result host regressions, warning-free production build (2014936 bytes), layout guard (IWRAM gap 1,088 bytes; heap 7,112 bytes; stack reserve 12,288 bytes), and whitespace/diff review. An initial compiler format-size warning was resolved by sizing the local text buffer for the full u32 representation. Zero-width fills are skipped. Candidate includes plugin launch-bar fix: `files/candidate/8.3.1-loading-ui/ezkernelnew.bin`, SHA-256 `08346c3e61b5acc20ef3a5e5015a8feaf66b9d5b4c99fab6db260262660cd605`. Physical UI verification and timing measurements remain pending; stable 8.3.1 unchanged. Next: commit/push and test clean/addon NOR installs, light/dark themes and plugin transitions on hardware.
+
 ## 2026-11-10 18:18 UTC — Plugin launch bar fix in progress
 
 - Owner authorized immediate fix for external-plugin black progress bar. Added the existing `!launcher_launch_screen_active` guard around legacy progress drawing in `LoadEMU2PSRAM()`, matching the subsequent game-data loop. File reads, page selection, DMA, error handling and fallback progress remain unchanged.
