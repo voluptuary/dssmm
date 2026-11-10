@@ -3,10 +3,10 @@
 The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
 (`https://github.com/voluptuary/ezfode-dssmm-kernel`). The Codespaces workspace
 may retain its original local directory name after the repository rename.
-The owner-designated primary branch name is `ezfode`. Do not delete the old
-remote `main` ref until GitHub confirms `ezfode` is the default branch; if the
-repository-settings API is unavailable, keep both refs synchronized and record
-the exact blocker.
+The primary and GitHub default branch is `ezfode`. The owner completed the
+rename through GitHub; remote `main` no longer exists. Do not recreate it.
+`ezfomega` and `ezfblue` are preparation branches for future ports; actual
+port implementation is paused until the owner resumes it.
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
 ran ahead of this repository's build number. In particular, its v8.4.1 release

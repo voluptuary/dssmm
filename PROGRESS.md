@@ -1,5 +1,11 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:04 UTC — GitHub branch rename verified
+
+- Owner completed deletion/rename through GitHub. Remote HEAD now points to `refs/heads/ezfode`; remote `main` is absent. `git fetch origin --prune` removed `origin/main`, and `git remote set-head origin -a` set `origin/HEAD` to `origin/ezfode`. The earlier permission blocker is resolved by the owner action; old synchronization instructions below are historical and superseded. Do not recreate `main`.
+- Active branch for this checkpoint: `ezfblue`. Updated AGENTS.md on all three project branches to reflect the default rename. Port frameworks were already committed/pushed: `ezfomega` at `59d290a`, `ezfblue` at `3e0a816`; their target plans and pinned references remain intact. No actual porting has begun.
+- Documentation-only reconciliation; no firmware build or tests needed. Commit/push this checkpoint to its matching branch, return to `ezfode`, verify clean status, and await owner direction. Loader hardware testing and future port exploration remain pending.
+
 ## Port preparation branch `ezfblue`
 
 Current branch: `ezfblue`, created from `691dc5ec0391cd30c537082a8428978b29c5500a`. Only target planning documentation differs from the common baseline. Read `docs/porting/TARGET.md` and `docs/porting/README.md`. Commit/push this preparation checkpoint; do not start actual porting until the owner resumes it. Existing firmware still targets DE Rev. A/B.
