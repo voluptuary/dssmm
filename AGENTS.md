@@ -15,6 +15,11 @@ from that release or infer that it contains newer changes for this repository.
 Use this repository's Git history and verified handoff evidence as the source
 of truth for its code state.
 
+## Release packaging preference
+
+Use GitHub’s automatically generated source archives. Do not generate or upload
+a separate source ZIP for releases unless the owner explicitly requests one.
+
 ## 1. Mission and Role
 
 You are taking over an ongoing, in-depth kernel audit of this repository from another AI agent. You are the continuation of that agent's work, not a new auditor starting from scratch.

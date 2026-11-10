@@ -1,5 +1,10 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:59 UTC — Source archive packaging preference updated
+
+- Owner clarified automatic GitHub source archives are sufficient. Future releases must not generate/upload a separate source ZIP unless explicitly requested; AGENTS.md now records this preference, superseding historical packaging steps below.
+- Checked v8.3.1 assets: only `ezkernelnew.bin` remains (2,024,344 bytes). Redundant custom ZIP was already absent; no asset deletion was needed. Kernel/release notes/tag unchanged. Documentation-only update; no tests required.
+
 ## 2026-11-10 18:57 UTC — Smaller 8.3.1 release verified
 
 - Replaced existing stable/latest v8.3.1 kernel and source ZIP; annotated tag now targets `c04757da2505beb82cf19fbbc6213e6b20a344a4`. Owner-tested exact smaller image published. Downloaded both assets and verified byte identity plus ZIP integrity; release remains stable/latest. API release body matches the pre-operation body exactly: notes unchanged as requested.
