@@ -1,5 +1,21 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 19:22 UTC — Original Omega development checkpoint / branch isolation verified
+
+- Branch ezfomega contains baseline checkpoint 8fb20bb, transparency checkpoint 62bb32e and the pending loader/target-tooling checkpoint. Owner explicitly requires isolation. Verified origin/ezfode remains `5f700c9a89768309f06993984bb6c3a3190d04ef`; no DE commits, tags, release assets or upstream refs were modified.
+- Target verifier passed: PSRAM policy, filename precedence/path/bounds/I/O host regression, marked title/box/malformed-header regression, rendering differential against pinned DE 5f700c9 (766,800 scan cases, no mismatch; identical framebuffer/DMA count), production build and Original Omega layout guard. Size guard negative tests also pass. Image 2,029,736 bytes, 67,416 headroom. Three inherited launcher compiler warnings remain recorded in OMEGA_STATUS.md; no new compiler warning introduced.
+- Reference hardware files verified byte-identical: Ezcard_OP.c/.h, GBApatch.c, NORflash_OP.c, reset.s and ff15/ff.c. ez_define.h gains only reference-established PSRAM constants. Loader source/caller checks are the deliberate high-level changes. Windows packaging scripts restored from reference, but not executed on Windows.
+- Local development candidate `files/candidate/omega-8.3.1-dev1/ezkernel.bin`, SHA-256 `3377d8ffa9a1c78f416dff0be970a6ea625cd30c1c70cd9799fc3b93d1b0f123`. This image is Original Omega only and hardware-untested. No release published. DE host suite/DE hardware reports do not validate this target.
+- Remaining work: mirrored-directory/LFN artwork, fast lookup, remembered/collapsible cheats, save/settings transactions and NOR artwork/progress/error protections require target-specific review. Integer-only formatting/global compiler changes are not part of this port. Exact priority matrix and validation commands: docs/porting/OMEGA_STATUS.md. Before a release, require Original Omega boot/navigation/artwork/launch/save hardware checks; full compatibility is not established by this checkpoint.
+- Next: commit/push pending loader/tooling changes only to ezfomega, verify clean tree; then continue target-specific feature work from the matrix without touching ezfode. Preserve development candidate and all audit history.
+
+## 2026-11-10 19:20 UTC — Original Omega PSRAM loader safeguards
+
+- Transparency committed/pushed as 62bb32e, ezfode remote still exactly 5f700c9. Target packaging now uses Original Omega ezkernel.bin; dedicated verify-omega-port.sh avoids applying the DE audit suite blindly.
+- Source evidence: Original Omega reference already enforces 32 MiB PSRAM launch limit and uses 8 MiB/0x1000 ROM and 4 MiB/0x0800 plugin selectors. Ported policy helper and checked PSRAM loaders with these same conventions: 64-bit size validation, padded spans, window splits, exact seek/read/close, page reset, combined plugin/ROM/argument bounds and caller failure propagation.
+- Launch metadata checks GBA header only for native GBA; plugins retain support for files shorter than a GBA header. Failed opens/short headers/oversized exFAT input now abort safely. NOR, flash, saves and reset implementations remain reference code.
+- Build/tests pending. Next: focused PSRAM policy plus artwork checks, target build, diff review and committed checkpoint. No DE branch/release writes permitted.
+
 ## 2026-11-10 19:18 UTC — Omega transparency pipeline implementation
 
 - First checkpoint committed/pushed only to ezfomega as 8fb20bb. Owner reiterated isolation: ezfode remote was verified at 5f700c9 and must remain there unless a separately authorized DE task changes it.

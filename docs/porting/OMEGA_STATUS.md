@@ -17,17 +17,21 @@ Work only on ezfomega. Do not merge into ezfode, change DE release tags/assets, 
 | Remembered/collapsible cheats | Pending target source/storage/runtime comparison |
 | File identity / FatFs fast-open | Pending; do not replace Omega filesystem/storage paths wholesale |
 | Save/settings transactions | Pending; retain target recovery behavior until storage path and buffer ownership review |
-| Loader size/I/O/window safeguards | Pending target selector/capacity/caller audit; no DE geometry blindly copied |
+| Loader size/I/O/window safeguards | Ported exact-I/O/range/window policy with reference selectors and 32 MiB limit; callers stop on failure; native headers checked without rejecting short plugin files; target build and policy tests pass; hardware pending |
 | NOR artwork/progress/error safeguards | Pending Omega mapping/capacity/catalog review |
 | DE LEDs, hardware settings, firmware update and FRAM behavior | Not transferable by assumption; retain target implementations and assess actual capabilities |
 | Extra custom theme/color slots | Reference excludes these for size; remain excluded pending size/RAM evaluation |
 
 ## Validation
 
-Use make BUILD=build-omega TARGET=omega-port and bash scripts/test-omega-artwork-host.sh. A 2 MiB post-build guard was ported into the reference Makefile; compiler/linker memory policy otherwise remains reference policy. Existing DE host/layout/audit scripts are not an Omega validation suite; scope them before reuse.
+Use bash scripts/verify-omega-port.sh for the target-specific host checks/build, or make BUILD=build-omega TARGET=omega-port. A 2 MiB post-build guard was ported into the reference Makefile; compiler/linker memory policy otherwise remains reference policy. Existing DE host/layout/audit scripts are not an Omega validation suite; scope them before reuse.
 
 First clean forced build: 2,028,640 bytes, 68,512 below 2 MiB. Layout: EWRAM static end/heap start 0x02039628, heap end 0x02040000; user stack is in IWRAM at 0x03007F00, unlike DE's EWRAM stack policy. This is not a runtime stack bound. Three inherited compiler warnings: two misleading indentation sites and favorite-name suffix truncation; track separately. New filename harness tests actual extracted production functions and passes paths/priority/bounds/read/close failures. Initial host assertion failure was a fixture counter-reset defect, corrected before passing.
 
 No Original Omega hardware tested. Build results do not prove compatibility. Next work: transparency pipeline with differential rendering tests, then target-specific save/loader safeguards and hardware boot/save matrix. Main ezfode remains untouched.
 
 Transparency milestone: production image 2,029,336 bytes (67,816 bytes headroom). Draw output/DMA identical to pinned DE 5f700c9 over the existing differential suite; 766,800 helper cases, zero mismatches. Marker tests cover title/box, malformed/short headers and preserving unmarked black. Low-level hardware files still match reference byte-for-byte. Background restoration call paths were reviewed but still need visual hardware validation. No flash/save tests claimed.
+
+Windows build/clean scripts now also match the Original Omega reference and output ezkernel.bin. Windows execution has not been tested in this Linux workspace. Do not use the inherited DE browser-installer payloads for this target; packaging/installer migration is pending.
+
+Loader milestone: image 2,029,736 bytes (67,416 headroom); added original-target layout guard. Reference EWRAM heap has 27,096 bytes, IWRAM data-to-user-SP gap 7,752 bytes, neither is a runtime allocation/stack peak measurement. Kernel-size guard negative tests pass. Hardware protocol files remain unchanged; ez_define.h only gains the established geometry constants. Three inherited launcher warnings persist.

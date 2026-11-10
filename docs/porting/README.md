@@ -1,6 +1,6 @@
 # Merkin Mix port exploration
 
-Preparation only. No target firmware implementation or compatibility claim exists yet.
+ezfomega is now in active implementation under owner authorization; see OMEGA_STATUS.md. ezfblue remains preparation only. No new target has hardware validation yet.
 
 | Branch | Target | Reference repository | Pinned reference commit |
 | --- | --- | --- | --- |

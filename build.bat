@@ -10,22 +10,22 @@ echo Done!
 
 if not exist images\blank\SD_LIST.h (
 	echo Missing images\blank\SD_LIST.h
-	echo Add SD_LIST.bmp, SD_HORIZONTAL.bmp, SD_VERTICAL.bmp, SET.bmp, START.bmp, and HELP.bmp to images\blank, then run Grit\Build Skin Files.bat first.
+	echo Add SD_LIST.bmp, SD_HORIZONTAL.bmp, SD_VERTICAL.bmp, SET.bmp, START.bmp, and HELP.bmp to images\blank, then run Build Skin Files.bat first.
 	goto :done
 )
 if not exist images\blank\SET.h (
 	echo Missing images\blank\SET.h
-	echo Add SD_LIST.bmp, SD_HORIZONTAL.bmp, SD_VERTICAL.bmp, SET.bmp, START.bmp, and HELP.bmp to images\blank, then run Grit\Build Skin Files.bat first.
+	echo Add SD_LIST.bmp, SD_HORIZONTAL.bmp, SD_VERTICAL.bmp, SET.bmp, START.bmp, and HELP.bmp to images\blank, then run Build Skin Files.bat first.
 	goto :done
 )
 if not exist images\blank\START.h (
 	echo Missing images\blank\START.h
-	echo Add SD_LIST.bmp, SD_HORIZONTAL.bmp, SD_VERTICAL.bmp, SET.bmp, START.bmp, and HELP.bmp to images\blank, then run Grit\Build Skin Files.bat first.
+	echo Add SD_LIST.bmp, SD_HORIZONTAL.bmp, SD_VERTICAL.bmp, SET.bmp, START.bmp, and HELP.bmp to images\blank, then run Build Skin Files.bat first.
 	goto :done
 )
 if not exist images\blank\HELP.h (
 	echo Missing images\blank\HELP.h
-	echo Add SD_LIST.bmp, SD_HORIZONTAL.bmp, SD_VERTICAL.bmp, SET.bmp, START.bmp, and HELP.bmp to images\blank, then run Grit\Build Skin Files.bat first.
+	echo Add SD_LIST.bmp, SD_HORIZONTAL.bmp, SD_VERTICAL.bmp, SET.bmp, START.bmp, and HELP.bmp to images\blank, then run Build Skin Files.bat first.
 	goto :done
 )
 
@@ -69,8 +69,8 @@ popd
 if defined BUILD_DRIVE subst %BUILD_DRIVE% /D >NUL
 if not "%MAKE_EXIT%"=="0" goto :done
 if exist "%BUILD_OUTPUT_GBA%" (
-	copy /Y "%BUILD_OUTPUT_GBA%" ezkernelnew.bin >NUL
-	echo Output: ezkernelnew.bin
+	copy /Y "%BUILD_OUTPUT_GBA%" ezkernel.bin >NUL
+	echo Output: ezkernel.bin
 )
 echo Done!
 

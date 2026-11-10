@@ -1,5 +1,9 @@
 # Credits and provenance
 
+## Original Omega development branch
+
+The ezfomega backport builds on FrankieT19’s Original Omega DS Style v8.0 adaptation (ef30b8b), which builds on EZ-FLASH and Sterophonick’s work. Merkin Mix artwork and safety improvements are being selectively adapted for this hardware. See docs/porting/OMEGA_STATUS.md for provenance and validation status.
+
 - **EZ-FLASH** — original OMEGA Definitive Edition kernel source.
 - **Sterophonick** — SimpleLight custom kernel, part of DS Style's foundation.
 - **[FrankieT19](https://github.com/FrankieT19/omega-de-ds-style-kernel)** — DS Style v7.5 foundation ([commit](https://github.com/FrankieT19/omega-de-ds-style-kernel/commit/df346b5ee173ab47bb0c40305a682ce4f7f190e1)), including animated carousels and the launch pulse. His separately authored [v8.0 commit](https://github.com/FrankieT19/omega-de-ds-style-kernel/commit/6d6084e01d9410ddaae8ac69bb93a245c5edac28) supplied the Start-screen/UI refinements, Auto theme, View grouping, Open SYSTEM, wrap defaults, Boot to, double-tap favourites and save-presentation artwork integrated into Merkin Mix 8.3.0.
