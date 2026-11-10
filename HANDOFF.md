@@ -1,5 +1,9 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## Port preparation branch `ezfomega`
+
+Current branch: `ezfomega`, created from `691dc5ec0391cd30c537082a8428978b29c5500a`. Only target planning documentation differs from the common baseline. Read `docs/porting/TARGET.md` and `docs/porting/README.md`. Commit/push this preparation checkpoint; do not start actual porting until the owner resumes it. Existing firmware still targets DE Rev. A/B.
+
 ## 2026-11-10 17:54 UTC — Port exploration framework prepared
 
 - Owner requested preparation only for `ezfomega` (original Omega) and `ezfblue` (vendor BLUE), with no actual porting yet. `docs/porting/README.md` records pinned source references, scope, provenance and ordered continuation gates. Each branch will add its target plan; inherited firmware remains DE Rev. A/B code.
