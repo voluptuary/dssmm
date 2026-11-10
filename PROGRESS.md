@@ -1,5 +1,12 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 17:54 UTC — Port exploration framework prepared
+
+- Owner requested preparation only for `ezfomega` (original Omega) and `ezfblue` (vendor BLUE), with no actual porting yet. `docs/porting/README.md` records pinned source references, scope, provenance and ordered continuation gates. Each branch will add its target plan; inherited firmware remains DE Rev. A/B code.
+- Default-branch PATCH was retried and again returned HTTP 403 `Resource not accessible by integration`. Keep `main` synchronized with `ezfode`; GitHub must accept the default change before deleting `main`.
+- Reference commits: Omega `ef30b8ba78147943d95653dfa82f721b52096f67`; BLUE `109f1a050d9c35008379ce61ae40d05dc528c614`. Fetched into dedicated reference refs without merging code. BLUE README documents a separate image-linking step with `image.bin` and `Link_kernel_image.exe`; packaging must be investigated before any firmware artifact.
+- Documentation-only preparation; no build or runtime tests required. Next: commit/push framework, create and push both target branches with plans, return to `ezfode`, and await owner resumption.
+
 ## 2026-11-10 17:49 UTC — Loader candidate pushed; hardware check pending
 
 - **Objective:** finish the previously implemented PSRAM loader work and verify if any remaining code-level issue can be fixed safely without hardware-revision assumptions.
