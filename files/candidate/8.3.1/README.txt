@@ -1,6 +1,6 @@
-DS Style Merkin Mix 8.3.1 refreshed release
+DS Style Merkin Mix 8.3.1 release
 
-Owner-tested PSRAM safeguards, clean plugin transitions, themed NOR writing progress with NOR.bmp background, username and clock. Release image exactly matches tested NOR artwork candidate.
+Owner-tested loading UI and losslessly packed NOR background.
 
-Size: 2092064 bytes (5088 below 2 MiB)
-SHA-256: 2d0093f12f7f81125373bfdbe4f60712b3ba9b94d6818b5eb5c3f87e7be5c8c9
+Size: 2024344 bytes (72808 below 2 MiB)
+SHA-256: 8fb4cd6054679680d4b774275f114a885e66b00b07ebc9cbe98837726f1c9bf8

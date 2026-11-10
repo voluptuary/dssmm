@@ -1,5 +1,10 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 18:57 UTC — Smaller 8.3.1 replacement authorized
+
+- Owner reports size-audit candidate works and authorizes replacing 8.3.1 with that exact image. No additional hardware revision/mode details were specified. Kernel is 2,024,344 bytes, SHA-256 `8fb4cd6054679680d4b774275f114a885e66b00b07ebc9cbe98837726f1c9bf8`; prior full 34-host/build/static/pixel validation applies to this exact source/image. Local release binary refreshed.
+- Release notes must remain byte-for-byte unchanged. Next: commit/push checkpoint, move v8.3.1 tag to source including lossless packing, replace kernel/source ZIP, verify downloads and unchanged notes, then delete temporary ZIP. No firmware changes or repeated tests needed for publication of the owner-tested artifact.
+
 ## 2026-11-10 18:54 UTC — ROM-size audit completed in software
 
 - Implemented NOR-only lossless asset packing. Production kernel is 2,024,344 bytes versus baseline 2,092,064: saves 67,720 bytes (3.24%); restores 72,808 bytes of headroom, about 14.3x the prior margin. Original BMP and standard raw NOR.h remain in images/blank; only generated NOR_lz.h is linked. No features/formats/languages removed and no rendering hot-loop/compiler/flash-policy changes.
