@@ -1,5 +1,11 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 18:47 UTC — Superseded build candidates cleaned
+
+- Owner requested candidate cleanup. Removed six superseded candidate folders (8.3.0, PSRAM audit, plugin launch, loading UI, loading UI background and NOR BMP tests), including ignored binaries and tracked candidate READMEs. Reclaimed 12,168,519 bytes.
+- Preserved only `files/candidate/8.3.1/` with the verified published kernel and README. Kernel SHA-256 remains `2d0093f12f7f81125373bfdbe4f60712b3ba9b94d6818b5eb5c3f87e7be5c8c9`. Prior candidate paths below are historical evidence; their hashes/results remain recorded. HANDOFF.md and PROGRESS.md preserved.
+- No firmware, release assets/notes, tags or port branches changed. Cleanup verified by directory inventory and retained-kernel hash; no build/tests needed. Next: commit/push cleanup and leave clean `ezfode`.
+
 ## 2026-11-10 18:46 UTC — Refreshed 8.3.1 release verified
 
 - Updated existing stable/latest [8.3.1 release](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1) and annotated tag to `06899427220edebaaabf751c1109ea959f41ddec` on `ezfode`, as authorized. Includes owner-tested plugin transition and NOR progress/background/username/clock changes, plus earlier PSRAM fixes. Notes retain cumulative style/credits and add only final user-facing changes.
