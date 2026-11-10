@@ -8,6 +8,7 @@ bash scripts/test-cheat-row-host.sh
 bash scripts/test-savefile-host.sh
 bash scripts/test-omega-patch-host.sh
 bash scripts/test-omega-trim-host.sh
+bash scripts/test-omega-nor-scan-host.sh
 bash scripts/test-omega-nor-load-host.sh
 bash scripts/test-omega-nor-progress-host.sh
 bash scripts/test-nor-background-host.sh

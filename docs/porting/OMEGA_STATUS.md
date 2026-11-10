@@ -8,7 +8,7 @@ Work only on ezfomega. Do not merge into ezfode, change DE release tags/assets, 
 
 | Area | Status / next action |
 | --- | --- |
-| Omega cartridge, save-chip, reset and SD bus code | Ezcard_OP.c, reset.s and ff15/ff.c remain reference code. GBApatch.c has software window/trim corrections; NORflash_OP.c has checked input/UI changes, with erase/program/enumeration routines retained. ez_define.h gains constants/UI declarations; no DE flash protocol copied |
+| Omega cartridge, save-chip, reset and SD bus code | Ezcard_OP.c, reset.s and ff15/ff.c remain reference code. GBApatch.c has software window/trim corrections; NORflash_OP.c has checked input/UI changes, with erase/program routines retained and enumeration bounds/IRQ fixes. ez_define.h gains constants/UI declarations; no DE flash protocol copied |
 | Existing DS Style v8 UI / themes / carousels / sound | Reference implementation retained; built with its launcher -Os policy |
 | Filename artwork | First batch: custom priority, legacy GBA header lookup, then filename BMP fallback at active artwork root; non-GBA no longer probes arbitrary bytes as GBA header. Bounds/exact reads/closes checked. Mirrored directory/LFN alias resolution is now implemented and host-tested; indexed fast-open remains pending |
 | Plugin transitions | Merkin guard ported around external-plugin progress strip |
@@ -53,3 +53,5 @@ Artwork integration correction: initial function-level filename tests did not ex
 Windows packaging now uses explicit TARGET=omega-kernel to match the copied ezkernel.bin input regardless of checkout name. Static review only; no Windows execution available.
 
 Final artwork integration validation: explicit-directory helper also serves Start/favorite previews, where filesystem CWD and displayed currentpath may differ. Forced build plus full target verifier passed at 2,044,200 bytes (52,952 margin). No hardware tests.
+
+NOR scan follow-up: simulated ROM window reproduces slot-64 overrun with stale following header. Guards reject zero/misaligned/oversized catalog spans, recompute offsets, respect kernel base page and restore prior IRQ state even on full-capacity early exit. Full verifier passes; final image 2,044,264 bytes (52,888 headroom), heap 21,424 bytes, IWRAM gap 8,048. NOR physical programming/status and metadata power-loss safety remain unverified. Remaining major areas are indexed file identity/fast-open, verified install-folder/LFN persistence for NOR artwork, and further UI/settings parity; do not assume these are finished.

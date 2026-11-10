@@ -11,6 +11,9 @@ Do not copy DE flash/save/reset protocols into the Original Omega port.
 Keep ezfomega isolated from ezfode. Record suspected ezfode defects with evidence
 as deferred review items; do not fix them on ezfode during this port.
 Use automatic GitHub source archives; do not upload separate source ZIPs.
+Original Omega hardware is unavailable: validation is source/build/host only.
+On ezfomega use scripts/verify-omega-port.sh; do not treat DE tests or hardware
+reports as validation of this port. Do not publish it as hardware-qualified.
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
 ran ahead of this repository's build number. In particular, its v8.4.1 release

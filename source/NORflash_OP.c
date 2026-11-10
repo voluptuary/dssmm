@@ -1,6 +1,7 @@
 #include <gba_interrupt.h>
 #include <gba_input.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <gba_base.h>
 #include <gba_dma.h>
@@ -331,20 +332,27 @@ file_failed:
 //-----------------------------------------------------------
 u32 GetFileListFromNor(void)
 {
-    REG_IME = 0 ;
+    u16 old_ime = REG_IME;
+    REG_IME = 0;
+    gl_norOffset = 0;
     u32 page=0,count=0;
-    u32 StartAddress = FlashBase_S98;
+    uintptr_t StartAddress = FlashBase_S98;
     char temp[50];
     vu16  Value;
+    SetRompage(gl_currentpage);
     Value = *(vu16 *)(StartAddress + 0xbe);
     u16 x24 = *(vu16 *)(StartAddress + 0x6);
     //DEBUG_printf(" %x %x %x",StartAddress,Value,x24);
     while( ((Value&0xFF)==0xCE) || ((Value&0xFF)==0xCF)|| ((Value&0xFF)==0x00)|| (x24==0x51ae)) {
+        if(count >= MAX_NOR) break;
         //DEBUG_printf(" %x %x %x",StartAddress,Value,x24);
         if(*(vu8 *)(StartAddress+0xb2) == 0x96) {
             memcpy(temp,(char*)(StartAddress+0xa0),0x10);
             //temp[12] = 0 ;
             //DEBUG_printf("  %s VS %s",temp ,pNorFS[count].gamename);
+            if(pNorFS[count].filesize < 0x20000 ||
+                (pNorFS[count].filesize & 0x1FFFF) ||
+                pNorFS[count].filesize > 0x4000000 - gl_norOffset) break;
             if(memcmp(temp,pNorFS[count].gamename,0x10) ==0) { //if(!strcasecmp(temp, pNorFS[count].gamename))
                 gl_norOffset += pNorFS[count].filesize;
                 StartAddress += pNorFS[count].filesize;
@@ -361,19 +369,20 @@ u32 GetFileListFromNor(void)
             page += 0x1000 ;
             if(page>0x7000) {
                 SetRompage(gl_currentpage);
+                REG_IME = old_ime;
                 return count;
             }
             SetRompage(gl_currentpage+page);
             StartAddress -= 0x800000 ;
         }
-        if(count > MAX_NOR) {
+        if(count >= MAX_NOR) {
             break;    //max
         }
         Value = *(vu16 *)(StartAddress + 0xbe);
         x24 = *(vu16 *)(StartAddress + 0x6);
     }
     SetRompage(gl_currentpage);
-    REG_IME   = 1 ;
+    REG_IME = old_ime;
     return count ;
 }
 //-----------------------------------------------------------
