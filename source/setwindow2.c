@@ -47,7 +47,6 @@ extern u16 gl_SD_R;
 extern u16 gl_SD_G;
 extern u16 gl_SD_B;
 extern void UIAudio_HandleKeys(u16 keysdown, u16 keysrepeat);
-extern void Show_error_num(u8 error_num);
 
 void save_set2_info(void);
 extern void Draw_select_icon(u32 X,u32 Y,u32 mode);

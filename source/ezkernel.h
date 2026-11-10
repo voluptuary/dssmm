@@ -10,28 +10,20 @@ typedef struct FM_NOR_FILE_SECT{////save to nor
 	u16 rompage ;
 	u16 have_patch ;
 	u16	have_RTS;
-	u16 is_64MBrom;//reserved;
+	u16 reserved;
 	u32 filesize;
-	u8 savemode;
-	u8 reserved1;
-	u16 reserved2 ;
+	u32 reserved2 ;
 	char gamename[0x10];
 } FM_NOR_FS;
 
 typedef struct FM_Folder_SECT{
 	char filename[100];
-	char altname[13];
-	u8 flags;
 } FM_Folder_FS;
 
 typedef struct FM_FILE_SECT{
 	char filename[100];
 	u32 filesize;
-	char altname[13];
-	u8 flags;
 } FM_FILE_FS;
-
-#define FM_ENTRY_ALIAS_DISPLAY 0x01
 
 
 typedef enum {

@@ -15,7 +15,7 @@ char* gl_theme_credit2;
 char* gl_generating_emu;
 
 char* gl_menu_btn;
-char* gl_nor_delete_info;
+char* gl_lastest_game;
 int gl_font_above_extent = 0;
 
 char* gl_writing;
@@ -88,10 +88,6 @@ char* gl_error_3;
 char* gl_error_4;
 char* gl_error_5;
 char* gl_error_6;
-char* gl_nor_device_error;
-char* gl_nor_erase_error;
-char* gl_nor_program_error;
-char* gl_nor_catalog_error;
 
 char* gl_save_sav;
 char* gl_save_ing;
@@ -138,7 +134,7 @@ const char en_file_overflow[]=DSTEXT_STATUS_FILE_TOO_BIG;
 
 const char en_menu_btn[]=" (B) No     (A) OK";
 const char en_writing[]=DSTEXT_STATUS_WRITING;
-const char en_nor_delete_info[]=DSTEXT_STATUS_SELECT_LATEST;
+const char en_lastest_game[]=DSTEXT_STATUS_SELECT_LATEST;
 
 const char en_time[]="     Time";
 const char en_Mon[]="Mon";
@@ -163,7 +159,7 @@ const char en_lang[]="English";
 const char en_set_btn[]="Set";
 const char en_ok_btn[]=" OK";
 const char en_formatnor_info1[]="Are you sure?";
-const char en_formatnor_info2[]="Formatting, this may take some time. Please wait...";
+const char en_formatnor_info2[]="This will take a while.";
 
 const char en_theme_credit[]="DS Style v6";
 const char en_theme_credit2[]="by FrankieT19";
@@ -211,10 +207,6 @@ const char en_error_3[]=DSTEXT_ERROR_SAVE;
 const char en_error_4[]=DSTEXT_ERROR_READ_SAVE;
 const char en_error_5[]=DSTEXT_ERROR_MAKE_SAVE;
 const char en_error_6[]=DSTEXT_ERROR_RTS;
-const char en_nor_device_error[]="Unsupported NOR device";
-const char en_nor_erase_error[]="NOR erase failed";
-const char en_nor_program_error[]="NOR program failed";
-const char en_nor_catalog_error[]="NOR catalog save failed";
 
 
 const char en_save_sav[]=DSTEXT_STATUS_COPY_SAVE;
@@ -271,7 +263,7 @@ const char th_file_overflow[]= "ไฟล์ใหญ่เกินไป";
 
 const char th_menu_btn[]     = "(B)ยกเลิก   (A)ตกลง";
 const char th_writing[]      = "กำลังเขียน...";
-const char th_nor_delete_info[] = "ลบได้เฉพาะเกม NOR ล่าสุด";
+const char th_lastest_game[] = "เลือกเกมล่าสุด";
 
 const char th_time[]         = "     เวลา";
 const char th_Mon[]          = "จัน";
@@ -398,7 +390,7 @@ void LoadChinese(void)
 
 	gl_menu_btn = (char*)zh_menu_btn;
 	gl_writing = (char*)zh_writing;
-	gl_nor_delete_info = (char*)zh_lastest_game;
+	gl_lastest_game = (char*)zh_lastest_game;
 
 
 	gl_time = (char*)zh_time;
@@ -425,7 +417,7 @@ void LoadChinese(void)
 	gl_set_btn = (char*)zh_set_btn;
 	gl_ok_btn = (char*)zh_ok_btn;
 	gl_formatnor_info1 = (char*)zh_formatnor_info;
-	gl_formatnor_info2 = (char*)en_formatnor_info2;
+	gl_formatnor_info2= " ";
 
 	temp = " ";
 
@@ -468,10 +460,6 @@ void LoadChinese(void)
 	gl_error_4 = (char*)zh_error_4;
 	gl_error_5 = (char*)zh_error_5;
 	gl_error_6 = (char*)zh_error_6;
-	gl_nor_device_error = (char*)en_nor_device_error;
-	gl_nor_erase_error = (char*)en_nor_erase_error;
-	gl_nor_program_error = (char*)en_nor_program_error;
-	gl_nor_catalog_error = (char*)en_nor_catalog_error;
 
 	gl_save_sav = (char*)zh_save_sav;
 	gl_save_ing = (char*)zh_save_ing;
@@ -523,7 +511,7 @@ void LoadEnglish(void)
 
 	gl_menu_btn = (char*)en_menu_btn;
 	gl_writing = (char*)en_writing;
-	gl_nor_delete_info = (char*)en_nor_delete_info;
+	gl_lastest_game = (char*)en_lastest_game;
 
 	gl_time = (char*)en_time;
 	gl_Mon = (char*)en_Mon;
@@ -591,10 +579,6 @@ void LoadEnglish(void)
 	gl_error_4 = (char*)en_error_4;
 	gl_error_5 = (char*)en_error_5;
 	gl_error_6 = (char*)en_error_6;
-	gl_nor_device_error = (char*)en_nor_device_error;
-	gl_nor_erase_error = (char*)en_nor_erase_error;
-	gl_nor_program_error = (char*)en_nor_program_error;
-	gl_nor_catalog_error = (char*)en_nor_catalog_error;
 
 	gl_save_sav = (char*)en_save_sav;
 	gl_save_ing = (char*)en_save_ing;
@@ -644,7 +628,7 @@ void LoadThai(void)
 
 	gl_menu_btn            = (char*)th_menu_btn;
 	gl_writing             = (char*)th_writing;
-	gl_nor_delete_info        = (char*)th_nor_delete_info;
+	gl_lastest_game        = (char*)th_lastest_game;
 
 	gl_time                = (char*)th_time;
 	gl_Mon                 = (char*)th_Mon;
@@ -711,10 +695,6 @@ void LoadThai(void)
 	gl_error_4             = (char*)th_error_4;
 	gl_error_5             = (char*)th_error_5;
 	gl_error_6             = (char*)th_error_6;
-	gl_nor_device_error   = (char*)"อุปกรณ์ NOR ไม่รองรับ";
-	gl_nor_erase_error     = (char*)"ลบ NOR ไม่สำเร็จ";
-	gl_nor_program_error   = (char*)"เขียน NOR ไม่สำเร็จ";
-	gl_nor_catalog_error   = (char*)"บันทึกรายการ NOR ไม่สำเร็จ";
 	
 	gl_save_sav            = (char*)th_save_sav;
 	gl_save_ing            = (char*)th_save_ing;

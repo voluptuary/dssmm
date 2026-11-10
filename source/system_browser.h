@@ -6,7 +6,7 @@ static struct {
     u32 active, depth, saved_depth, restore, recent, favourites;
     u32 return_offset, return_selected, return_depth, recent_offset, recent_selected;
     TCHAR path[MAX_path_len], saved_path[MAX_path_len], return_path[MAX_path_len];
-    u32 offsets[MAX_path_len], selections[MAX_path_len];
+    u32 offsets[100], selections[100];
 } launcher_system_browser EWRAM_BSS;
 
 static FRESULT Launcher_OpenSystemFolder(u32 *offset, u32 *selected, u32 *depth)

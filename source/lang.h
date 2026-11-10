@@ -11,7 +11,7 @@ extern char* gl_theme_credit;
 extern char* gl_theme_credit2;
 
 extern char* gl_menu_btn;
-extern char* gl_nor_delete_info;
+extern char* gl_lastest_game;
 
 extern char* gl_writing;
 extern char* gl_time;
@@ -82,10 +82,6 @@ extern char* gl_error_3;
 extern char* gl_error_4;
 extern char* gl_error_5;
 extern char* gl_error_6;
-extern char* gl_nor_device_error;
-extern char* gl_nor_erase_error;
-extern char* gl_nor_program_error;
-extern char* gl_nor_catalog_error;
 
 extern char* gl_save_sav;
 extern char* gl_save_ing;

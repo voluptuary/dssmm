@@ -19,7 +19,6 @@ extern u16 gl_engine_sel;
 extern u16 gl_show_Thumbnail;
 extern u16 gl_ingame_RTC_open_status;
 extern void UIAudio_HandleKeys(u16 keysdown, u16 keysrepeat);
-extern void Show_error_num(u8 error_num);
 
 extern void CheckSwitch(void);
 extern void CheckLanguage(void);

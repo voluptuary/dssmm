@@ -36,7 +36,6 @@ CFLAGS	:=	-g -Wall -O\
 		-mcpu=arm7tdmi -mtune=arm7tdmi\
  		-fomit-frame-pointer\
 		-ffast-math \
-		-ffunction-sections -fdata-sections \
 		$(ARCH)
 
 CFLAGS	+=	$(INCLUDE)
@@ -44,19 +43,13 @@ CFLAGS	+=	$(INCLUDE)
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
-# Keep the user stack out of IWRAM .data and leave a bounded heap in EWRAM.
-GBA_USER_STACK_TOP := 0x0203F000
-GBA_HEAP_END := 0x0203C000
-LDFLAGS	=	-g $(ARCH) -Wl,-Map,$(notdir $*.map) \
-		-Wl,--gc-sections \
-		-Wl,--defsym,__sp_usr=$(GBA_USER_STACK_TOP) \
-		-Wl,--defsym,__eheap_end=$(GBA_HEAP_END)
-KERNEL_SIZE_LIMIT := 2097152
+LDFLAGS	=	-g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
 LIBS	:= -lmm -lgba
+KERNEL_SIZE_LIMIT := 2097152
 
 
 #---------------------------------------------------------------------------------
@@ -154,7 +147,8 @@ $(OUTPUT).gba	:	$(OUTPUT).elf
 
 $(OUTPUT).elf	:	$(OFILES)
 
-# Keep launcher size bounded; hot animation routines select their own optimisation.
+# Size-optimise the launcher unit so the Original Omega stays below 2 MiB.
+# The animation pixel loop explicitly uses O2 in IWRAM.
 ezkernelnew.o: CFLAGS += -Os
 
 $(OFILES_SOURCES) : $(HFILES)

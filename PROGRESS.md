@@ -1,5 +1,13 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 19:12 UTC — Original Omega port implementation resumed
+
+- Owner explicitly resumed actual backporting on ezfomega. Reference remains FrankieT19 ef30b8ba78147943d95653dfa82f721b52096f67. Branch was c8712f1, clean, still inherited DE firmware; that is not an Original Omega implementation.
+- Decision: use reference source/images/Makefile as executable hardware baseline, retain project history/audit docs and selectively backport Merkin Mix. Preserve reference low-level flash/reset/save behavior and -Os launcher policy. First batch: bounded filename artwork fallback and themed external-plugin launch guard. Target-specific build/layout and focused host validation required; DE test results do not apply automatically.
+- Next: install baseline tracked tree, build in a distinct build-omega directory, implement/test first batch, write feature matrix, commit/push checkpoint. No release or hardware-compatibility claim yet.
+- First batch validated: forced build 2,028,640 bytes; extracted filename-art tests pass; reference low-level files verified identical. Status/matrix in docs/porting/OMEGA_STATUS.md. Imported showcht indentation normalized after diff whitespace check. Owner explicitly requires isolation; only ezfomega is being pushed, ezfode must remain untouched. Next: transparency pipeline port.
+
+
 ## 2026-11-10 18:04 UTC — GitHub branch rename verified
 
 - Owner completed deletion/rename through GitHub. Remote HEAD now points to `refs/heads/ezfode`; remote `main` is absent. `git fetch origin --prune` removed `origin/main`, and `git remote set-head origin -a` set `origin/HEAD` to `origin/ezfode`. The earlier permission blocker is resolved by the owner action; old synchronization instructions below are historical and superseded. Do not recreate `main`.

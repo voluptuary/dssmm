@@ -1,23 +1,16 @@
 #ifndef EZ_DEFINE_HEADER
 #define EZ_DEFINE_HEADER
 
-#include "fat_table_builder.h"
-
 #define MAX_pReadCache_size 0x20000
-#define PSRAM_CAPACITY_BYTES 0x02000000UL
-#define PSRAM_WINDOW_BYTES 0x00800000UL
-#define PSRAM_WINDOW_PAGE_STEP 0x1000U
-#define PSRAM_PLUGIN_WINDOW_BYTES 0x00400000UL
-#define PSRAM_PLUGIN_PAGE_STEP 0x0800U
 #define MAX_files     0x200
 #define MAX_folder    0x60
 #define MAX_NOR				0x40
 
 #define MAX_path_len 0x100
 
-#define FAT_table_size FAT_TABLE_SIZE_BYTES
-//#define FAT_table_SAV_offset 0x200
-#define FAT_table_RTS_offset FAT_TABLE_RTS_OFFSET_BYTES
+#define FAT_table_size 0x400
+#define FAT_table_SAV_offset 0x200
+#define FAT_table_RTS_offset 0x300
 
 #define DEBUG
 
@@ -25,7 +18,7 @@
 #define Vcache         (u16*)pReadCache
 #define RGB(r,g,b) ((r)+(g<<5)+(b<<10))
 
-#define PSRAMBase_S98			((unsigned char*)0x08800000)
+#define PSRAMBase_S98			(void*)0x08800000
 #define FlashBase_S98 		(u32)0x09000000
 #define FlashBase_S98_end (u32)0x09800000
 
