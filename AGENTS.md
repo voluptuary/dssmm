@@ -12,6 +12,10 @@ ezfode defects in a branch-local deferred queue rather than changing ezfode.
 No BLUE hardware testing is available; never imply DE reports validate BLUE.
 Use automatic GitHub source archives, not separately uploaded source ZIPs.
 The original Omega port has its own hardware-untested prerelease on ezfomega.
+Active BLUE sources are in targets/blue; root source/images are retained DS
+Style donors, excluded from the build. Run bash scripts/verify-blue-port.sh.
+No BLUE release or hardware-qualified artifact exists; raw GBA output needs
+its resources and must not be flashed or booted by itself.
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
 ran ahead of this repository's build number. In particular, its v8.4.1 release

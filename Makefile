@@ -3,7 +3,9 @@
 .PHONY: all clean check
 all:
 	$(MAKE) -C targets/blue
+	python3 scripts/pack-blue-kernel.py --check-code targets/blue/ezbluekernel-development.gba
 clean:
 	$(MAKE) -C targets/blue clean
 check:
 	python3 tests/test-blue-packaging.py
+	python3 tests/test-blue-psram-load.py

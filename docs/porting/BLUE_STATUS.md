@@ -24,10 +24,27 @@ The BLUE source is the vendor's classic menu, not DS Style. Establish it as the 
 | DS Style launcher/themes/navigation | Root source/images retained as donor; not yet built for BLUE |
 | Name-matched/transparent artwork and cache | Pending launcher integration; do not claim present |
 | Saves/settings/remembered cheats | Vendor behavior initially; transactional/persistence changes pending target review |
-| Loader safeguards | Vendor native loader ignores short reads and caller ignores its failure; first narrow backport candidate |
+| Loader safeguards | Native file loader exact-read/size/window/padding checks and caller abort ported and host-tested. Plugin, header, trim and hardware/FAT-offload paths still need review |
 | NOR catalog/allocation/patching | Vendor format retained; inventory and bounded tests needed before Merkin changes |
 | Hardware verification | No reports available; boot/save/NOR/64 MiB/plugin matrix all unverified |
 
 Next: commit inventory, introduce isolated vendor build and tested portable packer, then port native loader exact-I/O/bounds checks with failure propagation. Review SD directory append overflow and catalog enumeration separately. DE shared findings must be reproduced against current ezfode before queueing; do not assume vendor bugs exist there.
 
 Isolated build checkpoint: root make now delegates only to targets/blue. Full target build succeeds at 703,752 bytes; four packaging test groups pass. Raw ELF symbols: EWRAM heap start/end 0x0203E36C/0x02040000 (7,316 bytes); IWRAM overlay end 0x03007080 to user SP 0x03007F00 (3,712-byte gap). These are static reservations, not measured runtime peaks. Eight inherited warning diagnostics remain, including directory sprintf overlap/overflow; none suppressed. Windows batch changes are statically reviewed only. No packaged update distributed.
+
+## First Merkin safety backport validated
+
+Native Loadfile2PSRAM now checks the full exFAT size before narrowing (1..64 MiB), seek/read/close results, pads the final 128 KiB block with FF, restores selector zero on failure and success, and preserves BLUE 8 MiB windows/0x1000 page stride and streaming PatchInternal. Its actual caller aborts before Make_pat_file/further patching/boot on failure. Host tests compile the production function and simulate all eight banks, one-byte/tail/full-limit inputs, >4 GiB narrowing cases, short/failed reads on blocks 1/65, and open/seek/close errors. The pre-fix baseline fails the deterministic-tail assertion; corrected function passes. Caller ordering is checked statically, not by executing the full target menu.
+
+Clean build and bash scripts/verify-blue-port.sh pass: raw code 703,912 bytes, 344,664 bytes before the fixed resource boundary; raw SHA-256 76731cf06d11e8ce84bcba787f22139c29bd69caa913ce6e1fcbf4fe3b386f5f. Resource recipe verified in memory, no installable candidate distributed. EWRAM heap 7,316; IWRAM-to-user-SP gap 3,664 bytes. Eight inherited warnings persist; no runtime stack/heap or hardware claim.
+
+Correction to initial baseline checkpoint: the temporary vendor build succeeded, but the first repository build's final size-guard command failed because its path was relative to the recursive build directory. That failure was initially overlooked in the baseline checkpoint. Corrected to an output-relative absolute path, added Makefile/script dependencies and .DELETE_ON_ERROR, and checked the code boundary on every root make. A subsequent clean build and aggregate verifier succeeded end to end. Baseline import retains vendor whitespace; full imported-range diff --check reported inherited whitespace. Focused new changes pass diff --check.
+
+## Exact continuation
+
+1. Read AGENTS/HANDOFF/PROGRESS and this status. Confirm branch ezfblue and remote ezfode still 5f700c9. Baseline and packaging commit is 2a3d1ca; native-loader checkpoint follows it. Run bash scripts/verify-blue-port.sh after relevant changes.
+2. Design DS Style resource/firmware placement before copying the launcher: compare current ezfode 5f700c9 source/ezkernelnew.c, source/ez_define.h, source/fw.h and asset footprint with BLUE's 1 MiB resource split and firmware 0x08195000. Root donor is an older inherited snapshot, not all latest DE changes. Determine whether fixed-address firmware can be preserved with code/asset separation or safely relocated; source-level packer layout alone does not prove bootloader flexibility. Keep vendor firmware CRC/protocols intact.
+3. Integrate DS Style frontend against BLUE-specific NOR catalog/allocation, page 0x400 native launch, GBApatch_DDR, settings metadata and firmware APIs. Do not copy DE flash polling/timeouts or NOR path metadata sectors by assumption. Add a per-feature matrix and target regressions before claiming artwork/UI parity.
+4. Review vendor ezbluekernel.c folder appends (overlapping sprintf), header/file-size probes, addon trim reads and LoadEMU2PSRAM, plus NOR allocation/catalog functions. Native checked loader does not make these paths safe automatically. Test each narrow correction and checkpoint it.
+5. Keep docs/porting/EZFODE_REVIEW_QUEUE.md updated for verified shared DE findings. Existing six entries were established on the unchanged DE commit during Omega work; vendor-only loader/path issues are not new DE bugs. No stable DE changes/merges/releases during BLUE work.
+6. Hardware verification remains outstanding for BLUE boot/SD, game saves/settings, plugins, cheats/RTS, 32/64 MiB games and NOR install/delete/format. Do not publish raw baseline as a finished DS Style build.

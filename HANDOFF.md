@@ -1,5 +1,14 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 20:43 UTC — BLUE native-loader backport and first port checkpoint validated
+
+- Actual native Loadfile2PSRAM now checks full 64-bit file size before 64 MiB narrowing, exact seek/read/close, deterministic FF tail, bank/page geometry and selector restoration. Caller returns on failure before creating patch files, further patching or boot. Preserved BLUE streaming patch behavior and 0x400 game launch/8 MiB selector conventions; no flash commands/reset/firmware changes.
+- tests/test-blue-psram-load.py compiles actual production function with SD/banked-memory mocks: all eight banks, max capacity, >4 GiB wrap candidate, partial blocks and open/seek/read/short-read/close failure cases pass. Baseline 2a3d1ca reproduces stale-tail failure. Full menu caller is static-order checked, not hardware-executed.
+- Clean build and scripts/verify-blue-port.sh pass. Raw 703,912 bytes (344,664 before resources), SHA 76731cf06d11e8ce84bcba787f22139c29bd69caa913ce6e1fcbf4fe3b386f5f. In-memory combined vendor recipe 2,124,252 bytes; no update distributed. Static heap 7,316 and IWRAM gap 3,664, not runtime bounds. Eight inherited warnings remain.
+- Correction: initial temporary baseline compile succeeded, but the initial repository build failed at the new guard due to a recursive-directory path mistake, overlooked in the earlier checkpoint. Fixed absolute output-relative path/dependencies, added .DELETE_ON_ERROR and root always-check, then reran a clean build and aggregate checks successfully. Full vendor import diff --check has inherited whitespace; focused new diff passes. No warning suppression.
+- Carried the six previously evidenced DE review entries from ezfomega into BLUE queue; current DE still 5f700c9 and Omega still 439289b. BLUE-only old loader/directory defects are explicitly not asserted as DE defects. DS Style integration remains unfinished: code/assets must not collide with vendor's resource split; no BLUE candidate/release or hardware testing.
+- Next ordered work is in docs/porting/BLUE_STATUS.md (resource/firmware layout, frontend target API adaptation, then remaining loader/path/catalog review). Commit/push this checkpoint only on ezfblue; verify clean tree and remote isolation. Build products are local/ignored and current, not release assets.
+
 ## 2026-11-10 20:40 UTC — Isolated BLUE vendor build and resource packer validated
 
 - Added targets/blue/source + vendor license and byte-identical resource input. Only missing declarations, HZK12 case and metadata input type changed from pinned source; all flash commands, reset assembly and firmware bytes preserved. Root make/batch scripts now select BLUE only; retained root source/images are excluded DS Style donor material, documented prominently.

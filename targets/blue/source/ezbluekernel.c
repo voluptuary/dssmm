@@ -1417,57 +1417,54 @@ u8 Get_saveMODE(u8 Save_num,u32 gamefilesize)
 //---------------------------------------------------------------
 u32 IWRAM_CODE Loadfile2PSRAM(TCHAR *filename)
 {
-	UINT  ret;
-	u32 filesize;
-	u32 res;
-	u32 blocknum;
-	char msg[20];
-	
-	u32 Address;
-	vu16 page=0;
-		
-	SetPSRampage(page);
-	
-	res = f_open(&gfile, filename, FA_READ);
-	if(res == FR_OK)
-	{
-		filesize = f_size(&gfile);		
-		Clear(60,160-15,120,15,gl_color_cheat_black,1);	
-		DrawHZText12(gl_writing,0,70,160-15,gl_color_text,1);	
+    u32 result = 1;
+    u32 filesize;
+    u32 offset;
+    UINT received;
+    char msg[20];
 
-		f_lseek(&gfile, 0x0000);
-		for(blocknum=0x0000;blocknum<filesize;blocknum+=0x20000)
-		{		
-			sprintf(msg,"%luMb/%luMb",(blocknum)/0x20000,filesize/0x20000);
-			Clear(70+54,160-15,110,15,gl_color_cheat_black,1);
-			DrawHZText12(msg,0,70+54,160-15,gl_color_text,1);
-			f_read(&gfile, pReadCache, 0x20000, &ret);//pReadCache max 0x20000 Byte
-			
-			if((gl_reset_on==1) || (gl_rts_on==1) || (gl_sleep_on==1) || (gl_cheat_on==1))		    
-			{
-				PatchInternal((u32*)pReadCache,0x20000,blocknum);
-			}
-						
-			Address=blocknum;
-			while(Address>=0x800000)
-			{
-				Address-=0x800000;
-				page+=0x1000;
-			}
+    SetPSRampage(0);
+    if (f_open(&gfile, filename, FA_READ) != FR_OK)
+        return 1;
 
-			SetPSRampage(page);
-			dmaCopy((void*)pReadCache,PSRAMBase_S98+Address, 0x20000);
-			page = 0;
-		}
-		f_close(&gfile);
-		SetPSRampage(0);
-		return 0;
-	}
-	else
-	{
-		return 1;
-	}	
-	
+    /* Check the full exFAT size before narrowing to GBA address arithmetic. */
+    if (f_size(&gfile) == 0 || f_size(&gfile) > BLUE_PSRAM_NATIVE_LIMIT)
+        goto done;
+    filesize = (u32)f_size(&gfile);
+    if (f_lseek(&gfile, 0) != FR_OK)
+        goto done;
+
+    Clear(60, 145, 120, 15, gl_color_cheat_black, 1);
+    DrawHZText12(gl_writing, 0, 70, 145, gl_color_text, 1);
+    for (offset = 0; offset < filesize; offset += MAX_pReadCache_size)
+    {
+        u32 bytes = filesize - offset;
+        if (bytes > MAX_pReadCache_size)
+            bytes = MAX_pReadCache_size;
+        memset(pReadCache, 0xFF, MAX_pReadCache_size);
+        received = 0;
+        if (f_read(&gfile, pReadCache, bytes, &received) != FR_OK || received != bytes)
+            goto done;
+
+        if (gl_reset_on || gl_rts_on || gl_sleep_on || gl_cheat_on)
+            PatchInternal((u32 *)pReadCache, MAX_pReadCache_size, offset);
+
+        /* Preserve the vendor's BLUE 8 MiB window and selector units. */
+        SetPSRampage((offset / BLUE_PSRAM_WINDOW_BYTES) * BLUE_PSRAM_PAGE_STRIDE);
+        dmaCopy(pReadCache, (u8 *)PSRAMBase_S98 + offset % BLUE_PSRAM_WINDOW_BYTES,
+                MAX_pReadCache_size);
+        snprintf(msg, sizeof(msg), "%luMb/%luMb", (unsigned long)(offset / MAX_pReadCache_size),
+                (unsigned long)(filesize / MAX_pReadCache_size));
+        Clear(124, 145, 110, 15, gl_color_cheat_black, 1);
+        DrawHZText12(msg, 0, 124, 145, gl_color_text, 1);
+    }
+    result = 0;
+
+done:
+    if (f_close(&gfile) != FR_OK)
+        result = 1;
+    SetPSRampage(0);
+    return result;
 }
 //---------------------------------------------------------------------------------
 void CheckLanguage(void)
@@ -3170,6 +3167,10 @@ re_show_menu:
 			    		FAT_table_buffer[0x1F4/4] = SET_PARAMETER_MODE;
 							Send_FATbuffer(FAT_table_buffer,1);												
 			    		res=Loadfile2PSRAM(pfilename);
+                            if (res != 0) {
+                                Show_error_num(1);
+                                return 0;
+                            }
 							ShowbootProgress(gl_make_pat);
 							Make_pat_file(pfilename);		    		
 						}

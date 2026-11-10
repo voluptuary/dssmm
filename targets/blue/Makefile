@@ -1,5 +1,6 @@
 #---------------------------------------------------------------------------------
 .SUFFIXES:
+.DELETE_ON_ERROR:
 #---------------------------------------------------------------------------------
 
 ifeq ($(strip $(DEVKITARM)),)
@@ -130,10 +131,10 @@ else
 # main targets
 #---------------------------------------------------------------------------------
 
-$(OUTPUT).gba	:	$(OUTPUT).elf
+$(OUTPUT).gba	:	$(OUTPUT).elf $(dir $(OUTPUT))../../scripts/pack-blue-kernel.py $(dir $(OUTPUT))Makefile
 	$(SILENTCMD)$(OBJCOPY) -O binary $< $@
 	$(SILENTCMD)gbafix $@
-	@python3 ../../scripts/pack-blue-kernel.py --check-code $@
+	@python3 "$(dir $(OUTPUT))../../scripts/pack-blue-kernel.py" --check-code "$@"
 
 $(OUTPUT).elf	:	$(OFILES)
 

@@ -134,3 +134,7 @@
 #define LX16_newomega_top_bin_size  0x716a0
 #define LX16_wirte_address 0x100000
 #define LX16_FW_crc32 0x22DD74FA
+/* BLUE vendor native launch limit and observed PSRAM selector geometry. */
+#define BLUE_PSRAM_NATIVE_LIMIT 0x04000000u
+#define BLUE_PSRAM_WINDOW_BYTES 0x00800000u
+#define BLUE_PSRAM_PAGE_STRIDE 0x1000u
