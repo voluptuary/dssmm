@@ -1,5 +1,12 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 17:34 UTC — Official default-branch rename route confirmed unavailable
+
+- **Investigation:** consulted GitHub's official branch REST API docs after the repository `default_branch` PATCH failed. The branch-rename endpoint allows direct rename; renaming the default requires admin/owner permission and a fine-grained token with `administration:write` ([GitHub REST docs](https://docs.github.com/en/rest/branches/branches#rename-a-branch)).
+- **Attempt/result:** `gh api -X POST repos/voluptuary/ezfode-dssmm-kernel/branches/main/rename -f new_name=ezfode` returned HTTP 403 `Resource not accessible by integration`, the same denial as the default-branch PATCH. `git ls-remote` still shows both remote refs at `90795aa`; no ref was changed by the denied operation.
+- **Conclusion:** the external blocker is permission scope on this session's GitHub API integration, not branch ancestry or local Git state. Repository metadata identifies `voluptuary` as admin, but does not grant this API call's integration the needed repository-setting permission. Do not attempt to delete `main` while it is still default; retain synchronized `main` and `ezfode` refs.
+- **Next:** remove verified-merged remote feature refs and local historical project branches only; keep `upstream/*` refs. Inspect stashes before pruning any recovery copy. Verify final branch heads, default branch, and working tree, then checkpoint. A repository owner can finish the default-branch setting once the integration has admin write access or via GitHub settings.
+
 ## 2026-11-10 17:31 UTC — Main code committed; local rename complete, remote default blocked
 
 - **Commit:** committed all validated RAM audit/loader/cache work, tests, and current ledger updates as `9944dc76f60c17f53de4645a477484ac18e85f65` (`Harden PSRAM loader bounds and cache lifetimes`). `git push origin main` succeeded. Then `git push origin main:ezfode` created the new remote ref; `git ls-remote` confirmed both refs at the same SHA.

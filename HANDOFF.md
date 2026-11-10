@@ -1,5 +1,11 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 17:34 UTC — GitHub branch-rename API also denied
+
+- Checked GitHub's documented `POST /repos/{owner}/{repo}/branches/{branch}/rename` endpoint after the default-branch PATCH failed. The documented endpoint requires push access, and renaming the default also requires admin/owner permission; fine-grained tokens require `administration:write` ([GitHub REST docs](https://docs.github.com/en/rest/branches/branches#rename-a-branch)). The request to rename `main` to `ezfode` returned the same HTTP 403 `Resource not accessible by integration`. No remote refs changed; both `origin/main` and `origin/ezfode` remain synchronized at `90795aa`.
+- **Actionable blocker:** this session's GitHub API integration lacks the repository-setting/admin write permission required for the default-branch rename, despite collaborator metadata reporting the repository owner as admin. Keep both refs synchronized and retain `main` as default until that permission is granted or the owner changes the setting in GitHub.
+- **Next:** delete only the verified-merged, non-default remote feature refs and local historical project branches; retain `main`, `ezfode`, and separate `upstream/*` refs. Then compare the two recovery stashes with committed history, verify all surviving remote refs and local status, and add a final handoff/progress checkpoint. The loader changes are committed and validated; hardware verification is still not available.
+
 ## 2026-11-10 17:31 UTC — Local branch renamed; GitHub default change blocked
 
 - **Commit and push:** validated RAM/loader/cache work is committed as `9944dc76f60c17f53de4645a477484ac18e85f65` (`Harden PSRAM loader bounds and cache lifetimes`) and pushed to both `origin/main` and `origin/ezfode` at that same SHA.
