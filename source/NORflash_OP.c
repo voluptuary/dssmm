@@ -194,6 +194,35 @@ void IWRAM_CODE WriteFlash_with32word(u32 address,u8 *buffer,u32 size)
     SetRompage(gl_currentpage);
 }
 //-----------------------------------------------------------
+#define NOR_MENU_WIDTH     168
+#define NOR_PROGRESS_X     72
+#define NOR_PROGRESS_Y     104
+#define NOR_PROGRESS_W     96
+#define NOR_PROGRESS_H     8
+
+static void NOR_DrawWriteProgress(u32 completed, u32 total, u32 *last_percent)
+{
+	u32 percent = completed * 100 / total;
+	u32 filled = completed * NOR_PROGRESS_W / total;
+	u32 row;
+	char text[12];
+	const u16 *menu = (const u16*)gImage_MENU;
+	if(percent == *last_percent)
+		return;
+	*last_percent = percent;
+	Launcher_UpdateNORWriteClock(0);
+	for(row = 57; row < 69; row++)
+		DrawPic((u16*)(menu + row * NOR_MENU_WIDTH), 36, 25 + row,
+			NOR_MENU_WIDTH, 1, 0, 0, 1);
+	snprintf(text, sizeof(text), "%lu%%", (unsigned long)percent);
+	DrawHZText12(text, 0, (240 - strlen(text) * 6) / 2, 82, gl_color_text, 1);
+	Clear(NOR_PROGRESS_X, NOR_PROGRESS_Y, NOR_PROGRESS_W, NOR_PROGRESS_H,
+		gl_color_selectBG_sd, 1);
+	if(filled)
+		Clear(NOR_PROGRESS_X, NOR_PROGRESS_Y, filled, NOR_PROGRESS_H,
+			gl_color_text, 1);
+}
+
 u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u32 have_patch)
 {
     FSIZE_t file_size;
@@ -201,8 +230,8 @@ u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u32 have_patch)
     u32 filesize, fileneedsize, blocknum, read_size;
     u32 add_patch = 0;
     FM_NOR_FS tmpNorFS;
-    char msg[128];
-    u8 str_len;
+    u32 last_percent = 101;
+    u32 progress_blocks;
     if(!filename || strlen(filename) >= sizeof(tmpNorFS.filename))
         return NOR_WRITE_FILE_ERROR;
     if(game_total_NOR >= MAX_NOR || NORaddress >= 0x4000000 ||
@@ -248,14 +277,17 @@ u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u32 have_patch)
         *((vu16 *)(FlashBase_S98+0x000*2)) = 0x00 ;
         /////////////////
 
-    Clear(0,160-15,240,15,gl_color_cheat_black,1);
-    ShowbootProgress(gl_copying_data);
+    progress_blocks = fileneedsize / 0x20000;
+    Launcher_DrawNORWriteBackground();
+    DrawPic((u16*)gImage_MENU,36,25,NOR_MENU_WIDTH,110,0,0,1);
+    {
+        u16 length = DrawText12VisibleLength(gl_writing);
+        if(length > 26) length = 26;
+        DrawHZText12(gl_writing,length,(240-length*6)/2,60,gl_color_text,1);
+    }
     for(blocknum=0; blocknum<filesize; blocknum+=0x20000)
     {
-        sprintf(msg,"%luMbit",blocknum/0x20000);
-        str_len = strlen(msg);
-        Clear(0,130,240,15,gl_color_cheat_black,1);
-        DrawHZText12(msg,0,(240-str_len*6)/2,160-30,0x7fff,1);
+        NOR_DrawWriteProgress(blocknum / 0x20000, progress_blocks, &last_percent);
         read_size = filesize - blocknum;
         if(read_size > 0x20000) read_size = 0x20000;
         memset(pReadCache, 0xFF, 0x20000);
@@ -278,6 +310,7 @@ u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u32 have_patch)
     if(f_close(&gfile) != FR_OK) return NOR_WRITE_FILE_ERROR;
     if(have_patch && add_patch)
     {
+        NOR_DrawWriteProgress(blocknum / 0x20000, progress_blocks, &last_percent);
         Block_Erase(blocknum+NORaddress);
         GBApatch_NOR((u32*)pReadCache,0x20000,blocknum);
         WriteFlash_with32word(blocknum+NORaddress,pReadCache,0x20000);
@@ -285,6 +318,7 @@ u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u32 have_patch)
     /* Backend flash functions are void: this checks SD input, not flash success. */
     dmaCopy(&tmpNorFS,&pNorFS[game_total_NOR],sizeof(tmpNorFS));
     Save_NOR_info((u16*)pNorFS,sizeof(FM_NOR_FS)*MAX_NOR);
+    NOR_DrawWriteProgress(progress_blocks, progress_blocks, &last_percent);
     return 0;
 full:
     (void)f_close(&gfile);

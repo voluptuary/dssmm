@@ -18,7 +18,7 @@ Work only on ezfomega. Do not merge into ezfode, change DE release tags/assets, 
 | File identity / FatFs fast-open | Pending; do not replace Omega filesystem/storage paths wholesale |
 | Save/settings transactions | Ported staged SD replacement/recovery with Original Omega SRAM sequence and boot settings cache retained; fault-injection suite passes; case-insensitive target policy and both-separator rejection added; physical interruption untested |
 | Loader size/I/O/window safeguards | Ported exact-I/O/range/window policy with reference selectors and 32 MiB limit; callers stop on failure; native headers checked without rejecting short plugin files; target build and policy tests pass; hardware pending |
-| NOR artwork/progress/error safeguards | SD-input/bounds/catalog-publication safeguards implemented and mocked-flash host-tested; themed progress/artwork pending. Target flash APIs remain void, so physical failures are not detectable by this port yet |
+| NOR artwork/progress/error safeguards | SD-input/bounds/catalog-publication safeguards implemented and mocked-flash host-tested; themed NOR writing window/background/username/clock ported and host-tested; visual hardware validation unavailable. Target flash APIs remain void, so physical failures are not detectable by this port yet |
 | DE LEDs, hardware settings, firmware update and FRAM behavior | Not transferable by assumption; retain target implementations and assess actual capabilities |
 | Extra custom theme/color slots | Reference excludes these for size; remain excluded pending size/RAM evaluation |
 
@@ -43,3 +43,5 @@ Diagnostic pre-cheat stack snapshot (source 6606239): main 928 bytes; SD_list_ME
 Cheat milestone final build: 2,033,904 bytes; 63,248 headroom; EWRAM heap 21,936 and IWRAM gap 8,048. Runtime assembly unchanged. Remembered snapshots are checksum/identity validated but replacement is not atomic and may lose an old cheat snapshot on write failure; ordinary save transactions have separate safeguards. No physical gameplay, persistence or UI test available.
 
 NOR input milestone: open failure no longer reports success, both callers handle file error, file size/range/catalog slot/name bounds checked, read/seek/close failures abort, final block FF padded, and RAM catalog publication follows complete SD I/O. The Original Omega PPB sequence/erase/program routines remain unchanged; no generic timeout/status protocol copied. Mocked flash tests establish file-I/O ordering, not chip correctness or power-loss safety.
+
+NOR presentation checkpoint: target verifier passes all existing Omega checks plus actual-helper NOR progress bounds/cadence (1..512-block spans) and compressed asset equality. Image 2,043,816 bytes, 53,336 headroom; EWRAM heap 21,936 bytes, IWRAM gap 8,048. Original reset.s exports a VRAM SWI 0x12 wrapper under the legacy name LZ77UnCompWram; reuse avoids pulling libgba Compression.o and duplicate-symbol failure. No reset assembly changed.

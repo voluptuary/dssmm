@@ -1,5 +1,12 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 19:55 UTC — NOR themed progress integration
+
+- Added compressed NOR.bmp presentation, themed panel, percentage/bar, username and normal clock to Original Omega writing path. Canonical BMP/RGB555 header retained under images/blank; linked compressed data is 9,096 bytes and all source pixels/VRAM backreferences verified by asset regression. No shared transfer-pool allocation.
+- Initial link failed because Original Omega reset.s already exports LZ77UnCompWram, which actually invokes VRAM BIOS SWI 0x12; pulling libgba's VRAM wrapper duplicated that symbol. Resolved by using the existing target entry, without editing reset assembly. This target-specific difference is documented, not treated as an ezfode defect.
+- New actual-helper host test covers all 1..512-block spans, 0..100 percent, duplicate redraw suppression and draw bounds. NOR loader tests still pass with mocked UI/flash. Build 2,043,816 bytes, 53,336 headroom; layout unchanged. Flash routines before Loadfile2NOR, NOR enumeration after it, and reset.s were compared directly with the reference and remain unchanged.
+- Full target verifier passed including save/cheat/artwork/PSRAM/NOR file/progress/asset regressions, target build and layout. Next: commit/push isolated UI checkpoint, then review unchecked trim-block reads in both addon launch paths. No release or hardware validation.
+
 ## 2026-11-10 19:52 UTC — NOR input safeguards validated
 
 - Extracted original Loadfile2NOR test failed as expected: missing file reported success. After correction, tests pass short header/first/later reads, seek/close failures, 64-bit oversize, empty inputs, offset/alignment/catalog capacity, exact last-block fit, extra-patch capacity/counts and deterministic FF tail. File failure leaves RAM catalog unchanged and does not erase an unread block; prior successfully written free blocks may remain after a later failure.

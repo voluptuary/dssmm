@@ -1,6 +1,9 @@
 #ifndef EZ_DEFINE_HEADER
 #define EZ_DEFINE_HEADER
 
+void Launcher_DrawNORWriteBackground(void);
+void Launcher_UpdateNORWriteClock(unsigned int force);
+
 #define MAX_pReadCache_size 0x20000
 #define PSRAM_CAPACITY_BYTES 0x02000000UL
 #define PSRAM_WINDOW_BYTES 0x00800000UL

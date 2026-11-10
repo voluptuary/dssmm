@@ -17,8 +17,15 @@ static u8 pReadCache[MAX_pReadCache_size];
 static FIL gfile;
 static u32 game_total_NOR,iTrimSize;
 static u16 gl_rts_on,gl_reset_on,gl_sleep_on,gl_cheat_on;
-static u32 gl_color_cheat_black;
-static char *gl_copying_data="Copying";
+static char *gl_writing="Writing";
+static u16 gImage_MENU[168*110];
+static u32 gl_color_text;
+#define NOR_MENU_WIDTH 168
+static void Launcher_DrawNORWriteBackground(void){}
+static void DrawPic(u16 *p,int x,int y,int w,int h,int a,int b,int c){}
+static u16 DrawText12VisibleLength(char *s){return strlen(s);}
+static void expect(int ok,const char *msg);
+static void NOR_DrawWriteProgress(u32 done,u32 total,u32 *last){expect(total>0 && done<=total,"progress bounded");*last=done*100/total;}
 static FSIZE_t input_size;
 static int open_failure,close_failure,seek_failure,short_call,read_failure,reads,closes,erases,writes,publishes;
 static u16 chip=0x223d;
@@ -29,9 +36,7 @@ FRESULT f_read(FIL *f,void *out,UINT n,UINT *got){reads++;if(reads==read_failure
 FRESULT f_close(FIL *f){closes++;return close_failure?FR_DISK_ERR:FR_OK;}
 static u16 Read_S98NOR_ID(void){return chip;}
 static void dmaCopy(const void *a,void *b,u32 n){memcpy(b,a,n);}
-static void Clear(int a,int b,int c,int d,int e,int f){}
 static void DrawHZText12(char *s,int a,int b,int c,int d,int e){}
-static void ShowbootProgress(char *s){}
 static void Block_Erase(u32 address){erases++;}
 static void WriteFlash_with32word(u32 address,u8 *p,u32 n){writes++;expect(n==NOR_BLOCK_SIZE,"fixed write block");}
 static void PatchInternal(u32 *p,int n,u32 b){}
