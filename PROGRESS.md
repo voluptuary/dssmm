@@ -1,5 +1,13 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 17:36 UTC — Merged branch cleanup and stash comparison
+
+- **Remote cleanup:** deleted `origin/docs/8.3.0-release-state`, `origin/exploratory`, and `origin/fix/save-and-settings-transactions`. Before deletion, each was proven an ancestor of the synchronized `main`/`ezfode` commit, and GitHub listed no open PRs. Local merged docs/release/exploratory/fix branches were deleted with `git branch -d`. Only local `ezfode` remains; upstream refs to FrankieT19's separate repository remain unchanged.
+- **Remote state:** `origin/main` and `origin/ezfode` both point at `1b6f8f1`. GitHub default is still `main`; `origin/HEAD` therefore remains correctly set to `origin/main`. Do not delete the old default ref. Branch PATCH and official rename endpoint both returned 403 as documented above.
+- **Artifact cleanup verification:** repository-wide search finds no `.elf`. The seven remaining `.gba` files are tracked emulator plug-ins in `docs/manager/packages/current/common/SYSTEM/PLUG/`; no generated firmware `.gba` remains. All `build-ram-*` directories and root RAM-audit ELF/GBA outputs were removed after recording results.
+- **Stash audit:** `stash@{0}` and `stash@{1}` are checkpoints based on `9613e61`. Their tracked edits to the two audit ledgers, stack-layout test, PSRAM constants/helper, and loader source are represented in the current committed tree; current code/tests add the verified completion beyond them. Their untracked additions are only the generated stack/callgraph report directories, whose evidence is recorded above and whose files were removed. Both stashes are redundant after this checkpoint is pushed and can then be dropped.
+- **Next:** commit/push this checkpoint to both remote refs, drop the two verified-redundant stashes, and confirm clean tree plus remote state. The requested default branch setting remains the only external blocker.
+
 ## 2026-11-10 17:34 UTC — Official default-branch rename route confirmed unavailable
 
 - **Investigation:** consulted GitHub's official branch REST API docs after the repository `default_branch` PATCH failed. The branch-rename endpoint allows direct rename; renaming the default requires admin/owner permission and a fine-grained token with `administration:write` ([GitHub REST docs](https://docs.github.com/en/rest/branches/branches#rename-a-branch)).

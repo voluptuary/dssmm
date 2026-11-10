@@ -1,5 +1,13 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 17:36 UTC — Merged project refs pruned; recovery stashes reviewed
+
+- Deleted remote merged project branches `docs/8.3.0-release-state`, `exploratory`, and `fix/save-and-settings-transactions`; no open PRs referenced them. Deleted local merged docs/release/exploratory/fix branches. Local project branches now contain only `ezfode`; the separate `upstream/main` and `upstream/experimental/enhanced-cheats-v7.2` refs remain untouched.
+- Remote `main` and `ezfode` both point to `1b6f8f1`; GitHub still identifies `main` as default, so `origin/HEAD` correctly remains `origin/main`. The API rename attempts are documented above and were denied with 403. Do not remove `main` until default branch is actually changed.
+- Full artifact search shows no `.elf`; the only `.gba` files left are seven tracked emulator plug-ins under `docs/manager/packages/current/common/SYSTEM/PLUG/`. Generated root images and all `build-ram-*` reports are gone.
+- Compared `stash@{0}` and `stash@{1}` against the committed tree. Both are snapshots based on `9613e61`; all tracked audit/source changes are represented by the current commits. Their untracked payload consists of the generated `build-ram-audit/` and `build-ram-callgraph/` reports already removed after their measurements/findings were recorded. Once this checkpoint is committed and pushed, the two redundant stashes can be dropped.
+- **Next:** record this cleanup/stash audit, push the checkpoint to both synchronized refs, drop both redundant stashes, and verify `git status`, refs, and remote branch list. The only remaining requested operation is changing GitHub's default from `main` to `ezfode`, blocked by the current integration's 403.
+
 ## 2026-11-10 17:34 UTC — GitHub branch-rename API also denied
 
 - Checked GitHub's documented `POST /repos/{owner}/{repo}/branches/{branch}/rename` endpoint after the default-branch PATCH failed. The documented endpoint requires push access, and renaming the default also requires admin/owner permission; fine-grained tokens require `administration:write` ([GitHub REST docs](https://docs.github.com/en/rest/branches/branches#rename-a-branch)). The request to rename `main` to `ezfode` returned the same HTTP 403 `Resource not accessible by integration`. No remote refs changed; both `origin/main` and `origin/ezfode` remain synchronized at `90795aa`.
