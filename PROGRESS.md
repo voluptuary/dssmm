@@ -1,5 +1,17 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 19:27 UTC — Mirrored art validated; SD save/settings safety next
+
+- Expanded filename harness passes SFN-to-LFN file/directory resolution, mirrored lookup and root fallback alongside prior precedence/short-read/close/length checks. Target build is 2,030,288 bytes; layout passes with 25,232-byte EWRAM heap and 7,752-byte IWRAM static-to-user-SP gap. Dedicated workspace adds 1,864 EWRAM bytes and no shared-pool alias.
+- Added deferred ezfode review queue: ART-HEADER-01 records incomplete marked-BMP validation as a low-impact review candidate, not a proven memory-safety failure. No change made to ezfode.
+- Next implementation: SD-only staged save/settings replacement and recovery. Cartridge SRAM bank/read behavior must stay identical to Original Omega reference. Use existing fault-injection FatFs host suite against target functions and retain documented ambiguous-rename recovery refusal. No changes to S71 catalog/settings flash protocol.
+
+## 2026-11-10 19:24 UTC — Mirrored artwork / deferred DE findings policy
+
+- Owner has no Original Omega hardware; all current validation is source/build/host only. No target hardware claims permitted. Owner also requests recording suspected ezfode coding errors for later review, without changing ezfode during this port.
+- Implemented filename/LFN mirrored artwork lookup after custom/GBA-header priority. Resolve ROM filename and directory components through FatFs stat without changing actual ROM I/O paths, then try mirrored artwork and root fallback. Dedicated EWRAM workspace avoids large nested stack buffers and the shared transfer pool; target layout must be rechecked.
+- Existing inherited compiler warnings are Original Omega reference findings, not proven ezfode defects. No new verified ezfode defect identified at this milestone. Next: run expanded alias/mirror/fallback host tests, production build/layout and record any cross-branch concern separately.
+
 ## 2026-11-10 19:22 UTC — Original Omega development checkpoint / branch isolation verified
 
 - Branch ezfomega contains baseline checkpoint 8fb20bb, transparency checkpoint 62bb32e and the pending loader/target-tooling checkpoint. Owner explicitly requires isolation. Verified origin/ezfode remains `5f700c9a89768309f06993984bb6c3a3190d04ef`; no DE commits, tags, release assets or upstream refs were modified.

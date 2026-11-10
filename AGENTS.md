@@ -8,6 +8,8 @@ rename through GitHub; remote `main` no longer exists. Do not recreate it.
 `ezfomega` is the active Original Omega backport branch, resumed by the owner.
 Use its target plan and original-hardware baseline. `ezfblue` remains preparation only.
 Do not copy DE flash/save/reset protocols into the Original Omega port.
+Keep ezfomega isolated from ezfode. Record suspected ezfode defects with evidence
+as deferred review items; do not fix them on ezfode during this port.
 Use automatic GitHub source archives; do not upload separate source ZIPs.
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that

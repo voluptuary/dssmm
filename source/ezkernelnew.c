@@ -28,6 +28,7 @@
 #include "launcher_text.h"
 #include "savefile_policy.h"
 #include "psram_load_policy.h"
+#include "launcher_artwork_path.h"
 #include "thai620.h"
 #include "select_raw.h"
 
@@ -6164,17 +6165,51 @@ static u32 Launcher_LoadThumbnailFromRomHeader(TCHAR *filename, u8 *dst)
 	return Launcher_LoadThumbnailByGameCode(GAMECODE, dst);
 }
 
-/* Filename artwork is available to every supported system, after legacy GBA lookup. */
-static u32 Launcher_LoadFilenameThumbnail(const char *filename, u8 *dst)
+typedef struct {
+	FILINFO info;
+	char directory[MAX_path_len * 2];
+	char component[MAX_path_len];
+	char path[MAX_path_len * 2 + 32];
+	char name[MAX_path_len];
+} LauncherOmegaArtworkWorkspace;
+static LauncherOmegaArtworkWorkspace launcher_omega_artwork EWRAM_BSS;
+
+static int Launcher_ResolveOmegaArtworkDirectory(void *context,
+	const char *parent, const char *component, char *name, size_t capacity)
 {
-	const char *base;
-	const char *slash;
-	const char *dot;
-	char path[MAX_path_len + 32];
+	LauncherOmegaArtworkWorkspace *work = context;
+	int length = snprintf(work->path, sizeof(work->path), "%s%s%s", parent,
+		strcmp(parent, "/") ? "/" : "", component);
+	size_t name_length;
+	if(length < 0 || (size_t)length >= sizeof(work->path) ||
+		f_stat(work->path, &work->info) != FR_OK || !(work->info.fattrib & AM_DIR))
+		return 0;
+	name_length = strlen(work->info.fname);
+	if(!name_length || name_length >= capacity) return 0;
+	memcpy(name, work->info.fname, name_length + 1);
+	return 1;
+}
+
+static u32 Launcher_LoadOmegaArtworkPath(const char *path, u8 *dst)
+{
 	UINT got = 0;
 	u32 size = Launcher_ThumbnailReadSize();
-	u32 result;
-	u32 close_result;
+	u32 result, close_result;
+	if(f_open(&gfile, path, FA_READ) != FR_OK) return 0;
+	UIAudio_StopForSharedBufferUse();
+	result = Launcher_ReadThumbnailBytes(&gfile, dst, size, &got);
+	close_result = f_close(&gfile);
+	return result == FR_OK && got == size && close_result == FR_OK;
+}
+
+/* Mirror long directory/file names in artwork paths without changing ROM I/O. */
+static u32 Launcher_LoadFilenameThumbnail(const char *filename, u8 *dst)
+{
+	LauncherOmegaArtworkWorkspace *work = &launcher_omega_artwork;
+	const char *base;
+	const char *slash;
+	char *dot;
+	size_t length;
 	int written;
 	if(!filename || !dst) return 0;
 	base = filename;
@@ -6182,16 +6217,29 @@ static u32 Launcher_LoadFilenameThumbnail(const char *filename, u8 *dst)
 	if(slash) base = slash + 1;
 	slash = strrchr(base, '\\');
 	if(slash) base = slash + 1;
-	dot = strrchr(base, '.');
-	if(!dot || dot == base || !dot[1] || dot - base > MAX_path_len) return 0;
-	written = snprintf(path, sizeof(path), "%s/%.*s.bmp",
-		Launcher_ThumbnailFolder(), (int)(dot - base), base);
-	if(written < 0 || (u32)written >= sizeof(path)) return 0;
-	if(f_open(&gfile, path, FA_READ) != FR_OK) return 0;
-	UIAudio_StopForSharedBufferUse();
-	result = Launcher_ReadThumbnailBytes(&gfile, dst, size, &got);
-	close_result = f_close(&gfile);
-	return result == FR_OK && got == size && close_result == FR_OK;
+	if(f_stat(filename, &work->info) == FR_OK && !(work->info.fattrib & AM_DIR))
+		base = work->info.fname;
+	length = strlen(base);
+	if(!length || length >= sizeof(work->name)) return 0;
+	memcpy(work->name, base, length + 1);
+	dot = strrchr(work->name, '.');
+	if(!dot || dot == work->name || !dot[1]) return 0;
+	*dot = '\0';
+	if(strchr(work->name, '/') || strchr(work->name, '\\')) return 0;
+
+	if(strcmp(currentpath, "/") && LauncherArtworkResolveDirectoryPath(currentpath,
+		work->directory, sizeof(work->directory), work->component, sizeof(work->component),
+		Launcher_ResolveOmegaArtworkDirectory, work))
+	{
+		written = snprintf(work->path, sizeof(work->path), "%s%s/%s.bmp",
+			Launcher_ThumbnailFolder(), work->directory, work->name);
+		if(written >= 0 && (size_t)written < sizeof(work->path) &&
+			Launcher_LoadOmegaArtworkPath(work->path, dst)) return 1;
+	}
+	written = snprintf(work->path, sizeof(work->path), "%s/%s.bmp",
+		Launcher_ThumbnailFolder(), work->name);
+	if(written < 0 || (size_t)written >= sizeof(work->path)) return 0;
+	return Launcher_LoadOmegaArtworkPath(work->path, dst);
 }
 
 u32 Load_ThumbnailEx(TCHAR *pfilename_pic, u8 *dst)
