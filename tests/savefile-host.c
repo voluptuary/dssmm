@@ -471,6 +471,11 @@ static void test_settings_transaction(void)
 
 int main(void)
 {
+	CHECK(FileTxn_IsAllowedTarget("/system/saver/lower.sav"), "lowercase FAT save directory is accepted");
+	CHECK(FileTxn_IsAllowedTarget("0:/System/Settings.txt"), "mixed-case settings path is accepted");
+	CHECK(!FileTxn_IsAllowedTarget("/SYSTEM/SAVER/..\\..\\game.gba"), "backslash directory traversal is rejected");
+	CHECK(!FileTxn_IsAllowedTarget("/SYSTEM/SAVER/sub/game.sav"), "nested save target is rejected");
+
 	printf("[save-file creation, overwrite, and failure handling]\n");
 	format_volume();
 	test_new_save_creation();

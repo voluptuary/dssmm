@@ -1,5 +1,12 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 19:31 UTC — SD save/settings transactions validated
+
+- Ported shared FileTxn staging/recovery to Save_savefile/SavefileWrite and target-specific settings serialization. Preserve Omega SRAM read/bank order and boot settings cache; recovery occurs before cache fill, streaming reads and save processing. Target path policy folds fixed ASCII directory names and rejects both slash forms.
+- Real target FatFs host fault suite passed write sweeps, full media, old-save preservation, settings writes and recovery ambiguity. Added lowercase/mixed-case and backslash-traversal regressions. Initial host compilation failed because target FatFs includes gba_base.h only for EWRAM_BSS; local host shim defines that placement macro without changing filesystem logic. First scripted edit stopped on a source-layout assertion before writing changes; adapted to Omega's startup cache explicitly.
+- Build 2,031,816 bytes (65,336-byte margin); EWRAM heap 24,644 bytes; IWRAM static-to-user-SP gap 7,672 bytes. Three inherited warnings remain. No physical save or power-interruption testing available; ambiguous rename states are preserved and block automatic recovery as on DE.
+- Deferred DE queue now contains verified case-sensitivity and backslash-policy behavior; no ezfode mutation. Next: commit/push only ezfomega, measure compiler stack frames and rerun target verifier before continuing feature matrix.
+
 ## 2026-11-10 19:27 UTC — Mirrored art validated; SD save/settings safety next
 
 - Expanded filename harness passes SFN-to-LFN file/directory resolution, mirrored lookup and root fallback alongside prior precedence/short-read/close/length checks. Target build is 2,030,288 bytes; layout passes with 25,232-byte EWRAM heap and 7,752-byte IWRAM static-to-user-SP gap. Dedicated workspace adds 1,864 EWRAM bytes and no shared-pool alias.

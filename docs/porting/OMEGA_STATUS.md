@@ -10,13 +10,13 @@ Work only on ezfomega. Do not merge into ezfode, change DE release tags/assets, 
 | --- | --- |
 | Omega cartridge, save-chip, reset and SD bus code | Reference preserved byte-for-byte in Ezcard_OP.c, GBApatch.c, NORflash_OP.c, reset.s, ff15/ff.c, ez_define.h; no DE protocols copied |
 | Existing DS Style v8 UI / themes / carousels / sound | Reference implementation retained; built with its launcher -Os policy |
-| Filename artwork | First batch: custom priority, legacy GBA header lookup, then filename BMP fallback at active artwork root; non-GBA no longer probes arbitrary bytes as GBA header. Bounds/exact reads/closes checked. Mirrored directories and indexed LFN enhancements remain pending |
+| Filename artwork | First batch: custom priority, legacy GBA header lookup, then filename BMP fallback at active artwork root; non-GBA no longer probes arbitrary bytes as GBA header. Bounds/exact reads/closes checked. Mirrored directory/LFN alias resolution is now implemented and host-tested; indexed fast-open remains pending |
 | Plugin transitions | Merkin guard ported around external-plugin progress strip |
 | Marked transparency | Ported DST1 tagging, exact-sentinel blits/scaling, aligned row scan, backing restoration and pool metadata invalidation; host differential passed; hardware pending |
 | Opaque/header-art acceleration | Correctness-compatible transparency scan ported; specialized no-scan header path/fast-open remain pending |
 | Remembered/collapsible cheats | Pending target source/storage/runtime comparison |
 | File identity / FatFs fast-open | Pending; do not replace Omega filesystem/storage paths wholesale |
-| Save/settings transactions | Pending; retain target recovery behavior until storage path and buffer ownership review |
+| Save/settings transactions | Ported staged SD replacement/recovery with Original Omega SRAM sequence and boot settings cache retained; fault-injection suite passes; case-insensitive target policy and both-separator rejection added; physical interruption untested |
 | Loader size/I/O/window safeguards | Ported exact-I/O/range/window policy with reference selectors and 32 MiB limit; callers stop on failure; native headers checked without rejecting short plugin files; target build and policy tests pass; hardware pending |
 | NOR artwork/progress/error safeguards | Pending Omega mapping/capacity/catalog review |
 | DE LEDs, hardware settings, firmware update and FRAM behavior | Not transferable by assumption; retain target implementations and assess actual capabilities |
@@ -35,3 +35,5 @@ Transparency milestone: production image 2,029,336 bytes (67,816 bytes headroom)
 Windows build/clean scripts now also match the Original Omega reference and output ezkernel.bin. Windows execution has not been tested in this Linux workspace. Do not use the inherited DE browser-installer payloads for this target; packaging/installer migration is pending.
 
 Loader milestone: image 2,029,736 bytes (67,416 headroom); added original-target layout guard. Reference EWRAM heap has 27,096 bytes, IWRAM data-to-user-SP gap 7,752 bytes, neither is a runtime allocation/stack peak measurement. Kernel-size guard negative tests pass. Hardware protocol files remain unchanged; ez_define.h only gains the established geometry constants. Three inherited launcher warnings persist.
+
+Save/settings milestone: production image 2,031,816 bytes, 65,336 bytes headroom; EWRAM heap 24,644 bytes and IWRAM static-to-user-SP gap 7,672 bytes. Fault injection passes first-save/full-card/write sweeps/existing-save preservation/settings staging/recovery states. Ambiguous duplicate FAT rename entries remain preserved and require manual recovery; do not claim power-loss atomicity. Host shim removes only EWRAM section annotation from target FatFs, leaving filesystem logic unchanged. Startup cache recovery occurs before cache fill and before streaming reads.
