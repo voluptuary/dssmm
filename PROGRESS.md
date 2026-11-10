@@ -1,5 +1,12 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:16 UTC — Future plugin launch progress UI consistency
+
+- Owner reports a brief black bar with centered 0MB before .gg/.nes launches, while .gbc fades cleanly into the game. Source confirms a matching kernel-side drawing path in `LoadEMU2PSRAM()` (`source/ezkernelnew.c`, external-plugin loop around lines 5884–5891): unconditional `Clear(0,130,240,15,...)` and white `DrawHZText12` progress text before the plugin executes. Its first iteration formats zero as `0Mb`.
+- GB/GBC use built-in Goomba and bypass this external-plugin loading loop. The subsequent game-loading progress drawing already checks `!launcher_launch_screen_active`; the external-plugin loop lacks that guard. This explains the reported difference from kernel code; no evidence requires a plugin-internal change.
+- Future task: align external-plugin progress with the themed launch/fade presentation, reviewing the existing launch-screen guard and progress UI. Preserve transfer/error handling and performance. The displayed counter divides bytes by 128 KiB despite its Mb label; review units if any numeric progress remains. No code changes or tests were made for this documentation-only finding; published 8.3.1 remains unchanged.
+- Next: implement only when owner resumes feature work; coordinate with the recorded future NOR writing-progress theme task. Commit/push this finding on `ezfode`.
+
 ## 2026-11-10 18:11 UTC — Published stable 8.3.1; future NOR progress presentation
 
 - Published [DS Style Merkin Mix 8.3.1](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1), stable/latest, from annotated tag `v8.3.1` at `997073e9782a5c88112d4cd16bf9b8b751acfaf3` on `ezfode`. Release notes match the prior cumulative style, with current loader/cache fixes first and earlier features/fixes and credits retained. README points to 8.3.1. No PR was created for README changes.
