@@ -14,6 +14,7 @@
 #include "ez_define.h"
 #include "ff.h"
 #include "file_transaction.h"
+#include "psram_load_policy.h"
 #include "draw.h"
 #include "ezkernel.h"
 #include "Ezcard_OP.h"
@@ -164,9 +165,11 @@ static u32 launcher_start_title_scroll_frame = 0;
 #define LAUNCHER_LIST_ROW_HEIGHT 14
 #define LAUNCHER_LIST_ROW_PIXELS (240 * LAUNCHER_LIST_ROW_HEIGHT)
 #define LAUNCHER_LIST_ROW_BYTES (LAUNCHER_LIST_ROW_PIXELS * 2)
-/* Clear() uses the first 480 bytes of pReadCache as a fill line.  Nine cached
-   rows live after that scratch line; the tenth fits in the unused tail after
-   the three maximum-size 120x80 thumbnail slots. */
+/* Clear() uses the first 480 bytes of pReadCache as a fill line. Nine cached
+   rows live after it; the tenth fits in the tail after the maximum thumbnails.
+   The selected-row scratch intentionally overlays the carousel previous-image
+   slot. List-like views invalidate thumbnail metadata before reusing the pool;
+   carousel entry reloads its image slots before drawing. */
 #define LAUNCHER_LIST_ROW_CACHE_BASE 0x0200
 #define LAUNCHER_LIST_ROW_CACHE_TAIL 0x1E400
 #define LAUNCHER_LIST_SELECTED_ROW_SCRATCH 0x14C00
@@ -5276,57 +5279,72 @@ u8 Get_saveMODE(u8 Save_num,u32 gamefilesize)
 u32 IWRAM_CODE Loadfile2PSRAM(TCHAR *filename)
 {
 	UIAudio_StopForSharedBufferUse();
-	UINT  ret;
+	FSIZE_t file_size;
 	u32 filesize;
+	u32 transfer_size;
 	u32 res;
 	u32 blocknum;
+	u32 read_size;
+	u32 file_open = 0;
+	u32 chunk_offset;
+	PSRAM_LoadWindowPlan plan;
 	char msg[20];
 
-	u32 Address;
-	vu16 page=0;
-	SetPSRampage(page);
+	SetPSRampage(0);
 
 	res = f_open(&gfile, filename, FA_READ);
-	if(res == FR_OK)
+	if(res != FR_OK)
+		goto load_failed;
+	file_open = 1;
+	file_size = f_size(&gfile);
+	if(file_size == 0 || file_size > PSRAM_CAPACITY_BYTES ||
+		!PSRAM_LoadPaddedSize((u32)file_size, &transfer_size) ||
+		!PSRAM_LoadRangeFits(0, transfer_size))
+		goto close_failed;
+	filesize = (u32)file_size;
+	if(f_lseek(&gfile, 0) != FR_OK)
+		goto close_failed;
+	if(!launcher_launch_screen_active) Clear(0, 160 - 15, 240, 15, gl_color_cheat_black, 1);
+	ShowbootProgress(gl_copying_data);
+	for(blocknum = 0; blocknum < filesize; )
 	{
-		filesize = f_size(&gfile);
-		if(!launcher_launch_screen_active) Clear(0, 160 - 15, 240, 15, gl_color_cheat_black, 1);
-		ShowbootProgress(gl_copying_data);
-		f_lseek(&gfile, 0x0000);
-		for(blocknum=0x0000;blocknum<filesize;blocknum+=0x20000)
+		if(!launcher_launch_screen_active)
 		{
-            if(!launcher_launch_screen_active)
-            {
-                sprintf(msg,"%luMb/%luMb",(blocknum)/0x20000,filesize/0x20000);
-                Clear(78+54,160-15,110,15,gl_color_cheat_black,1);
-                DrawHZText12(msg,0,78+54,160-15,gl_color_text,1);
-            }
-			f_read(&gfile, pReadCache, 0x20000, &ret);//pReadCache max 0x20000 Byte
-
-			if((gl_reset_on==1) || (gl_rts_on==1) || (gl_sleep_on==1) || (gl_cheat_on==1))
-			{
-				PatchInternal((u32*)pReadCache,0x20000,blocknum);
-			}
-
-			Address=blocknum;
-			while(Address>=0x800000)
-			{
-				Address-=0x800000;
-				page+=0x1000;
-			}
-
-			SetPSRampage(page);
-			dmaCopy((void*)pReadCache,PSRAMBase_S98+Address, 0x20000);
-			page = 0;
+			sprintf(msg,"%luMb/%luMb",blocknum/MAX_pReadCache_size,filesize/MAX_pReadCache_size);
+			Clear(78+54,160-15,110,15,gl_color_cheat_black,1);
+			DrawHZText12(msg,0,78+54,160-15,gl_color_text,1);
 		}
-		f_close(&gfile);
-		SetPSRampage(0);
-		return 0;
+		if(!PSRAM_ReadFileChunk(&gfile, pReadCache, filesize - blocknum, 0xFF, &read_size))
+			goto close_failed;
+
+		if((gl_reset_on==1) || (gl_rts_on==1) || (gl_sleep_on==1) || (gl_cheat_on==1))
+			PatchInternal((u32*)pReadCache,MAX_pReadCache_size,blocknum);
+
+		chunk_offset = 0;
+		while(chunk_offset < MAX_pReadCache_size)
+		{
+			if(!PSRAM_LoadPlanWindow(blocknum + chunk_offset,
+				MAX_pReadCache_size - chunk_offset, PSRAM_WINDOW_BYTES,
+				PSRAM_WINDOW_PAGE_STEP, &plan))
+				goto close_failed;
+			SetPSRampage(plan.page);
+			dmaCopy((void*)(pReadCache + chunk_offset),
+				PSRAMBase_S98 + plan.window_offset, plan.size);
+			chunk_offset += plan.size;
+		}
+		blocknum += read_size;
 	}
-	else
-	{
-		return 1;
-	}
+	res = f_close(&gfile);
+	file_open = 0;
+	SetPSRampage(0);
+	return res == FR_OK ? 0 : 1;
+
+close_failed:
+	if(file_open)
+		(void)f_close(&gfile);
+load_failed:
+	SetPSRampage(0);
+	return 1;
 
 }
 //---------------------------------------------------------------------------------
@@ -5825,22 +5843,27 @@ u32 IWRAM_CODE LoadEMU2PSRAM(TCHAR *filename,u32 is_EMU)
 {
 	UIAudio_StopForSharedBufferUse();
 	u8 str_len;
-	UINT  ret;
+	FSIZE_t file_size;
 	u32 filesize;
+	u32 transfer_size;
 	u32 res;
-    // u32 blocknum, blockoffset = gl_error_0; // why are you setting it to a string pointer? This is never brought up again outside of overwriting it.
 	u32 blocknum, blockoffset = 0;
+	u32 read_size;
+	u32 file_open = 0;
+	u32 chunk_offset;
 	char msg[20];
 
-	u32 Address;
-	vu16 page=0;
-	SetPSRampage(page);
+	PSRAM_LoadWindowPlan plan;
+	SetPSRampage(0);
 
 	u32 rom_start_address=0;
 	switch(is_EMU)
 	{
 		case 1://gbc
 		case 2://gb
+			if(goomba_gba_size == 0 || goomba_gba_size > PSRAM_CAPACITY_BYTES ||
+				!PSRAM_LoadRangeFits(0, (u32)goomba_gba_size))
+				goto load_failed;
 			dmaCopy((void*)goomba_gba,pReadCache, goomba_gba_size);
 			dmaCopy((void*)pReadCache,PSRAMBase_S98, goomba_gba_size);
 			rom_start_address = goomba_gba_size;
@@ -5848,48 +5871,69 @@ u32 IWRAM_CODE LoadEMU2PSRAM(TCHAR *filename,u32 is_EMU)
 		default:
 			res = f_open(&gfile, plugin, FA_READ);
 			if(res != FR_OK)
-				return 1;
-
-			filesize = f_size(&gfile);
-
-			f_lseek(&gfile, 0x0000);
+				goto load_failed;
+			file_open = 1;
+			file_size = f_size(&gfile);
+			if(file_size == 0 || file_size > PSRAM_CAPACITY_BYTES ||
+				!PSRAM_LoadPaddedSize((u32)file_size, &transfer_size) ||
+				!PSRAM_LoadRangeFits(0, transfer_size))
+				goto close_failed;
+			filesize = (u32)file_size;
+			if(f_lseek(&gfile, 0) != FR_OK)
+				goto close_failed;
 			ShowbootProgress(gl_generating_emu);
-			for(blocknum=0x0000;blocknum<filesize;blocknum+=0x20000)
+			for(blocknum = 0; blocknum < filesize; )
 			{
-				sprintf(msg,"%luMb",(blocknum)/0x20000);
+				sprintf(msg,"%luMb",blocknum/MAX_pReadCache_size);
 				str_len = strlen(msg);
 				Clear(0, 130, 240, 15, gl_color_cheat_black, 1);
 				DrawHZText12(msg, 0, (240 - str_len * 6) / 2, 160 - 30, 0x7fff, 1);
-				//f_lseek(&gfile, blocknum);
-				if (filesize-blocknum*0x20000 < 0x20000)
-					memset(pReadCache, 0, 0x20000);
-				f_read(&gfile, pReadCache, 0x20000, (UINT*)&ret);//pReadCache max 0x20000 Byte
-				page = 0;
-
-				Address=blocknum;
-				while(Address>=0x400000)
+				if(!PSRAM_ReadFileChunk(&gfile, pReadCache, filesize - blocknum, 0, &read_size))
+					goto close_failed;
+				chunk_offset = 0;
+				while(chunk_offset < MAX_pReadCache_size)
 				{
-					Address-=0x400000;
-					page+=0x800;
+					if(!PSRAM_LoadPlanWindow(blocknum + chunk_offset,
+						MAX_pReadCache_size - chunk_offset, PSRAM_PLUGIN_WINDOW_BYTES,
+						PSRAM_PLUGIN_PAGE_STEP, &plan))
+						goto close_failed;
+					SetPSRampage(plan.page);
+					dmaCopy((void*)(pReadCache + chunk_offset),
+						PSRAMBase_S98 + plan.window_offset, plan.size);
+					chunk_offset += plan.size;
 				}
-				SetPSRampage(page);
-				dmaCopy((void*)pReadCache,PSRAMBase_S98 + Address, 0x20000);
-
+				blocknum += read_size;
 			}
-			f_close(&gfile);
+			res = f_close(&gfile);
+			file_open = 0;
+			if(res != FR_OK)
+				goto load_failed;
 			SetPSRampage(0);
-			blockoffset=blocknum;
+			blockoffset = filesize;
 
-			// Guarantee word alignment
-			rom_start_address = (filesize+3)&~3;
+			if(!PSRAM_LoadAlignUp(filesize, 4, &rom_start_address))
+				goto load_failed;
 
 			break;
 	}
 
 	res = f_open(&gfile, filename, FA_READ);
-	if(res == FR_OK)
+	if(res != FR_OK)
+		goto load_failed;
+	file_open = 1;
+	file_size = f_size(&gfile);
+	if(file_size == 0 || file_size > PSRAM_CAPACITY_BYTES ||
+		!PSRAM_LoadPaddedSize((u32)file_size, &transfer_size) ||
+		!PSRAM_LoadRangeFits(rom_start_address, transfer_size))
+		goto close_failed;
+	filesize = (u32)file_size;
+	if(is_EMU > 3)
 	{
-		filesize = f_size(&gfile);
+		u32 argument_offset;
+		if(!PSRAM_LoadAlignUp(rom_start_address + filesize, 0x8000, &argument_offset) ||
+			!PSRAM_LoadRangeFits(argument_offset, 0x58))
+			goto close_failed;
+	}
 
         if(!launcher_launch_screen_active)
         {
@@ -5897,9 +5941,10 @@ u32 IWRAM_CODE LoadEMU2PSRAM(TCHAR *filename,u32 is_EMU)
             DrawHZText12(gl_writing,0,78,160-15,0x7fff,1);
         }
 
-		f_lseek(&gfile, 0x0000);
+		if(f_lseek(&gfile, 0) != FR_OK)
+			goto close_failed;
 		ShowbootProgress(gl_generating_emu);
-		for(blocknum=0x0000;blocknum<filesize;blocknum+=0x20000)
+		for(blocknum = 0; blocknum < filesize; )
 		{
             if(!launcher_launch_screen_active)
             {
@@ -5908,46 +5953,50 @@ u32 IWRAM_CODE LoadEMU2PSRAM(TCHAR *filename,u32 is_EMU)
                 Clear(0, 130, 240, 15, gl_color_cheat_black, 1);
                 DrawHZText12(msg, 0, (240 - str_len * 6) / 2, 160 - 30, 0x7fff, 1);
             }
-			//f_lseek(&gfile, blocknum);
-			if (filesize - blocknum * 0x20000 < 0x20000)
-				memset(pReadCache, 0, 0x20000);
-			f_read(&gfile, pReadCache, 0x20000, &ret);//pReadCache max 0x20000 Byte
-			page = 0;
-			Address=blocknum;
-			while(Address>=0x800000)
+			if(!PSRAM_ReadFileChunk(&gfile, pReadCache, filesize - blocknum, 0, &read_size))
+				goto close_failed;
+			chunk_offset = 0;
+			while(chunk_offset < MAX_pReadCache_size)
 			{
-				Address-=0x800000;
-				page+=0x1000;
+				if(!PSRAM_LoadPlanWindow(rom_start_address + blocknum + chunk_offset,
+					MAX_pReadCache_size - chunk_offset, PSRAM_WINDOW_BYTES,
+					PSRAM_WINDOW_PAGE_STEP, &plan))
+					goto close_failed;
+				SetPSRampage(plan.page);
+				dmaCopy((void*)(pReadCache + chunk_offset),
+					PSRAMBase_S98 + plan.window_offset, plan.size);
+				chunk_offset += plan.size;
 			}
-			SetPSRampage(page);
-			dmaCopy((void*)pReadCache,PSRAMBase_S98 + rom_start_address + Address, 0x20000);
 
-			page = 0;
+			blocknum += read_size;
 		}
-		f_close(&gfile);
+		res = f_close(&gfile);
+		file_open = 0;
+		if(res != FR_OK)
+			goto load_failed;
 
 		if (is_EMU > 3) {
-			Address = rom_start_address + filesize;
-			Address = (Address + 0x7fff)&~0x7fff;
-			u32 offset = Address;
-			while(Address>=0x400000)
-			{
-				Address-=0x400000;
-				page+=0x800;
-			}
-			SetPSRampage(page);
-			make_pogoshell_arguments(plugin + 9, filename, rom_start_address, filesize, Address, offset);
+			u32 offset;
+			if(!PSRAM_LoadAlignUp(rom_start_address + filesize, 0x8000, &offset))
+				goto load_failed;
+			if(!PSRAM_LoadPlanWindow(offset, 0x58, PSRAM_PLUGIN_WINDOW_BYTES,
+				PSRAM_PLUGIN_PAGE_STEP, &plan) ||
+				plan.size != 0x58)
+				goto load_failed;
+			SetPSRampage(plan.page);
+			make_pogoshell_arguments(plugin + 9, filename, rom_start_address, filesize,
+				plan.window_offset, offset);
 		}
 
 		SetPSRampage(0);
-		return 0;
-	}
-	else
-	{
-		return 1;
-	}
-
 	return 0;
+
+close_failed:
+	if(file_open)
+		(void)f_close(&gfile);
+load_failed:
+	SetPSRampage(0);
+	return 1;
 }
 //---------------------------------------------------------------------------------
 extern u16 SET_info_buffer [0x200]EWRAM_BSS;
@@ -6825,6 +6874,23 @@ static void Launcher_SetThumbCachePointers(void)
 	launcher_cache_prev.thumb_data = pReadCache + 0x14C36;
 	launcher_cache_selected.thumb_data = pReadCache + 0x10036;
 	launcher_cache_next.thumb_data = pReadCache + 0x19836;
+}
+
+static void Launcher_InvalidateThumbCacheEntries(void)
+{
+	launcher_cache_center_index = 0xFFFFFFFF;
+	launcher_cache_prev.valid = 0;
+	launcher_cache_selected.valid = 0;
+	launcher_cache_next.valid = 0;
+	launcher_cache_prev.absolute_index = 0xFFFFFFFF;
+	launcher_cache_selected.absolute_index = 0xFFFFFFFF;
+	launcher_cache_next.absolute_index = 0xFFFFFFFF;
+	launcher_cache_prev.has_thumbnail = 0;
+	launcher_cache_selected.has_thumbnail = 0;
+	launcher_cache_next.has_thumbnail = 0;
+	launcher_cache_prev.custom_thumbnail = 0;
+	launcher_cache_selected.custom_thumbnail = 0;
+	launcher_cache_next.custom_thumbnail = 0;
 }
 
 static u32 Launcher_ThumbCachePointersValid(void)
@@ -8005,19 +8071,7 @@ static void Launcher_ResetThumbCache(void)
     launcher_motion_finished = 0xFFFFFFFF;
     launcher_motion_incoming_ready = 0;
 	Launcher_SetThumbCachePointers();
-	launcher_cache_center_index = 0xFFFFFFFF;
-	launcher_cache_prev.valid = 0;
-	launcher_cache_selected.valid = 0;
-	launcher_cache_next.valid = 0;
-	launcher_cache_prev.absolute_index = 0xFFFFFFFF;
-	launcher_cache_selected.absolute_index = 0xFFFFFFFF;
-	launcher_cache_next.absolute_index = 0xFFFFFFFF;
-	launcher_cache_prev.has_thumbnail = 0;
-	launcher_cache_selected.has_thumbnail = 0;
-	launcher_cache_next.has_thumbnail = 0;
-	launcher_cache_prev.custom_thumbnail = 0;
-	launcher_cache_selected.custom_thumbnail = 0;
-	launcher_cache_next.custom_thumbnail = 0;
+	Launcher_InvalidateThumbCacheEntries();
 	Launcher_InitScaleMaps();
 	memset(&launcher_thumbnail_workspace, 0, sizeof(launcher_thumbnail_workspace));
 	Launcher_InvalidateListArtScaledCache();
@@ -9419,6 +9473,8 @@ static void Launcher_CycleViewModeAndRedraw(u32 page_num, u32 *show_offset_ptr, 
 	launcher_active_page = page_num;
 	Launcher_UpdateEffectiveViewMode();
 	new_view = Launcher_ActiveViewMode();
+	if((new_view == LAUNCHER_VIEW_LIST) || (new_view == LAUNCHER_VIEW_LIST_ART))
+		Launcher_InvalidateThumbCacheEntries();
 	if((old_view == LAUNCHER_VIEW_LIST || old_view == LAUNCHER_VIEW_LIST_ART) &&
 	(new_view != LAUNCHER_VIEW_LIST && new_view != LAUNCHER_VIEW_LIST_ART) && total)
 	{
@@ -17358,8 +17414,9 @@ load_file:
 	//DrawHZText12(gl_Loading,0,(240-strlen(gl_Loading)*6)/2,74, gl_color_text,1);
 
 	u32 gamefilesize=0;
-	//u32 savefilesize=0;
-	u32 ret;
+	FSIZE_t launch_file_size;
+	UINT header_bytes;
+	FRESULT close_result;
 	u32 have_pat=0;
 
 	init_FAT_table();
@@ -17368,15 +17425,33 @@ load_file:
 
 	f_chdir(currentpath);//return to game folder
 	res = f_open(&gfile, pfilename, FA_READ);
-	if(res == FR_OK)			{
-		f_lseek(&gfile, 0xAC);
-		f_read(&gfile, GAMECODE, 4, (UINT *)&ret);
-		gamefilesize = f_size(&gfile);
-		f_close(&gfile);
+	if(res != FR_OK){
+		error_num = 1;
+		Show_error_num(error_num);
+		return 0;
 	}
-	else{
-		memset(GAMECODE,'F',4);
+	launch_file_size = f_size(&gfile);
+	if(launch_file_size > (FSIZE_t)0xFFFFFFFFUL){
+		(void)f_close(&gfile);
+		Launcher_ShowLaunchError(gl_file_overflow);
+		wait_btn();
+		return 0;
 	}
+	if(launch_file_size < 0xB0 || f_lseek(&gfile, 0xAC) != FR_OK){
+		(void)f_close(&gfile);
+		error_num = 1;
+		Show_error_num(error_num);
+		return 0;
+	}
+	header_bytes = 0;
+	res = f_read(&gfile, GAMECODE, 4, &header_bytes);
+	close_result = f_close(&gfile);
+	if(res != FR_OK || header_bytes != 4 || close_result != FR_OK){
+		error_num = 1;
+		Show_error_num(error_num);
+		return 0;
+	}
+	gamefilesize = (u32)launch_file_size;
 
 	//check
 
@@ -17415,6 +17490,10 @@ load_file:
 		Send_FATbuffer(FAT_table_buffer,1);
 
 		res=LoadEMU2PSRAM(pfilename,is_EMU);
+		if(res != 0){
+			Show_error_num(1);
+			return 0;
+		}
 			int bootmode = ((is_EMU > 3) && (is_EMU < 9)) ?
 				((is_EMU == 6) ? 2
 					: (is_EMU == 7) ? 4
@@ -17498,6 +17577,10 @@ load_file:
 					FAT_table_buffer[0x1F4/4] = SET_PARAMETER_MODE;
 							Send_FATbuffer(FAT_table_buffer,1);
 					res=Loadfile2PSRAM(pfilename);
+					if(res != 0){
+						Show_error_num(1);
+						return 0;
+					}
 							ShowbootProgress(gl_make_pat);
 							Make_pat_file(pfilename);
 						}

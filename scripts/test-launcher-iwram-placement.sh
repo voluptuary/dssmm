@@ -63,4 +63,38 @@ if (( gap < 512 )); then
 	exit 1
 fi
 
-printf 'Scale maps are in IWRAM, path buffers are in EWRAM; static-to-IRQ-stack gap: %u bytes (layout guard, not stack high-water).\n' "$gap"
+symbol_address()
+{
+	"$nm" -n "$elf" | awk -v name="$1" '$3 == name && !found { print $1; found = 1 }'
+}
+
+sbss_end=$(symbol_address __sbss_end__)
+heap_start=$(symbol_address __eheap_start)
+heap_end=$(symbol_address __eheap_end)
+user_sp=$(symbol_address __sp_usr)
+if [[ -z "$sbss_end" || -z "$heap_start" || -z "$heap_end" || -z "$user_sp" ]]; then
+	printf 'Missing EWRAM static/heap/user-stack linker symbols.\n' >&2
+	exit 1
+fi
+
+ewram_static_end=$((16#$sbss_end))
+ewram_heap_start=$((16#$heap_start))
+ewram_heap_end=$((16#$heap_end))
+ewram_user_sp=$((16#$user_sp))
+ewram_top=$((0x02040000))
+user_stack_reserve=$((ewram_user_sp - ewram_heap_end))
+if (( ewram_static_end < 0x02000000 || ewram_static_end > ewram_heap_start ||
+	ewram_heap_start >= ewram_heap_end || ewram_heap_end >= ewram_user_sp ||
+	ewram_user_sp > ewram_top )); then
+	printf 'EWRAM static/heap/user-stack ordering is invalid: static end 0x%s, heap 0x%s..0x%s, user SP 0x%s\n' \
+		"$sbss_end" "$heap_start" "$heap_end" "$user_sp" >&2
+	exit 1
+fi
+if (( user_stack_reserve < 0x3000 )); then
+	printf 'EWRAM user-stack reserve is below the configured 12 KiB minimum: %u bytes\n' \
+		"$user_stack_reserve" >&2
+	exit 1
+fi
+
+printf 'Scale maps are in IWRAM, path buffers are in EWRAM; IWRAM stack gap: %u bytes; EWRAM heap: %u bytes; user-stack reserve: %u bytes (layout guards, not runtime high-water).\n' \
+	"$gap" "$((ewram_heap_end - ewram_heap_start))" "$user_stack_reserve"

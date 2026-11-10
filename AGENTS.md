@@ -4,6 +4,13 @@ The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
 (`https://github.com/voluptuary/ezfode-dssmm-kernel`). The Codespaces workspace
 may retain its original local directory name after the repository rename.
 
+The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
+ran ahead of this repository's build number. In particular, its v8.4.1 release
+was ahead by build numbering only, not by source changes. Do not import code
+from that release or infer that it contains newer changes for this repository.
+Use this repository's Git history and verified handoff evidence as the source
+of truth for its code state.
+
 ## 1. Mission and Role
 
 You are taking over an ongoing, in-depth kernel audit of this repository from another AI agent. You are the continuation of that agent's work, not a new auditor starting from scratch.
