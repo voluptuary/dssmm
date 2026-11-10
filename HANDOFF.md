@@ -1,5 +1,11 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-10 18:40 UTC — User NOR.bmp background and normal top-bar content
+
+- Owner requested `files/NOR.bmp` as the NOR writing background plus username/time. Validated 240x160 uncompressed indexed BMP; grit converts to RGB555 LZ77 (9,096 bytes). Generated source/header include regeneration command; original user image is preserved and tracked.
+- Background decompresses directly into VRAM, with normal light/dark/custom top bar overlaid. Existing username drawing and 12/24-hour clock formatting are reused. Clock polls only on integer progress updates and redraws when its time changes; no RTC access within flash erase/program polling. Progress panel remains themed; ordinary menu background caches are invalidated afterward.
+- Validation passed: warning-free production build (2024344 bytes), NOR format/write-result regressions, layout guard (IWRAM gap 1,080 bytes; heap 7,112 bytes; stack reserve 12,288 bytes), whitespace/diff review. Independent LZ77 decode matched all 38,400 source BMP pixels after RGB555 conversion and verified VRAM-safe backreferences. Initial checker accidentally parsed a hex-like dimension comment; corrected array-only parsing passed. Candidate: `files/candidate/8.3.1-nor-bmp/ezkernelnew.bin`, SHA-256 `2cc78f6eede92bbd395960710154e76a8ed3cceb8db313b4004b1da03fe8c651`. Hardware visual check pending. Commit/push; published release unchanged.
+
 ## 2026-11-10 18:28 UTC — NOR writing themed background follow-up
 
 - Owner hardware feedback: themed progress panel works, but surrounding screen is black. Added `Launcher_DrawNORWriteBackground()` using the existing full theme renderer before drawing the NOR progress panel. Explicitly invalidates background caches because the launch fade can clear pixels while cached theme identity remains set. Includes active light/dark/custom background and theme top bar; no shared buffer use or flash operation changes.

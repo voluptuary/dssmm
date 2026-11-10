@@ -144,6 +144,7 @@ static void NOR_DrawWriteProgress(u32 completed, u32 total, u32 *last_percent)
 	if(percent == *last_percent)
 		return;
 	*last_percent = percent;
+	Launcher_UpdateNORWriteClock(0);
 	for(row = 57; row < 69; row++)
 		DrawPic((u16*)(menu + row * NOR_MENU_WIDTH), 36, 25 + row,
 			NOR_MENU_WIDTH, 1, 0, 0, 1);

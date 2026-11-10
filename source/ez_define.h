@@ -2,6 +2,7 @@
 #define EZ_DEFINE_HEADER
 
 void Launcher_DrawNORWriteBackground(void);
+void Launcher_UpdateNORWriteClock(unsigned int force);
 
 #include "fat_table_builder.h"
 

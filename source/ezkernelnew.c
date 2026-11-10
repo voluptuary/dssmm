@@ -15,6 +15,7 @@
 #include "ff.h"
 #include "file_transaction.h"
 #include "psram_load_policy.h"
+#include "nor_write_background.h"
 #include "draw.h"
 #include "ezkernel.h"
 #include "Ezcard_OP.h"
@@ -1342,12 +1343,45 @@ static void Launcher_DrawThemeBGFull(const u16 *base)
 	launcher_counter_valid = 0;
 }
 
+void Launcher_UpdateNORWriteClock(unsigned int force)
+{
+	static u32 last_time = 0xFFFFFFFF;
+	u8 datetime[3];
+	u8 hh, mm, ss;
+	u32 current_time;
+	char text[16];
+	rtc_enable();
+	rtc_gettime(datetime);
+	rtc_disenable();
+	delay(5);
+	hh = UNBCD(datetime[0] & 0x3F);
+	mm = UNBCD(datetime[1] & 0x7F);
+	ss = UNBCD(datetime[2] & 0x7F);
+	if(hh > 23) hh = 0;
+	if(mm > 59) mm = 0;
+	if(ss > 59) ss = 0;
+	current_time = ((u32)hh << 16) | ((u32)mm << 8) | ss;
+	if(!force && current_time == last_time) return;
+	last_time = current_time;
+	Launcher_ClearWithThemeBG((const u16*)gImage_SD_LIST, 189, 3, 48, 13);
+	Launcher_FormatClock(text, sizeof(text), hh, mm, ss);
+	DrawHZText12(text, 0, 189, 3, gl_color_topbar_text, 1);
+}
+
 void Launcher_DrawNORWriteBackground(void)
 {
-	/* Launch fade may have cleared the framebuffer; force a full theme redraw. */
+	const u16 *base = (const u16*)gImage_SD_LIST;
+	const u16 *top = Launcher_GetThemeTopForBase(base);
+	/* Decode into VRAM; the file-transfer pool remains available to the loader. */
+	Launcher_EndLaunchIndicator();
+	LZ77UnCompVram(nor_write_backgroundBitmap, (void*)0x06000000);
+	DrawPic((u16*)(top ? top : base), 0, 0, 240, LAUNCHER_TOP_BAR_HEIGHT, 0, 0, 1);
+	/* This screen has its own background, so invalidate ordinary menu caches. */
 	launcher_current_topbar_bg = 0;
 	launcher_current_theme_bg = 0;
-	Launcher_DrawThemeBGFull((const u16*)gImage_SD_LIST);
+	launcher_counter_valid = 0;
+	Launcher_DrawTopbarName(NOR_list);
+	Launcher_UpdateNORWriteClock(1);
 }
 
 static void Launcher_ClearWithThemeBG(const u16 *base, u16 x, u16 y, u16 w, u16 h)
