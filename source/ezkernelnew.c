@@ -5884,10 +5884,13 @@ u32 IWRAM_CODE LoadEMU2PSRAM(TCHAR *filename,u32 is_EMU)
 			ShowbootProgress(gl_generating_emu);
 			for(blocknum = 0; blocknum < filesize; )
 			{
-				sprintf(msg,"%luMb",blocknum/MAX_pReadCache_size);
-				str_len = strlen(msg);
-				Clear(0, 130, 240, 15, gl_color_cheat_black, 1);
-				DrawHZText12(msg, 0, (240 - str_len * 6) / 2, 160 - 30, 0x7fff, 1);
+				if(!launcher_launch_screen_active)
+				{
+					sprintf(msg,"%luMb",blocknum/MAX_pReadCache_size);
+					str_len = strlen(msg);
+					Clear(0, 130, 240, 15, gl_color_cheat_black, 1);
+					DrawHZText12(msg, 0, (240 - str_len * 6) / 2, 160 - 30, 0x7fff, 1);
+				}
 				if(!PSRAM_ReadFileChunk(&gfile, pReadCache, filesize - blocknum, 0, &read_size))
 					goto close_failed;
 				chunk_offset = 0;

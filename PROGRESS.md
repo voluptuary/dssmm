@@ -1,5 +1,10 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 18:18 UTC — Plugin launch bar fix in progress
+
+- Owner authorized immediate fix for external-plugin black progress bar. Added the existing `!launcher_launch_screen_active` guard around legacy progress drawing in `LoadEMU2PSRAM()`, matching the subsequent game-data loop. File reads, page selection, DMA, error handling and fallback progress remain unchanged.
+- Validation passed: PSRAM policy host regression, production build (2014672 bytes), layout guard (IWRAM gap 1,088 bytes; EWRAM heap 7,112 bytes; stack reserve 12,288 bytes), and whitespace/diff review. Local candidate: `files/candidate/8.3.1-plugin-launch/ezkernelnew.bin`, SHA-256 `cc98b78c2035bfcb45fe8e06b418493b387fa0f37dd1a097234af64496fbb236`. Hardware visual verification pending for .nes/.gg and GB/GBC. Commit/push the fix and logs; published 8.3.1 remains unchanged. NOR writing UI remains future work.
+
 ## 2026-11-10 18:16 UTC — Future plugin launch progress UI consistency
 
 - Owner reports a brief black bar with centered 0MB before .gg/.nes launches, while .gbc fades cleanly into the game. Source confirms a matching kernel-side drawing path in `LoadEMU2PSRAM()` (`source/ezkernelnew.c`, external-plugin loop around lines 5884–5891): unconditional `Clear(0,130,240,15,...)` and white `DrawHZText12` progress text before the plugin executes. Its first iteration formats zero as `0Mb`.
