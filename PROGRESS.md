@@ -1,5 +1,12 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 20:30 UTC — Original Omega test publication checkpoint
+
+- Owner explicitly authorized publishing this checkpoint as a hardware-untested Original Omega test build. Prepared docs/releases/omega-test1.md in the established changelog style with positive contributor attribution, original-hardware-only warning, actual backports and known limitations. Kernel-only asset; automatic GitHub source archives only.
+- Code remains validated checkpoint 33e733a; release tag planned v8.3.1-omega-test1 on a documentation-only descendant. Reusing exact 2,044,264-byte candidate, SHA-256 bb7a5302d7711b4340d595856e2e5eaf433bc6cad45c20fb0850f5dfc678c336; no executable changes or redundant test run. Retains About identifier 8.3.1-omega-dev.
+- Next: commit/push only ezfomega, tag and publish as prerelease/non-latest, download asset and verify hash and release flags. Verify DE branch remains 5f700c9 and stable latest v8.3.1. Update journal with actual publication result.
+- New owner instruction: after publication/verification switch to ezfblue and begin its port in isolation. Preserve ezfode and record directly relevant DE issues for later review rather than fixing DE during BLUE work. Read BLUE target plan and reconcile its state first.
+
 ## 2026-11-10 20:25 UTC — Continued Omega backport checkpoint validated
 
 - Current branch ezfomega only. Isolated checkpoints pushed: NOR input checks 9d4aef7, themed NOR UI 1b3d95a, patch/trim safety 4ed518c, artwork cache/context integration a795336. Pending scan/IRQ guard checkpoint validated next. DE candidate artifacts removed from this branch at cce6e5f; only Omega candidate retained. Verified origin/ezfode still exactly `5f700c9a89768309f06993984bb6c3a3190d04ef`; no DE/BLUE source, tag or release changes.

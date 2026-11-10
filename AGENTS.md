@@ -14,6 +14,8 @@ Use automatic GitHub source archives; do not upload separate source ZIPs.
 Original Omega hardware is unavailable: validation is source/build/host only.
 On ezfomega use scripts/verify-omega-port.sh; do not treat DE tests or hardware
 reports as validation of this port. Do not publish it as hardware-qualified.
+The owner authorized v8.3.1-omega-test1 as an explicitly hardware-untested
+prerelease. Keep DE v8.3.1 latest; this does not authorize a stable Omega release.
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
 ran ahead of this repository's build number. In particular, its v8.4.1 release

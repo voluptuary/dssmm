@@ -1,6 +1,6 @@
 DS Style Merkin Mix Original Omega development checkpoint
 
-ORIGINAL EZ-FLASH OMEGA ONLY. Hardware untested; no release. Do not use on DE/BLUE.
+ORIGINAL EZ-FLASH OMEGA ONLY. Hardware untested; published as v8.3.1-omega-test1. Do not use on DE/BLUE.
 
 Includes filename/mirrored/marked-transparent artwork with cache/Start/recents integration; remembered/collapsible cheats; staged save/settings writes; checked PSRAM/NOR/trim reads; bounded patch/staging copies; themed NOR writing/background/top bar; catalog scan/IRQ guards. Flash backend APIs remain void: physical programming failures and power-loss atomicity are not proven.
 

@@ -7,7 +7,7 @@ DS Style is a custom kernel for the **original EZ-FLASH OMEGA**. It is based on 
 
 ## Development status
 
-This branch backports Merkin Mix onto FrankieT19's Original Omega DS Style v8.0 implementation. It is hardware-untested development code. There is no published Original Omega Merkin Mix release yet.
+This branch backports Merkin Mix onto FrankieT19's Original Omega DS Style v8.0 implementation. It is hardware-untested development code. The first hardware-untested prerelease is [Original Omega Test 1](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test1). It is a kernel-only test download, not a hardware-qualified release.
 
 Backported so far: filename/mirrored-LFN artwork in SYSTEM/IMGS or SYSTEM/IMGS2, marked transparency, clean external-plugin launch transitions, checked PSRAM/addon/NOR input handling, themed NOR writing progress with a dedicated background and top bar, staged SD save/settings replacement, and optional remembered cheats with collapsible groups. Marked artwork transparency is now implemented and host-tested; further Merkin Mix fixes are still being ported; see docs/porting/OMEGA_STATUS.md.
 
