@@ -32,7 +32,7 @@ if not exist images\blank\HELP.h (
 echo Making it with make...
 set "BUILD_CWD=%CD%"
 set "BUILD_DRIVE="
-set "BUILD_OUTPUT_GBA=x.gba"
+set "BUILD_OUTPUT_GBA=omega-kernel.gba"
 
 echo "%BUILD_CWD%" | findstr /C:" " >NUL
 if not errorlevel 1 (
@@ -48,7 +48,6 @@ if not errorlevel 1 (
 
 :drive_found
 if defined BUILD_DRIVE (
-	set "BUILD_OUTPUT_GBA=%BUILD_DRIVE:~0,1%.gba"
 	subst %BUILD_DRIVE% "%BUILD_CWD%" >NUL
 	if errorlevel 1 (
 		echo Could not map %BUILD_DRIVE% to "%BUILD_CWD%".
@@ -61,8 +60,8 @@ if defined BUILD_DRIVE (
 
 if exist "%BUILD_OUTPUT_GBA%" del "%BUILD_OUTPUT_GBA%" >NUL
 if exist x.gba del x.gba >NUL
-make clean
-make
+make clean TARGET=omega-kernel
+make TARGET=omega-kernel
 set "MAKE_EXIT=%ERRORLEVEL%"
 popd
 

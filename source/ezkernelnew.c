@@ -240,6 +240,7 @@ static const u16 *Launcher_NotFoundImage(void);
 static int Launcher_NotFoundWidth(void);
 static int Launcher_NotFoundHeight(void);
 u32 Load_ThumbnailEx(TCHAR *pfilename_pic, u8 *dst);
+static u32 Launcher_LoadOmegaThumbnailForDirectory(TCHAR *filename, const char *rom_dir, u8 *dst);
 u32 Check_file_type(TCHAR *pfilename);
 
 #define LAUNCHER_THEME_ASSET_DEFINITIONS
@@ -4429,7 +4430,7 @@ static u32 Launcher_StartPreviewEnsureCached(u32 index)
 
 	f_getcwd(saved_path, sizeof(saved_path) / sizeof(*saved_path));
 	if(f_chdir(path) == FR_OK)
-		have_thumb = Load_ThumbnailEx(name, pReadCache + 0x10000);
+		have_thumb = Launcher_LoadOmegaThumbnailForDirectory(name, path, pReadCache + 0x10000);
 	if(saved_path[0])
 		f_chdir(saved_path);
 
@@ -6190,6 +6191,7 @@ static u32 Launcher_LoadThumbnailFromRomHeader(TCHAR *filename, u8 *dst)
 typedef struct {
 	FILINFO info;
 	char directory[MAX_path_len * 2];
+	char input_directory[MAX_path_len * 2];
 	char component[MAX_path_len];
 	char path[MAX_path_len * 2 + 32];
 	char name[MAX_path_len];
@@ -6225,21 +6227,38 @@ static u32 Launcher_LoadOmegaArtworkPath(const char *path, u8 *dst)
 }
 
 /* Mirror long directory/file names in artwork paths without changing ROM I/O. */
-static u32 Launcher_LoadFilenameThumbnail(const char *filename, u8 *dst)
+static u32 Launcher_LoadFilenameThumbnailAt(const char *filename, const char *rom_dir, u8 *dst)
 {
 	LauncherOmegaArtworkWorkspace *work = &launcher_omega_artwork;
 	const char *base;
+	const char *absolute_path;
+	const char *directory = rom_dir ? rom_dir : "/";
 	const char *slash;
 	char *dot;
 	size_t length;
 	int written;
 	if(!filename || !dst) return 0;
+	absolute_path = filename;
+	if(filename[0] && filename[1] == ':') absolute_path += 2;
+	if(rom_dir && absolute_path[0] == '/')
+	{
+		const char *separator = strrchr(absolute_path, '/');
+		length = separator ? (size_t)(separator - absolute_path) : 0;
+		if(length >= sizeof(work->input_directory)) return 0;
+		if(length)
+		{
+			memcpy(work->input_directory, absolute_path, length);
+			work->input_directory[length] = '\0';
+			directory = work->input_directory;
+		}
+		else directory = "/";
+	}
 	base = filename;
 	slash = strrchr(base, '/');
 	if(slash) base = slash + 1;
 	slash = strrchr(base, '\\');
 	if(slash) base = slash + 1;
-	if(f_stat(filename, &work->info) == FR_OK && !(work->info.fattrib & AM_DIR))
+	if(rom_dir && f_stat(filename, &work->info) == FR_OK && !(work->info.fattrib & AM_DIR))
 		base = work->info.fname;
 	length = strlen(base);
 	if(!length || length >= sizeof(work->name)) return 0;
@@ -6249,7 +6268,7 @@ static u32 Launcher_LoadFilenameThumbnail(const char *filename, u8 *dst)
 	*dot = '\0';
 	if(strchr(work->name, '/') || strchr(work->name, '\\')) return 0;
 
-	if(strcmp(currentpath, "/") && LauncherArtworkResolveDirectoryPath(currentpath,
+	if(strcmp(directory, "/") && LauncherArtworkResolveDirectoryPath(directory,
 		work->directory, sizeof(work->directory), work->component, sizeof(work->component),
 		Launcher_ResolveOmegaArtworkDirectory, work))
 	{
@@ -6264,7 +6283,12 @@ static u32 Launcher_LoadFilenameThumbnail(const char *filename, u8 *dst)
 	return Launcher_LoadOmegaArtworkPath(work->path, dst);
 }
 
-u32 Load_ThumbnailEx(TCHAR *pfilename_pic, u8 *dst)
+static u32 Launcher_LoadFilenameThumbnail(const char *filename, u8 *dst)
+{
+	return Launcher_LoadFilenameThumbnailAt(filename, currentpath, dst);
+}
+
+static u32 Launcher_LoadOmegaThumbnailForDirectory(TCHAR *pfilename_pic, const char *rom_dir, u8 *dst)
 {
 	TCHAR custom_name[104];
 
@@ -6275,11 +6299,16 @@ u32 Load_ThumbnailEx(TCHAR *pfilename_pic, u8 *dst)
 
 	{
 		const char *extension = pfilename_pic ? strrchr(pfilename_pic, '.') : NULL;
-		if(extension && !strcasecmp(extension, ".gba") &&
+		if(extension && (!strcasecmp(extension, ".gba") || !strcasecmp(extension, ".agb")) &&
 			Launcher_LoadThumbnailFromRomHeader(pfilename_pic, dst))
 			return 1;
 	}
-	return Launcher_LoadFilenameThumbnail(pfilename_pic, dst);
+	return Launcher_LoadFilenameThumbnailAt(pfilename_pic, rom_dir, dst);
+}
+
+u32 Load_ThumbnailEx(TCHAR *pfilename_pic, u8 *dst)
+{
+	return Launcher_LoadOmegaThumbnailForDirectory(pfilename_pic, currentpath, dst);
 }
 
 u32 Load_Thumbnail(TCHAR *pfilename_pic)
@@ -7846,6 +7875,9 @@ static u32 Launcher_LoadThumbDataForIndex(u32 absolute_index, u8 *thumb_data)
 		if(!has_thumbnail && Launcher_IsValidGameCodeBytes((const u8*)&pNorFS[absolute_index].gamename[12]))
 			has_thumbnail = Launcher_LoadThumbnailByGameCode((const u8*)&pNorFS[absolute_index].gamename[12],
 			thumb_data - LAUNCHER_THUMB_BMP_HEADER);
+		if(!has_thumbnail && name)
+			has_thumbnail = Launcher_LoadFilenameThumbnailAt(name, NULL,
+				thumb_data - LAUNCHER_THUMB_BMP_HEADER);
 		return has_thumbnail;
 	}
 
@@ -7881,6 +7913,9 @@ static u32 Launcher_LoadThumbDataForIndex(u32 absolute_index, u8 *thumb_data)
 		((len >= 3) && !strcasecmp(&(name[len - 3]), "agb"))))
 			has_thumbnail = Launcher_LoadThumbnailFromRomHeader(name, thumb_data - LAUNCHER_THUMB_BMP_HEADER);
 	}
+	if(!has_thumbnail && name)
+		has_thumbnail = Launcher_LoadFilenameThumbnail(name,
+			thumb_data - LAUNCHER_THUMB_BMP_HEADER);
 	return has_thumbnail;
 }
 
@@ -13243,7 +13278,7 @@ static void Launcher_DrawStartLastThumb(int x, int y)
         {
             f_getcwd(saved_path, sizeof(saved_path) / sizeof(*saved_path));
             if(f_chdir(recent_path) == FR_OK)
-                have_thumb = Load_ThumbnailEx(recent_name, pReadCache + 0x10000);
+                have_thumb = Launcher_LoadOmegaThumbnailForDirectory(recent_name, recent_path, pReadCache + 0x10000);
             if(saved_path[0])
                 f_chdir(saved_path);
         }

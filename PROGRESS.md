@@ -1,5 +1,11 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 20:09 UTC — Artwork cache integration and packaging checkpoint
+
+- Correction to earlier port status: filename fallback was implemented/tested at Load_ThumbnailEx level, but original cache-loader paths still bypassed it. Expanded production-cache harness reproduced the SD non-GBA failure; now covers SD/NOR/root fallback and virtual recents with LFN directory/file aliases. Added real-parent extraction for absolute recents and no SD source probing for NOR catalog names. Restored .agb header-art priority alongside .gba.
+- Final integration build is 2,044,200 bytes (52,952 headroom); forced build and full target verifier pass. EWRAM heap 21,424 bytes, IWRAM gap 8,048. Additional 512-byte directory workspace is EWRAM, not transfer-pool/stack scratch. Production-cache tests pass for SD/NOR/absolute recents and explicit Start/favorite directory context; .agb priority preserved. NOR install-folder sidecar storage remains pending.
+- Fixed Omega Windows output-stem mismatch with explicit make TARGET=omega-kernel and matching GBA copy path. Static-only verification; related ezfode candidate logged for later review, without changing DE. Next: full target verifier, update local Original Omega candidate, commit/push only ezfomega and verify branch isolation.
+
 ## 2026-11-10 20:02 UTC — Patch-window and trim-boundary safeguards
 
 - Reproduced Original Omega PSRAM Write failing a cross-8-MiB patch in banked-aperture simulation. Ported DE page splitting and odd-address guard; trim analysis now guards null/zero inputs and avoids unsigned underflow on one-byte final blocks/short padding scans. Retains target per-game trim hook.

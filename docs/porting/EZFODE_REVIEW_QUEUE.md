@@ -29,3 +29,7 @@ Related review: Get_all_Section_val caps produced menu entries, but skipped comm
 At ezfode 5f700c9, GBApatch.c::Write NOR branch checks only the starting address against windows_offset..+0x20000, then copies size/2 words without clipping the end. A six-byte patch starting at windows_offset+0x1FFFE overwrites four bytes past the 128 KiB staging buffer. A host extraction with an explicit guard region reproduced this failure; the NOR branch was identical to DE before the Omega fix. Actual game-specific caller reachability is not yet established, so do not claim an observed cartridge failure.
 
 Omega now intersects the patch with the current staged window and supports the remaining slice when called for the next window; tests verify both slices and untouched guards. This is a memory safety issue to review on DE separately, including whether every cross-block patch producer re-emits its global patch in the subsequent block. No ezfode change made.
+
+## BUILD-WIN-01 — output filename mismatch in plain-directory build (static review candidate)
+
+At ezfode 5f700c9, build.bat initializes BUILD_OUTPUT_GBA=x.gba, while the Makefile defaults TARGET to the working-directory basename. When no temporary drive is mapped and the project directory is not named x, successful make output may not be copied to the expected kernel .bin. Windows runtime reproduction is unavailable here. Review the no-spaces path case with a differently named checkout. Omega now passes an explicit TARGET=omega-kernel and uses the matching output stem; no ezfode change made.
