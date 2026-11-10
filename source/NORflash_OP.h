@@ -1,6 +1,9 @@
 #include <gba_base.h>
 
 #include "ff.h"
+
+/* Preserve legacy 0=success, 1=device, 2=full; distinguish SD input failure. */
+#define NOR_WRITE_FILE_ERROR 3
 //---------------------------------------------------------------
 void Chip_Reset();
 void Block_Erase(u32 blockAdd);

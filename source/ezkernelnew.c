@@ -16966,6 +16966,11 @@ load_file:
 					launcher_current_theme_bg = 0;
 					return 2;
 				}
+				else if(res == NOR_WRITE_FILE_ERROR)
+				{
+					Show_error_num(1);
+					return 0;
+				}
 				else if(res==2)
 				{
 					Clear(0,160-15,200,15,gl_color_cheat_black,1);
@@ -17009,6 +17014,11 @@ load_file:
 					launcher_current_topbar_bg = 0;
 					launcher_current_theme_bg = 0;
 					return 2;
+				}
+				else if(res == NOR_WRITE_FILE_ERROR)
+				{
+					Show_error_num(1);
+					return 0;
 				}
 				else if(res==2)
 				{

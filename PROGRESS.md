@@ -1,5 +1,11 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 19:52 UTC — NOR input safeguards validated
+
+- Extracted original Loadfile2NOR test failed as expected: missing file reported success. After correction, tests pass short header/first/later reads, seek/close failures, 64-bit oversize, empty inputs, offset/alignment/catalog capacity, exact last-block fit, extra-patch capacity/counts and deterministic FF tail. File failure leaves RAM catalog unchanged and does not erase an unread block; prior successfully written free blocks may remain after a later failure.
+- High-level function preserves original PPB command/poll sequence and calls original void Block_Erase/WriteFlash functions. No hardware success/timeout/catalog atomicity claim. New return 3 identifies SD file failure; both native clean/addon callers report it. Legacy device/full codes retained.
+- Build 2,034,088 bytes, 63,064 bytes headroom; target layout unchanged. NOR source tests use mocked flash/file boundaries; actual target FatFs remains separately tested by save suite. Next: commit/push this isolated safety checkpoint, add themed writing presentation using shared GBA rendering assets, rerun verifier and update candidate/status.
+
 ## 2026-11-10 19:50 UTC — DE candidate artifacts removed from Omega branch
 
 - Owner identified unnecessary inherited DE candidates. Removed folders 8.3.0, 8.3.0-psram-loader-audit, 8.3.1-size-audit, 8.3.1 from the workspace, including ignored DE binaries and tracked DE candidate READMEs. Retained only Original Omega candidate folders. Published releases and ezfode branch remain untouched; candidate paths elsewhere in older history are historical.

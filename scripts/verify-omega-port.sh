@@ -6,6 +6,7 @@ cd "$repo_root"
 bash scripts/test-cheat-state-host.sh
 bash scripts/test-cheat-row-host.sh
 bash scripts/test-savefile-host.sh
+bash scripts/test-omega-nor-load-host.sh
 bash scripts/test-psram-load-policy.sh
 bash scripts/test-omega-artwork-host.sh
 bash scripts/test-omega-transparency-host.sh

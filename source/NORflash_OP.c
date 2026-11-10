@@ -196,37 +196,39 @@ void IWRAM_CODE WriteFlash_with32word(u32 address,u8 *buffer,u32 size)
 //-----------------------------------------------------------
 u32 Loadfile2NOR(TCHAR *filename, u32 NORaddress,u32 have_patch)
 {
-u8 str_len;
-    u32 res;
-    u32 ret;
-    u32 filesize;
-    u32 fileneedsize;
-    u32 blocknum;
-    char msg[128];
-    FM_NOR_FS tmpNorFS ;
-    char temp[50];
+    FSIZE_t file_size;
+    UINT got;
+    u32 filesize, fileneedsize, blocknum, read_size;
     u32 add_patch = 0;
-    u16 norid = Read_S98NOR_ID();
-    if(norid == 0x223D) { //S98
-        res = f_open(&gfile, filename, FA_READ);
-        if(res != FR_OK) {
-            return 0;
-        }
-        filesize = f_size(&gfile);
-        f_lseek(&gfile, 0xa0);
-        f_read(&gfile, temp, 0x10, (UINT*)&ret);//read game name
-        memcpy(tmpNorFS.gamename,temp,0x10);
-        tmpNorFS.rompage = NORaddress >> 17;
-        fileneedsize = ((((filesize+0x1FFFF)/0x20000)*0x20000));
-        if(have_patch) {
-            if(iTrimSize>=fileneedsize) {
-                fileneedsize = fileneedsize+0x20000;
-                add_patch = 1;
-            }
-        }
-        if(	fileneedsize > (0x4000000-NORaddress)) {
-            return 2; //Not enough NOR space
-        }
+    FM_NOR_FS tmpNorFS;
+    char msg[128];
+    u8 str_len;
+    if(!filename || strlen(filename) >= sizeof(tmpNorFS.filename))
+        return NOR_WRITE_FILE_ERROR;
+    if(game_total_NOR >= MAX_NOR || NORaddress >= 0x4000000 ||
+        (NORaddress & 0x1FFFF)) return 2;
+    if(Read_S98NOR_ID() != 0x223D) return 1;
+    if(f_open(&gfile, filename, FA_READ) != FR_OK) return NOR_WRITE_FILE_ERROR;
+    file_size = f_size(&gfile);
+    if(file_size < 0xB0) goto file_failed;
+    if(file_size > 0x4000000) goto full;
+    filesize = (u32)file_size;
+    fileneedsize = (filesize + 0x1FFFF) & ~0x1FFFFUL;
+    if(have_patch && iTrimSize >= fileneedsize)
+    {
+        fileneedsize += 0x20000;
+        add_patch = 1;
+    }
+    if(fileneedsize > 0x4000000 - NORaddress) goto full;
+    memset(&tmpNorFS, 0, sizeof(tmpNorFS));
+    if(f_lseek(&gfile, 0xA0) != FR_OK ||
+        f_read(&gfile, tmpNorFS.gamename, sizeof(tmpNorFS.gamename), &got) != FR_OK ||
+        got != sizeof(tmpNorFS.gamename)) goto file_failed;
+    tmpNorFS.rompage = NORaddress >> 17;
+    tmpNorFS.filesize = fileneedsize;
+    tmpNorFS.have_patch = have_patch;
+    tmpNorFS.have_RTS = gl_rts_on;
+    strcpy(tmpNorFS.filename, filename);
         ////////////////// erase all BBP
         *((vu16 *)(FlashBase_S98)) = 0xF0 ;
         *((vu16 *)(FlashBase_S98+0x555*2)) = 0xAA ;
@@ -245,51 +247,53 @@ u8 str_len;
         *((vu16 *)(FlashBase_S98+0x000*2)) = 0x90 ;
         *((vu16 *)(FlashBase_S98+0x000*2)) = 0x00 ;
         /////////////////
-        tmpNorFS.filesize = fileneedsize;
-        tmpNorFS.have_patch = have_patch;
-        tmpNorFS.have_RTS = gl_rts_on;
-        sprintf(tmpNorFS.filename,"%s",filename);
-        dmaCopy(&tmpNorFS,&pNorFS[game_total_NOR], sizeof(FM_NOR_FS));
-        Clear(0,160-15,240,15,gl_color_cheat_black,1);
-        ShowbootProgress(gl_copying_data);
-        for(blocknum=0; blocknum<filesize; blocknum+=0x20000) {
-            sprintf(msg,"%luMbit",(blocknum)/0x20000);
-			str_len = strlen(msg);
-            Clear(0,130,240,15,gl_color_cheat_black,1);
-            DrawHZText12(msg,0,(240-str_len*6)/2,160-30,0x7fff,1);
-            Block_Erase(blocknum+NORaddress);
-            f_lseek(&gfile, blocknum);
-            f_read(&gfile, pReadCache, 0x20000, (UINT*)&ret);//pReadCache max 0x20000 Byte
-            if(have_patch) {
-                if((gl_reset_on==1) || (gl_rts_on==1) || (gl_sleep_on==1) || (gl_cheat_on==1)) {
-                    PatchInternal((u32*)pReadCache,0x20000,blocknum);
-                    GBApatch_NOR((u32*)pReadCache,0x20000,blocknum);//some nes need check
-                }
-            }
-            else {
-                GBApatch_Cleanrom_NOR((u32*)pReadCache,blocknum);
-            }
-            WriteFlash_with32word(blocknum+NORaddress,pReadCache,0x20000);
-            //WriteFlash(blocknum+NORaddress,pReadCache,0x20000);
-        }
-        f_close(&gfile);
-        if(have_patch) {
-            if(add_patch) {
-                Block_Erase(blocknum+NORaddress);
+
+    Clear(0,160-15,240,15,gl_color_cheat_black,1);
+    ShowbootProgress(gl_copying_data);
+    for(blocknum=0; blocknum<filesize; blocknum+=0x20000)
+    {
+        sprintf(msg,"%luMbit",blocknum/0x20000);
+        str_len = strlen(msg);
+        Clear(0,130,240,15,gl_color_cheat_black,1);
+        DrawHZText12(msg,0,(240-str_len*6)/2,160-30,0x7fff,1);
+        read_size = filesize - blocknum;
+        if(read_size > 0x20000) read_size = 0x20000;
+        memset(pReadCache, 0xFF, 0x20000);
+        if(f_lseek(&gfile, blocknum) != FR_OK ||
+            f_read(&gfile, pReadCache, read_size, &got) != FR_OK || got != read_size)
+            goto file_failed;
+        /* Never erase/program a block whose SD contents were not read fully. */
+        Block_Erase(blocknum+NORaddress);
+        if(have_patch)
+        {
+            if(gl_reset_on || gl_rts_on || gl_sleep_on || gl_cheat_on)
+            {
+                PatchInternal((u32*)pReadCache,0x20000,blocknum);
                 GBApatch_NOR((u32*)pReadCache,0x20000,blocknum);
-                WriteFlash_with32word(blocknum+NORaddress,pReadCache,0x20000);
             }
         }
-        Save_NOR_info((u16*)pNorFS,sizeof(FM_NOR_FS)*0x40);
-        return 0;
+        else GBApatch_Cleanrom_NOR((u32*)pReadCache,blocknum);
+        WriteFlash_with32word(blocknum+NORaddress,pReadCache,0x20000);
     }
-    else {
-#ifdef DEBUG
-        //DEBUG_printf("Bad NOR ID");
-#endif
-        return 1;
+    if(f_close(&gfile) != FR_OK) return NOR_WRITE_FILE_ERROR;
+    if(have_patch && add_patch)
+    {
+        Block_Erase(blocknum+NORaddress);
+        GBApatch_NOR((u32*)pReadCache,0x20000,blocknum);
+        WriteFlash_with32word(blocknum+NORaddress,pReadCache,0x20000);
     }
+    /* Backend flash functions are void: this checks SD input, not flash success. */
+    dmaCopy(&tmpNorFS,&pNorFS[game_total_NOR],sizeof(tmpNorFS));
+    Save_NOR_info((u16*)pNorFS,sizeof(FM_NOR_FS)*MAX_NOR);
+    return 0;
+full:
+    (void)f_close(&gfile);
+    return 2;
+file_failed:
+    (void)f_close(&gfile);
+    return NOR_WRITE_FILE_ERROR;
 }
+
 //-----------------------------------------------------------
 u32 GetFileListFromNor(void)
 {

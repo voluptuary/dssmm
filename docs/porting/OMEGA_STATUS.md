@@ -18,7 +18,7 @@ Work only on ezfomega. Do not merge into ezfode, change DE release tags/assets, 
 | File identity / FatFs fast-open | Pending; do not replace Omega filesystem/storage paths wholesale |
 | Save/settings transactions | Ported staged SD replacement/recovery with Original Omega SRAM sequence and boot settings cache retained; fault-injection suite passes; case-insensitive target policy and both-separator rejection added; physical interruption untested |
 | Loader size/I/O/window safeguards | Ported exact-I/O/range/window policy with reference selectors and 32 MiB limit; callers stop on failure; native headers checked without rejecting short plugin files; target build and policy tests pass; hardware pending |
-| NOR artwork/progress/error safeguards | Pending Omega mapping/capacity/catalog review |
+| NOR artwork/progress/error safeguards | SD-input/bounds/catalog-publication safeguards implemented and mocked-flash host-tested; themed progress/artwork pending. Target flash APIs remain void, so physical failures are not detectable by this port yet |
 | DE LEDs, hardware settings, firmware update and FRAM behavior | Not transferable by assumption; retain target implementations and assess actual capabilities |
 | Extra custom theme/color slots | Reference excludes these for size; remain excluded pending size/RAM evaluation |
 
@@ -41,3 +41,5 @@ Save/settings milestone: production image 2,031,816 bytes, 65,336 bytes headroom
 Diagnostic pre-cheat stack snapshot (source 6606239): main 928 bytes; SD_list_MENU 128; Loadfile2PSRAM 80; LoadEMU2PSRAM 120; Save_savefile 624; SavefileWrite implementation 624; Launcher_SaveUnifiedSettings 616; FileTxn_Begin 328, ReadJournal 624, WriteJournal 632, Recover 40; directory resolver 40. These compiler frames exclude nested library/call-chain peaks and do not prove runtime stack safety. Generated stack reports were summarized then removed.
 
 Cheat milestone final build: 2,033,904 bytes; 63,248 headroom; EWRAM heap 21,936 and IWRAM gap 8,048. Runtime assembly unchanged. Remembered snapshots are checksum/identity validated but replacement is not atomic and may lose an old cheat snapshot on write failure; ordinary save transactions have separate safeguards. No physical gameplay, persistence or UI test available.
+
+NOR input milestone: open failure no longer reports success, both callers handle file error, file size/range/catalog slot/name bounds checked, read/seek/close failures abort, final block FF padded, and RAM catalog publication follows complete SD I/O. The Original Omega PPB sequence/erase/program routines remain unchanged; no generic timeout/status protocol copied. Mocked flash tests establish file-I/O ordering, not chip correctness or power-loss safety.
