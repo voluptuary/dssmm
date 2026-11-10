@@ -1,5 +1,19 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-10 20:38 UTC — BLUE hardware and packaging inventory
+
+- Added docs/porting/BLUE_STATUS.md with exact registers/memory/metadata/64 MiB launch differences and phased feature/provenance matrix. Vendor reference refresh remains 109f1a0. No DE changes.
+- Verified packer main by static disassembly: code at zero, zero-filled gap, image.bin at 1 MiB; no transform/checksum. Resource SHA be609b61..., firmware slice CRC 22DD74FA matches source. Existing DS Style code cannot simply use that resource placement without overlap. No bootloader/hardware compatibility claim.
+- Temporary vendor source initially fails modern compiler. Minimal prototypes, const void metadata input, and HZK12 include case fixes produce 703,752-byte raw image. Flash commands/reset/firmware unmodified. No warnings suppressed; directory sprintf overlap and unchecked native loader remain verified source defects.
+- Next implementation: targets/blue vendor hardware build, root make delegation to prevent accidental DE output, portable bounds-checked resource packer with regression tests. Preserve root source/images as explicit DS Style donor until safe integration. Then exact-I/O native loader backport; hardware/update validation remains unavailable.
+
+## 2026-11-10 20:34 UTC — BLUE port resumed by owner
+
+- Active branch ezfblue at 9459779; clean inherited preparation snapshot still targets DE Rev. A/B. Earlier instructions to wait are superseded by owner authorization to start actual isolated BLUE porting after publishing Omega test. Omega test published/verified at v8.3.1-omega-test1; ezfomega publication record pushed at 439289b. Do not merge either port into ezfode.
+- Verified remote ezfode remains 5f700c9a89768309f06993984bb6c3a3190d04ef. Record directly relevant DE defects in a branch-local review queue, with evidence, without changing DE. No BLUE hardware validation is available or implied by prior DE reports.
+- First phase: inspect pinned vendor blue-reference/main 109f1a0 hardware/register/save/flash/reset source and packaging tool/image contract. Compare with current DE source to choose a safe hardware baseline before implementing launcher changes. Do not generate an installable BLUE candidate until its packaging and bounds are understood.
+- Next: refresh vendor reference without changing the pinned baseline; inventory exact hardware differences and source dependencies; establish a reproducible target build/packaging plan. Update target plan, progress and handoff before starting substantial source adaptation. Historical entries below apply to earlier DE audit/preparation state, not current port status.
+
 ## 2026-11-10 18:04 UTC — GitHub branch rename verified
 
 - Owner completed deletion/rename through GitHub. Remote HEAD now points to `refs/heads/ezfode`; remote `main` is absent. `git fetch origin --prune` removed `origin/main`, and `git remote set-head origin -a` set `origin/HEAD` to `origin/ezfode`. The earlier permission blocker is resolved by the owner action; old synchronization instructions below are historical and superseded. Do not recreate `main`.
