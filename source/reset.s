@@ -106,3 +106,69 @@ HardReset:
 	.align
 	.ltorg
 SoftReset_end:
+
+@ No return to a C frame in EWRAM after clearing/replacing that memory.
+@ Keep this outside SoftReset..SoftReset_end so the native stub is unchanged.
+    .syntax unified
+    .thumb
+    .align 2
+    .global DE_BootHandoff
+    .type DE_BootHandoff, %function
+    .thumb_func
+DE_BootHandoff:
+    movs r4, r0
+    ldr r1, =0x03007F00
+    mov sp, r1
+    movs r0, #0xFC
+    cmp r4, #0
+    bne 1f
+    movs r0, #0xFD
+1:  swi 1
+    cmp r4, #0
+    beq 6f
+    cmp r4, #1
+    beq 7f
+    cmp r4, #4
+    bhi 6f
+    ldr r1, =0x02000000
+    ldr r2, =0x0203FBF8
+    movs r0, #0
+2:  str r0, [r1]
+    adds r1, #4
+    cmp r1, r2
+    blo 2b
+    cmp r4, #3
+    beq 6f
+    ldr r0, =0x08000000
+    ldr r1, =0x02000000
+    cmp r4, #4
+    beq 4f
+    ldr r2, =0x0203FBFC
+    ldr r2, [r2]
+    lsls r2, r2, #5
+    lsrs r2, r2, #5
+    ldr r3, =0x3FBF8
+    cmp r2, r3
+    bhi 8f
+    movs r3, #3
+    tst r2, r3
+    bne 8f
+    cmp r2, #0
+    beq 8f
+3:  ldr r3, [r0]
+    str r3, [r1]
+    adds r0, #4
+    adds r1, #4
+    subs r2, #4
+    bne 3b
+    b 5f
+4:  swi 0x11
+5:  movs r0, #0xFC
+    swi 1
+    ldr r0, =0x02000000
+    bx r0
+6:  b SoftReset_now
+7:  b HardReset
+8:  b 8b
+    .ltorg
+    .size DE_BootHandoff, .-DE_BootHandoff

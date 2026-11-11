@@ -15,6 +15,7 @@
 #include "ff.h"
 #include "file_transaction.h"
 #include "psram_load_policy.h"
+#include "kernel_boot_policy.h"
 #include "blank/NOR_lz.h"
 #include "draw.h"
 #include "ezkernel.h"
@@ -6033,8 +6034,11 @@ u32 IWRAM_CODE LoadEMU2PSRAM(TCHAR *filename,u32 is_EMU)
 				plan.window_offset, offset);
 		}
 
-		SetPSRampage(0);
-	return 0;
+        SetPSRampage(0);
+        if((is_EMU == 6 && !KernelPluginPayloadValid(PSRAMBase_S98, rom_start_address, 2)) ||
+           (is_EMU == 7 && !KernelPluginPayloadValid(PSRAMBase_S98, blockoffset, 4)))
+            goto load_failed;
+    return 0;
 
 close_failed:
 	if(file_open)

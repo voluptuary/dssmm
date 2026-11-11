@@ -12,7 +12,8 @@ Baseline refs: DE5f700c9, BLUEdb3db27, Original OMEGA20a1d94. Port releases BLUE
 | Immutable NES blob consumes832 bytes of IWRAM | Informational | DE/Omega now const aligned ROM, matching BLUE; bytes/hash unchanged, ROM symbols and RAM margins checked |
 | Save-path ASCII/DBCS policy | Medium (port compatibility), Low (DE policy) | Real FatFs reproduces valid CP936 save rejection on ports and ASCII policy failures on DE; corrected scanner/prefix tests and complete fault suite pass on all targets |
 | DE full-width cheat sizes | Low / malformed-input identity |4 GiB+4 fixture reproduces truncated hash validation; full-width guards/clamps and cheat tests now pass |
-| DE plugin boot/copy/failure/metadata handling | Medium pending per-case proof | Deferred source/host evidence from porting; actual linked boot and filesystem verification required |
+| DE plugin boot | Medium | Linked baseline reproduces overwritten EWRAM stack in modes2/3 and post-map ROM decoder fetch in mode4; IWRAM no-return handoff and bounded payload checks now pass seven-mode linked test and20,000 malformed policy cases; BIOS/cartridge mocked |
+| DE launch copy/failure/metadata handling | Pending per-case proof | Deferred source/host evidence; focused actual-function verification next |
 | F-022 raw flash polling; F-032 catalog interruption | Existing unresolved limits | Chip timing/safe sector-allocation evidence absent. Do not transplant another target's protocol or claim host tests solve physical behavior |
 
 Commands: per-target verify scripts for Omega/BLUE; DE production build + scripts/run-host-test-suite.sh, browser/JS checks and configured Cppcheck. Shared NES regression is scripts/test-nes-patch-host.sh. See branch HANDOFF/PROGRESS for exact milestone results, current code state and continuation.

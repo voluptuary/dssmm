@@ -1,5 +1,18 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-11 13:44 UTC — DE plugin handoff corrected
+
+- Actual linked seven-mode Unicorn test now passes: native hard/soft choices retained, IRQ masked before mapping, EWRAM-clearing/plugin paths switch to IWRAM SP, raw copy remains in IWRAM and compressed plugin uses BIOS11h directly. Pogoshell words/arguments survive all non-native-clear modes. No post-map ROM fetch occurs. BIOS and cartridge effects are mocked; physical runtime remains unverified.
+- Added bounded raw/LZ input validation before mapping;20,000 malformed-policy cases pass ASan/UBSan. Build passes at2,024,936 bytes. Original native assembly copy bounds/reset commands unchanged. New test requires Python Unicorn plus DEVKITARM and current default-named ELF; installed Unicorn2.0.1 here. Initial attempted hot-map script name did not exist; final suite uses actual registered placement check.
+- Preparing commit/push of this narrow DE correction. Next DE copy/size/header/basename/error rebuild cases, then artwork parser and full target/static checks. Audit fixes are not in existing published assets.
+
+
+## 2026-11-11 13:39 UTC — DE linked boot reproducer
+
+- Executing the actual linked DE reset driver under Unicorn reproduces modes2/3 overwriting SP0x0203EFF0 during EWRAM clear and mode4 fetching kernel ROM0x0801ECA4 after game mapping. Native0, native1 hard/soft and fallback5 pass controls. This is software machine-code evidence with mocked BIOS/cartridge, not hardware qualification.
+- Implement an IWRAM no-return plugin handoff with safe IWRAM SP, direct BIOS WRAM decompression and IRQ masking before mapping; retain DE RTC/page calls, native reset choices and Pogoshell argument boundaries. Add existing bounded raw/LZ plugin policy before mapping. Then run linked modes, policy tests and build/RAM checks before committing. Audit remains active; published assets unchanged.
+
+
 ## 2026-11-11 13:22 UTC — Save-path compatibility and DE cheat-size fixes validated
 
 - All three complete real-FatFs save/settings fault suites now pass, including transactional write/readback for CP9360x815C filenames, mixed/lowercase fixed prefixes, actual separators after DBCS pairs, invalid-lead/forward-separator and empty targets. DE baseline failed its three ASCII policy cases; Omega/BLUE baselines failed the valid CP936 transaction. The corrected scanner matches the project fixed936 lead/trail ranges and preserves genuine single-basename restrictions. No journal format or interruption guarantee changed.

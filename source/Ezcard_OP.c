@@ -357,48 +357,16 @@ void IWRAM_CODE Send_FATbuffer(u32*buffer,u32 mode)
 // --------------------------------------------------------------------
 extern u16 gl_ingame_RTC_open_status;
 
+/* Caller has quiesced launcher audio/DMA before changing the ROM window. */
+extern void DE_BootHandoff(u32 mode) __attribute__((noreturn));
 void IWRAM_CODE SetRompageWithHardReset(u16 page,u32 bootmode)
 {
-	Set_RTC_status(gl_ingame_RTC_open_status);
-	SetRompage(page);
-	u32 reset_flags = RESET_PALETTE | RESET_VRAM | RESET_OAM | RESET_SIO | RESET_SOUND | RESET_OTHER;
-	if(bootmode == 0)
-	{
-		reset_flags |= RESET_EWRAM;
-		ResetWithEwramClear(reset_flags);
-	}
-	RegisterRamReset(reset_flags);
-	if(bootmode==1) {
-		if(key_L)
-			SoftReset_now();
-		else
-			HardReset();
-	} else if (bootmode==2 || bootmode==4) {
-		int i;
-		//Clear exram up to pogoshell arg
-		u32 *p = (u32*)(0x02000000);
-		for(i=0;i<0xfefe;i++)
-			p[i]=0;
-		// Copy plugin to EWRAM using pogoshell arg's size
-		if (bootmode==2)
-			dmaCopy((u8*)(0x08000000),(u8*)(0x02000000), *(u32 *)(0x0203fbfc) & 0x7ffffff);
-		else if (bootmode==4)
-			LZ77UnCompWram((u8*)(0x08000000),(u8*)(0x02000000));
-		RegisterRamReset(0xfc);
-		((void(*)(void))0x02000000)();
-	}
-	else if (bootmode == 3) {
-		int i;
-		//Clear exram up to pogoshell arg
-		u32 *p = (u32*)(0x02000000);
-		for(i=0;i<0xfefe;i++)
-			p[i]=0;
-		//SoftReset_now(0,0x100);
-		SoftReset_now();
-	}
-	else {
-		SoftReset_now();
-	}
+    if(bootmode > 4 || (bootmode == 1 && key_L))
+        bootmode = 5; /* Existing soft reset without clearing EWRAM. */
+    REG_IME = 0;
+    Set_RTC_status(gl_ingame_RTC_open_status);
+    SetRompage(page);
+    DE_BootHandoff(bootmode);
 }
 // --------------------------------------------------------------------
 void IWRAM_CODE ReadSram(u32 address, u8* data , u32 size )
