@@ -1,5 +1,16 @@
 # AUTONOMOUS KERNEL AUDIT — MASTER DIRECTIVE
 
+## Current release task (2026-11-11 23:24 UTC)
+
+The owner authorizes stable Definitive Edition8.3.2 publication from ezfomegade.
+This supersedes the earlier hold on stable8.3.1. GitHub default is now dssmm;
+ezfode was renamed by the owner and must not be recreated. Use this isolated
+DE release worktree; do not merge release changes into other platform branches
+or dssmm. Verify software/build checks and downloaded release assets, keep
+hardware limitations explicit, and upload only ezkernelnew.bin (automatic source
+archives). Preserve historical audit/release records below.
+
+
 ## Current software-audit checkpoint (2026-11-11 23:15 UTC)
 
 The three-branch software audit and delivery are complete. See
@@ -23,7 +34,7 @@ listed in the report. Do not silently restart completed porting from old notes.
 The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
 (`https://github.com/voluptuary/ezfode-dssmm-kernel`). The Codespaces workspace
 may retain its original local directory name after the repository rename.
-The primary and GitHub default branch is `ezfode`. The owner completed the
+The GitHub default branch is `dssmm`; the DE release branch is `ezfomegade`. The owner completed the
 rename through GitHub; remote `main` no longer exists. Do not recreate it.
 The owner resumed both isolated ports: hardware-untested BLUE Test1 and Original
 OMEGA Test2 are published. The active phase is now the authorized three-branch

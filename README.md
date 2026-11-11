@@ -9,7 +9,7 @@ DS Style Merkin Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Editi
 
 ## Download and install
 
-Get the stable [DS Style Merkin Mix 8.3.1 release](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1). Copy `ezkernelnew.bin` to the root of the SD card, then start the cartridge while holding **R** to install the kernel. Back up saves before updating.
+Get the stable [DS Style Merkin Mix 8.3.2 release](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.2). Copy `ezkernelnew.bin` to the root of the SD card, then start the cartridge while holding **R** to install the kernel. Back up saves before updating.
 
 ## What it offers
 
@@ -22,7 +22,7 @@ Get the stable [DS Style Merkin Mix 8.3.1 release](https://github.com/voluptuary
 
 ## Known issues
 
-The next maintenance focus is safer recovery when replacing an existing save, clearer reporting of settings-file write failures, and more resilient NOR catalog updates if an operation is interrupted. Back up saves regularly and avoid powering off during NOR writes.
+Known remaining limits include flash operations without a chip-qualified timeout, NOR catalog updates that are not power-loss atomic, and SD-file replacements that can require manual recovery after an interruption. Back up saves regularly and avoid powering off during writes. See the [audit report](docs/audits/cross-platform-2026-11.md) for validation limits.
 
 ## Custom artwork
 

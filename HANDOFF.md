@@ -1,5 +1,19 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-11 23:26 UTC —8.3.2 validated and ready for publication
+
+- Production build passed without diagnostics at2,025,056 bytes (72,096 headroom). All41 registered DE host scripts passed in43s, browser installer tests and all manager JS syntax checks passed. Input-fidelity regression and final layout guard passed: IWRAM IRQ gap1,688; EWRAM heap7,112; user reserve12,288. No new hardware claim. Only firmware source delta from validated a57b009 is launcher version8.3.1→8.3.2.
+- Packaged files/candidate/8.3.2/ezkernelnew.bin; SHA256 6d7774ecbadc40e8c91d9e0e977fe09cd36abe8ff34462d362557f828f926f38. Notes in docs/releases/8.3.2.md follow8.3.1 with new final-build fixes/832-byte RAM improvement, cumulative earlier features/fixes and preserved positive credit. Exclude branch/repository/test-suite maintenance. README points to8.3.2 and current remaining limits. No separate source archive.
+- Next: commit/push this isolated ezfomegade release, publish NEW v8.3.2 stable/latest against exact commit with only ezkernelnew.bin, download/hash/tag/flags verify, record verification JSON and completion, push documentation descendant. dssmm/Omega/BLUE product sources stay untouched; do not merge release into them.
+
+
+## 2026-11-11 23:24 UTC — Definitive Edition8.3.2 release preparation
+
+- Owner explicitly requests publishing the main ezfomegade kernel as8.3.2, superseding the previous8.3.1-latest hold. Release source ezfomegade a57b0090fe79edceb6d26ee8c363afd72e4099a2 contains the validated DE audit corrections. Isolated release worktree /workspaces/dssmm-release-ezfomegade; no platform merge or hardware-protocol change is planned.
+- Verified owner completed GitHub rename: default is dssmm at the same a57b009, ezfode remote absent. Renamed local old DE branch to dssmm, repaired upstream and origin/HEAD; ezfomegade remains separate. Older branch-name/hold instructions below are historical where superseded.
+- Next: change release version to8.3.2, build with the production Makefile, run complete DE host/browser/JS/layout checks, prepare notes following8.3.1 (new user-facing changes, cumulative earlier features/fixes, positive provenance), commit/push only ezfomegade release changes, publish binary-only8.3.2/latest with automatic source archives, then download/hash/tag verify. No new physical Rev. A/B report exists for audit fixes; do not claim one or claim flash timeouts/catalog atomicity are fixed. Maintenance stays out of release notes.
+
+
 ## 2026-11-11 23:15 UTC — Audit delivery verified after session recovery
 
 - Reconciled actual repository/remote state with the prior publication-ready checkpoint. All code/tooling/report changes had already been committed and pushed: Omega b9307d42f099f049b00c66bfdf14f374a949b290, BLUE e5bf9a34c79fb6f869de9bbbe4146240da0c8299, DE613d77559650db836ec606c6929aa8447fc4ba6b. The interrupted verification process and /tmp logs were unavailable after recovery; no claim was made that the missing process completed. Completed fresh GitHub download/tag/asset verification and persisted the JSON in docs/audits/release-verification-2026-11.json.
