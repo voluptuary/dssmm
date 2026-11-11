@@ -1,5 +1,8 @@
 # BLUE port status
 
+Current audit delivery: software audit complete; hardware-untested Test2 is prepared with shared bounds/path/save/artwork fixes. See [audit findings and limits](../audits/cross-platform-2026-11.md) and [Test2 notes](../releases/blue-test2.md). Publication verification is in HANDOFF.md. Final packed kernel3,982,696 bytes; heap15,760; IRQ gap1,656; user reserve12,288 (static only). Its NES blob was already ROM-resident before this audit. Older sizes/next steps below are historical.
+
+
 ## Current state — DS Style integrated, hardware untested
 
 Active branch `ezfblue`. The frontend now uses Merkin Mix `ezfode` 5f700c9; target-specific hardware is based on EZ-FLASH BLUE 109f1a050d9c35008379ce61ae40d05dc528c614. Older baseline-only entries below are historical, not the current feature status. No physical BLUE results exist. DE and original OMEGA branches were not changed during this integration.

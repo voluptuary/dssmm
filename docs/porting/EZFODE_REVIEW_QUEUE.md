@@ -1,5 +1,10 @@
 # Deferred ezfode review queue
 
+Current disposition: the authorized three-branch audit has reviewed this queue.
+See [the final audit report](../audits/cross-platform-2026-11.md) for fixes and
+remaining limitations; historical entries below describe their original state.
+
+
 Owner policy: record directly relevant DE findings during the isolated BLUE port; do not change ezfode. The entries below were established during the Omega port against ezfode 5f700c9 and carried forward unchanged in substance. The current DE branch remains at that commit. New BLUE vendor findings are not automatically DE findings.
 
 ## ART-HEADER-01 — incomplete marked-BMP validation (review candidate, low impact)
