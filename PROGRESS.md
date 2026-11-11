@@ -1,5 +1,11 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 05:08 UTC — BLUE Test 1 published; moving to Omega
+
+- Published https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-blue-test1 as prerelease, draft=false/latest=false. Tag points to 0b29e9052779afa43ab557383cd02535182d62d7. Exactly one binary asset ezbluekernel.bin, 3,982,680 bytes; downloaded SHA256 matches 638b50eed433ac8be1f4ddec5fb9a91847d8fe3800a64e4981375d58f51331b0. Automatic GitHub source archives only. Stable latest remains v8.3.1. Short target SHA was rejected (422); using verified pushed branch succeeded.
+- Hardware and larger-updater acceptance remain unverified, as stated in notes. No physical qualification. DE and Omega remote refs remain 5f700c9 / 439289b.
+- Current BLUE port milestone complete at software-validation level. Next ordered owner task: switch to ezfomega, read its state, port remaining compatible software/UI improvements and narrow shared loader fixes without importing BLUE hardware; publish test2 if changed. Then audit all three branches, including queue items and NES index bounds. Keep per-branch logs current.
+
 ## 2026-11-11 05:08 UTC — BLUE publication-ready software validation
 
 - Full scripts/verify-blue-port.sh passed, including platform checks and all 24 shared suites. Post-format rebuild succeeds with identical image length. Integration f44c681 committed and pushed. Packed /tmp/dssmm-blue-test1/ezbluekernel.bin: 3,982,680 bytes, SHA256 638b50eed433ac8be1f4ddec5fb9a91847d8fe3800a64e4981375d58f51331b0. Publication notes explicitly state hardware and larger updater acceptance unverified. Preparing v8.3.1-blue-test1 prerelease, latest=false; no source ZIP.

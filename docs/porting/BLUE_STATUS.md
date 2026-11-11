@@ -21,7 +21,7 @@ Current linked size: **3,982,680 bytes**. EWRAM heap reservation: **15,760 bytes
 
 Run `bash scripts/verify-blue-port.sh` for build, protected layout, packaging, native/NOR/metadata/IRQ/folder/update/boot tests and all 24 shared software/UI suites. See [target packaging instructions](../../targets/blue/README.md). No separately uploaded source archive is needed.
 
-Next: finish final validation, checkpoint and publish a clearly hardware-untested BLUE prerelease if all software checks pass; then complete remaining Omega backports and audit all three branches. Relevant DE findings remain in [the review queue](EZFODE_REVIEW_QUEUE.md). Do not merge target hardware code across branches. No stable DE release change is part of this port.
+Full aggregate validation passed. [BLUE Test 1](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-blue-test1) is published as a hardware-untested prerelease at 0b29e90; downloaded binary SHA256 verified. Next: complete remaining Omega backports, then audit all three branches. Relevant DE findings remain in [the review queue](EZFODE_REVIEW_QUEUE.md). Do not merge target hardware code across branches. No stable DE release change is part of this port.
 
 ## Historical baseline investigation
 

@@ -24,8 +24,10 @@ BIOS; it does not validate physical cartridge behavior.
 BLUE uses a split ROM layout preserving image.bin at 1 MiB and firmware at
 0x08195000; assets start at 0x08207000, metadata remains at 0x08780000.
 Never flatten that layout or copy a raw .gba as a BLUE update; pack with its ELF.
-No BLUE release or hardware-qualified artifact exists; raw GBA output needs
-its resources and must not be flashed or booted by itself.
+BLUE hardware-untested prerelease v8.3.1-blue-test1 is published; no hardware
+qualification exists. Raw GBA output still requires packing and must not be
+flashed or booted by itself. Next owner phase is Omega backports, then the
+separate three-branch audit. Keep this BLUE branch isolated.
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
 ran ahead of this repository's build number. In particular, its v8.4.1 release

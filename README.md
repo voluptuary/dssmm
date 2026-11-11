@@ -2,7 +2,7 @@
 
 Merkin Mix brings artwork transparency, name-matched artwork for supported systems beyond GBA, and the DS Style menus to the **EZ-FLASH OMEGA Definitive Edition B (BLUE)**. Menu rendering is highly optimized while retaining transparency compatibility.
 
-**Hardware untested.** This branch targets the newer BLUE cartridge only. The older Definitive Edition Rev. A/B uses [ezfode](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfode); the original OMEGA uses [ezfomega](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfomega). Their kernel updates are not interchangeable.
+**[BLUE Test 1 prerelease](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-blue-test1) — hardware untested.** This branch targets the newer BLUE cartridge only. The older Definitive Edition Rev. A/B uses [ezfode](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfode); the original OMEGA uses [ezfomega](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfomega). Their kernel updates are not interchangeable.
 
 The BLUE frontend includes the current Merkin Mix themes, carousel/list views, favorites, recent and last-played games, artwork caches, remembered cheat selections, save/settings protections, and themed NOR progress. It retains BLUE's hardware drivers, firmware, native 64 MiB/5G handling, and NOR allocation format. Compatible plugins use the existing plugin interfaces; their runtime behavior still needs BLUE hardware testing.
 
