@@ -299,7 +299,7 @@ u32 Setting_window(void)
 				if(month ==0)month=1;
 				if(day ==0)day=1;
 
-				sprintf(msg,"%u/%02u/%02u %02d:%02d:%02d %s",UNBCD(datetime[0])+2000,month,day,HH,MM,SS, wkday);
+				sprintf(msg,"%u/%02u/%02u %02d:%02d:%02d %s",(unsigned)(UNBCD(datetime[0])+2000),month,day,HH,MM,SS, wkday);
 				ClearWithBG((u16*)gImage_SET,x_offset, y_offset, 22*6, 13, 1);
 				DrawHZText12(msg,0,x_offset,y_offset,gl_color_text,1);
 				VBlankIntrWait();

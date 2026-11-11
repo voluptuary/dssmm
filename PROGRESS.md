@@ -1,6 +1,36 @@
 # DS Style Kernel Audit Progress
 
-## 2026-11-11 14:29 UTC — Save loader validated; aggregate checkpoint
+## 2026-11-11 14:21 UTC — Final audit findings and publication-ready checkpoint
+
+- Software audit complete; docs/audits/cross-platform-2026-11.md now reports scope, verified defects, fixes/optimizations, validation and remaining issues separately for all three branches. No new Critical/High defect established; known flash polling/catalog interruption and physical-validation limits remain. AGENTS and archived review queues point to the current disposition. No old history removed.
+- Full active C analysis completed (15/17/16 units) with tested ARM-preprocessed inputs. Final two printf corrections and prerelease identity strings rebuilt without warnings, and focused static checks pass apart from explicitly triaged constant-style/dependency diagnostics. Full DE40-host+new save-loader/browser/JS, complete Omega verifier and complete BLUE verifier passed; linked DE/BLUE boot rechecked after loader builds. Analysis is not described as warning-free or hardware proof.
+- Prepared exact artifacts: DE candidate files/candidate/8.3.1-adversarial-audit/ezkernelnew.bin2,025,056/SHA8414503f41b218264f0982cef448ca9a160b9fafe69e815854aa4e387aa43857; OmegaTest3 ezkernel.bin2,049,416/SHA c1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52; BLUE Test2 packed ezbluekernel.bin3,982,696/SHA ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710. Candidate READMEs tracked, binaries ignored locally.
+- Next: commit/push final code/tooling/report/notes on their own branches, publish NEW OmegaTest3 and BLUE Test2 prereleases against exact commits with latest=false, binary only, automatic source archives. Download and verify hashes/tag commits/model warnings/prerelease flags and stable DE latest before recording delivery complete. Existing tags/assets remain untouched. Do not publish DE candidate as stable.
+
+
+## 2026-11-11 14:14 UTC — Static triage and final delivery checkpoint
+
+- Actual ARM-preprocessed analysis completes on all active C units (DE15, Omega17, BLUE16), with numeric immutable asset declarations retaining types/dimensions and line counts; input-fidelity regression passes. Corrected GNU line-marker handling exposes actual SDK/newlib diagnostics instead of spurious source locations. Earlier incomplete/SIGTERM runs are not passes; final successful runs are /tmp/<ode|omega|blue>-final-static.log.
+- Triaged remaining diagnostics: constant Start-style clauses are compile-time alternatives; FatFs null-string loop stops at initialized nul0, and partial-object warnings read fields initialized on their selected FAT/exFAT paths. Actual two local printf type mismatches are being corrected (unsigned cheat count and promoted RTC year), with unchanged representable output. SDK signed DMA bit31 macros and unused newlib condition initializer missing return remain external dependency findings, not patched installed headers.
+- Session record correction: earlier checkpoint headings after13:39 used estimated UTC times, some later than the actual clock. Replaced only those estimated times with date-only session milestone labels; chronology/technical evidence preserved. Current heading uses datetime.now(UTC).
+- Prepare updated hardware-untested Omega Test3/BLUE Test2 with audit corrections after final format/build checks; preserve existing assets/tags and stable latest DE8.3.1. Prepare DE audit candidate only, plus final per-branch findings/fixes/residual report. Audit delivery remains in progress.
+
+
+## 2026-11-11 — Static-analysis input fidelity (session milestone; time not captured)
+
+- Configured diagnostics exposed a model mismatch, not a format bug: arm-none-eabi-gcc predefined __UINT32_TYPE__ is long unsigned int; Cppcheck's missing-system-header fallback assumed unsigned int, falsely flagging correct %lu calls. Compiler builds have no format warnings. Actual libgba signed1<<31 macros remain dependency diagnostics.
+- Including all image initializers raised each frontend worker to~1.4 GiB and one worker received SIGTERM; that incomplete run is not a pass. Use actual ARM GCC preprocessing to resolve ABI/configuration, then turn only bulk immutable numeric array initializers into opaque extern declarations preserving element count/type and line mapping for Cppcheck. Runtime functions, mutable data and enabled checks remain intact; packed-image/source-byte/decompression tests validate the separate asset payloads. Bound analysis serially to avoid parallel asset-memory pressure. Retain all failed/incomplete logs.
+- This changes audit tooling only; source/binaries unchanged. Update wrapper and run complete active C units on each target, triage diagnostics, then finalize report/delivery. Known malformed cheat comment streams can still take file-length-proportional time: bounded menu/RAM does not imply a total parser work budget; do not impose a speculative compatibility-breaking file cap.
+
+
+## 2026-11-11 — Static-analysis configuration correction (session milestone; time not captured)
+
+- Broad legacy Cppcheck command lacked actual GBA/FatFs include paths and32-bit target configuration; six workers remained in first large units for over10 minutes. Properly configured DE Ezcard_OP analysis completes in0.14s and resolves GBA types. It reports two signed-bit31 macro diagnostics in external libgba gba_dma.h, not a modified project defect; do not alter installed toolchain headers to hide them.
+- Stop only those owned incomplete unconfigured workers, retain logs as incomplete evidence, and run actual active sources with shared target-aware Cppcheck wrapper (32-bit/ARM+Thumb, real libgba/FatFs/images includes, same enabled checks/suppressions). This replaces an inadequate configuration, not a passing-check bypass. Re-run configured all-target analysis and triage every project diagnostic before declaring completion.
+- All production source/builds and focused save tests pass; complete Omega verifier now passes, DE40+new save suite and BLUE complete verifier pass. Final report will distinguish hardware uncertainty and parser responsiveness limits from fixed defects. Published binaries unchanged.
+
+
+## 2026-11-11 — Save loader validated; aggregate checkpoint (session milestone; time not captured)
 
 - Actual save-load tests pass on all targets for0/1/511/512/64 KiB/cross-bank/128 KiB/oversized/4 GiB+4 inputs and read/short/close failures; SRAM unchanged on failures and bank-zero restoration checked. Builds pass: DE2,025,056, Omega2,049,416, BLUE3,982,696 bytes. Native bank protocols unchanged. This concerns filesystem input validation; supported games remain32 MiB DE/Omega,64 MiB native BLUE, not4 GiB.
 - DE aggregate40 host scripts, browser installer and JS syntax checks pass; added save-load suite also passes separately (now41 registered scripts). BLUE complete verifier passes target-specific checks,24 actual-source UI suites, new marked/OEM/save-load checks, packing and heap15,760/IRQgap1,656 guards. Final linked-boot checks repeat against current ELF because loader build changed. No physical qualification.
@@ -8,33 +38,33 @@
 - Commit/push save-loader milestone; next complete static triage, finalize architecture/residual/per-branch audit report and delivery. Releases/tags untouched. Current audit is not yet complete.
 
 
-## 2026-11-11 14:22 UTC — Save-loader full-width/failure follow-up
+## 2026-11-11 — Save-loader full-width/failure follow-up (session milestone; time not captured)
 
 - New actual Loadsavefile fixture reproduces size4 GiB+4 wrapping to4 before128 KiB prefix clamp on all targets, and read-only close failure still mutating SRAM. Low malformed-input/recovery severity; no physical save corruption report. Existing short/read errors already avoid writes.
 - Clamp full FSIZE_t before narrowing and require close success before first SRAM bank/write; preserve zero/ordinary/oversized-prefix behavior and each target bank protocol. Test includes both banks, final bounded byte/canary, huge size and all three I/O failures. Omega full suite also found stale patch fixture missing new capacity macro; fixture now extracts actual target definition. No product check disabled.
 - Full suites/static checks running; repeat only affected checks/builds after this milestone. No published assets changed.
 
 
-## 2026-11-11 14:15 UTC — OEM path consolidation validated
+## 2026-11-11 — OEM path consolidation validated (session milestone; time not captured)
 
 - Real-FatFs encoded backup write/open and artwork-directory resolution pass on all three actual targets; production custom-basename ASan/UBSan tests preserve CP9360x815C while detecting real separators and invalid lead sequences. Shared scanner now serves transaction, backup and artwork policies; complete transaction fault suites re-pass. Omega inherited NOR fixture does not match its ported loader; removed only this session's attempted changes to that inactive fixture and used the new target-aware actual basename test plus Omega artwork suite instead. DE/BLUE existing NOR fallback tests pass.
 - Builds pass: DE2,025,048 bytes/IRQ gap1,696/heap7,112/user reserve12,288; Omega2,049,408/user gap8,320/heap19,424; BLUE3,982,696/protected split. These remain static limits, not stack high-water/runtime evidence. Preparing per-branch commit/push.
 - DE BUILD-WIN-01 also corrected with explicit ezkernelnew TARGET and matching output stem on plain/mapped paths; static contract verified, Windows unavailable. Final aggregate regression/static and architecture/pool review now in progress. No release tag or asset rewritten.
 
 
-## 2026-11-11 14:08 UTC — CP936 backup/artwork follow-up
+## 2026-11-11 — CP936 backup/artwork follow-up (session milestone; time not captured)
 
 - Actual FatFs regressions reproduce valid encoded backup rejection on all targets. Shared configured-OEM separator helper now covers backups, resolved artwork components, custom basename and transaction policy; valid CP936 trail0x5C is not a separator. Actual ASCII separator rejection remains required. This consolidates duplicate policy instead of changing filesystem formats/protocols.
 - Run encoded backup/directory/basename checks and complete prior save faults, then final target/static/pool suites. Existing releases unchanged. Initial integration corrected a declaration-match extraction and avoided reloading private test ffconf definitions before product build.
 
 
-## 2026-11-11 14:03 UTC — Marked-art correction validated
+## 2026-11-11 — Marked-art correction validated (session milestone; time not captured)
 
 - Shared actual-parser regression passes ASan/UBSan on every target: complete valid headers at both widths,26 individually malformed field bytes, all marker bytes, wrong orientation/length, pixel preservation and canaries. Existing production renderer differential passes on DE and Omega; original Omega transparency fixture now supplies a genuine valid header. All target builds pass; BLUE protected split passes.
 - Fixed only opt-in marked BMP format recognition. No per-pixel/header-lookup path change or performance claim. Preparing per-branch commit/push; published releases untouched. Next follow-up: CP936 trail-backslash in backup/artwork paths (same encoding issue beyond transaction policy), DE Windows output stem, final static/RAM/full suites.
 
 
-## 2026-11-11 13:57 UTC — Marked-art format validation
+## 2026-11-11 — Marked-art format validation (session milestone; time not captured)
 
 - ART-HEADER-01 low-severity malformed-format handling reproduced with actual marker functions on all targets: accepted DST1 files missing BM signature, fixed54-byte pixel offset,40-byte DIB and single-plane declaration. Existing dimensions/depth/compression/span checks bound memory; no new out-of-bounds or security claim.
 - Add those missing fixed-layout fields only to the opt-in marked parser. Preserve opaque legacy files and header-art fast paths. New shared ASan/UBSan fixture covers both supported widths, each malformed field, sentinel pixels, unmarked preservation and trailing canary. Validate build/render comparisons before committing; published assets unchanged.

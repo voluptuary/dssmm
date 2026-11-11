@@ -1,5 +1,10 @@
 # Deferred ezfode review queue
 
+Current disposition: the authorized three-branch audit has reviewed this queue.
+See [the final audit report](../audits/cross-platform-2026-11.md) for fixes and
+remaining limitations; historical entries below describe their original state.
+
+
 Owner policy: record evidence here during the Original Omega port; do not change ezfode without a separate task.
 
 ## ART-HEADER-01 — incomplete marked-BMP validation (review candidate, low impact)

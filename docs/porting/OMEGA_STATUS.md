@@ -1,5 +1,8 @@
 # Original Omega Merkin Mix port status
 
+Current audit delivery: software audit complete; hardware-untested Test3 is prepared with shared bounds/path/save/artwork fixes and832-byte IWRAM recovery. See [audit findings and limits](../audits/cross-platform-2026-11.md) and [Test3 notes](../releases/omega-test3.md). Publication verification is in HANDOFF.md. Final kernel2,049,416 bytes; heap19,424; IWRAM user-stack gap8,312 (static only). Older milestone sizes/releases below are historical.
+
+
 ## Current state — Test 2 published, cross-platform audit active
 
 Current target is Original OMEGA only. Earlier entries below are historical checkpoints; the current matrix supersedes their pending-feature labels. Hardware remains unavailable. Do not equate DE Rev. A/B or BLUE reports with an Original OMEGA test.
