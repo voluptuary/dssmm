@@ -582,10 +582,33 @@ static void test_indexed_name_thumbnail_performance(void)
 		small_scan_entries, large_scan_entries);
 }
 
+
+static void test_cp936_component_paths(void)
+{
+    static const char name[] = "CP936\x81\x5C.sav";
+    static const char directory[] = "/CP936\x81\x5C";
+    char backup[128], resolved[128], component[128];
+    FIL file;
+    check(LauncherBuildSaveBackupPath("0:", name, backup, sizeof backup),
+        "CP936 trail backslash is part of a backup filename");
+    write_file(backup, "encoded");
+    check(f_open(&file, backup, FA_READ) == FR_OK && f_size(&file) == 7,
+        "FatFs opens the generated encoded backup path");
+    check(f_close(&file) == FR_OK, "close encoded backup");
+    check(f_mkdir("0:/CP936\x81\x5C") == FR_OK, "create encoded artwork directory");
+    check(LauncherArtworkResolveDirectoryPath(directory, resolved, sizeof resolved,
+        component, sizeof component, resolve_artwork_directory_component, 0),
+        "resolve encoded directory without splitting its trail byte");
+    check(!strcmp(directory, resolved), "preserve encoded directory bytes");
+    check(!LauncherBuildSaveBackupPath("0:", "bad\\name.sav", backup, sizeof backup),
+        "actual backslash still rejected");
+}
+
 int main(void)
 {
 	memset(disk, 0, sizeof(disk));
 	format_disk();
+	test_cp936_component_paths();
 	test_legacy_path_policy();
 	test_long_name_alias_operations();
 	test_long_directory_title_resolution();

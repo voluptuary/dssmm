@@ -6455,7 +6455,6 @@ static void Launcher_CustomThumbFileName(const char *filename, char *name, u32 n
 {
 	const char *base;
 	const char *slash;
-	const char *backslash;
 	char *dot;
 
 	if(!name || !name_size)
@@ -6465,12 +6464,8 @@ static void Launcher_CustomThumbFileName(const char *filename, char *name, u32 n
 		return;
 
 	base = filename;
-	slash = strrchr(filename, '/');
-	backslash = strrchr(filename, '\\');
-	if(slash && (!backslash || (slash > backslash)))
-		base = slash + 1;
-	else if(backslash)
-		base = backslash + 1;
+    slash = FatFsPathLastSeparator(filename);
+    if(slash) base = slash + 1;
 
 	strncpy(name, base, name_size - 1);
 	name[name_size - 1] = '\0';
