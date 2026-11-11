@@ -10,7 +10,8 @@ Baseline refs: DE5f700c9, BLUEdb3db27, Original OMEGA20a1d94. Port releases BLUE
 | PATCH-NOR-01: DE staged patch-copy overrun | Medium | Reproduced six-byte write at128 KiB minus2; DE intersection correction now passes shared canary/bank tests; Omega/BLUE retain equivalent clipping |
 | Native patch capacity preflight | Low / defense in depth | Invalid selectors reproduced in all three helpers; target-specific whole-range checks and last-halfword/bank tests pass; frontend producer reachability unverified |
 | Immutable NES blob consumes832 bytes of IWRAM | Informational | DE/Omega now const aligned ROM, matching BLUE; bytes/hash unchanged, ROM symbols and RAM margins checked |
-| Save-path case/separator policy; cheat-size narrowing | Medium/Low pending reachability | Deferred DE queue; reproduce against active DE before narrow changes |
+| Save-path ASCII/DBCS policy | Medium (port compatibility), Low (DE policy) | Real FatFs reproduces valid CP936 save rejection on ports and ASCII policy failures on DE; corrected scanner/prefix tests and complete fault suite pass on all targets |
+| DE full-width cheat sizes | Low / malformed-input identity |4 GiB+4 fixture reproduces truncated hash validation; full-width guards/clamps and cheat tests now pass |
 | DE plugin boot/copy/failure/metadata handling | Medium pending per-case proof | Deferred source/host evidence from porting; actual linked boot and filesystem verification required |
 | F-022 raw flash polling; F-032 catalog interruption | Existing unresolved limits | Chip timing/safe sector-allocation evidence absent. Do not transplant another target's protocol or claim host tests solve physical behavior |
 

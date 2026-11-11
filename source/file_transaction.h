@@ -75,6 +75,25 @@ static int FileTxn_PathPrefixEqual(const char *path, const char *prefix)
 	return 1;
 }
 
+static int FileTxn_NameHasSeparator(const char *name)
+{
+    const unsigned char *cursor = (const unsigned char *)name;
+    for(; *cursor; cursor++)
+    {
+#if FF_CODE_PAGE == 936
+        /* Match ff.c TBL_DC936: a valid trail byte may equal ASCII backslash. */
+        if(*cursor >= 0x81 && *cursor <= 0xFE &&
+           cursor[1] >= 0x40 && cursor[1] <= 0xFE && cursor[1] != 0x7F)
+        {
+            cursor++;
+            continue;
+        }
+#endif
+        if(*cursor == '/' || *cursor == '\\') return 1;
+    }
+    return 0;
+}
+
 static int FileTxn_IsAllowedTarget(const char *path)
 {
 	const char *relative = path;
@@ -85,7 +104,7 @@ static int FileTxn_IsAllowedTarget(const char *path)
 		strlen(relative) == strlen("/SYSTEM/SETTINGS.TXT")) return 1;
 	if(!FileTxn_PathPrefixEqual(relative, "/SYSTEM/SAVER/")) return 0;
 	name = relative + 14;
-	return name[0] && !strchr(name, '/') && !strchr(name, '\\') &&
+	return name[0] && !FileTxn_NameHasSeparator(name) &&
 		strcmp(name, ".") && strcmp(name, "..");
 }
 

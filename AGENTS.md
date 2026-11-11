@@ -22,6 +22,11 @@ reports as validation of this port. Do not publish it as hardware-qualified.
 The owner authorizes remaining compatible Omega backports and a new explicitly
 hardware-untested prerelease if changed, followed by a three-branch adversarial
 audit. Only that subsequent audit may apply narrow validated fixes on ezfode. Keep DE v8.3.1 latest; this does not authorize a stable Omega release.
+Final audit delivery must report findings, fixes/optimizations and remaining
+issues separately for ezfode, ezfomega and ezfblue, with validation limitations.
+Filename policy uses the project fixed CP936 OEM encoding; preserve DBCS trail
+bytes when checking separators and review it if FF_CODE_PAGE changes.
+
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
 ran ahead of this repository's build number. In particular, its v8.4.1 release

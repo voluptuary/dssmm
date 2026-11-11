@@ -469,8 +469,33 @@ static void test_settings_transaction(void)
 	check(f_close(&file), "close committed settings");
 }
 
+static void test_dbcs_save_filename(void)
+{
+    static const char target[] = "/SYSTEM/SAVER/\x81\x5c.sav";
+    static const BYTE contents[] = {1,2,3,4};
+    FIL file;UINT written = 0;
+    mount_fresh_formatted_volume();file_txn_recovered = 0;
+    check(f_open(&file, target, FA_WRITE | FA_CREATE_ALWAYS), "FatFs accepts CP936 backslash trail byte");
+    check(f_close(&file), "close CP936 direct-open fixture");
+    CHECK(FileTxn_IsAllowedTarget(target), "CP936 trail byte is a filename character, not a separator");
+    if(!FileTxn_Begin(target, &file)) {
+        CHECK(0, "begin transaction for valid CP936 save filename");return;
+    }
+    check(f_write(&file, contents, sizeof contents, &written), "write CP936 staged save");
+    CHECK(written == sizeof contents && FileTxn_Commit(&file), "commit CP936 save transaction");
+    BYTE actual[sizeof contents];UINT received = 0;
+    check(f_open(&file, target, FA_READ), "read CP936 save target");
+    check(f_read(&file, actual, sizeof actual, &received), "read complete CP936 save contents");
+    CHECK(received == sizeof actual && !memcmp(actual, contents, sizeof actual), "CP936 save contents retained");
+    check(f_close(&file), "close CP936 save target");
+}
+
 int main(void)
 {
+    CHECK(!FileTxn_IsAllowedTarget("/SYSTEM/SAVER/\x81\x5c\\nested.sav"), "real separator after CP936 pair is rejected");
+    CHECK(!FileTxn_IsAllowedTarget("/SYSTEM/SAVER/\x81/nested.sav"), "forward separator after invalid DBCS lead is rejected");
+    CHECK(!FileTxn_IsAllowedTarget(NULL) && !FileTxn_IsAllowedTarget(""), "empty transaction target is rejected");
+
 	CHECK(FileTxn_IsAllowedTarget("/system/saver/lower.sav"), "lowercase FAT save directory is accepted");
 	CHECK(FileTxn_IsAllowedTarget("0:/System/Settings.txt"), "mixed-case settings path is accepted");
 	CHECK(!FileTxn_IsAllowedTarget("/SYSTEM/SAVER/..\\..\\game.gba"), "backslash directory traversal is rejected");
@@ -484,6 +509,7 @@ int main(void)
 	test_existing_save_overwrite_failure();
 	test_transaction_recovery();
 	test_settings_transaction();
+	test_dbcs_save_filename();
 	printf("%s (%d failure%s)\n", failures ? "FAILED" : "PASSED",
 		failures, failures == 1 ? "" : "s");
 	return failures ? 1 : 0;
