@@ -227,54 +227,69 @@ bool IWRAM_CODE PatchDragonBallZ(u32 *Data)
   return res;
 }
 //------------------------------------------------------------------
-void IWRAM_CODE CheckNes(u32 *Data)
+static u8 Nes_probe_state; /* 0: not encountered, 1: absent, 2: special patch. */
+
+/* Native patching sees the first mapped 8 MiB PSRAM aperture. NOR patching
+   instead supplies the exact 128 KiB staging span at each call. */
+static inline u32 NesNativeBytes(int size)
 {
-  u32 jump=Data[0];
-  if((jump&0xff000000)==0xea000000)
-  {
-		Nes_index=(jump&0xffffff)+2;
-		if((Data[Nes_index]&0xffffff00)==0xe28f5000&& \
-		   Data[Nes_index+1]==0xe8b503d3&&\
-		   Data[Nes_index+2]==0xe129f007&&\
-		   Data[Nes_index+3]==0xe281deba&&\
-		   Data[Nes_index+4]==0xe129f008&&\
-		   Data[Nes_index+5]==0xe281debe&&\
-		   Data[Nes_index+6]==0xe129f009&&\
-		   Data[Nes_index+7]==0xe281dc0b&&\
-		   Data[Nes_index+8]==0xe92d0003&&\
-		   Data[Nes_index+9]==0xef110000&&\
-		   Data[Nes_index+10]==0xe8bd8001)
-		{
-			if(Data[Nes_index]==0xe28f503c)
-				is_Nes = 1;
-			else if (Data[Nes_index]==0xe28f5040)
-				is_Nes = 2;
-		}
-		else
-			is_Nes = 0;
-  }
+    if(size <= 0) return 0;
+    return (u32)size < 0x800000 ? (u32)size : 0x800000;
+}
+
+void IWRAM_CODE CheckNes(u32 *Data, u32 available)
+{
+    is_Nes = Nes_index = Nes_index_17_patch = 0;
+    Nes_probe_state = 0;
+    u32 words = available / sizeof(*Data);
+    if(!Data || words < 19) return;
+    u32 jump = Data[0];
+    if((jump & 0xFF000000) != 0xEA000000) return;
+    u32 index = (jump & 0xFFFFFF) + 2;
+    if(index > words - 19) return;
+    u32 variant = Data[index] == 0xE28F503C ? 1 :
+        (Data[index] == 0xE28F5040 ? 2 : 0);
+    if(!variant) return;
+    if(Data[index+1] == 0xE8B503D3 && Data[index+2] == 0xE129F007 &&
+       Data[index+3] == 0xE281DEBA && Data[index+4] == 0xE129F008 &&
+       Data[index+5] == 0xE281DEBE && Data[index+6] == 0xE129F009 &&
+       Data[index+7] == 0xE281DC0B && Data[index+8] == 0xE92D0003 &&
+       Data[index+9] == 0xEF110000 && Data[index+10] == 0xE8BD8001) {
+        Nes_index = index;
+        is_Nes = variant;
+    }
 }
 //------------------------------------------------------------------
-bool PatchNes(u32 *Data)
+bool PatchNes(u32 *Data, u32 available)
 {
-  bool res=false;
-  if(is_Nes)
-  {
-      res=true;
-      u32 patch=0xea000000|(0x3fdf5-Nes_index);
-      Write(36+Nes_index*4,(u8*)&patch,sizeof(patch));
-      Write(0xff800,gba_nes_patch_bin,0x340);
-      if(windows_offset == 0)
-    	  Nes_index_17_patch=Data[Nes_index+17+is_Nes-1];
-      Write(0xff840,(u8*)&Nes_index_17_patch,sizeof(patch));
-      u32 index2=(Nes_index_17_patch-0x08000000)/4;
-      if(Data[index2-1-windows_offset/4]==0x3032)
-      {
-        patch=0x060000f8;
-        Write(0xff86c,(u8*)&patch,sizeof(patch));
-      }
-  }
-  return res;
+    u32 words = available / sizeof(*Data);
+    if(!Data || !words || (windows_offset & 3) || (is_Nes != 1 && is_Nes != 2)) return false;
+    if(!windows_offset) {
+        if(words < 19 || Nes_index > words - 19) return false;
+        Nes_index_17_patch = Data[Nes_index + 16 + is_Nes];
+    }
+    /* A staged block cannot be indexed with a logical address from a different
+       window. Remember a valid observation so later patch-output blocks can
+       apply it without reading before the current staging buffer. */
+    if(!Nes_probe_state) {
+        u32 pointer = Nes_index_17_patch;
+        if(pointer < 0x08000004 || pointer >= 0x0A000000 || (pointer & 3))
+            Nes_probe_state = 1;
+        else {
+            u32 probe = pointer - 0x08000000 - 4;
+            if(probe >= windows_offset && (probe - windows_offset) / 4 < words)
+                Nes_probe_state = Data[(probe - windows_offset) / 4] == 0x3032 ? 2 : 1;
+        }
+    }
+    u32 patch = 0xEA000000 | (0x3FDF5 - Nes_index);
+    Write(36 + Nes_index * 4, (u8 *)&patch, sizeof(patch));
+    Write(0xFF800, gba_nes_patch_bin, 0x340);
+    Write(0xFF840, (u8 *)&Nes_index_17_patch, sizeof(patch));
+    if(Nes_probe_state == 2) {
+        patch = 0x060000F8;
+        Write(0xFF86C, (u8 *)&patch, sizeof(patch));
+    }
+    return true;
 }
 //---------------------------------------------------------------------------------
 void Add2(u32 anOffset, u32 aValue)
@@ -599,8 +614,8 @@ void GBApatch_Cleanrom(u32* address,int filesize)//Only once
 {
 	windows_offset = 0;
 	is_NORpatch = 0;
-	CheckNes(address);
-	PatchNes(address);
+	CheckNes(address, NesNativeBytes(filesize));
+	PatchNes(address, NesNativeBytes(filesize));
 	PatchDragonBallZ(address);
 	//Check_Fire_Emblem();
 }
@@ -654,8 +669,8 @@ void GBApatch_PSRAM(u32* address,int filesize)//Only once
 	is_NORpatch = 0;
 	EA_offset = address[0] & 0xFFFFFF;
 
-	CheckNes(address);
-	PatchNes(address);
+	CheckNes(address, NesNativeBytes(filesize));
+	PatchNes(address, NesNativeBytes(filesize));
 	PatchDragonBallZ(address);
 	//Check_Fire_Emblem();
 	Patch_somegame(address);
@@ -682,9 +697,9 @@ void GBApatch_Cleanrom_NOR(u32* address,u32 offset)
 	is_NORpatch = 1;
 	if(offset==0)
   {
-		CheckNes(address);
+		CheckNes(address, MAX_pReadCache_size);
 	}
-	PatchNes(address);
+	PatchNes(address, MAX_pReadCache_size);
 	PatchDragonBallZ(address);
 	//Check_Fire_Emblem();
 }
@@ -695,7 +710,7 @@ void GBApatch_NOR(u32* address,int filesize,u32 offset)
 	is_NORpatch = 1;
   if(offset==0)
   {
-	  CheckNes(address);
+	  CheckNes(address, MAX_pReadCache_size);
 	  EA_offset = address[0] & 0xFFFFFF;
 
 		u32 B_install_handler;
@@ -705,7 +720,7 @@ void GBApatch_NOR(u32* address,int filesize,u32 offset)
 
 		Patch_somegame(address);
   }
-	PatchNes(address);
+	PatchNes(address, MAX_pReadCache_size);
 	PatchDragonBallZ(address);
 	//Check_Fire_Emblem();
 

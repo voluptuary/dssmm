@@ -1,0 +1,17 @@
+# Cross-platform adversarial audit — November 2026
+
+Status: active; not a completed audit or hardware qualification.
+
+Baseline refs: DE5f700c9, BLUEdb3db27, Original OMEGA20a1d94. Port releases BLUE Test1 and Original OMEGA Test2 were software-validated and are preserved; stable DE v8.3.1 remains latest. Worktrees isolate all target code and metadata.
+
+| Finding | Severity | Evidence / current status |
+| --- | --- | --- |
+| PATCH-NES-02: unchecked NES indices and stale state | Medium | Reproduced on all three production functions with sanitizers/assertions. Explicit native/staged spans, pointer checks and retained probe state implemented; ten scenarios incl5,000 poisoned-tail iterations and all target builds pass. Full post-fix audit suites still pending |
+| PATCH-NOR-01: DE staged patch-copy overrun | Medium | Previously reproduced six-byte write at128 KiB minus2; Omega/BLUE bounded, DE review next |
+| Save-path case/separator policy; cheat-size narrowing | Medium/Low pending reachability | Deferred DE queue; reproduce against active DE before narrow changes |
+| DE plugin boot/copy/failure/metadata handling | Medium pending per-case proof | Deferred source/host evidence from porting; actual linked boot and filesystem verification required |
+| F-022 raw flash polling; F-032 catalog interruption | Existing unresolved limits | Chip timing/safe sector-allocation evidence absent. Do not transplant another target's protocol or claim host tests solve physical behavior |
+
+Commands: per-target verify scripts for Omega/BLUE; DE production build + scripts/run-host-test-suite.sh, browser/JS checks and configured Cppcheck. Shared NES regression is scripts/test-nes-patch-host.sh. See branch HANDOFF/PROGRESS for exact milestone results, current code state and continuation.
+
+Coverage limits: valid NES signatures are synthetic conformance fixtures, not game execution; bus/BIOS/flash tests are simulated. Uncommon legacy layouts whose probe occurs after its patch output block remain unqualified; no unseen future data is read or claimed to be patched retroactively. No physical tests for either port.
