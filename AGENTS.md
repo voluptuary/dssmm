@@ -1,16 +1,23 @@
 # AUTONOMOUS KERNEL AUDIT — MASTER DIRECTIVE
 
-## Current software-audit checkpoint (2026-11-11 14:19 UTC)
+## Current software-audit checkpoint (2026-11-11 23:15 UTC)
 
-The three-branch software audit is complete; see docs/audits/cross-platform-2026-11.md
-for per-branch findings, corrections, validation and remaining risks. Delivery of
-hardware-untested Omega Test3/BLUE Test2 is in progress; verify publication in
-HANDOFF.md before claiming those newer tags exist. DE stable v8.3.1 stays latest
-and unchanged; its audit binary is an unreleased candidate. Older active-phase
-text below is historical where it conflicts with this checkpoint. Preserve
-platform isolation. Static analysis uses scripts/check-kernel-cppcheck.sh with
-actual ARM preprocessing, tested opaque immutable asset declarations and explicit
-dependency-diagnostic triage. Never count an interrupted tool run as a pass.
+The three-branch software audit and delivery are complete. See
+`docs/audits/cross-platform-2026-11.md` for per-branch findings, fixes,
+validation and unresolved limits. Hardware-untested Original OMEGA
+`v8.3.1-omega-test3` and BLUE `v8.3.1-blue-test2` are published; downloaded
+hashes, tag commits and unchanged stable latest are recorded in
+`docs/audits/release-verification-2026-11.json` and HANDOFF.md.
+DE stable v8.3.1 remains latest and unchanged; its new audit binary is an
+unreleased candidate requiring Rev. A/B testing. No alternate platform has
+hardware qualification. Keep the three platforms isolated. Earlier active-phase
+instructions below are historical where superseded by this checkpoint.
+Static analysis uses scripts/check-kernel-cppcheck.sh with actual ARM
+preprocessing, tested opaque immutable asset declarations and explicit
+SDK/FatFs diagnostic triage. Interrupted runs are never counted as passes.
+No implementation or publication task remains open in this software-audit scope;
+follow-up hardware, flash timing/atomicity and parser-work-budget limits are
+listed in the report. Do not silently restart completed porting from old notes.
 
 
 The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
