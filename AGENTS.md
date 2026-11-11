@@ -1,5 +1,18 @@
 # AUTONOMOUS KERNEL AUDIT — MASTER DIRECTIVE
 
+## Current software-audit checkpoint (2026-11-11 14:19 UTC)
+
+The three-branch software audit is complete; see docs/audits/cross-platform-2026-11.md
+for per-branch findings, corrections, validation and remaining risks. Delivery of
+hardware-untested Omega Test3/BLUE Test2 is in progress; verify publication in
+HANDOFF.md before claiming those newer tags exist. DE stable v8.3.1 stays latest
+and unchanged; its audit binary is an unreleased candidate. Older active-phase
+text below is historical where it conflicts with this checkpoint. Preserve
+platform isolation. Static analysis uses scripts/check-kernel-cppcheck.sh with
+actual ARM preprocessing, tested opaque immutable asset declarations and explicit
+dependency-diagnostic triage. Never count an interrupted tool run as a pass.
+
+
 The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
 (`https://github.com/voluptuary/ezfode-dssmm-kernel`). The Codespaces workspace
 may retain its original local directory name after the repository rename.

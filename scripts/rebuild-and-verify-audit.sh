@@ -79,13 +79,7 @@ git diff --check
 
 if command -v cppcheck >/dev/null 2>&1; then
 	printf '\nRunning Cppcheck on modified firmware files...\n'
-	# Bound preprocessor exploration to keep the audit duration predictable.
-	cppcheck --enable=warning,performance,portability \
-		--max-configs=1 -j 2 \
-		--suppress=missingIncludeSystem \
-		--suppress=arithOperationsOnVoidPointer \
-		--inline-suppr --template=gcc \
-		source/Ezcard_OP.c source/GBApatch.c source/showcht.c source/ezkernelnew.c
+	bash scripts/check-kernel-cppcheck.sh
 else
 	printf '\nCppcheck is not installed; skipping that optional check.\n'
 fi

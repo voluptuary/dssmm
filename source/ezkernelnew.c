@@ -3647,7 +3647,7 @@ static void Show_MENU_Row(u32 line, u32 menu_select, PAGE_NUM page, u32 havecht,
 			if(!strcmp(cheat_label, "Cheat"))
 				cheat_label = "Cheats";
 			if(gl_cheat_selected_count)
-				snprintf(msg,sizeof(msg),"%s (%ld)",cheat_label,gl_cheat_selected_count);
+				snprintf(msg,sizeof(msg),"%s (%lu)",cheat_label,gl_cheat_selected_count);
 			else
 				snprintf(msg,sizeof(msg),"%s",cheat_label);
 			DrawHZText12(msg, 32, 47, row_y, name_color,1);
