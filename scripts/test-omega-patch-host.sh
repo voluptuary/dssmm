@@ -3,10 +3,13 @@ set -euo pipefail
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
-python3 - "$repo_root/source/GBApatch.c" "$tmp/omega-patch.impl.h" <<'PY'
+python3 - "$repo_root/source/GBApatch.c" "$tmp/omega-patch.impl.h" "$repo_root/source/ez_define.h" <<'PY'
 import re,sys
 from pathlib import Path
-s=Path(sys.argv[1]).read_text(errors='surrogateescape');out=[]
+s=Path(sys.argv[1]).read_text(errors='surrogateescape')
+capacity=re.search(r'^#define PSRAM_CAPACITY_BYTES[^\n]*',Path(sys.argv[3]).read_text(),re.M)
+assert capacity
+out=[capacity.group()]
 for name in ['Write','SetTrimSize']:
  m=re.search(r'^void '+name+r'\([^;]*?\n\{',s,re.M);assert m
  out.append(s[m.start():s.index('\n}',m.start())+2])
