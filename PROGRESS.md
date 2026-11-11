@@ -1,5 +1,20 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 12:56 UTC — PATCH-NES-02 fixed and validated on all targets
+
+- Verified medium-severity shared read-bound/state defect with actual production functions: valid variants pass before changes; eight branch/stale/unsupported-variant/probe/later-window/short/misaligned/pending cases fail under ASan or assertions on all three baselines. Branch fixture reads exactly one word past a128 KiB allocation. No physical compatibility claim.
+- Added explicit input spans: native callers cap reads to the first mapped8 MiB aperture/file extent, NOR callers pass128 KiB staging capacity. Detector clears stale state and requires the complete signature/pointer fields. Patch probes validate alignment/logical address/current-window containment and retain valid observations for later output blocks instead of reading before staging memory. Existing valid native variant outputs retained in fixtures.
+- Shared tests/nes-patch-host.c and tests/test-nes-patch-host.py now pass ten scenarios including5,000 poisoned-tail randomized iterations; target verifiers include the production test. All three builds pass. DE2,024,528 bytes/heap7,112/IRQ gap1,056/user stack12 KiB; BLUE3,982,696/heap15,760/IRQ gap1,656; Omega2,049,312/heap19,424/user-stack gap7,488. Static reservations only. DE hot-map placement and BLUE protected split/resource checks pass.
+- DE baseline build before code change2,024,344 bytes; all34 preexisting host scripts passed. Initial suite stopped only because custom TARGET did not match ELF name assumed by placement test; relinked with default worktree basename and resumed remaining19 scripts, all passed. No product/test check disabled.
+- Preparing focused per-branch commit/push. Next: DE staged Write overflow and immutable patch-blob placement (IRQ margin is tight), then deferred path/cheat/launch issues, full target/static suites. Uncommon legacy NES layout ordering and physical runtime remain unverified; no promise of retroactive patching from unseen future input blocks. Published assets/tags unchanged.
+
+## 2026-11-11 12:42 UTC — Three-branch adversarial audit baseline
+
+- Owner phase now permits narrow validated shared fixes on DE after both software port milestones. Isolated worktrees: DE /workspaces/dssmm-audit-ezfode at5f700c9; BLUE /workspaces/dssmm-audit-ezfblue atdb3db27; Omega primary workspace at20a1d94 after verified Test2. No cross-platform merges, stable/prerelease tag or asset rewrites. Instructions on old branch heads saying ports are pending/paused are historical and superseded by the owner's resumed port/audit direction.
+- Read/reconciled per-branch AGENTS/HANDOFF/PROGRESS with actual refs. Existing physical limitations remain: DE F-022 flash timeout needs supported chip timing evidence; F-032 catalog atomicity needs safe sector-allocation evidence; no new Omega/BLUE hardware reports. Do not infer those are resolved by host tests or porting.
+- Prioritize shared bounds: CheckNes branch-derived reads, stale detector state and PatchNes staged-window subtraction; DE Write staged-copy overflow; then deferred save-path/cheat-size/launch-stack/copy/failed-load cases. Establish sanitizer reproducers with valid NES fixtures before changing behavior. Reuse current complete target verifiers and inspect RAM/size/static-analysis results afterward.
+- Next: baseline DE build/host suite, inspect all target NES call spans (native aperture vs128 KiB NOR staging), reproduce exact failures, implement smallest per-target correction, validate and checkpoint each milestone. Audit remains active/incomplete.
+
 ## 2026-11-10 18:59 UTC — Historical release source-archive cleanup check
 
 - Owner authorized removing redundant manually uploaded source archives from past releases. Enumerated all nine releases with paginated GitHub API (v7.4.2-fallback through v8.3.1): each has exactly one uploaded asset, `ezkernelnew.bin`; no custom source ZIP/tarball remains. No deletion necessary and no release/tag/note changed. Automatic GitHub source archives remain available.

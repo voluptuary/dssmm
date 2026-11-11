@@ -5,8 +5,11 @@ The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
 may retain its original local directory name after the repository rename.
 The primary and GitHub default branch is `ezfode`. The owner completed the
 rename through GitHub; remote `main` no longer exists. Do not recreate it.
-`ezfomega` and `ezfblue` are preparation branches for future ports; actual
-port implementation is paused until the owner resumes it.
+The owner resumed both isolated ports: hardware-untested BLUE Test1 and Original
+OMEGA Test2 are published. The active phase is now the authorized three-branch
+adversarial audit. Use isolated worktrees; apply only narrow validated common
+fixes to ezfode. Preserve target hardware protocols, release tags/assets and
+stable v8.3.1 latest. No hardware reports qualify the alternate platforms.
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
 ran ahead of this repository's build number. In particular, its v8.4.1 release
