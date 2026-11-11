@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "fatfs_oem_path.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -71,6 +72,10 @@ static void check(int condition, const char *message)
 
 int main(void)
 {
+    char encoded_name[64];
+    Launcher_CustomThumbFileName("/folder/CP936\x81\x5C.gba", encoded_name, sizeof encoded_name);
+    if(strcmp(encoded_name, "CP936\x81\x5C")) abort();
+
 	u8 thumbnail[1];
 	const u8 gamecode[4] = { 'A', 'B', 'C', 'D' };
 	u32 custom_thumbnail = 1;

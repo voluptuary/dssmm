@@ -20,3 +20,5 @@ Commands: per-target verify scripts for Omega/BLUE; DE production build + script
 Coverage limits: valid NES signatures are synthetic conformance fixtures, not game execution; bus/BIOS/flash tests are simulated. Uncommon legacy layouts whose probe occurs after its patch output block remain unqualified; no unseen future data is read or claimed to be patched retroactively. No physical tests for either port.
 
 ART-HEADER-01 (Low): actual marked parsers accepted invalid BMP signature/offset/DIB/planes. Fixed fixed-layout fields only; complete-header/malformed/canary tests pass on all targets. Opaque/header lookup paths unchanged.
+
+OEM-PATH-03 (Medium compatibility): inherited backup/artwork policies also split CP936 trail0x5C. Consolidated OEM-aware scanner; actual FatFs backup/directory, actual basename and full save-fault tests pass. DE Windows output-stem mismatch corrected by explicit target; statically validated, Windows runtime unavailable.

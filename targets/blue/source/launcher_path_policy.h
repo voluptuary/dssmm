@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include "fatfs_oem_path.h"
 
 #define LAUNCHER_SAVE_BACKUP_PATH_EXTRA 32U
 #define LAUNCHER_SAVE_NAME_MAX_BYTES 255U
@@ -60,7 +61,7 @@ static inline int LauncherBuildSaveBackupPath(const char *backup_dir,
 	out[0] = '\0';
 	if(backup_dir[0] == '\0' || save_name[0] == '\0')
 		return 0;
-	if(strchr(save_name, '/') != NULL || strchr(save_name, '\\') != NULL)
+	if(FatFsPathLastSeparator(save_name) != NULL)
 		return 0;
 
 	dir_length = strlen(backup_dir);

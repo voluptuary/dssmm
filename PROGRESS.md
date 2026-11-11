@@ -1,5 +1,18 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 14:15 UTC — OEM path consolidation validated
+
+- Real-FatFs encoded backup write/open and artwork-directory resolution pass on all three actual targets; production custom-basename ASan/UBSan tests preserve CP9360x815C while detecting real separators and invalid lead sequences. Shared scanner now serves transaction, backup and artwork policies; complete transaction fault suites re-pass. Omega inherited NOR fixture does not match its ported loader; removed only this session's attempted changes to that inactive fixture and used the new target-aware actual basename test plus Omega artwork suite instead. DE/BLUE existing NOR fallback tests pass.
+- Builds pass: DE2,025,048 bytes/IRQ gap1,696/heap7,112/user reserve12,288; Omega2,049,408/user gap8,320/heap19,424; BLUE3,982,696/protected split. These remain static limits, not stack high-water/runtime evidence. Preparing per-branch commit/push.
+- DE BUILD-WIN-01 also corrected with explicit ezkernelnew TARGET and matching output stem on plain/mapped paths; static contract verified, Windows unavailable. Final aggregate regression/static and architecture/pool review now in progress. No release tag or asset rewritten.
+
+
+## 2026-11-11 14:08 UTC — CP936 backup/artwork follow-up
+
+- Actual FatFs regressions reproduce valid encoded backup rejection on all targets. Shared configured-OEM separator helper now covers backups, resolved artwork components, custom basename and transaction policy; valid CP936 trail0x5C is not a separator. Actual ASCII separator rejection remains required. This consolidates duplicate policy instead of changing filesystem formats/protocols.
+- Run encoded backup/directory/basename checks and complete prior save faults, then final target/static/pool suites. Existing releases unchanged. Initial integration corrected a declaration-match extraction and avoided reloading private test ffconf definitions before product build.
+
+
 ## 2026-11-11 14:03 UTC — Marked-art correction validated
 
 - Shared actual-parser regression passes ASan/UBSan on every target: complete valid headers at both widths,26 individually malformed field bytes, all marker bytes, wrong orientation/length, pixel preservation and canaries. Existing production renderer differential passes on DE and Omega; original Omega transparency fixture now supplies a genuine valid header. All target builds pass; BLUE protected split passes.

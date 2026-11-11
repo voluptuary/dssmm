@@ -6,6 +6,7 @@ make
 make check
 bash scripts/test-blue-ui.sh
 bash scripts/test-marked-artwork-host.sh
+bash scripts/test-oem-path-host.sh
 python3 - <<'PY'
 from pathlib import Path
 import importlib.util

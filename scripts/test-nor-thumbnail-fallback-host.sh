@@ -25,7 +25,7 @@ if ! grep -q 'Launcher_LoadNorThumbnail' "$test_tmp/nor-thumbnail-fallback.impl.
 	exit 1
 fi
 
-gcc -std=c99 -O2 -Wall -Wextra -I"$test_tmp" \
+gcc -std=c99 -O2 -Wall -Wextra -I"$test_tmp" -I"$repo_root/source" \
 	"$repo_root/tests/nor-thumbnail-fallback-host.c" \
 	-o "$test_tmp/nor-thumbnail-fallback-host"
 "$test_tmp/nor-thumbnail-fallback-host"
