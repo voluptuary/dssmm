@@ -6320,7 +6320,11 @@ static u32 Launcher_HasTransparentThumbnailMarker(const u8 *dst, u32 read_size)
 	   reserved bytes happen to match. This loader supports 16-bit BI_RGB. */
 	/* The scraper writes top-down BMPs, whose signed height is negative. */
 	expected_top_down_height = (u32)(-(s32)Launcher_ThumbnailSourceHeight());
-	if(dst[18] != (u8)(Launcher_ThumbnailSourceWidth() & 0xFF) ||
+    if(dst[0] != 'B' || dst[1] != 'M' ||
+    dst[10] != LAUNCHER_THUMB_BMP_HEADER || dst[11] || dst[12] || dst[13] ||
+    dst[14] != 40 || dst[15] || dst[16] || dst[17] ||
+    dst[26] != 1 || dst[27] ||
+    dst[18] != (u8)(Launcher_ThumbnailSourceWidth() & 0xFF) ||
 	dst[19] != (u8)((Launcher_ThumbnailSourceWidth() >> 8) & 0xFF) ||
 	dst[20] != 0 || dst[21] != 0 ||
 	dst[22] != (u8)(expected_top_down_height & 0xFF) ||

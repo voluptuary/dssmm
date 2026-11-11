@@ -19,3 +19,5 @@ Baseline refs: DE5f700c9, BLUEdb3db27, Original OMEGA20a1d94. Port releases BLUE
 Commands: per-target verify scripts for Omega/BLUE; DE production build + scripts/run-host-test-suite.sh, browser/JS checks and configured Cppcheck. Shared NES regression is scripts/test-nes-patch-host.sh. See branch HANDOFF/PROGRESS for exact milestone results, current code state and continuation.
 
 Coverage limits: valid NES signatures are synthetic conformance fixtures, not game execution; bus/BIOS/flash tests are simulated. Uncommon legacy layouts whose probe occurs after its patch output block remain unqualified; no unseen future data is read or claimed to be patched retroactively. No physical tests for either port.
+
+ART-HEADER-01 (Low): actual marked parsers accepted invalid BMP signature/offset/DIB/planes. Fixed fixed-layout fields only; complete-header/malformed/canary tests pass on all targets. Opaque/header lookup paths unchanged.

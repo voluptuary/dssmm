@@ -1,5 +1,18 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 14:03 UTC — Marked-art correction validated
+
+- Shared actual-parser regression passes ASan/UBSan on every target: complete valid headers at both widths,26 individually malformed field bytes, all marker bytes, wrong orientation/length, pixel preservation and canaries. Existing production renderer differential passes on DE and Omega; original Omega transparency fixture now supplies a genuine valid header. All target builds pass; BLUE protected split passes.
+- Fixed only opt-in marked BMP format recognition. No per-pixel/header-lookup path change or performance claim. Preparing per-branch commit/push; published releases untouched. Next follow-up: CP936 trail-backslash in backup/artwork paths (same encoding issue beyond transaction policy), DE Windows output stem, final static/RAM/full suites.
+
+
+## 2026-11-11 13:57 UTC — Marked-art format validation
+
+- ART-HEADER-01 low-severity malformed-format handling reproduced with actual marker functions on all targets: accepted DST1 files missing BM signature, fixed54-byte pixel offset,40-byte DIB and single-plane declaration. Existing dimensions/depth/compression/span checks bound memory; no new out-of-bounds or security claim.
+- Add those missing fixed-layout fields only to the opt-in marked parser. Preserve opaque legacy files and header-art fast paths. New shared ASan/UBSan fixture covers both supported widths, each malformed field, sentinel pixels, unmarked preservation and trailing canary. Validate build/render comparisons before committing; published assets unchanged.
+
+
+
 ## 2026-11-11 13:51 UTC — DE launch I/O corrections validated
 
 - Actual production Copy_file baseline falsely succeeds after close failure; checked exact reads/writes, explicit sync, both independent closes, full-width size rejection and incomplete-output removal now pass fault fixture. Invalidates borrowed artwork workspace; forward declaration added after first build caught ordering. Rebuild then passes at2,025,016 bytes; IWRAM IRQ gap1,696, heap7,112, user reserve12,288 (static only).
