@@ -1,5 +1,12 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-11 12:41 UTC — Original Omega Test2 published; cross-platform audit begins
+
+- Published https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test2, prerelease=true/draft=false/latest=false. Tag53db52ead35e08117d8287d60892749262d502ec is a docs-only descendant of validated1c98bd2. Only binary asset ezkernel.bin2,049,144 bytes. Downloaded asset SHA256 a256c3dce226b3d6abdf6f9b13790cf610dead2b2b42f19411cee1d0d3e5e9a8 matches candidate. Automatic GitHub source archives only. Stable latest remains v8.3.1. No hardware qualification.
+- Owner-ordered software port milestones are complete for the supported frontend/hardware scope; remaining chip/runtime uncertainties are explicit in status/notes. DE5f700c9 and BLUEdb3db27 were unchanged throughout Omega porting. Remove obsolete local dev1 candidate now that Test2 is available; retain current Test2 candidate and all logs. Maintenance is not in release notes.
+- Begin the separately authorized adversarial audit of all three branches. Prioritize deferred shared defects, especially NES detector/staged patch indices, DE NOR patch clipping, save-path policy, cheat sizes, plugin boot/copy/failure paths, then targeted static analysis/RAM/build checks. Narrow validated DE fixes are now authorized by the owner phase; do not merge hardware or rewrite stable release tags/assets.
+- Next: create isolated audit worktrees for DE/BLUE while retaining Omega clean, read their AGENTS/HANDOFF/PROGRESS and verify exact refs, compare current queue, establish baseline checks, reproduce/fix the highest-risk bounded-memory failures with shared production tests. Update each branch logs as fixes land; audit is not complete merely because prereleases exist.
+
 ## 2026-11-11 12:37 UTC — Omega Test2 publication-ready checkpoint
 
 - Final full scripts/verify-omega-port.sh passed with all target/new/shared suites. Code1c98bd2 is validated. Kernel2,049,144 bytes; SHA256 a256c3dce226b3d6abdf6f9b13790cf610dead2b2b42f19411cee1d0d3e5e9a8. Copied exact bytes to files/candidate/omega-8.3.1-test2/ezkernel.bin; no source ZIP. No hardware results.

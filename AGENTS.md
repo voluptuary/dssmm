@@ -5,7 +5,9 @@ The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
 may retain its original local directory name after the repository rename.
 The primary and GitHub default branch is `ezfode`. The owner completed the
 rename through GitHub; remote `main` no longer exists. Do not recreate it.
-`ezfomega` is the active Original Omega backport branch, resumed by the owner.
+`ezfomega` has completed the supported software backport and published
+hardware-untested v8.3.1-omega-test2. The active owner phase is now the separate
+adversarial audit of all three platform branches, using isolated worktrees.
 Use its target plan and original-hardware baseline. `ezfblue` has published hardware-untested v8.3.1-blue-test1.
 Do not copy DE flash/save/reset protocols into the Original Omega port.
 Keep ezfomega isolated from ezfode. Record suspected ezfode defects with evidence
@@ -14,6 +16,7 @@ Use automatic GitHub source archives; do not upload separate source ZIPs.
 Original Omega hardware is unavailable: validation is source/build/host only.
 Omega NOR artwork hints are SD-only OAR1 records in SYSTEM/NORART/*.oma;
 do not reserve extra cartridge metadata sectors without hardware evidence.
+Preserve existing prerelease/stable tags and assets during audit fixes.
 On ezfomega use scripts/verify-omega-port.sh; do not treat DE tests or hardware
 reports as validation of this port. Do not publish it as hardware-qualified.
 The owner authorizes remaining compatible Omega backports and a new explicitly

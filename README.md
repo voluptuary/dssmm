@@ -4,7 +4,7 @@ Merkin Mix adds artwork transparency and name-matched artwork for supported syst
 
 **Original EZ-FLASH OMEGA only. Hardware untested.** These builds are incompatible with the older OMEGA Definitive Edition Rev. A/B and the newer OMEGA Definitive Edition B / BLUE. Those targets have separate [ezfode](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfode) and [ezfblue](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfblue) branches.
 
-The current development checkpoint identifies itself as `Merkin Mix 8.3.1-omega-test2`. It has source, build and host-test validation only. Installation, booting, gameplay, saving, plugins, cheats/save states and NOR operations still need testing on an Original OMEGA cartridge. [Test 1](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test1) remains available while Test 2 completes validation.
+The current development checkpoint identifies itself as `Merkin Mix 8.3.1-omega-test2`. It has source, build and host-test validation only. Installation, booting, gameplay, saving, plugins, cheats/save states and NOR operations still need testing on an Original OMEGA cartridge. [Original OMEGA Test 2](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test2) is the current hardware-untested prerelease.
 
 Features include:
 
