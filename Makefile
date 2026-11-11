@@ -9,6 +9,7 @@ clean:
 check:
 	python3 tests/test-blue-packaging.py
 	python3 tests/test-blue-psram-load.py
+	bash scripts/test-nes-patch-host.sh
 	python3 tests/test-blue-nor.py
 	python3 tests/test-blue-nor-scan.py
 	python3 tests/test-blue-nor-metadata.py

@@ -5,7 +5,10 @@ The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
 may retain its original local directory name after the repository rename.
 The primary and GitHub default branch is `ezfode`. The owner completed the
 rename through GitHub; remote `main` no longer exists. Do not recreate it.
-`ezfblue` is the active BLUE port branch, resumed by the owner.
+`ezfblue` has published hardware-untested BLUE Test1; Original OMEGA Test2 is
+also published. The active phase is now the authorized three-branch adversarial
+audit in isolated worktrees. Narrow validated DE fixes are permitted in this
+phase; do not merge hardware or modify published release tags/assets.
 Keep platform ports isolated: no cross-platform merges or DE release changes
 during porting. Owner follow-up authorizes BLUE software-validated test release,
 remaining Omega backports/test release, then a separate adversarial audit of all
