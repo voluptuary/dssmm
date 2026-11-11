@@ -144,6 +144,9 @@
 #ifndef DSTEXT_SETTINGS_BACKUP_SAVES
 #define DSTEXT_SETTINGS_BACKUP_SAVES "Backup saves"
 #endif
+#ifndef DSTEXT_SETTINGS_REMEMBER_CHEATS
+#define DSTEXT_SETTINGS_REMEMBER_CHEATS "Remember cheats"
+#endif
 #ifndef DSTEXT_SETTINGS_LED
 #define DSTEXT_SETTINGS_LED "LED settings"
 #endif
@@ -365,7 +368,7 @@
 #define DSTEXT_STATUS_WRITING "Writing..."
 #endif
 #ifndef DSTEXT_STATUS_SELECT_LATEST
-#define DSTEXT_STATUS_SELECT_LATEST "Select the lastest"
+#define DSTEXT_STATUS_SELECT_LATEST "Delete newest title only"
 #endif
 #ifndef DSTEXT_STATUS_CHECK_SAVE
 #define DSTEXT_STATUS_CHECK_SAVE "Checking Save Data..."

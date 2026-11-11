@@ -4,6 +4,7 @@
 #include <strings.h>
 #include <stdint.h>
 typedef uint32_t u32;
+typedef uint16_t u16;
 typedef unsigned char u8;
 typedef unsigned int UINT;
 typedef char TCHAR;
@@ -16,7 +17,7 @@ typedef char TCHAR;
 #include "launcher_artwork_path.h"
 typedef struct {char fname[256];unsigned char fattrib;} FILINFO;
 static char currentpath[256]="/";
-static int missing_mirror, failed_opens;
+static int missing_mirror, failed_opens, no_images, extension_available;
 static unsigned stats;
 static int f_stat(const char *path,FILINFO *info){
  stats++;
@@ -32,7 +33,7 @@ static UINT read_count=64;
 static char seen[400];
 static const char *Launcher_ThumbnailFolder(void){return "/SYSTEM/IMGS";}
 static u32 Launcher_ThumbnailReadSize(void){return 64;}
-static int f_open(int *f,const char *p,int m){(void)f;(void)m;opened++;snprintf(seen,sizeof(seen),"%s",p);if(missing_mirror && strstr(p,"Game Collection")){failed_opens++;return 1;}return 0;}
+static int f_open(int *f,const char *p,int m){(void)f;(void)m;opened++;if(no_images && !(extension_available && strstr(p,"/CUSTOM/gg.bmp"))){failed_opens++;return 1;}snprintf(seen,sizeof(seen),"%s",p);if(missing_mirror && strstr(p,"Game Collection")){failed_opens++;return 1;}return 0;}
 static int f_close(int *f){(void)f;closed++;return close_result;}
 static void UIAudio_StopForSharedBufferUse(void){stopped++;}
 static u32 Launcher_ReadThumbnailBytes(int *f,u8 *b,u32 n,UINT *got){(void)f;(void)b;(void)n;*got=read_count;return read_result;}
@@ -52,6 +53,11 @@ static unsigned Launcher_GetTotalEntries(void){return nor_page?1:folder_total+ga
 static unsigned Launcher_IsNORPage(void){return nor_page;}
 static unsigned Launcher_IsValidGameCodeBytes(const u8 *p){(void)p;return 1;}
 static unsigned Launcher_LoadThumbnailByGameCode(const u8 *p,u8 *d){(void)p;(void)d;return header;}
+static const u16 notfound_pixels[16]={0x1234,0x7FFF};
+static unsigned Launcher_ThumbnailSourceWidth(void){return 4;}
+static unsigned Launcher_ThumbnailSourceHeight(void){return 4;}
+static const u16 *Launcher_NotFoundImage(void){return notfound_pixels;}
+static unsigned Launcher_IsLaunchableFilename(const char *name){const char *dot=strrchr(name,'.');return dot && (!strcasecmp(dot,".gba") || !strcasecmp(dot,".gg"));}
 static const char *nor_source;
 static char captured_source[514];
 static const char *Omega_ReadNorArtworkPath(unsigned slot){assert(slot<64);return nor_source;}
@@ -97,5 +103,13 @@ int main(void){
  assert(Launcher_LoadOmegaThumbnailForDirectory("SONIC~1.gg","/GAMES~1",dst));assert(!strcmp(seen,"/SYSTEM/IMGS/Game Collection/Sonic The Hedgehog.bmp"));
  nor_page=0;recents_view_active=1;strcpy(currentpath,"/Recently Played");strcpy(p_recently_play[0],"/GAMES~1/SONIC~1.gg");
  assert(Launcher_LoadThumbDataForIndex(0,image+54,NULL));assert(!strcmp(seen,"/SYSTEM/IMGS/Game Collection/Sonic The Hedgehog.bmp"));
+ no_images=1;extension_available=1;recents_view_active=0;strcpy(pFilename_buffer[0].filename,"Sonic.gg");
+ assert(Launcher_LoadThumbDataForIndex(0,image+54,&provenance));
+ assert(!strcmp(seen,"/SYSTEM/IMGS/CUSTOM/gg.bmp") && provenance==0);
+ extension_available=0;memset(image,0xCC,sizeof image);
+ assert(Launcher_LoadThumbDataForIndex(0,image+54,&provenance) && provenance==0);
+ assert(!memcmp(image+54,notfound_pixels,sizeof notfound_pixels));
+ assert(image[54+sizeof notfound_pixels]==0xCC);
+ strcpy(pFilename_buffer[0].filename,"Notes.txt");assert(!Launcher_LoadThumbDataForIndex(0,image+54,NULL));
  puts("Omega filename artwork: precedence, all-system paths, length bounds and I/O failures passed.");
 }

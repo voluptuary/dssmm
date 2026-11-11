@@ -6506,6 +6506,52 @@ static u32 Launcher_LoadFilenameThumbnail(const char *filename, u8 *dst)
 	return Launcher_LoadFilenameThumbnailAt(filename, currentpath, dst);
 }
 
+static u32 Launcher_LoadExtensionDefaultThumbnail(const char *filename, u8 *dst)
+{
+	char picpath[160];
+	char extension[24];
+	const char *dot;
+	u32 i;
+	int written;
+	size_t len;
+
+	if(!filename || !dst)
+		return 0;
+	dot = strrchr(filename, '.');
+	if(!dot || !dot[1])
+		return 0;
+	len = strlen(dot + 1);
+	if(len >= sizeof(extension))
+		return 0;
+	for(i = 0; i < len; i++)
+	{
+		char c = dot[1 + i];
+		if(!(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z')) ||
+		((c >= '0') && (c <= '9')) || (c == '_') || (c == '-')))
+			return 0;
+		if((c >= 'A') && (c <= 'Z'))
+			c += ('a' - 'A');
+		extension[i] = c;
+	}
+	extension[len] = '\0';
+	written = snprintf(picpath, sizeof(picpath), "%s/CUSTOM/%s.bmp", Launcher_ThumbnailFolder(), extension);
+	if(written <= 0 || (u32)written >= sizeof(picpath))
+		return 0;
+	return Launcher_LoadOmegaArtworkPath(picpath, dst);
+}
+
+static u32 Launcher_LoadMissingThumbnail(const char *filename, u8 *dst)
+{
+    if(!filename || !dst) return 0;
+    const char *base = strrchr(filename, '/');
+    base = base ? base + 1 : filename;
+    if(!Launcher_IsLaunchableFilename(base)) return 0;
+    u32 bytes = Launcher_ThumbnailSourceWidth() * Launcher_ThumbnailSourceHeight() * 2;
+    memset(dst, 0, LAUNCHER_THUMB_BMP_HEADER);
+    memcpy(dst + LAUNCHER_THUMB_BMP_HEADER, Launcher_NotFoundImage(), bytes);
+    return 1;
+}
+
 static u32 Launcher_LoadOmegaThumbnailForDirectory(TCHAR *pfilename_pic, const char *rom_dir, u8 *dst)
 {
 	TCHAR custom_name[104];
@@ -6521,7 +6567,9 @@ static u32 Launcher_LoadOmegaThumbnailForDirectory(TCHAR *pfilename_pic, const c
 			Launcher_LoadThumbnailFromRomHeader(pfilename_pic, dst))
 			return 1;
 	}
-	return Launcher_LoadFilenameThumbnailAt(pfilename_pic, rom_dir, dst);
+    if(Launcher_LoadFilenameThumbnailAt(pfilename_pic, rom_dir, dst)) return 1;
+    if(Launcher_LoadExtensionDefaultThumbnail(pfilename_pic, dst)) return 1;
+    return Launcher_LoadMissingThumbnail(pfilename_pic, dst);
 }
 
 u32 Load_ThumbnailEx(TCHAR *pfilename_pic, u8 *dst)
@@ -8174,6 +8222,12 @@ static u32 Launcher_LoadThumbDataForIndex(u32 absolute_index, u8 *thumb_data, u3
 	if(!has_thumbnail && name)
 		has_thumbnail = Launcher_LoadFilenameThumbnail(name,
 			thumb_data - LAUNCHER_THUMB_BMP_HEADER);
+    if(!has_thumbnail && name) {
+        has_thumbnail = Launcher_LoadExtensionDefaultThumbnail(name, thumb_data - LAUNCHER_THUMB_BMP_HEADER);
+    }
+    if(!has_thumbnail && name) {
+        has_thumbnail = Launcher_LoadMissingThumbnail(name, thumb_data - LAUNCHER_THUMB_BMP_HEADER);
+    }
 	return has_thumbnail;
 }
 
@@ -9433,7 +9487,8 @@ static u32 Launcher_MotionLaunchPage(void)
 u32 SD_list_L_START(u32 show_offset,u32 file_select,u32 folder_total)
 {
 	//u32 res;
-	Launcher_DrawPopupPanel(36, 25);//show menu pic
+	Launcher_DrawPopupPanel(36, 25);
+    Launcher_DrawPopupButtonHints();//show menu pic
 
 	char *msg1 = "Delete this file?"; int x1 = (240 - strlen(msg1) * 6) / 2;
 	DrawHZText12(msg1, 0, x1, 66, gl_color_text, 1);
@@ -16731,7 +16786,8 @@ u8 NOR_list_MENU(u32 show_offset,	u32 file_select)
 	//pfilename = pNorFS[show_offset+file_select].filename;
 	UIAudio_PlayAccept();
 	MENU_max = 2;
-	Launcher_DrawPopupPanel(36, 25);//show menu pic
+	Launcher_DrawPopupPanel(36, 25);
+    Launcher_DrawPopupButtonHints();//show menu pic
 	while(1)//3
 	{
 		if(re_menu)
@@ -16812,6 +16868,7 @@ u8 NOR_list_MENU(u32 show_offset,	u32 file_select)
 				}
 				else{
 					Launcher_DrawPopupPanel(36, 25);
+    Launcher_DrawPopupButtonHints();
                     DrawHZText12(gl_lastest_game,0,66,74,gl_color_text,1);
 					wait_btn();
 				}
@@ -16971,6 +17028,7 @@ if (is_EMU == 0xff)
 				else
 				{
 					Launcher_DrawPopupPanel(36, 25);
+    Launcher_DrawPopupButtonHints();
 
 					DrawHZText12(DSTEXT_PREPARATION_FAILED, 0, 47, 74, RGB(31,0,0), 1);
 

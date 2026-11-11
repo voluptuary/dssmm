@@ -1,5 +1,14 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 12:35 UTC — Omega final frontend inventory and Test2 validation
+
+- Extension-default CUSTOM/<extension>.bmp and full-size missing-art fallback now cover supported SD/plugin/recents previews. Existing CUSTOM/header/root/NOR fallbacks remain; production tests cover missing paths, extension defaults, actual fallback pixels/canaries, and non-game exclusion.
+- Ported current Merkin splash/help artwork; retained Omega inline VRAM BIOS wrapper to avoid legacy symbol conflicts. Splash decodes byte-for-byte to canonical76,800-byte RGB555 source. Current-deletion labels/remember-cheat localization tables imported from pinned DE software donor; pre-fix Omega language completeness fixture fails on missing table entry, corrected13 packs x154 entries pass (Thai remembered-cheat gap had shifted subsequent labels).
+- Popup confirm/back hints restored to file/NOR management panels. Actual hint drawing fixture passes. Copied fixture moved into readable tests/omega/launch-copy.c without changing its assertions. Version identifies8.3.1-omega-test2.
+- Full verifier passed before the final language/hint change at2,048,928 bytes; subsequent affected language/hint tests and build pass at2,049,144 bytes (48,008 headroom), no diagnostics. Final full rerun is still required before publication. No Original Omega hardware exists.
+- Feature inventory now covers feasible current DSSMM frontend features; target-specific DE LEDs/ModeB/FRAM/firmware and BLUE64 MiB mappings are not imported. Native/save/reset/flash remain Original Omega protocols, apart from narrow WRAM decoder call correction and unreachable duplicate removal documented above.
+- Next: finish current README/status/release notes; final full verifier, commit/push, package Test2 kernel only and publish hardware-untested/non-latest; download/hash verify. Then begin authorized adversarial audit of all three branches with deferred issues. DE remains5f700c9, BLUEdb3db27 unchanged.
+
 ## 2026-11-11 12:28 UTC — Omega launch/copy and compressed-plugin safety
 
 - Actual Omega Copy_file fixture reproduces baseline4f7019b false success on failed close (assertion on !Copy_file/output/closes). Ported checked exact reads/writes/both closes, full-width size bound, incomplete-output removal and shared-cache invalidation; updated fixture passes. Failed plugin/native PSRAM callers now return1 for directory rebuild, and plugin arguments use the basename instead of stale +9 offset.

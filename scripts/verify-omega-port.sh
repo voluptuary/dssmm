@@ -2,6 +2,8 @@
 set -euo pipefail
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
+omega_test_dir="$(mktemp -d)"
+trap 'rm -rf "$omega_test_dir"' EXIT
 # Keep target validation separate from the inherited DE audit wrapper.
 bash scripts/test-cheat-state-host.sh
 bash scripts/test-cheat-row-host.sh
@@ -12,10 +14,13 @@ bash scripts/test-omega-nor-scan-host.sh
 bash scripts/test-omega-nor-load-host.sh
 bash scripts/test-omega-nor-progress-host.sh
 bash scripts/test-nor-background-host.sh
+python3 tests/test-omega-splash.py
 bash scripts/test-psram-load-policy.sh
 bash scripts/test-launcher-settings-readers-host.sh
 bash scripts/test-launcher-wrap-system-host.sh
 bash scripts/test-launcher-clean-list-cache-host.sh
+"${CC:-cc}" -std=c99 -O1 -Wall -Wextra -Werror -Isource tests/omega/languages.c -o "$omega_test_dir/languages"
+"$omega_test_dir/languages"
 bash scripts/test-launcher-enum-settings-host.sh
 bash scripts/test-launcher-art-style-policy-host.sh
 bash scripts/test-carousel-motion-host.sh
