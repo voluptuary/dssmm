@@ -1,5 +1,19 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 13:22 UTC — Save-path compatibility and DE cheat-size fixes validated
+
+- All three complete real-FatFs save/settings fault suites now pass, including transactional write/readback for CP9360x815C filenames, mixed/lowercase fixed prefixes, actual separators after DBCS pairs, invalid-lead/forward-separator and empty targets. DE baseline failed its three ASCII policy cases; Omega/BLUE baselines failed the valid CP936 transaction. The corrected scanner matches the project fixed936 lead/trail ranges and preserves genuine single-basename restrictions. No journal format or interruption guarantee changed.
+- DE CHEAT-SIZE-01 reproduced with widened FSIZE_t fixture:4 GiB+4-byte file wrongly marked hash-valid after truncation. Production test now passes after checking full size before the1 MiB hash limit/narrowing. GameID map prefix length is likewise clamped from full width before its64 KiB read. Existing selection/viewport and cheat-row tests pass; runtime cheat assembly unchanged. Omega/BLUE already had these size corrections.
+- Builds pass without diagnostics: DE2,024,752 bytes; Omega2,049,384; BLUE3,982,696 protected split. Native RAM allocations unchanged by these policy/size edits. Preparing per-branch commit/push.
+- Latest owner request: final audit response must give separate findings, fixes/optimizations and remaining issues for each of ezfode, ezfomega and ezfblue, with software versus hardware evidence clear. Maintain per-branch report, not a blended claim.
+- Next highest priority: DE deferred plugin reset paths clear its EWRAM C stack and may call ROM code after mapping the game. Establish linked machine evidence; preserve DE native RTC/bank/reset behavior, add bounded no-return handoff and loader policy/error fixes as proven. Then finish format/parser/static/pool checks and final target suites. Audit remains active; all published assets/tags unchanged.
+
+## 2026-11-11 13:13 UTC — Save-path encoding compatibility finding
+
+- Real FatFs fixture confirms /SYSTEM/SAVER/<CP936 0x815C>.sav opens successfully. Omega/BLUE raw strchr(backslash) policy then rejects that same valid filename/transaction; this is a verified medium compatibility defect in the ported path policy. DE existing policy accepts the DBCS name but fails lowercase/mixed-case fixed-prefix and ASCII traversal rejection cases. All three projects explicitly use FF_CODE_PAGE936 and OEM API paths.
+- Use configured CP936 lead/trail ranges matching ff.c TBL_DC936 so a trail0x5C is consumed as part of its character, while actual ASCII backslash/forward slash components remain rejected. Preserve case-insensitive ASCII fixed-prefix validation. Re-run complete real-FatFs save/settings fault suite on all targets; do not blindly port the earlier bytewise separator change to DE.
+- BLUE UI runner now accepts validated optional suite names for focused checks; default full24 suites remain unchanged. Product changes pending. Journal interruption/manual-recovery limits remain unchanged.
+
 ## 2026-11-11 13:04 UTC — Patch writer bounds and immutable RAM usage validated
 
 - DE Write now intersects copies with the128 KiB staged NOR window, including continuation from the preceding block. Six-byte/last-halfword reproducer and28 offset/length canary comparisons pass. All three writers preflight the whole native destination against their own32/64 MiB capacity before selecting a bank/copying; invalid ranges cannot partially modify the last bank. Null/no-halfword inputs are safe and page-zero restoration is retained. Native invalid-selector reproducer passed as expected before correction; producer reachability remains unverified (defense-in-depth/native guard, low severity).

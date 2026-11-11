@@ -20,6 +20,16 @@ tests=(
     popup-button-hints-host psram-load-policy save-popup-artwork-host
     savefile-host upstream-ui-host
 )
+# Optional focused checks retain the complete list as the default verifier.
+if (( $# )); then
+    for requested in "$@"; do
+        case " ${tests[*]} " in
+            *" $requested "*) ;;
+            *) echo "Unknown BLUE software suite: $requested" >&2; exit 2 ;;
+        esac
+    done
+    tests=("$@")
+fi
 for test in "${tests[@]}"; do
     cp "$repo_dir/scripts/test-$test.sh" "$test_root/scripts/"
     if [[ "$test" == cheat-state-host ]]; then

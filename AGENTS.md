@@ -31,6 +31,11 @@ BLUE hardware-untested prerelease v8.3.1-blue-test1 is published; no hardware
 qualification exists. Raw GBA output still requires packing and must not be
 flashed or booted by itself. Next owner phase is Omega backports, then the
 separate three-branch audit. Keep this BLUE branch isolated.
+Final audit delivery must report findings, fixes/optimizations and remaining
+issues separately for ezfode, ezfomega and ezfblue, with validation limitations.
+Filename policy uses the project fixed CP936 OEM encoding; preserve DBCS trail
+bytes when checking separators and review it if FF_CODE_PAGE changes.
+
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
 ran ahead of this repository's build number. In particular, its v8.4.1 release
