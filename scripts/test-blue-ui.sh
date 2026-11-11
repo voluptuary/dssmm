@@ -11,7 +11,8 @@ cp "$test_root/source/ezbluekernel.c" "$test_root/source/ezkernelnew.c"
 # Fixture-relative ../source includes must also resolve to the private BLUE source.
 cp -R "$repo_dir/tests" "$test_root/tests"
 for item in images docs files; do ln -s "$repo_dir/$item" "$test_root/$item"; done
-ln -s "$(git -C "$repo_dir" rev-parse --absolute-git-dir)" "$test_root/.git"
+export GIT_DIR="$(git -C "$repo_dir" rev-parse --absolute-git-dir)"
+export GIT_WORK_TREE="$(git -C "$repo_dir" rev-parse --show-toplevel)"
 tests=(
     cheat-state-host cheat-row-host fat-table-builder-host fatfs-long-name-host
     carousel-motion-host carousel-lookup-scaling-host custom-manifest-host
