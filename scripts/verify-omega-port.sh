@@ -23,12 +23,14 @@ bash scripts/test-custom-manifest-host.sh
 bash scripts/test-launcher-thumb-cache-invalidation.sh
 bash scripts/test-carousel-lookup-scaling-host.sh
 python3 tests/test-omega-index.py
+python3 tests/test-omega-launch-copy.py
 python3 tests/test-omega-nor-artwork.py
 bash scripts/test-fatfs-long-name-host.sh
 bash scripts/test-omega-artwork-host.sh
 bash scripts/test-omega-transparency-host.sh
 make BUILD=build-omega TARGET=omega-port
 bash scripts/test-omega-layout.sh
+python3 tests/test-omega-plugin-policy.py
 python3 - <<'PY'
 from pathlib import Path
 size=Path('omega-port.gba').stat().st_size

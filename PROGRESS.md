@@ -1,5 +1,13 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 12:28 UTC — Omega launch/copy and compressed-plugin safety
+
+- Actual Omega Copy_file fixture reproduces baseline4f7019b false success on failed close (assertion on !Copy_file/output/closes). Ported checked exact reads/writes/both closes, full-width size bound, incomplete-output removal and shared-cache invalidation; updated fixture passes. Failed plugin/native PSRAM callers now return1 for directory rebuild, and plugin arguments use the basename instead of stale +9 offset.
+- Added bounded raw/compressed EWRAM payload validation before boot: .mb payload must fit below Pogoshell arguments; .mbz header/output/tokens/backreferences must be complete and bounded. Policy tests pass20,000 malformed inputs under ASan/UBSan.
+- Verified legacy Omega LZ77UnCompWram assembly actually invokes SWI12h (VRAM), also used by NOR backgrounds. Compressed plugins now call an additional IWRAM WRAM SWI11h wrapper; legacy NOR wrapper unchanged. Linked disassembly test checks both distinct calls and source wiring. Reference: devkitPro/libgba src/Compression.c (https://github.com/devkitPro/libgba/blob/master/src/Compression.c) confirms BIOS17/18 wrapper distinction. No physical decompression/game test. Removed an identical unreachable duplicate bootmode3 branch; remaining target reset/register behavior retained.
+- Latest build before duplicate-branch cleanup2,048,608 bytes (48,544 headroom), heap19,424/user-stack gap7,488 static, no diagnostics. Focused copy/policy/patch tests pass; final aggregate follows. No claim of hardware success.
+- Next: finish supported missing/default artwork behavior and final feature inventory, then full verifier, Test2 package/release, commit/push. Subsequent three-branch audit must revisit shared queue/NES patch bounds and platform memory limits.
+
 ## 2026-11-11 12:24 UTC — Omega custom-art/cache/motion and enum milestone validated
 
 - Current donor pure renderer/cache functions propagate per-image CUSTOM provenance through all carousel/list scaled caches, motion incoming frames and popup restoration. Added CUSTOM Only rounded corners and legacy CUSTOM Only migration; enum settings readers consolidated without changing established matching behavior. Original Omega source/path/sidecar loader retained and reports actual successful CUSTOM provenance.

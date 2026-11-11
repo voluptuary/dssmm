@@ -33,10 +33,12 @@
 #include "launcher_artwork_path.h"
 #include "launcher_setting_parse.h"
 #include "nor_artwork_sd.h"
+#include "kernel_boot_policy.h"
 #include "thai620.h"
 #include "select_raw.h"
 
 static void Launcher_SaveUnifiedSettings(void);
+static void Launcher_ResetThumbCache(void);
 static u32 Launcher_BrowserWrapAroundEnabled(void);
 static void Launcher_SaveSettingsInfo(void);
 extern u16 gl_select_lang;
@@ -1826,60 +1828,36 @@ static void Launcher_PrepareSettingsFlashWrite(void)
 }
 //---------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------
-u32 Copy_file(const char* src, const char* dst)
+u32 Copy_file(const TCHAR *src, const TCHAR *dst)
 {
-	UIAudio_StopForSharedBufferUse();
-	UINT read_ret;
-	UINT write_ret;
-	u32 filesize;
-	u32 res;
-	u32 blocknum;
-	u32 total_read = 0;
-	u32 total_written = 0;
-	FIL dst_file;
-
-	res = f_open(&gfile, src, FA_READ);
-	if (res == FR_OK)
-	{
-		res = f_open(&dst_file, dst, FA_WRITE | FA_CREATE_ALWAYS);
-		if (res == FR_OK)
-		{
-			filesize = f_size(&gfile);
-			res = f_lseek(&gfile, 0x0000);
-
-			for (blocknum = 0x0000; (res == FR_OK) && (blocknum < filesize); blocknum += 0x20000)
-			{
-				u32 chunk = filesize - blocknum;
-				if (chunk > 0x20000)
-					chunk = 0x20000;
-
-				res = f_read(&gfile, pReadCache, chunk, &read_ret);
-				if ((res != FR_OK) || (read_ret != chunk))
-					break;
-
-				total_read += read_ret;
-				res = f_write(&dst_file, pReadCache, read_ret, &write_ret);
-				if (write_ret != read_ret)
-					break;
-
-				total_written += write_ret;
-			}
-			if (res == FR_OK)
-				res = f_sync(&dst_file);
-			f_close(&dst_file);
-
-			if ((res == FR_OK) && (total_read == filesize) && (total_written == filesize))
-			{
-				f_close(&gfile);
-				return 1;
-			}
-
-			f_unlink(dst);
-		}
-		f_close(&gfile);
-	}
-
-	return 0;
+    UIAudio_StopForSharedBufferUse();
+    Launcher_ResetThumbCache();
+    FIL destination;
+    UINT read_size, written;
+    u32 copied = 0;
+    if(!src || !dst || !strcasecmp(src, dst)) return 0;
+    if(f_open(&gfile, src, FA_READ) != FR_OK) return 0;
+    FSIZE_t full_size = f_size(&gfile);
+    if(full_size > 0xFFFFFFFFUL) { f_close(&gfile); return 0; }
+    u32 size = (u32)full_size;
+    if(f_open(&destination, dst, FA_WRITE | FA_CREATE_ALWAYS) != FR_OK) {
+        f_close(&gfile); return 0;
+    }
+    u32 good = 1;
+    while(copied < size) {
+        u32 bytes = size - copied;
+        if(bytes > MAX_pReadCache_size) bytes = MAX_pReadCache_size;
+        read_size = written = 0;
+        if(f_read(&gfile, pReadCache, bytes, &read_size) != FR_OK || read_size != bytes ||
+           f_write(&destination, pReadCache, bytes, &written) != FR_OK || written != bytes) {
+            good = 0; break;
+        }
+        copied += bytes;
+    }
+    if(f_close(&destination) != FR_OK) good = 0;
+    if(f_close(&gfile) != FR_OK) good = 0;
+    if(!good) f_unlink(dst);
+    return good && copied == size;
 }
 u32 Is_bin_file(const TCHAR *name)
 {
@@ -5924,12 +5902,15 @@ u32 IWRAM_CODE LoadEMU2PSRAM(TCHAR *filename,u32 is_EMU)
 				plan.size != 0x58)
 				goto load_failed;
 			SetPSRampage(plan.page);
-			make_pogoshell_arguments(plugin + 9, filename, rom_start_address, filesize,
+			make_pogoshell_arguments(strrchr(plugin, '/') ? strrchr(plugin, '/') + 1 : plugin, filename, rom_start_address, filesize,
 				plan.window_offset, offset);
 		}
 
-		SetPSRampage(0);
-	return 0;
+        SetPSRampage(0);
+        if((is_EMU == 6 && !KernelPluginPayloadValid(PSRAMBase_S98, rom_start_address, 2)) ||
+           (is_EMU == 7 && !KernelPluginPayloadValid(PSRAMBase_S98, blockoffset, 4)))
+            goto load_failed;
+    return 0;
 
 close_failed:
 	if(file_open)
@@ -17289,7 +17270,7 @@ load_file:
 		Send_FATbuffer(FAT_table_buffer,1);
 
 		res=LoadEMU2PSRAM(pfilename,is_EMU);
-		if(res != 0) { Show_error_num(1); return 0; }
+		if(res != 0) { Show_error_num(1); return 1; } /* PSRAM index needs rebuilding. */
 			int bootmode = ((is_EMU > 3) && (is_EMU < 9)) ?
 				((is_EMU == 6) ? 2
 					: (is_EMU == 7) ? 4
@@ -17373,7 +17354,7 @@ load_file:
 					FAT_table_buffer[0x1F4/4] = SET_PARAMETER_MODE;
 							Send_FATbuffer(FAT_table_buffer,1);
 					res=Loadfile2PSRAM(pfilename);
-		if(res != 0) { Show_error_num(1); return 0; }
+		if(res != 0) { Show_error_num(1); return 1; } /* PSRAM index needs rebuilding. */
 							ShowbootProgress(gl_make_pat);
 							Make_pat_file(pfilename);
 						}

@@ -12,7 +12,6 @@
 extern void delay(u32 R0);
 void IWRAM_CODE Set_RTC_status(u16  status);
 extern void SoftReset_now(u16 unknown1, u16 unknown2); //this function is undocumented. wtf does it do?
-extern void LZ77UnCompWram(void* source, void* dest); //this is bad! bad!!
 extern void HardReset();
 int aP_depack(u8 *source,u8 *destination);
 
@@ -256,6 +255,7 @@ void IWRAM_CODE Send_FATbuffer(u32*buffer,u32 mode)
 #define	RESET_OTHER		 	(1<<7)	/*!< all other registers				*/
 // --------------------------------------------------------------------
 extern u16 gl_ingame_RTC_open_status;
+extern void Omega_DecompressPluginEwram(const void *source, void *destination);
 
 void IWRAM_CODE SetRompageWithHardReset(u16 page,u32 bootmode)
 {
@@ -284,7 +284,7 @@ void IWRAM_CODE SetRompageWithHardReset(u16 page,u32 bootmode)
 		if (bootmode==2)
 			dmaCopy((u8*)(0x08000000),(u8*)(0x02000000), *(u32 *)(0x0203fbfc) & 0x7ffffff);
 		else if (bootmode==4)
-			LZ77UnCompWram((u8*)(0x08000000),(u8*)(0x02000000));
+			Omega_DecompressPluginEwram((u8*)(0x08000000),(u8*)(0x02000000));
 		else if (bootmode==5)
 			aP_depack((u8*)(0x08000000), (u8*)(0x02000000));
 		RegisterRamReset(0xfc);
@@ -299,15 +299,7 @@ void IWRAM_CODE SetRompageWithHardReset(u16 page,u32 bootmode)
 		//SoftReset_now(0,0x100);
 		SoftReset_now(0,0xfe);
 	}
-	else if (bootmode == 3) {
-		int i;
-		//Clear exram up to pogoshell arg
-		u32 *p = (u32*)(0x02000000);
-		for(i=0;i<0xfefe;i++)
-			p[i]=0;
-		//SoftReset_now(0,0x100);
-		SoftReset_now(0,0xfe);
-	}
+
 	else {
 		if(key_L)
 			HardReset();

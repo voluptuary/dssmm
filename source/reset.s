@@ -108,3 +108,14 @@ HardReset:
 	.align
 	.ltorg
 SoftReset_end:
+
+@ Plugin payloads use BIOS WRAM LZ77 (11h). Keep the legacy 12h wrapper
+@ above for NOR backgrounds and other existing VRAM callers.
+    .section .iwram,"ax",%progbits
+    .code 16
+    .align 2
+    .global Omega_DecompressPluginEwram
+    .thumb_func
+Omega_DecompressPluginEwram:
+    swi 0x11
+    bx lr
