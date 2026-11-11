@@ -1,17 +1,7 @@
-# Omega Definitive Edition BLUE exploration
+# ezfblue target layout
 
-Branch: `ezfblue`
+Hardware identity is recorded in ../../project.json. This branch contains only its target's build/source/assets/tools and applicable tests; canonical dssmm keeps an independent snapshot under targets/ezfblue.
 
-Framework baseline: `691dc5ec0391cd30c537082a8428978b29c5500a`
+Run `python3 scripts/project.py build ezfblue` and `python3 scripts/project.py verify ezfblue` from the project root. See [BLUE_STATUS.md](BLUE_STATUS.md) for origin, hardware limits and historical milestones. No hardware qualification is implied.
 
-Reference: https://github.com/ezflash-team/blue-kernel
-
-Pinned commit: `109f1a050d9c35008379ce61ae40d05dc528c614`
-
-Status: owner resumed implementation. Hardware/build inventory is in [BLUE_STATUS.md](BLUE_STATUS.md). Establish a vendor BLUE build under targets/blue and selectively adapt DS Style; no hardware validation or public BLUE candidate.
-
-## First investigation when resumed
-
-Start with the vendor memory/register map, flash/save protocols and boot/update format. The vendor README requires linking the compiled image with image.bin using Link_kernel_image.exe; inspect that packaging contract and tool reproducibility before designing a build. Establish supported board identity and limits from source evidence.
-
-Follow [the shared preparation checklist](README.md). Produce a feature/provenance matrix and hardware/build inventory before changing code. The owner has resumed BLUE porting; keep all work isolated on ezfblue.
+DE-only installer documentation, DE hardware tests and obsolete verification wrappers were removed. BLUE additionally removed its excluded DE donor source. Audited removals are in [target-cleanup.json](target-cleanup.json); all HANDOFF/PROGRESS records are preserved. Shared frontend tests and asset generation tools remain. No automatic push, synchronization, cross-target merge or release publication is configured.

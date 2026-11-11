@@ -8,7 +8,9 @@ mkdir "$test_root/source" "$test_root/scripts"
 # Real copies are essential: filesystem tests instrument their private ff15 tree.
 cp -R "$repo_dir/targets/blue/source/." "$test_root/source/"
 cp "$test_root/source/ezbluekernel.c" "$test_root/source/ezkernelnew.c"
-for item in tests images docs files; do ln -s "$repo_dir/$item" "$test_root/$item"; done
+# Fixture-relative ../source includes must also resolve to the private BLUE source.
+cp -R "$repo_dir/tests" "$test_root/tests"
+for item in images docs files; do ln -s "$repo_dir/$item" "$test_root/$item"; done
 ln -s "$(git -C "$repo_dir" rev-parse --absolute-git-dir)" "$test_root/.git"
 tests=(
     cheat-state-host cheat-row-host fat-table-builder-host fatfs-long-name-host

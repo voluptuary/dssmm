@@ -1,5 +1,28 @@
 # AUTONOMOUS KERNEL AUDIT — MASTER DIRECTIVE
 
+## Current target-only layout
+
+This standalone branch owns ezfblue; project.json is its hardware identity.
+Canonical dssmm stores this project's independent snapshot at targets/ezfblue.
+Use this branch's own Makefile and verifier. Sources/assets are never shared
+through symlinks or auto-merges. Root CI has contents:read only, verifies this
+target, and rejects known cross-target PRs. There is no Pages deployment on
+hardware branches. A common fix must be adapted/validated per project.
+All historical handoff/progress logs are preserved. Do not recreate ezfode/main.
+
+
+## Target isolation and compartmentalization
+
+This branch owns only EZ-FLASH OMEGA Definitive Edition B / BLUE only. Canonical dssmm collects independent projects
+under targets/ezfomegade, targets/ezfomega and targets/ezfblue; never merge a
+hardware branch wholesale into dssmm or another hardware branch. Import/adapt
+changes deliberately within the appropriate target and revalidate. project.json
+is the target identity; root GitHub default is dssmm, never recreate ezfode/main.
+This branch retains its standalone build/verification environment. No automatic
+synchronization, cross-target pushes or release publication is part of cleanup.
+See docs/porting/target-cleanup.json for audited removals; preserve all logs.
+
+
 ## Current software-audit checkpoint (2026-11-11 23:15 UTC)
 
 The three-branch software audit and delivery are complete. See
@@ -23,7 +46,7 @@ listed in the report. Do not silently restart completed porting from old notes.
 The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
 (`https://github.com/voluptuary/ezfode-dssmm-kernel`). The Codespaces workspace
 may retain its original local directory name after the repository rename.
-The primary and GitHub default branch is `ezfode`. The owner completed the
+The GitHub default branch is `dssmm`. The owner completed the
 rename through GitHub; remote `main` no longer exists. Do not recreate it.
 `ezfblue` has published hardware-untested BLUE Test1; Original OMEGA Test2 is
 also published. The active phase is now the authorized three-branch adversarial
@@ -39,7 +62,7 @@ No BLUE hardware testing is available; never imply DE reports validate BLUE.
 Use automatic GitHub source archives, not separately uploaded source ZIPs.
 The original Omega port has its own hardware-untested prerelease on ezfomega.
 Active BLUE sources are in targets/blue; root images are now active shared
-assets, while root source is archived donor code excluded from the build. Run
+assets. The unused root DE donor source has been removed. Run
 bash scripts/verify-blue-port.sh and bash scripts/test-blue-ui.sh.
 Boot validation additionally uses tests/test-blue-boot.py (Debian dependencies:
 python3-unicorn and python3-distutils). It executes linked ARM/Thumb with mocked

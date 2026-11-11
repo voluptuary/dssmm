@@ -33,5 +33,6 @@ static void Launcher_DrawPackedSplash(void)
     LZ77UnCompVram(launcher_splash_lz, (void*)VRAM);
 }
 '''
-(root / 'source/launcher_splash_lz.h').write_text(text)
+source = root / ('targets/blue/source' if (root / 'targets/blue/source/ezbluekernel.c').exists() else 'source')
+(source / 'launcher_splash_lz.h').write_text(text)
 print(f'Packed local splash: {len(packed)} bytes; exact 76800-byte round trip verified.')

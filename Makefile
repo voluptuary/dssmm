@@ -1,4 +1,4 @@
-# Active ezfblue target. Root images are active assets; root source is archived donor code.
+# Active ezfblue target. Root images are active assets; only targets/blue/source is firmware code.
 .DEFAULT_GOAL := all
 .PHONY: all clean check
 all:
