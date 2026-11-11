@@ -1,5 +1,18 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 23:21 UTC — Default-branch rename externally blocked
+
+- POST repos/voluptuary/ezfode-dssmm-kernel/branches/ezfode/rename with new_name=dssmm returned HTTP403, Resource not accessible by integration. Native rename is unavailable to the connected GitHub integration; no rename, fallback create/delete, default-setting edit, local branch rename, or active-reference rewrite was performed. This is an external permission restriction, not an unfinished code/audit task.
+- Owner must rename ezfode to dssmm through GitHub using an account permitted to rename the default branch (or supply an integration authorized for that operation). After the external rename, verify preserved SHA/default/old-ref removal, fetch/prune origin, rename the existing local ezfode branch in its DE worktree, set upstream/origin HEAD, and update active documentation links/guidance. Preserve the repository name, historical audit/source refs, platform code isolation and releases. Until then ezfode remains the actual default; do not recreate retired main or introduce an unrequested duplicate default branch.
+- Only these operational HANDOFF/PROGRESS entries changed on the current ezfomega workspace; committing/pushing that documentation checkpoint. Software-audit delivery remains complete and its binaries are unaffected.
+
+
+## 2026-11-11 23:21 UTC — Owner-requested default-branch rename checkpoint
+
+- Owner requests renaming ezfode to dssmm as the first compartmentalization step. Remote/default ezfode currently a57b0090fe79edceb6d26ee8c363afd72e4099a2; dssmm does not exist. Primary workspace remains ezfomega; DE audit worktree has ezfode checked out. No firmware, releases, platform merges or repository rename requested.
+- Next: GitHub native rename API, verify default/commit preservation and old-ref removal; rename local branch in its existing worktree and repair upstream/origin HEAD. Update current default-branch guidance/links in isolated branch documentation without rewriting historical audit evidence or changing target code. If GitHub rejects rename permissions, record exact restriction instead of bypassing it with a create/delete sequence.
+
+
 ## 2026-11-11 23:15 UTC — Audit delivery verified after session recovery
 
 - Reconciled actual repository/remote state with the prior publication-ready checkpoint. All code/tooling/report changes had already been committed and pushed: Omega b9307d42f099f049b00c66bfdf14f374a949b290, BLUE e5bf9a34c79fb6f869de9bbbe4146240da0c8299, DE613d77559650db836ec606c6929aa8447fc4ba6b. The interrupted verification process and /tmp logs were unavailable after recovery; no claim was made that the missing process completed. Completed fresh GitHub download/tag/asset verification and persisted the JSON in docs/audits/release-verification-2026-11.json.
