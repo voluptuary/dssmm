@@ -15,8 +15,15 @@ ezfode defects in a branch-local deferred queue rather than changing ezfode.
 No BLUE hardware testing is available; never imply DE reports validate BLUE.
 Use automatic GitHub source archives, not separately uploaded source ZIPs.
 The original Omega port has its own hardware-untested prerelease on ezfomega.
-Active BLUE sources are in targets/blue; root source/images are retained DS
-Style donors, excluded from the build. Run bash scripts/verify-blue-port.sh.
+Active BLUE sources are in targets/blue; root images are now active shared
+assets, while root source is archived donor code excluded from the build. Run
+bash scripts/verify-blue-port.sh and bash scripts/test-blue-ui.sh.
+Boot validation additionally uses tests/test-blue-boot.py (Debian dependencies:
+python3-unicorn and python3-distutils). It executes linked ARM/Thumb with mocked
+BIOS; it does not validate physical cartridge behavior.
+BLUE uses a split ROM layout preserving image.bin at 1 MiB and firmware at
+0x08195000; assets start at 0x08207000, metadata remains at 0x08780000.
+Never flatten that layout or copy a raw .gba as a BLUE update; pack with its ELF.
 No BLUE release or hardware-qualified artifact exists; raw GBA output needs
 its resources and must not be flashed or booted by itself.
 

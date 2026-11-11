@@ -37,3 +37,23 @@ At ezfode 5f700c9, build.bat initializes BUILD_OUTPUT_GBA=x.gba, while the Makef
 ## BLUE baseline comparison — loader and directory findings
 
 BLUE 109f1a0 has unchecked native reads/ignored loader failures and overlapping directory sprintf appends. These are verified BLUE vendor defects, not newly demonstrated DE defects: current ezfode has checked loading and different directory construction. Do not report them as regressions in ezfode merely because the source shares ancestry. BLUE retains additional unchecked plugin/header/trim paths for subsequent review.
+
+## PLUGIN-HEADER-01 — tiny external-plugin inputs pass through native-header probe
+
+At ezfode 5f700c9, SD_list_MENU unconditionally requires launch_file_size >= 0xB0 and reads GAMECODE at 0xAC after determining is_EMU. Valid supported external-plugin inputs can be smaller than a GBA header (for example a short CHIP-8 program). Source control flow therefore rejects them before LoadEMU2PSRAM despite that loader supporting arbitrary nonempty data. This is a source-verified policy mismatch; hardware occurrence and an installed .ch8 plugin are untested. BLUE will separate native metadata from plugin bounds/close checks. Review all targets with regression cases before a DE fix.
+
+## BOOT-EWRAM-02 — EWRAM plugin reset paths clear the active stack (review in progress)
+
+At ezfode 5f700c9, SetRompageWithHardReset boot modes 2/4/3 clear EWRAM in C, while Makefile puts the user SP at 0x0203F000, inside the cleared range ending 0x0203FBF8. Native mode 0 already uses ResetWithEwramClear, but the plugin branches do not. Need linked-code/machine-execution evidence and bounded plugin-payload checks before fixing DE. BLUE integration hit the related original reset/relocated-stack conflict; no DE changes yet.
+
+## UPDATE-COPY-01 — file copy reports success despite close failure (verified host reproduction)
+
+At ezfode 5f700c9, Copy_file checks f_sync but discards both f_close results and narrows f_size before checking its bound. tests/test-blue-launch-update.py ezfode compiles that production function with a fault model; injected close failure returns success and fails the expected rejection assertion. The BLUE correction checks full size, exact read/write/close outcomes and rejects identical source/destination paths. Review/port the narrow correction during the authorized DE audit, with actual FatFs scenarios where feasible. DE unchanged.
+
+## POGO-PATH-01 — plugin argument uses obsolete fixed directory offset (verified source)
+
+DE 5f700c9 calls make_pogoshell_arguments(plugin + 9, ...), but plugin paths are /SYSTEM/PLUG/name.ext (basename starts at offset 13). This supplies LUG/name.ext instead of the actual plugin basename. Actual compatibility impact depends on whether the plugin uses argv[0]; file payload/address passing is separate. Replace with separator-based basename extraction and test the produced argument record on each affected port/DE in its proper phase.
+
+### PSRAM-INDEX-FAIL-01 — refresh directory after a failed game load
+
+Verified control-flow risk on ezfode 5f700c9: directory records reside in the final page-zero PSRAM region. A sufficiently large partial load overwrites them before a read/close failure. SD_list_MENU returns zero on that failure and its callers refresh only for nonzero results, leaving overwritten records eligible for redraw/navigation. BLUE now returns one after either plugin/native PSRAM load failure, triggering existing directory rebuild paths. Follow up with a DE production-caller regression and retain target banking rules. Severity: medium; physical symptom not hardware-reproduced.

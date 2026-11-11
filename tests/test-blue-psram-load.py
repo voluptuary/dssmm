@@ -3,6 +3,7 @@
 
 from pathlib import Path
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -13,7 +14,7 @@ if len(sys.argv) == 2:
     source = subprocess.check_output(["git", "show", f"{sys.argv[1]}:{RELATIVE}"], cwd=ROOT).decode("latin1")
 else:
     source = (ROOT / RELATIVE).read_bytes().decode("latin1")
-start = source.index("u32 IWRAM_CODE Loadfile2PSRAM(TCHAR *filename)")
+start = source.index("u32 " + ("IWRAM_CODE " if "u32 IWRAM_CODE Loadfile2PSRAM" in source else "") + "Loadfile2PSRAM(TCHAR *filename)")
 end = source.index("//---------------------------------------------------------------", start)
 function = source[start:end]
 
@@ -132,5 +133,6 @@ with tempfile.TemporaryDirectory() as folder:
 if len(sys.argv) == 1:
     # Failure must precede patch-file creation, further patching and game boot.
     caller = source[source.index("res=Loadfile2PSRAM(pfilename);"):]
-    assert caller.index("if (res != 0)") < caller.index("Make_pat_file")
-    assert caller.index("return 0;") < caller.index("Make_pat_file")
+    guard = re.search(r"if\s*\(res\s*!=\s*0\)", caller)
+    assert guard and guard.start() < caller.index("Make_pat_file")
+    assert caller.index("return 1;") < caller.index("Make_pat_file")

@@ -27,6 +27,24 @@ class PackagingTest(unittest.TestCase):
         self.assertEqual(result[0x100000:], resource)
         self.assertEqual(result[0x195000:0x2066A0], resource[0x95000:0x1066A0])
 
+    def test_actual_split_layout(self):
+        elf = ROOT / "targets/blue/ezbluekernel-development.elf"
+        code = elf.with_suffix(".gba").read_bytes()
+        resource = RESOURCE.read_bytes()
+        result = packer.pack(code, resource, elf)
+        self.assertEqual(len(result), len(code))
+        self.assertEqual(result[:0x100000], code[:0x100000])
+        self.assertEqual(result[0x100000:0x2069DC], resource)
+        self.assertEqual(result[0x207000:], code[0x207000:])
+        for offset in (0x220, 0x207000, len(code) - 1):
+            damaged = bytearray(code)
+            damaged[offset] ^= 1
+            with self.subTest(offset=offset), self.assertRaises(ValueError):
+                packer.pack(bytes(damaged), resource, elf)
+        for invalid in (code[:-1], code + b"x"):
+            with self.assertRaises(ValueError):
+                packer.pack(invalid, resource, elf)
+
     def test_boundary(self):
         resource = RESOURCE.read_bytes()
         self.assertEqual(packer.pack(bytes(0x100000), resource)[0x100000:], resource)

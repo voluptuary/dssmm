@@ -1,5 +1,30 @@
 # BLUE port status
 
+## Current state — DS Style integrated, hardware untested
+
+Active branch `ezfblue`. The frontend now uses Merkin Mix `ezfode` 5f700c9; target-specific hardware is based on EZ-FLASH BLUE 109f1a050d9c35008379ce61ae40d05dc528c614. Older baseline-only entries below are historical, not the current feature status. No physical BLUE results exist. DE and original OMEGA branches were not changed during this integration.
+
+| Area | Implemented and software evidence | Remaining limits |
+| --- | --- | --- |
+| DS menus/themes/navigation | Current frontend, assets, start/auto themes, carousel/list, favorites/recent/last-played; 24 shared software/UI suites | Frame timing, audio and appearance need hardware |
+| Artwork | Name/header/mirrored lookup, marked transparency, borders, scaled rendering, caches; differential renderer and lookup tests | Malformed artwork follow-up remains in audit queue |
+| Native game loading | Exact I/O, FF padding, full-width size validation, all eight 8 MiB banks; native game page 0x400 and vendor 64 MiB/5G handling retained | Physical 32/64 MiB games and FPGA offload untested |
+| Plugins/embedded GB | Current GB payload and plugin loader; combined plugin ROM bounded to 32 MiB, EWRAM payload/arguments bounded; LZ structure/backreferences checked | Plugin-specific support comes from each plugin; physical execution untested |
+| Boot/reset | BLUE native resets retained, IWRAM no-return handoff switches off EWRAM stack before clearing; linked modes 0–6 exercised in Unicorn with BIOS mocks | BIOS mocks do not qualify real hardware |
+| Saves/settings/cheats | Transactional SD saves/settings, bounded paths and cheat snapshots; real FatFs fault-injection tests; full-width cheat size bounds | BLUE save/reset/SRAM protocol and vendor runtime cheat engine retained; no claim of DE engine extensions |
+| NOR library | 132-byte vendor catalog, 960-page allocation map, free-run install, selected-title delete, game-only format; exact reads, padding and delayed publication; allocation/scan tests | Raw vendor toggle polling still has no timeout; catalog and map are single-copy, not power-loss atomic |
+| NOR errors/art/progress | Erase/program/metadata readback, reserve/publish/release ordering; SD artwork sidecars validated by catalog identity; themed NOR background/time/name | Readback and bus behavior mocked; sidecars can fall back after SD failure; no physical NOR results |
+| Directory/RAM pools | 256 folders at PSRAM 0x08FE0000, files/offsets at 0x08FF0000; DMA16 staging, no byte writes or PSRAM-to-PSRAM DMA; rebuild after load failure | Static bounds are not runtime stack/heap measurements |
+| Update/resources | Firmware identity/size/header checked before staging, exact copies and close failures; fixed vendor image preserved | Updater source unavailable; acceptance of the larger split image unknown |
+
+Current linked size: **3,982,680 bytes**. EWRAM heap reservation: **15,760 bytes**; user stack reserve: **12 KiB**; IWRAM overlay to IRQ SP: **1,680 bytes**. NES patch bytes are unchanged, now const in ROM instead of occupying 832 bytes of IWRAM. No hot renderer tables were moved.
+
+Run `bash scripts/verify-blue-port.sh` for build, protected layout, packaging, native/NOR/metadata/IRQ/folder/update/boot tests and all 24 shared software/UI suites. See [target packaging instructions](../../targets/blue/README.md). No separately uploaded source archive is needed.
+
+Next: finish final validation, checkpoint and publish a clearly hardware-untested BLUE prerelease if all software checks pass; then complete remaining Omega backports and audit all three branches. Relevant DE findings remain in [the review queue](EZFODE_REVIEW_QUEUE.md). Do not merge target hardware code across branches. No stable DE release change is part of this port.
+
+## Historical baseline investigation
+
 ## Baseline and isolation
 
 Active branch: ezfblue only. Vendor baseline: ezflash-team/blue-kernel 109f1a050d9c35008379ce61ae40d05dc528c614 (unchanged after reference refresh). DE remains origin/ezfode 5f700c9a89768309f06993984bb6c3a3190d04ef. Original Omega test is separately published as v8.3.1-omega-test1. Neither branch is to be merged here wholesale.

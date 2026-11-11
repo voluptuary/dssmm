@@ -2,7 +2,7 @@
 
 ## BLUE port hardware baseline
 
-The isolated ezfblue target uses EZ-FLASH's published BLUE kernel at 109f1a050d9c35008379ce61ae40d05dc528c614. Its vendor source/license and unchanged resource image are retained under targets/blue. The existing DS Style source/assets remain donor material attributed below; their presence does not imply BLUE feature integration. Linux header-case correction follows the existing HZK12 correction credited to Kekun in this project's lineage.
+The isolated ezfblue target uses EZ-FLASH's published BLUE kernel at 109f1a050d9c35008379ce61ae40d05dc528c614. Its vendor source/license and unchanged resource image are retained under targets/blue. The BLUE target now adapts the current Merkin Mix frontend and assets attributed below, retaining BLUE hardware protocols, firmware and metadata. Its runtime cheat engine remains the vendor BLUE implementation; extended DE cheat-engine behavior is not claimed. Linux header-case correction follows the existing HZK12 correction credited to Kekun in this project's lineage.
 
 - **EZ-FLASH** — original OMEGA Definitive Edition kernel source.
 - **Sterophonick** — SimpleLight custom kernel, part of DS Style's foundation.

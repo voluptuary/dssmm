@@ -18,6 +18,7 @@ extern u32 FAT_table_buffer[FAT_table_size/4]EWRAM_BSS;
 
 extern FIL gfile;
 // --------------------------------------------------------------------
+extern void Blue_PrepareFlashAccess(void);
 extern void HardReset(void);
 extern void SoftReset_now(void);
 extern u32 gl_currentpage;
@@ -164,6 +165,10 @@ u32 IWRAM_CODE Write_SD_sectors(u32 address,u16 count, const u8* SDbuffer)
 // --------------------------------------------------------------------
 u16 IWRAM_CODE Read_S98NOR_ID()
 {
+    Blue_PrepareFlashAccess();
+    u16 saved_ime = REG_IME;
+    REG_IME = 0;
+
 	u16 ID1;
 	*((vu16 *)(FlashBase_S98)) = 0xF0 ;	
 	*((vu16 *)(FlashBase_S98+0x555*2)) = 0xAA;
@@ -171,6 +176,7 @@ u16 IWRAM_CODE Read_S98NOR_ID()
 	*((vu16 *)(FlashBase_S98+0x555*2)) = 0x90;
 	ID1 = *((vu16 *)(FlashBase_S98+0xE*2));
 	*((vu16 *)(FlashBase_S98)) = 0xF0 ;	
+	REG_IME = saved_ime;
 	return ID1;
 }	
 // --------------------------------------------------------------------
@@ -261,15 +267,12 @@ extern u16 gl_ingame_RTC_open_status;
 
 void IWRAM_CODE SetRompageWithHardReset(u16 page,u32 bootmode)
 {
-	Set_RTC_status(gl_ingame_RTC_open_status);
-	SetRompage_MODE(page,SYSTEM_MODE_GAME);
-	RegisterRamReset(RESET_EWRAM|RESET_PALETTE| RESET_VRAM|RESET_OAM |RESET_SIO | RESET_SOUND | RESET_OTHER);
-	if(bootmode==1){
-		HardReset();
-	}
-	else{
-		SoftReset_now();
-	}
+    Blue_PrepareFlashAccess();
+    REG_IME = 0;
+    Set_RTC_status(gl_ingame_RTC_open_status);
+    SetRompage_MODE(page, SYSTEM_MODE_GAME);
+    /* No C return or stack access after EWRAM is cleared. */
+    Blue_BootHandoff(bootmode);
 }
 // --------------------------------------------------------------------
 void IWRAM_CODE ReadSram(u32 address, u8* data , u32 size )
@@ -298,8 +301,15 @@ void IWRAM_CODE Bank_Switching(u8 bank)
 	*((vu8 *)(SAVE_sram_base+0x0000)) = bank ;	
 }
 // --------------------------------------------------------------------
-void IWRAM_CODE Save_info_2_NOR(u32 info_offset, const void * info_buffer,u32 buffersize)
+u8 IWRAM_CODE Save_info_2_NOR(u32 info_offset, const void * info_buffer,u32 buffersize)
 {
+    if(!info_buffer || !buffersize || (buffersize & 1) || buffersize > 0x20000 ||
+       (info_offset != SAVE_info_offset && info_offset != NOR_info_offset &&
+        info_offset != SET_info_offset && info_offset != NOR_FAT_offset)) return 0;
+    Blue_PrepareFlashAccess();
+    u16 saved_ime = REG_IME;
+    REG_IME = 0;
+
 	u32 offset;
 	const vu16* buf = (const vu16*)info_buffer ;
 	register u32 loopwrite ;
@@ -337,17 +347,23 @@ void IWRAM_CODE Save_info_2_NOR(u32 info_offset, const void * info_buffer,u32 bu
 	}			
 
 	*((vu16 *)(FlashBase_S98)) = 0xF0;	
+
+    u8 good = 1;
+    for(u32 index = 0; index < buffersize / 2; index++)
+        if(*(vu16 *)(FlashBase_S98 + info_offset + index * 2) != buf[index]) { good = 0; break; }
+    REG_IME = saved_ime;
+    return good;
 }
 
 // --------------------------------------------------------------------
-void IWRAM_CODE Save_sav_info(u16 * SAV_info_buffer,u32 buffersize)
+u8 IWRAM_CODE Save_sav_info(u16 * SAV_info_buffer,u32 buffersize)
 {
-	Save_info_2_NOR(SAVE_info_offset, SAV_info_buffer,buffersize);
+	return Save_info_2_NOR(SAVE_info_offset, SAV_info_buffer,buffersize);
 }
 // --------------------------------------------------------------------
-void IWRAM_CODE Save_NORgame_info(u16 * NOR_info_buffer,u32 buffersize)
+u8 IWRAM_CODE Save_NORgame_info(u16 * NOR_info_buffer,u32 buffersize)
 {
-	Save_info_2_NOR(NOR_info_offset, NOR_info_buffer,buffersize);
+	return Save_info_2_NOR(NOR_info_offset, NOR_info_buffer,buffersize);
 }
 // --------------------------------------------------------------------
 void IWRAM_CODE Save_SET_info(u16 * SET_info_buffer,u32 buffersize)
@@ -358,7 +374,7 @@ void IWRAM_CODE Save_SET_info(u16 * SET_info_buffer,u32 buffersize)
 void IWRAM_CODE Read_NORgame_info(void)
 {
 	u16 *dst = (u16*)pNorFS;
-	const u32 words = sizeof(pNorFS) / sizeof(u16);
+	const u32 words = sizeof(pNorFS) / (sizeof(u16));
 	
    for (u32 i = 0; i < words; i++)
        dst[i] = *(vu16*)(FlashBase_S98 + NOR_info_offset + i * 2);
@@ -393,9 +409,9 @@ u8 IWRAM_CODE Get_NOR_FAT_info(u32 offset)
 	return NOR_FAT_buffer[offset];
 }
 // --------------------------------------------------------------------
-void IWRAM_CODE Save_NOR_FAT_info(void)
+u8 IWRAM_CODE Save_NOR_FAT_info(void)
 {
-	Save_info_2_NOR(NOR_FAT_offset, NOR_FAT_buffer,NOR_FAT_SIZE);
+	return Save_info_2_NOR(NOR_FAT_offset, NOR_FAT_buffer,NOR_FAT_SIZE);
 }
 
 // --------------------------------------------------------------------

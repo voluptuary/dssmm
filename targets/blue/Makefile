@@ -24,7 +24,7 @@ include $(DEVKITARM)/gba_rules
 TARGET		:= ezbluekernel-development
 BUILD		:= build
 SOURCES		:= source source/ff15
-INCLUDES	:= include source/ff15
+INCLUDES	:= include source/ff15 ../../images
 DATA		:=
 MUSIC		:=
 
@@ -33,7 +33,7 @@ MUSIC		:=
 #---------------------------------------------------------------------------------
 ARCH	:=	-mthumb -mthumb-interwork
 
-CFLAGS	:=	-g -Wall -Os\
+CFLAGS	:=	-g -Wall -O -fomit-frame-pointer -ffast-math -ffunction-sections -fdata-sections\
 		-mcpu=arm7tdmi -mtune=arm7tdmi\
 		$(ARCH)
 
@@ -42,7 +42,8 @@ CFLAGS	+=	$(INCLUDE)
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-g $(ARCH) -Wl,-Map,$(notdir $*.map)
+LDFLAGS	=	-B$(DEPSDIR)/../layout/ -g $(ARCH) -Wl,-Map,$(notdir $*.map) \
+	-Wl,--gc-sections -Wl,--defsym,__sp_usr=0x0203F000 -Wl,--defsym,__eheap_end=0x0203C000
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
@@ -133,12 +134,16 @@ else
 
 $(OUTPUT).gba	:	$(OUTPUT).elf $(dir $(OUTPUT))../../scripts/pack-blue-kernel.py $(dir $(OUTPUT))Makefile
 	$(SILENTCMD)$(OBJCOPY) -O binary $< $@
-	$(SILENTCMD)gbafix $@
-	@python3 "$(dir $(OUTPUT))../../scripts/pack-blue-kernel.py" --check-code "$@"
+	$(SILENTCMD)gbafix $@ -tezbluekernel -c0000 -m00
+	@python3 "$(dir $(OUTPUT))../../scripts/check-blue-linked-layout.py" "$(@:.gba=.elf)"
 
 $(OUTPUT).elf	:	$(OFILES)
 
-$(OFILES_SOURCES) : $(HFILES)
+# Preserve the vendor hardware/bit-bang optimization policy; software/UI uses
+# the same production optimization flags as the current DSSMM donor.
+Ezcard_OP.o GBApatch.o NORflash_OP.o RTC.o diskio.o: CFLAGS += -Os
+
+$(OFILES_SOURCES) : $(HFILES) $(dir $(OUTPUT))Makefile
 
 #---------------------------------------------------------------------------------
 # The bin2o rule should be copied and modified
