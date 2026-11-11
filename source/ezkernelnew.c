@@ -467,28 +467,99 @@ u32 list_game_total;
    before any game or plug-in is loaded over PSRAM. */
 #define LAUNCHER_FILE_LIST_PSRAM_ADDRESS 0x08FF0000
 #define LAUNCHER_FILE_LIST_PSRAM_SIZE 0x10000
+#define LAUNCHER_FILE_DIRENT_INDEX_ADDRESS \
+	(LAUNCHER_FILE_LIST_PSRAM_ADDRESS + (sizeof(FM_FILE_FS) * MAX_files))
+#define LAUNCHER_FILE_DIRENT_INVALID 0xFFFFFFFFU
 typedef char LauncherFileListFitsPSRAM[
 	(sizeof(FM_FILE_FS) * MAX_files <= LAUNCHER_FILE_LIST_PSRAM_SIZE) ? 1 : -1];
+typedef char LauncherFileRecordUsesExpectedPSRAMBudget[
+	(sizeof(FM_FILE_FS) == 120) ? 1 : -1];
+typedef char LauncherFileAndDirentIndexesFitPSRAM[
+	((sizeof(FM_FILE_FS) + sizeof(u32)) * MAX_files <= LAUNCHER_FILE_LIST_PSRAM_SIZE) ? 1 : -1];
 #define pFilename_buffer ((FM_FILE_FS*)LAUNCHER_FILE_LIST_PSRAM_ADDRESS)
+#define pFilename_dirent_offset ((u32*)LAUNCHER_FILE_DIRENT_INDEX_ADDRESS)
 
 FM_NOR_FS pNorFS[MAX_NOR]EWRAM_BSS;
 FM_Folder_FS pFolder[MAX_folder]EWRAM_BSS;
 
 FM_FILE_FS pFilename_temp EWRAM_BSS;
 static FM_FILE_FS pFilename_sort_probe EWRAM_BSS;
+static FM_Folder_FS launcher_folder_sort_temp EWRAM_BSS;
 
 u32 FAT_table_buffer[FAT_table_size/4]EWRAM_BSS;
-u8 pReadCache [MAX_pReadCache_size]EWRAM_BSS;
+u8 pReadCache [MAX_pReadCache_size]EWRAM_BSS __attribute__((aligned(4)));
 
-static void Launcher_StoreFileRecord(u32 index, const TCHAR *filename, u32 filesize)
+static u32 Launcher_IsCP936LeadByte(u8 value)
+{
+	return value >= 0x81 && value <= 0xFE;
+}
+
+static void Launcher_CopyIndexedName(char *dst, u32 dst_size, const TCHAR *filename, u8 *flags)
+{
+	u32 source_length;
+	u32 copy_length;
+
+	if(!dst || dst_size == 0)
+		return;
+	dst[0] = '\0';
+	if(!filename)
+		return;
+
+	source_length = strlen(filename);
+	copy_length = (source_length < dst_size - 1) ? source_length : dst_size - 1;
+	if(source_length >= dst_size - 1 && flags)
+		*flags |= FM_ENTRY_ALIAS_DISPLAY;
+	/* FatFs exposes CP936 OEM bytes. Never leave half of a double-byte glyph
+	   at the end of the clipped display prefix. */
+	if(copy_length && Launcher_IsCP936LeadByte((u8)filename[copy_length - 1]))
+		copy_length--;
+	memcpy(dst, filename, copy_length);
+	dst[copy_length] = '\0';
+}
+
+static void Launcher_StoreFileRecord(u32 index, const TCHAR *filename, const TCHAR *altname, u32 filesize)
 {
 	if((index >= MAX_files) || !filename)
 		return;
 	memset(&pFilename_temp, 0x00, sizeof(pFilename_temp));
-	strncpy(pFilename_temp.filename, filename, sizeof(pFilename_temp.filename) - 1);
-	pFilename_temp.filename[sizeof(pFilename_temp.filename) - 1] = '\0';
+	Launcher_CopyIndexedName(pFilename_temp.filename, sizeof(pFilename_temp.filename), filename, &pFilename_temp.flags);
+	if(altname && altname[0])
+	{
+		strncpy(pFilename_temp.altname, altname, sizeof(pFilename_temp.altname) - 1);
+		pFilename_temp.altname[sizeof(pFilename_temp.altname) - 1] = '\0';
+	}
 	pFilename_temp.filesize = filesize;
 	dmaCopy(&pFilename_temp, &pFilename_buffer[index], sizeof(FM_FILE_FS));
+	pFilename_dirent_offset[index] = LAUNCHER_FILE_DIRENT_INVALID;
+}
+
+static const TCHAR *Launcher_FileIdentityName(const FM_FILE_FS *record)
+{
+	if(!record)
+		return "";
+	return record->altname[0] ? record->altname : record->filename;
+}
+
+static const TCHAR *Launcher_FolderIdentityName(const FM_Folder_FS *record)
+{
+	if(!record)
+		return "";
+	return record->altname[0] ? record->altname : record->filename;
+}
+
+static void Launcher_StoreFolderRecord(u32 index, const TCHAR *filename, const TCHAR *altname)
+{
+	FM_Folder_FS *record;
+	if(index >= MAX_folder || !filename)
+		return;
+	record = &pFolder[index];
+	memset(record, 0, sizeof(*record));
+	Launcher_CopyIndexedName(record->filename, sizeof(record->filename), filename, &record->flags);
+	if(altname && altname[0])
+	{
+		strncpy(record->altname, altname, sizeof(record->altname) - 1);
+		record->altname[sizeof(record->altname) - 1] = '\0';
+	}
 }
 
 static char (*Launcher_FavouritesBuffer(void))[LAUNCHER_FAVOURITE_PATH_LEN]
@@ -1912,7 +1983,6 @@ static void Launcher_DrawCurrentListArtImageOnly(void);
 static void Launcher_InvalidateListArtScaledCache(void);
 static void Launcher_DrawScrolledSDListBody(u32 show_offset, u32 file_select);
 static void Launcher_GetDisplayTitleBounded(const TCHAR *src, char *dst, u32 dst_size);
-static u32 Launcher_IsFavouritePathName(const TCHAR *path, const TCHAR *name);
 
 
 static void Launcher_GetListDisplayName(const TCHAR *src, char *dst, u32 dst_size)
@@ -1933,23 +2003,110 @@ static void Launcher_GetListDisplayName(const TCHAR *src, char *dst, u32 dst_siz
 	dst[dst_size - 1] = '\0';
 }
 
-static void Launcher_GetSDListDisplayNameWithFavourite(u32 file_index, char *out, u32 out_size)
+static void Launcher_BuildFullPath(const TCHAR *path, const TCHAR *name, char *out, u32 out_size);
+
+static void Launcher_JoinDisplaySuffix(char *out, u32 capacity, const char *prefix, const char *suffix)
 {
-	char clean_name[256];
-	TCHAR *src;
+    if(!out || !capacity) return;
+    u32 tail = strlen(suffix);
+    if(tail >= capacity) tail = capacity - 1;
+    u32 head = strlen(prefix);
+    if(head > capacity - tail - 1) head = capacity - tail - 1;
+    memcpy(out, prefix, head);
+    memcpy(out + head, suffix, tail);
+    out[head + tail] = 0;
+}
+
+static void Launcher_FormatIndexedDisplayName(const TCHAR *display_name, const TCHAR *alias,
+	u8 flags, u32 max_glyphs, u32 row_index, u32 favourite, char *out, u32 out_size)
+{
+	char suffix[24];
+	char prefix[256];
+	char source_prefix[256];
+	u32 suffix_glyphs;
+	u32 prefix_glyphs;
+	u32 visible_length;
 
 	if(!out || out_size == 0)
 		return;
 	out[0] = '\0';
-	if(file_index >= game_total_SD)
+	if(!display_name)
 		return;
+	if(max_glyphs == 0)
+		max_glyphs = 40;
+	Launcher_GetListDisplayName(display_name, prefix, sizeof(prefix));
+	if(!(flags & FM_ENTRY_ALIAS_DISPLAY))
+	{
+		if(favourite)
+			Launcher_JoinDisplaySuffix(out, out_size, prefix, " <3");
+		else
+			snprintf(out, out_size, "%s", prefix);
+		return;
+	}
 
-	src = pFilename_buffer[file_index].filename;
-	Launcher_GetListDisplayName(src, clean_name, sizeof(clean_name));
-	if(Launcher_IsFavouritePathName(currentpath, src))
-		snprintf(out, out_size, "%s <3", clean_name);
+	if(favourite)
+		snprintf(suffix, sizeof(suffix), " [%s] <3", alias ? alias : "");
 	else
-		snprintf(out, out_size, "%s", clean_name);
+		snprintf(suffix, sizeof(suffix), " [%s]", alias ? alias : "");
+	suffix_glyphs = DrawText12VisibleLength(suffix);
+	visible_length = DrawText12VisibleLength(prefix);
+	if(visible_length + suffix_glyphs <= max_glyphs)
+	{
+		Launcher_JoinDisplaySuffix(out, out_size, prefix, suffix);
+		return;
+	}
+
+	if(suffix_glyphs < max_glyphs)
+	{
+		prefix_glyphs = max_glyphs - suffix_glyphs;
+		strncpy(source_prefix, prefix, sizeof(source_prefix) - 1);
+		source_prefix[sizeof(source_prefix) - 1] = '\0';
+		DrawText12CopyVisible(prefix, sizeof(prefix), source_prefix, (u16)prefix_glyphs);
+		Launcher_JoinDisplaySuffix(out, out_size, prefix, suffix);
+		return;
+	}
+
+	/* Very narrow list-art rows cannot fit an 8.3 name. A per-view row number
+	   still lets the user distinguish clipped entries without exposing a
+	   potentially colliding LFN prefix as if it were unique. */
+	snprintf(suffix, sizeof(suffix), "#%lu", (unsigned long)(row_index + 1));
+	suffix_glyphs = DrawText12VisibleLength(suffix);
+	if(suffix_glyphs > max_glyphs)
+	{
+		DrawText12CopyVisible(out, (u16)out_size, suffix, (u16)max_glyphs);
+		return;
+	}
+	prefix_glyphs = max_glyphs - suffix_glyphs;
+	strncpy(source_prefix, prefix, sizeof(source_prefix) - 1);
+	source_prefix[sizeof(source_prefix) - 1] = '\0';
+	DrawText12CopyVisible(prefix, sizeof(prefix), source_prefix, (u16)prefix_glyphs);
+	Launcher_JoinDisplaySuffix(out, out_size, prefix, suffix);
+}
+
+static void Launcher_GetFolderListDisplayName(u32 folder_index, u32 max_glyphs, char *out, u32 out_size)
+{
+	const FM_Folder_FS *record;
+	if(!out || out_size == 0)
+		return;
+	out[0] = '\0';
+	if(folder_index >= folder_total)
+		return;
+	record = &pFolder[folder_index];
+	Launcher_FormatIndexedDisplayName(record->filename, Launcher_FolderIdentityName(record),
+		record->flags, max_glyphs, folder_index, 0, out, out_size);
+}
+
+static void Launcher_GetSDListDisplayNameWithFavourite(u32 file_index, char *out, u32 out_size)
+{
+    char full[512];
+    if(!out || !out_size) return;
+    out[0] = 0;
+    if(file_index >= game_total_SD) return;
+    const FM_FILE_FS *record = &pFilename_buffer[file_index];
+    Launcher_BuildFullPath(currentpath, Launcher_FileIdentityName(record), full, sizeof(full));
+    u32 favourite = full[0] && Launcher_FindFavouriteFullPath(full) >= 0;
+    Launcher_FormatIndexedDisplayName(record->filename, Launcher_FileIdentityName(record),
+        record->flags, 32, file_index, favourite, out, out_size);
 }
 
 static u32 Launcher_ListArtRowIntersects(u32 line)
@@ -2274,7 +2431,7 @@ void Show_ICON_filename_SD(u32 show_offset,u32 file_select,u32 haveThumbnail)
 
 		{
 			char list_name[256];
-			Launcher_GetListDisplayName(pFolder[show_offset+line].filename, list_name, sizeof(list_name));
+			Launcher_GetFolderListDisplayName(show_offset+line, 32, list_name, sizeof(list_name));
 			DrawHZText12(list_name, char_num, 1+16, y_offset + line*14, row_color,1);
 		}
 
@@ -2290,7 +2447,7 @@ void Show_ICON_filename_SD(u32 show_offset,u32 file_select,u32 haveThumbnail)
 
 
 	u32 offset=0;
-	TCHAR *pfilename;
+	const TCHAR *pfilename;
 	if(show_offset >= folder_total)
 		offset = show_offset - folder_total;
 
@@ -2305,7 +2462,7 @@ void Show_ICON_filename_SD(u32 show_offset,u32 file_select,u32 haveThumbnail)
 		}
 
 		u32 showy = y_offset +(line)*14;
-		pfilename = pFilename_buffer[offset+line-need_show_folder].filename;
+		pfilename = Launcher_FileIdentityName(&pFilename_buffer[offset+line-need_show_folder]);
 		u16* icon = (u16*)Launcher_GetFileIcon(pfilename);
 		DrawPic(icon,
 			0,
@@ -2504,7 +2661,7 @@ static void Launcher_BuildSDListRowBufferState(u16 *row_buffer, u32 show_offset,
 		Launcher_DrawListRowIcon(row_buffer, (const u16*)gImage_icon_folder);
 		{
 			char list_name[256];
-			Launcher_GetListDisplayName(pFolder[absolute_index].filename, list_name, sizeof(list_name));
+			Launcher_GetFolderListDisplayName(absolute_index, 32, list_name, sizeof(list_name));
 			DrawHZText12ToBuffer(list_name, char_num, 17, 0, row_color, row_buffer);
 		}
 		if(Launcher_ShowListMetaForRow(haveThumbnail, line, selected))
@@ -2513,7 +2670,7 @@ static void Launcher_BuildSDListRowBufferState(u16 *row_buffer, u32 show_offset,
 	else
 	{
 		u32 file_index = absolute_index - folder_total;
-		TCHAR *pfilename = pFilename_buffer[file_index].filename;
+		const TCHAR *pfilename = Launcher_FileIdentityName(&pFilename_buffer[file_index]);
 		char fav_name[256];
 
 		Launcher_DrawListRowIcon(row_buffer, (const u16*)Launcher_GetFileIcon(pfilename));
@@ -3215,7 +3372,7 @@ void IWRAM_CODE Refresh_filename(u32 show_offset,u32 file_select,u32 updown,u32 
 
 	if((file_select == (need_show_folder-1)) && (updown ==3))
 	{
-		{ char list_name1[256]; Launcher_GetListDisplayName(pFolder[show_offset+xx1].filename, list_name1, sizeof(list_name1)); DrawHZText12(list_name1, char_num1, 1+16, showy1, name_color1,1); }
+		{ char list_name1[256]; Launcher_GetFolderListDisplayName(show_offset+xx1, 32, list_name1, sizeof(list_name1)); DrawHZText12(list_name1, char_num1, 1+16, showy1, name_color1,1); }
 		{ char fav_name2[256]; Launcher_GetSDListDisplayNameWithFavourite(0, fav_name2, sizeof(fav_name2)); DrawHZText12(fav_name2, char_num2, 1+16, showy2, name_color2,1); }
 
 		if(!launcher_clean_list && char_num1==32){
@@ -3229,8 +3386,8 @@ void IWRAM_CODE Refresh_filename(u32 show_offset,u32 file_select,u32 updown,u32 
 	}
 	else if(file_select < need_show_folder)
 	{
-		{ char list_name1[256]; Launcher_GetListDisplayName(pFolder[show_offset+xx1].filename, list_name1, sizeof(list_name1)); DrawHZText12(list_name1, char_num1, 1+16, showy1, name_color1,1); }
-		{ char list_name2[256]; Launcher_GetListDisplayName(pFolder[show_offset+xx2].filename, list_name2, sizeof(list_name2)); DrawHZText12(list_name2, char_num2, 1+16, showy2, name_color2,1); }
+		{ char list_name1[256]; Launcher_GetFolderListDisplayName(show_offset+xx1, 32, list_name1, sizeof(list_name1)); DrawHZText12(list_name1, char_num1, 1+16, showy1, name_color1,1); }
+		{ char list_name2[256]; Launcher_GetFolderListDisplayName(show_offset+xx2, 32, list_name2, sizeof(list_name2)); DrawHZText12(list_name2, char_num2, 1+16, showy2, name_color2,1); }
 
 		sprintf(msg,"%s","DIR");
 		if(!launcher_clean_list && char_num1==32){
@@ -3242,7 +3399,7 @@ void IWRAM_CODE Refresh_filename(u32 show_offset,u32 file_select,u32 updown,u32 
 	}
 	else if((file_select == need_show_folder)&& (updown ==2))
 	{
-		{ char list_name1[256]; Launcher_GetListDisplayName(pFolder[show_offset+xx1].filename, list_name1, sizeof(list_name1)); DrawHZText12(list_name1, char_num1, 1+16, showy1, name_color1,1); }
+		{ char list_name1[256]; Launcher_GetFolderListDisplayName(show_offset+xx1, 32, list_name1, sizeof(list_name1)); DrawHZText12(list_name1, char_num1, 1+16, showy1, name_color1,1); }
 		{ char fav_name2[256]; Launcher_GetSDListDisplayNameWithFavourite(0, fav_name2, sizeof(fav_name2)); DrawHZText12(fav_name2, char_num2, 1+16, showy2, name_color2,1); }
 
 		if(!launcher_clean_list && char_num1==32){
@@ -3520,7 +3677,7 @@ void Filename_loop(u32 shift,u32 show_offset,u32 file_select,u32 haveThumbnail)
 		{
 			u32 absolute_index = Launcher_ResolveListEntryIndex(show_offset + file_select);
 			if(absolute_index < folder_total)
-				Launcher_GetListDisplayName(pFolder[absolute_index].filename, temp_filename, sizeof(temp_filename));
+				Launcher_GetFolderListDisplayName(absolute_index, 32, temp_filename, sizeof(temp_filename));
 			else
 				Launcher_GetSDListDisplayNameWithFavourite(absolute_index - folder_total, temp_filename, sizeof(temp_filename));
 		}
@@ -4051,12 +4208,7 @@ static s32 Launcher_FindFavouriteFullPath(const char *fullpath)
 	return -1;
 }
 
-static u32 Launcher_IsFavouritePathName(const TCHAR *path, const TCHAR *name)
-{
-	char full[512];
-	Launcher_BuildFullPath(path, name, full, sizeof(full));
-	return Launcher_FindFavouriteFullPath(full) >= 0;
-}
+
 
 static u32 Launcher_IsLaunchableFilename(const TCHAR *name)
 {
@@ -4078,13 +4230,13 @@ static u32 Launcher_IsGameFilename(const TCHAR *name)
 
 static u32 Launcher_GetSDFileFullPath(u32 absolute_index, char *out, u32 out_size)
 {
-	TCHAR *name;
+	const TCHAR *name;
 	if(!out || out_size == 0)
 		return 0;
 	out[0] = '\0';
 	if((absolute_index < folder_total) || (absolute_index >= folder_total + game_total_SD))
 		return 0;
-	name = pFilename_buffer[absolute_index - folder_total].filename;
+	name = Launcher_FileIdentityName(&pFilename_buffer[absolute_index - folder_total]);
 	Launcher_BuildFullPath(currentpath, name, out, out_size);
 	return out[0] != '\0';
 }
@@ -4542,7 +4694,7 @@ static u32 Build_favourites_virtual_list(void)
 		}
 		else
 			size = 0;
-		Launcher_StoreFileRecord(count, name, size);
+		Launcher_StoreFileRecord(count, name, 0, size);
 		count++;
 	}
 	return count;
@@ -4584,7 +4736,7 @@ static u32 Build_recent_virtual_list(void)
 			}
 			else
 				size = 0;
-			Launcher_StoreFileRecord(i, name, size);
+			Launcher_StoreFileRecord(i, name, 0, size);
 		}
 	}
 	return count;
@@ -5798,12 +5950,14 @@ void Sort_folder(u32 folder_total)
 		{
 			for(i=0;i<folder_total-ret-1;i++)
 			{
-				get = strcmp(pFolder[i].filename,pFolder[i+1].filename) ;
+				get = strcmp(pFolder[i].filename,pFolder[i+1].filename);
+				if(get == 0)
+					get = strcmp(pFolder[i].altname,pFolder[i+1].altname);
 				if(get>0)
 				{
-					dmaCopy(&pFolder[i+1],&(pFilename_temp.filename),sizeof(FM_Folder_FS));
+					dmaCopy(&pFolder[i+1],&launcher_folder_sort_temp,sizeof(FM_Folder_FS));
 					dmaCopy(&pFolder[i],&pFolder[i+1],sizeof(FM_Folder_FS));
-					dmaCopy(&(pFilename_temp.filename),&pFolder[i],sizeof(FM_Folder_FS));
+					dmaCopy(&launcher_folder_sort_temp,&pFolder[i],sizeof(FM_Folder_FS));
 				}
 			}
 		}
@@ -5823,15 +5977,23 @@ void Sort_file(u32 game_total_SD)
 	{
 		for(i = gap; i < game_total_SD; i++)
 		{
+			u32 dirent_offset = pFilename_dirent_offset[i];
 			dmaCopy(&pFilename_buffer[i], &pFilename_temp, sizeof(FM_FILE_FS));
 			for(j = i; j >= gap; j -= gap)
 			{
 				dmaCopy(&pFilename_buffer[j - gap], &pFilename_sort_probe, sizeof(FM_FILE_FS));
-				if(strcmp(pFilename_sort_probe.filename, pFilename_temp.filename) <= 0)
+				if(strcmp(pFilename_sort_probe.filename, pFilename_temp.filename) == 0)
+				{
+					if(strcmp(pFilename_sort_probe.altname, pFilename_temp.altname) <= 0)
+						break;
+				}
+				else if(strcmp(pFilename_sort_probe.filename, pFilename_temp.filename) < 0)
 					break;
 				dmaCopy(&pFilename_sort_probe, &pFilename_buffer[j], sizeof(FM_FILE_FS));
+				pFilename_dirent_offset[j] = pFilename_dirent_offset[j - gap];
 			}
 			dmaCopy(&pFilename_temp, &pFilename_buffer[j], sizeof(FM_FILE_FS));
+			pFilename_dirent_offset[j] = dirent_offset;
 		}
 	}
 }
@@ -6168,24 +6330,29 @@ static void Launcher_CustomThumbFileName(const char *filename, char *name, u32 n
 		*dot = '\0';
 }
 
-static u32 Launcher_LoadThumbnailFromRomHeader(TCHAR *filename, u8 *dst)
+static u32 Launcher_LoadThumbnailFromRomHeader(const TCHAR *filename, u8 *dst)
 {
-	u32 rett;
-	u32 res;
-
-	if(!filename || !dst)
-		return 0;
-
-	res = f_open(&gfile, filename, FA_READ);
-	if(res != FR_OK)
-		return 0;
-	f_lseek(&gfile, 0xAC);
-	res = Launcher_ReadThumbnailBytes(&gfile, GAMECODE, 4, (UINT *)&rett);
-	f_close(&gfile);
-	if((res != FR_OK) || (rett != 4))
-		return 0;
-
-	return Launcher_LoadThumbnailByGameCode(GAMECODE, dst);
+    u32 result = FR_NO_FILE;
+    UINT received = 0;
+    if(!filename || !dst) return 0;
+    uintptr_t pointer = (uintptr_t)filename;
+    uintptr_t base = (uintptr_t)pFilename_buffer;
+    if(!recents_view_active && !Launcher_IsNORPage() &&
+       pointer >= base && pointer - base < sizeof(FM_FILE_FS) * game_total_SD) {
+        u32 index = (pointer - base) / sizeof(FM_FILE_FS);
+        const FM_FILE_FS *record = &pFilename_buffer[index];
+        if(filename == Launcher_FileIdentityName(record) &&
+           pFilename_dirent_offset[index] != LAUNCHER_FILE_DIRENT_INVALID)
+            result = f_open_by_dirent(&gfile, currentpath, pFilename_dirent_offset[index],
+                Launcher_FileIdentityName(record), record->filesize);
+    }
+    if(result != FR_OK) result = f_open(&gfile, filename, FA_READ);
+    if(result != FR_OK) return 0;
+    result = f_lseek(&gfile, 0xAC);
+    if(result == FR_OK) result = Launcher_ReadThumbnailBytes(&gfile, GAMECODE, 4, &received);
+    u32 closed = f_close(&gfile);
+    if(result != FR_OK || closed != FR_OK || received != 4 || !Launcher_IsValidGameCodeBytes(GAMECODE)) return 0;
+    return Launcher_LoadThumbnailByGameCode(GAMECODE, dst);
 }
 
 typedef struct {
@@ -6444,7 +6611,8 @@ static int Launcher_SplitTitle(const char *title, char lines[3][32])
 
 typedef struct
 {
-	TCHAR *name;
+	const TCHAR *name;
+	const TCHAR *identity;
 	u32 is_folder;
 	u32 has_thumbnail;
 	u8 *thumb_data;
@@ -7364,12 +7532,15 @@ static void Launcher_UpdateEffectiveViewMode(void)
 	launcher_effective_show_thumbnail = gl_show_Thumbnail;
 	if((launcher_active_page == SD_list) && launcher_list_folders && !recents_view_active &&
 	gl_show_Thumbnail && (gl_show_Thumbnail != LAUNCHER_VIEW_LIST_ART) &&
-	(launcher_sd_launchable_file_count == 0))
+	(launcher_sd_launchable_file_count == 0)) {
 		launcher_effective_show_thumbnail = LAUNCHER_VIEW_LIST;
+	}
+
     if(launcher_active_page == SD_list && !recents_view_active &&
        !strncasecmp(currentpath, "/SYSTEM", 7) &&
-       (!currentpath[7] || currentpath[7] == '/'))
+       (!currentpath[7] || currentpath[7] == '/')) {
         launcher_effective_show_thumbnail = LAUNCHER_VIEW_LIST;
+    }
 	if(old_view != launcher_effective_show_thumbnail)
 		launcher_force_full_redraw = 1;
 }
@@ -7805,6 +7976,7 @@ static void Launcher_GetEntryInfo(u32 absolute_index, LauncherEntryInfo *info)
 	if(absolute_index < folder_total)
 	{
 		info->name = pFolder[absolute_index].filename;
+		info->identity = Launcher_FolderIdentityName(&pFolder[absolute_index]);
 		info->is_folder = 1;
 		return;
 	}
@@ -7814,6 +7986,7 @@ static void Launcher_GetEntryInfo(u32 absolute_index, LauncherEntryInfo *info)
 		return;
 
 	info->name = pFilename_buffer[file_index].filename;
+	info->identity = Launcher_FileIdentityName(&pFilename_buffer[file_index]);
 }
 
 static void Launcher_InvalidateThumbCacheEntries(void)
@@ -7855,7 +8028,7 @@ static void Launcher_ActivateThumbnailWorkspace(u32 mode)
 
 static u32 Launcher_LoadThumbDataForIndex(u32 absolute_index, u8 *thumb_data)
 {
-	TCHAR *name = 0;
+	const TCHAR *name = 0;
 	TCHAR custom_name[104];
 	u32 virtual_index = 0;
 	u32 total_entries = Launcher_GetTotalEntries();
@@ -7886,7 +8059,7 @@ static u32 Launcher_LoadThumbDataForIndex(u32 absolute_index, u8 *thumb_data)
 
 	if(absolute_index < folder_total)
 	{
-		name = pFolder[absolute_index].filename;
+		name = Launcher_FolderIdentityName(&pFolder[absolute_index]);
 		if(name)
 			has_thumbnail = Launcher_LoadCustomThumbnailByName(name, thumb_data - LAUNCHER_THUMB_BMP_HEADER);
 		return has_thumbnail;
@@ -7898,7 +8071,7 @@ static u32 Launcher_LoadThumbDataForIndex(u32 absolute_index, u8 *thumb_data)
 		name = p_recently_play[absolute_index - folder_total];
 	}
 	else
-		name = pFilename_buffer[absolute_index - folder_total].filename;
+		name = Launcher_FileIdentityName(&pFilename_buffer[absolute_index - folder_total]);
 	if(name)
 	{
 		u32 len = strlen(name);
@@ -7959,7 +8132,7 @@ static u32 Launcher_ShouldUsePreviewPanel(const LauncherEntryInfo *info)
 		return 0;
 	if(info->is_folder)
 		return 0;
-	return Launcher_IsGBAFile(info->name);
+	return Launcher_IsGBAFile(info->identity ? info->identity : info->name);
 }
 
 static const u16 *Launcher_GetPreviewSourceForEntry(const LauncherEntryInfo *info)
@@ -8562,8 +8735,9 @@ static void Launcher_ShiftThumbCache(int move, u32 new_center_index)
 
 static u32 Launcher_ThumbNavRepeatDelay(void)
 {
-    if(launcher_carousel_animations)
+    if(launcher_carousel_animations) {
         return (!launcher_cache_selected.valid || !launcher_cache_selected.has_thumbnail) ? 2 : 0;
+    }
 	u32 total;
 	u32 incomplete_triplet;
 
@@ -9140,7 +9314,7 @@ u32 SD_list_L_START(u32 show_offset,u32 file_select,u32 folder_total)
 
 	char *msg1 = "Delete this file?"; int x1 = (240 - strlen(msg1) * 6) / 2;
 	DrawHZText12(msg1, 0, x1, 66, gl_color_text, 1);
-	DrawHZText12( pFilename_buffer[show_offset + file_select - folder_total].filename, 20, 60, 84, gl_color_text, 1 );
+	DrawHZText12((char *) Launcher_FileIdentityName(&pFilename_buffer[show_offset + file_select - folder_total]), 20, 60, 84, gl_color_text, 1 );
 
 	while(1){
 		VBlankIntrWait();
@@ -9149,8 +9323,8 @@ u32 SD_list_L_START(u32 show_offset,u32 file_select,u32 folder_total)
 		UIAudio_HandleKeysEx(keysdown, 0, 0, 0);
 		if (keysdown & KEY_A) {
 			UIAudio_PlayAccept();
-			TCHAR *pdelfilename;
-			pdelfilename = pFilename_buffer[show_offset+file_select-folder_total].filename;
+			const TCHAR *pdelfilename;
+			pdelfilename = Launcher_FileIdentityName(&pFilename_buffer[show_offset+file_select-folder_total]);
 			/*res = */f_unlink(pdelfilename);
 			launcher_force_full_redraw = 1;
 			return 1;
@@ -9606,7 +9780,7 @@ static u32 Apply_last_played_selection(u32 *show_offset, u32 *file_select)
 		return 0;
 	for(i = 0; i < game_total_SD; i++)
 	{
-		if(strcmp(pFilename_buffer[i].filename, current_filename) == 0)
+		if(strcmp(Launcher_FileIdentityName(&pFilename_buffer[i]), current_filename) == 0)
 		{
 			absolute_index = folder_total + i;
 			if(absolute_index < 10)
@@ -10697,7 +10871,7 @@ static u32 Launcher_LoadStyleList(void)
             continue;
         if(!Is_bin_file(fileinfo.fname))
             continue;
-        Launcher_StoreFileRecord(count, fileinfo.fname, fileinfo.fsize);
+        Launcher_StoreFileRecord(count, fileinfo.fname, fileinfo.altname, fileinfo.fsize);
         count++;
     }
     f_closedir(&dir);
@@ -10744,7 +10918,7 @@ static void Launcher_StyleGetLine(u32 item, char *out, u32 out_size)
     if(item >= MAX_files)
         return;
 
-    Launcher_StyleDisplayName(pFilename_buffer[item].filename, out, out_size);
+    Launcher_StyleDisplayName(Launcher_FileIdentityName(&pFilename_buffer[item]), out, out_size);
 }
 
 static void Launcher_WaitForPopupButton(void)
@@ -10885,7 +11059,7 @@ static void Launcher_LoadStylePopup(void)
         else if(keysdown & KEY_A)
         {
             UIAudio_PlayAccept();
-            if(Launcher_PrepareStyleKernel(pFilename_buffer[selected].filename))
+            if(Launcher_PrepareStyleKernel(Launcher_FileIdentityName(&pFilename_buffer[selected])))
                 return;
             Launcher_SettingsDrawPopupEx(DSTEXT_SETTINGS_LOAD_STYLE, total, selected, top, Launcher_StyleGetLine, 45);
         }
@@ -14610,7 +14784,8 @@ refind_file:
 			{
 				while(1)
 				{
-					res = f_readdir(&dir, &fileinfo);                   //read next
+					DWORD entry_offset = LAUNCHER_FILE_DIRENT_INVALID;
+					res = f_readdir_with_offset(&dir, &fileinfo, &entry_offset); // read next
 					//DEBUG_printf("=%x %s %x %x",res, fileinfo.fname,fileinfo.fname[0],fileinfo.fattrib);
 					//wait_btn();
 					if (res != FR_OK || fileinfo.fname[0] == 0) break;
@@ -14621,14 +14796,14 @@ refind_file:
 					{
 						if ( folder_total >= MAX_folder )//cut
 							continue;
-						memcpy(pFolder[folder_total].filename,fileinfo.fname,100);
-						pFolder[folder_total++].filename[99] = 0;
+						Launcher_StoreFolderRecord(folder_total++, fileinfo.fname, fileinfo.altname);
 					}
 					else if(	(fileinfo.fattrib == AM_ARC) || (fileinfo.fattrib == 0x21) )
 					{
 						if ( game_total_SD >= MAX_files )//cut
 							continue;
-						Launcher_StoreFileRecord(game_total_SD, fileinfo.fname, fileinfo.fsize);
+						Launcher_StoreFileRecord(game_total_SD, fileinfo.fname, fileinfo.altname, fileinfo.fsize);
+						pFilename_dirent_offset[game_total_SD] = entry_offset;
 						if(launcher_list_folders && (launcher_sd_launchable_file_count == 0) &&
 						Launcher_IsGameFilename(fileinfo.fname))
 							launcher_sd_launchable_file_count = 1;
@@ -15387,7 +15562,7 @@ re_showfile:
 					select_tap_timer = 0;
 					launcher_select_release_cooldown = 20;
 					if((page_num == SD_list) && !recents_view_active && (selected_index >= folder_total) &&
-					Launcher_IsLaunchableFilename(pFilename_buffer[selected_index - folder_total].filename))
+					Launcher_IsLaunchableFilename(Launcher_FileIdentityName(&pFilename_buffer[selected_index - folder_total])))
 					{
 						p_folder_select_show_offset[folder_select] = show_offset;
 						p_folder_select_file_select[folder_select] = file_select;
@@ -16103,9 +16278,9 @@ re_showfile:
 						TCHAR nextpath[MAX_path_len + 200];
 						int path_length;
 						if(strcmp(currentpath,"/") !=0)
-							path_length = snprintf(nextpath, sizeof(nextpath), "%s/%s", currentpath, pFolder[selected_index].filename);
+							path_length = snprintf(nextpath, sizeof(nextpath), "%s/%s", currentpath, Launcher_FolderIdentityName(&pFolder[selected_index]));
 						else
-							path_length = snprintf(nextpath, sizeof(nextpath), "/%s", pFolder[selected_index].filename);
+							path_length = snprintf(nextpath, sizeof(nextpath), "/%s", Launcher_FolderIdentityName(&pFolder[selected_index]));
 						if(path_length < 0 || (size_t)path_length >= sizeof(currentpath)){
 							error_num = 0;
 							Show_error_num(error_num);
@@ -16575,7 +16750,7 @@ u8 SD_list_MENU(u32 show_offset,	u32 file_select,u32 play_re )
 		   ((absolute_index - folder_total) >= game_total_SD))
 			return 0;
 		strncpy(current_filename,
-			pFilename_buffer[absolute_index - folder_total].filename,
+			Launcher_FileIdentityName(&pFilename_buffer[absolute_index - folder_total]),
 			sizeof(current_filename) - 1);
 		current_filename[sizeof(current_filename) - 1] = '\0';
 		pfilename = current_filename;

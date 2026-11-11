@@ -13,6 +13,8 @@ bash scripts/test-omega-nor-load-host.sh
 bash scripts/test-omega-nor-progress-host.sh
 bash scripts/test-nor-background-host.sh
 bash scripts/test-psram-load-policy.sh
+python3 tests/test-omega-index.py
+bash scripts/test-fatfs-long-name-host.sh
 bash scripts/test-omega-artwork-host.sh
 bash scripts/test-omega-transparency-host.sh
 make BUILD=build-omega TARGET=omega-port

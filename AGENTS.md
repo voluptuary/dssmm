@@ -6,7 +6,7 @@ may retain its original local directory name after the repository rename.
 The primary and GitHub default branch is `ezfode`. The owner completed the
 rename through GitHub; remote `main` no longer exists. Do not recreate it.
 `ezfomega` is the active Original Omega backport branch, resumed by the owner.
-Use its target plan and original-hardware baseline. `ezfblue` remains preparation only.
+Use its target plan and original-hardware baseline. `ezfblue` has published hardware-untested v8.3.1-blue-test1.
 Do not copy DE flash/save/reset protocols into the Original Omega port.
 Keep ezfomega isolated from ezfode. Record suspected ezfode defects with evidence
 as deferred review items; do not fix them on ezfode during this port.
@@ -14,8 +14,9 @@ Use automatic GitHub source archives; do not upload separate source ZIPs.
 Original Omega hardware is unavailable: validation is source/build/host only.
 On ezfomega use scripts/verify-omega-port.sh; do not treat DE tests or hardware
 reports as validation of this port. Do not publish it as hardware-qualified.
-The owner authorized v8.3.1-omega-test1 as an explicitly hardware-untested
-prerelease. Keep DE v8.3.1 latest; this does not authorize a stable Omega release.
+The owner authorizes remaining compatible Omega backports and a new explicitly
+hardware-untested prerelease if changed, followed by a three-branch adversarial
+audit. Only that subsequent audit may apply narrow validated fixes on ezfode. Keep DE v8.3.1 latest; this does not authorize a stable Omega release.
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
 ran ahead of this repository's build number. In particular, its v8.4.1 release

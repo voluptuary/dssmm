@@ -1,5 +1,30 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 12:12 UTC — Omega indexed identities validated
+
+- Fresh full scripts/verify-omega-port.sh passed end to end: cheat/save fault injection, patch/trim/NOR mocks, compressed background, native load policy, indexed-record/fast-open regression, real FatFs long-name scenarios, artwork paths, 766,800 renderer comparisons, build/size/layout. Final image2,045,344 bytes (51,808 below2 MiB); EWRAM heap19,936, IWRAM-to-user-SP gap8,208. No hardware results.
+- Preserved Original Omega FatFs scratch placement in EWRAM through a host-neutral OMEGA_FATFS_SCRATCH annotation; shared ff import had otherwise moved1,120 bytes to IWRAM. Kernel/runtime code unchanged by that placement correction. Final compiler rebuild completed; current diff passes whitespace check.
+- Committing this indexed identity/fast-open milestone on ezfomega only, then proceeding to settings parity and SD-only NOR art records. Keep target protocols, catalog layout and stable DE release unchanged. No new Omega release yet.
+
+## 2026-11-11 12:11 UTC — Usage-limit recovery, Omega index validation resumed
+
+- Reconciled active ezfomega439289b with surviving uncommitted indexed-identity/FatFs changes. Temporary logs/build evidence from the interrupted run are unavailable; do not infer the final aggregate passed. AGENTS/HANDOFF/PROGRESS read and current working tree preserved. BLUE test1 is already published; no DE changes in this port.
+- Latest source includes display/identity separation, O(1) fast-open record identification, bounded display suffix assembly and test-policy headers. Fixed remaining misleading-indentation diagnostic using braces without changing SYSTEM list behavior.
+- Next: fresh full scripts/verify-omega-port.sh, inspect compiler/layout/diff results and checkpoint this milestone; then remaining compatible settings/artwork/NOR sidecars and test2. Subsequent three-branch audit remains outstanding.
+
+## 2026-11-11 05:16 UTC — Omega indexed-identity implementation checkpoint (uncommitted)
+
+- Added 120-byte browser file records with independent SFN alias/flags, paired dirent-offset pool within final 64 KiB PSRAM, and matching folder aliases. Directory enumeration uses f_readdir_with_offset; sorting moves offsets with records via EWRAM staging. Filesystem operations use identity aliases; carousel display names remain distinct. Header-art opens derive the indexed record in O(1), validate via f_open_by_dirent, and fall back to ordinary lookup. Hardware diskio/cartridge/reset sources unchanged.
+- Imported pure ff.c/ff.h helper changes from pinned DE5f700c9 (not diskio) and shared path/indexed-name policy headers needed by actual-FatFs tests. New tests/test-omega-index.py passes 512-record paired sorting, clipped/SFN identity, DMA staging and fast-open/fallback/seek/read/close failure cases under sanitizers. Artwork fallback regression passes; real FatFs long-name/indexed-name scenarios pass. Initial missing test-policy headers were copied; earlier aggregate attempt stopped for that dependency, not a product failure.
+- Integration build passed at 2,045,280 bytes before final display/const/diagnostic cleanup; EWRAM heap21,056 and IWRAM-to-user-SP gap7,088 (static only). Final incremental build and full verifier are running; check /tmp/omega-index-build.log and /tmp/omega-index-verify.log, rerun affected focused tests after final edits. Do not publish or call complete yet.
+- Next: finish and commit validated index milestone, then compatible settings scope/readers and NOR SD artwork sidecars; revisit cache/custom-only artwork parity. BLUE published/pushed db3db27; DE untouched. Bring BLUE deferred queue entries into later cross-branch audit without merging hardware.
+
+## 2026-11-11 05:10 UTC — Omega continuation after BLUE Test 1
+
+- Switched cleanly from pushed BLUE db3db27 to Omega439289b. BLUE v8.3.1-blue-test1 published/asset verified; stable DE remains5f700c9 and v8.3.1 latest. No hardware for either port. Re-read Omega operational state and feature inventory; remaining work is indexed identities/fast-open, opaque header rendering, settings behavior and SD-only NOR art paths.
+- Begin with bounded indexed identity/FatFs and artwork acceleration backports against Original Omega layout. Preserve its hardware source/protocols, 32 MiB game limit and 2 MiB kernel ceiling. Reuse current DE pure filesystem/UI code only with production-path tests; do not replace whole frontend or import BLUE hardware. Final cross-platform audit queue from BLUE will follow port milestones.
+- Current source unchanged; documentation checkpoint only. Next: integrate/test indexed filename aliases+offset sorting and opaque/header art paths, measure size/RAM, then finish compatible settings/sidecars and publish test2 if validated.
+
 ## 2026-11-10 20:32 UTC — Original Omega Test 1 published and verified
 
 - Published https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test1 as a public prerelease, not latest. Annotated tag points to 60a4f4e, a documentation-only descendant of validated code 33e733a. Only uploaded asset is ezkernel.bin (2,044,264 bytes); GitHub supplies automatic source archives.

@@ -20,7 +20,14 @@
 
 
 #include <string.h>
+
+/* Keep Original OMEGA directory scratch in EWRAM; host tests need no GBA headers. */
+#ifdef __arm__
 #include <gba_base.h>
+#define OMEGA_FATFS_SCRATCH EWRAM_BSS
+#else
+#define OMEGA_FATFS_SCRATCH
+#endif
 #include "ff.h"			/* Declarations of FatFs API */
 #include "diskio.h"		/* Declarations of device I/O functions */
 
@@ -519,9 +526,9 @@ static const BYTE LfnOfs[] = {1,3,5,7,9,14,16,18,20,22,24,28,30};	/* FAT: Offset
 
 #if FF_USE_LFN == 1		/* LFN enabled with static working buffer */
 #if FF_FS_EXFAT
-static BYTE	DirBuf[MAXDIRB(FF_MAX_LFN)] EWRAM_BSS;	/* Directory entry block scratchpad buffer */
+static BYTE	DirBuf[MAXDIRB(FF_MAX_LFN)] OMEGA_FATFS_SCRATCH;	/* Directory entry block scratchpad buffer */
 #endif
-static WCHAR LfnBuf[FF_MAX_LFN + 1] EWRAM_BSS;		/* LFN working buffer */
+static WCHAR LfnBuf[FF_MAX_LFN + 1] OMEGA_FATFS_SCRATCH;		/* LFN working buffer */
 #define DEF_NAMBUF
 #define INIT_NAMBUF(fs)
 #define FREE_NAMBUF()
@@ -3907,6 +3914,82 @@ FRESULT f_open (
 
 
 
+/* Open a FAT/FAT32 file using its directory-entry offset. The caller must
+   validate the enumerated short name and size; any mismatch fails closed so
+   it can retry through ordinary f_open. exFAT, lock-enabled and reentrant
+   builds use the normal path instead. */
+FRESULT f_open_by_dirent (
+	FIL* fp,
+	const TCHAR* directory,
+	DWORD entry_offset,
+	const TCHAR* expected_sfn,
+	DWORD expected_size
+)
+{
+#if FF_FS_READONLY || FF_FS_LOCK || FF_FS_REENTRANT
+	(void)fp; (void)directory; (void)entry_offset; (void)expected_sfn; (void)expected_size;
+	return FR_INVALID_PARAMETER;
+#else
+	FRESULT res;
+	DIR dj;
+	FATFS *fs;
+	const TCHAR *name;
+
+	if (!fp || !directory || !expected_sfn || entry_offset == 0xFFFFFFFF)
+		return FR_INVALID_PARAMETER;
+	fp->obj.fs = 0;
+	res = f_opendir(&dj, directory);
+	if (res != FR_OK) return res;
+	fs = dj.obj.fs;
+#if FF_FS_EXFAT
+	if (fs->fs_type == FS_EXFAT) {
+		dj.obj.fs = 0;
+		return FR_INVALID_PARAMETER;
+	}
+#endif
+	res = validate(&dj.obj, &fs);
+	if (res == FR_OK) {
+		INIT_NAMBUF(fs);
+		memset(dj.fn, 0, sizeof(dj.fn));
+		name = expected_sfn;
+		res = create_name(&dj, &name);
+		if (res == FR_OK && *name) res = FR_INVALID_NAME;
+		if (res == FR_OK) res = dir_sdi(&dj, entry_offset);
+		if (res == FR_OK) res = move_window(fs, dj.sect);
+		if (res == FR_OK) {
+			if (dj.dir[DIR_Name] == 0 || dj.dir[DIR_Name] == DDEM ||
+			dj.dir[DIR_Attr] == AM_LFN || (dj.dir[DIR_Attr] & (AM_DIR | AM_VOL)) ||
+			memcmp(dj.dir + DIR_Name, dj.fn, 11) ||
+			ld_dword(dj.dir + DIR_FileSize) != expected_size) {
+				res = FR_NO_FILE;
+			} else {
+				fp->dir_sect = fs->winsect;
+				fp->dir_ptr = dj.dir;
+				fp->obj.sclust = ld_clust(fs, dj.dir);
+				fp->obj.objsize = expected_size;
+#if FF_USE_FASTSEEK
+				fp->cltbl = 0;
+#endif
+				fp->obj.fs = fs;
+				fp->obj.id = fs->id;
+				fp->flag = FA_READ;
+				fp->err = 0;
+				fp->sect = 0;
+				fp->fptr = 0;
+#if !FF_FS_TINY
+				memset(fp->buf, 0, sizeof(fp->buf));
+#endif
+			}
+		}
+		FREE_NAMBUF();
+	}
+	dj.obj.fs = 0;
+	if (res != FR_OK) fp->obj.fs = 0;
+	return res;
+#endif
+}
+
+
 
 /*-----------------------------------------------------------------------*/
 /* Read File                                                             */
@@ -4691,16 +4774,17 @@ FRESULT f_closedir (
 /* Read Directory Entries in Sequence                                    */
 /*-----------------------------------------------------------------------*/
 
-FRESULT f_readdir (
+FRESULT f_readdir_with_offset (
 	DIR* dp,			/* Pointer to the open directory object */
-	FILINFO* fno		/* Pointer to file information to return */
+	FILINFO* fno,		/* Pointer to file information to return */
+	DWORD* entry_offset	/* Optional FAT short-entry offset */
 )
 {
 	FRESULT res;
 	FATFS *fs;
 	DEF_NAMBUF
 
-
+	if (entry_offset) *entry_offset = 0xFFFFFFFF;
 	res = validate(&dp->obj, &fs);	/* Check validity of the directory object */
 	if (res == FR_OK) {
 		if (!fno) {
@@ -4708,8 +4792,16 @@ FRESULT f_readdir (
 		} else {
 			INIT_NAMBUF(fs);
 			res = DIR_READ_FILE(dp);		/* Read an item */
-			if (res == FR_NO_FILE) res = FR_OK;	/* Ignore end of directory */
-			if (res == FR_OK) {				/* A valid entry is found */
+			if (res == FR_NO_FILE) {
+				res = FR_OK;	/* Ignore end of directory and return an empty FILINFO */
+				get_fileinfo(dp, fno);
+			} else if (res == FR_OK) {	/* A valid entry is found */
+#if FF_FS_EXFAT
+				if (entry_offset && fs->fs_type != FS_EXFAT)
+#else
+				if (entry_offset)
+#endif
+					*entry_offset = dp->dptr;
 				get_fileinfo(dp, fno);		/* Get the object information */
 				res = dir_next(dp, 0);		/* Increment index for next */
 				if (res == FR_NO_FILE) res = FR_OK;	/* Ignore end of directory now */
@@ -4720,6 +4812,14 @@ FRESULT f_readdir (
 	LEAVE_FF(fs, res);
 }
 
+
+FRESULT f_readdir (
+	DIR* dp,
+	FILINFO* fno
+)
+{
+	return f_readdir_with_offset(dp, fno, 0);
+}
 
 
 #if FF_USE_FIND

@@ -37,13 +37,16 @@ static void UIAudio_StopForSharedBufferUse(void){stopped++;}
 static u32 Launcher_ReadThumbnailBytes(int *f,u8 *b,u32 n,UINT *got){(void)f;(void)b;(void)n;*got=read_count;return read_result;}
 static void Launcher_CustomThumbFileName(const char *f,char *n,u32 z){(void)f;if(z)n[0]=0;}
 static u32 Launcher_LoadCustomThumbnailByName(const char *n,u8 *d){(void)n;(void)d;return custom;}
-static u32 Launcher_LoadThumbnailFromRomHeader(char *n,u8 *d){(void)n;(void)d;header_calls++;return header;}
+static u32 Launcher_LoadThumbnailFromRomHeader(const char *n,u8 *d){(void)n;(void)d;header_calls++;return header;}
 static unsigned nor_page,recents_view_active,folder_total,game_total_SD=1;
 static char p_recently_play[10][512];
 static unsigned char launcher_virtual_gamecode_valid[10];
 static unsigned char launcher_virtual_gamecode[10][4];
 static struct {char filename[100];char gamename[16];} pNorFS[64];
-static struct {char filename[100];} pFolder[96],pFilename_buffer[512];
+typedef struct {char filename[100];char altname[13];} MockRecord;
+static MockRecord pFolder[96],pFilename_buffer[512];
+static const char *Launcher_FileIdentityName(const MockRecord *record){return record->altname[0]?record->altname:record->filename;}
+static const char *Launcher_FolderIdentityName(const MockRecord *record){return record->altname[0]?record->altname:record->filename;}
 static unsigned Launcher_GetTotalEntries(void){return nor_page?1:folder_total+game_total_SD;}
 static unsigned Launcher_IsNORPage(void){return nor_page;}
 static unsigned Launcher_IsValidGameCodeBytes(const u8 *p){(void)p;return 1;}
