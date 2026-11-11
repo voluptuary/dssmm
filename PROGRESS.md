@@ -1,5 +1,19 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 12:24 UTC — Omega custom-art/cache/motion and enum milestone validated
+
+- Current donor pure renderer/cache functions propagate per-image CUSTOM provenance through all carousel/list scaled caches, motion incoming frames and popup restoration. Added CUSTOM Only rounded corners and legacy CUSTOM Only migration; enum settings readers consolidated without changing established matching behavior. Original Omega source/path/sidecar loader retained and reports actual successful CUSTOM provenance.
+- Imported transparency-aware motion code and corrected VRAM install range arithmetic already fixed on DE. Brought sorted CUSTOM hash lookup into the port (no extra RAM);169,620 differential queries and production partial/error/cap/style/warm-cache tests pass.
+- Broader cache regression exposed missing metadata invalidation when switching into a list-like view. Added invalidation after computing the new view, before list-art workspace redraw. Test now passes with custom flags cleared. This had already been fixed on current DE; no new DE defect asserted.
+- Focused tests pass:1,285 boolean cases,33,600 enum cases, custom style policy, motion bounds/rest frames, metadata invalidation, artwork loader/cache provenance and NOR path integration; lookup scaling tests pass against real FatFs. Build2,048,352 bytes (48,800 headroom), EWRAM heap19,424/IWRAM user-stack gap7,720. Current diff passes whitespace; no build diagnostics. Still no hardware validation.
+- Commit/push milestone; next finish extension-default/missing-art compatibility and narrow shared loader/error fixes, then full verifier/test2 publication. DE/BLUE branches and releases remain isolated.
+
+## 2026-11-11 12:21 UTC — Omega custom-art cache/enum parity in progress
+
+- Porting current DE pure renderer/cache custom provenance, CUSTOM Only corner mode, consolidated enum readers and legacy setting migration. Retaining Omega filename/NOR sidecar loaders; provenance is set only by successful CUSTOM loads and propagated through motion/list/carousel caches and popup restoration. Integration is uncommitted and not validated yet; initial compile identified old motion and popup call signatures, now adapted.
+- Imported current DE carousel_motion.h: preserves transparency-aware motion and adds the existing DE VRAM install-code range check; Omega old bound subtracted an absolute VRAM address from0x18000 (underflow). This was already corrected on DE, so it is not a new DE queue item. Run motion and art-style policy tests before any publication.
+- Next: finish compiler integration, test enum/custom/cache/motion policies, verify size/layout and checkpoint; then remaining shared loader fixes and full Omega test2 validation. Published BLUE/DE unchanged.
+
 ## 2026-11-11 12:19 UTC — Omega NOR artwork sidecars validated
 
 - Added source/nor_artwork_sd.c/.h: optional full source-path hints in /SYSTEM/NORART/<rompage>.oma, tagged OAR1, checked against complete catalog-entry identity/hash, exact file length/read/close and checksum. No NOR sector/catalog/protocol change. Failed SD record writes are removed when detected; unavailable/stale/malformed records fall back to existing root/header artwork. Hints are best-effort, not transactional save data.

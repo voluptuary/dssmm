@@ -16,6 +16,12 @@ bash scripts/test-psram-load-policy.sh
 bash scripts/test-launcher-settings-readers-host.sh
 bash scripts/test-launcher-wrap-system-host.sh
 bash scripts/test-launcher-clean-list-cache-host.sh
+bash scripts/test-launcher-enum-settings-host.sh
+bash scripts/test-launcher-art-style-policy-host.sh
+bash scripts/test-carousel-motion-host.sh
+bash scripts/test-custom-manifest-host.sh
+bash scripts/test-launcher-thumb-cache-invalidation.sh
+bash scripts/test-carousel-lookup-scaling-host.sh
 python3 tests/test-omega-index.py
 python3 tests/test-omega-nor-artwork.py
 bash scripts/test-fatfs-long-name-host.sh
