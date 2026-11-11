@@ -1,5 +1,12 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-11 23:50 UTC — Hosted CI ownership fix and relocation verification
+
+- Initial hosted CI built each kernel successfully, then failed historical Git-based fixtures because checkout/container UIDs differed (dubious ownership). YAML, dependency installation and model identity passed. Workflow now trusts only exact GITHUB_WORKSPACE, never safe.directory=*; no access-control or verification check is disabled. BLUE test history uses explicit real GIT_DIR/GIT_WORK_TREE while actual functions/headers/fixtures remain private; focused popup/art-border tests pass. Await rerun before claiming hosted success.
+- Canonical dssmm complete relocated builds and full verifiers now pass for all three projects. Omega/packed BLUE are byte-identical to published tests; relocated DE firmware payload is identical to8.3.2 and only its directory-derived GBA title/header checksum differs (11 bytes, both header checksums valid). No C/assembly/assets were altered to obtain this result. Source snapshot checks match Git blobs, respecting declared .bat EOL attributes; inherited whitespace is preserved rather than reformatted.
+- Commit/push CI/fixture-context correction; canonical snapshot provenance will advance to this commit and copy those exact metadata/test changes. No firmware release/tag update. Final documentation across branches will point to canonical isolation/verification records after dssmm commit.
+
+
 ## 2026-11-11 23:45 UTC — Standalone target cleanup validated; ready to commit
 
 - ezfomegade retains its complete standalone build environment, actual firmware/assets, required tools and applicable verifier fixtures. New project.json and read-only branch-aware CI/dispatcher identify the target explicitly. Root Pages deployment is removed from hardware branches. DE keeps41 host/browser/JS checks; Omega and BLUE full target verifiers pass. Policy tests reject wrong identity, foreign source directories, external source symlinks and direct known cross-target PRs. Workflow YAML and contents:read/no persisted checkout credentials validated.
