@@ -1,6 +1,6 @@
 # Cross-platform adversarial audit — November 2026
 
-Software audit completed on 2026-11-11. Delivery verification is recorded in HANDOFF.md and PROGRESS.md. This is not hardware qualification or a proof of all possible behavior.
+Software audit and delivery completed on 2026-11-11. [Downloaded release verification](release-verification-2026-11.json) records exact commits, asset sizes/hashes, prerelease flags and unchanged stable latest. Further operational details are in HANDOFF.md and PROGRESS.md. This is not hardware qualification or a proof of all possible behavior.
 
 ## Scope and architecture
 
@@ -33,7 +33,7 @@ No new Critical or High execution/memory defect was established in this audit. T
 
 Applied all shared corrections above plus DE-only staged patch clipping, safe plugin boot, checked copy completion, tiny-plugin/basename/index recovery, cheat-size and Windows fixes. Moved the unchanged832-byte NES patch payload from IWRAM to const ROM; all three payload copies match SHA256 cb7ba0c02daab7dd18701431e8e4fe4c86d8a89e2cb8ac4892c340c24ab4f9c7. Hot renderer maps stayed in IWRAM. Filename scanners are shared rather than independently maintained.
 
-Unreleased audit candidate:2,025,056 bytes;72,096 below2 MiB. IWRAM static-to-IRQ gap1,696 bytes, EWRAM heap7,112 and user-stack reserve12,288. Candidate SHA2568414503f41b218264f0982cef448ca9a160b9fafe69e815854aa4e387aa43857. Stable v8.3.1 tag/asset/latest remain unchanged; earlier Rev. A/B hardware reports do not validate this new candidate.
+Unreleased audit candidate:2,025,056 bytes;72,096 below2 MiB. IWRAM static-to-IRQ gap1,688 bytes, EWRAM heap7,112 and user-stack reserve12,288. Candidate SHA2568414503f41b218264f0982cef448ca9a160b9fafe69e815854aa4e387aa43857. Stable v8.3.1 tag/asset/latest remain unchanged; earlier Rev. A/B hardware reports do not validate this new candidate.
 
 Remaining: F-022 raw flash polling has no chip-qualified timeout; F-032 NOR catalog replacement remains single-copy/interruption-sensitive; F-036/FatFs rename interruption can require manual SD recovery. New boot/save/NOR behavior still needs physical Rev. A/B regression testing. Windows batch changes need Windows testing. Static stack margins are not measured runtime peaks.
 
@@ -41,7 +41,7 @@ Remaining: F-022 raw flash polling has no chip-qualified timeout; F-032 NOR cata
 
 Completed supported software backports before this audit: indexed long-name identities/header fast-open, optimized transparency-compatible menus/motion, CUSTOM Only corners, scoped wrapping/Clean list, extension/missing artwork, SD NOR artwork hints, updated splash/help/localization and popup hints, checked copies/load recovery and bounded plugin payloads with corrected WRAM decoder. These preserve Original OMEGA hardware protocols and32 MiB loading limits.
 
-Audit added shared NES/state/native-capacity, CP936 save/backup/artwork, marked-BMP and save-load corrections, shared path handling and832-byte const-ROM optimization. No DE/BLUE hardware features were imported. Final Test3 candidate:2,049,416 bytes;47,736 below2 MiB; heap19,424; IWRAM static-to-user-SP gap8,312. SHA256c1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52.
+Audit added shared NES/state/native-capacity, CP936 save/backup/artwork, marked-BMP and save-load corrections, shared path handling and832-byte const-ROM optimization. No DE/BLUE hardware features were imported. Published [Omega Test3](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test3):2,049,416 bytes;47,736 below2 MiB; heap19,424; IWRAM static-to-user-SP gap8,312. SHA256c1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52.
 
 Remaining: no Original OMEGA hardware reports at all. Installation, native/embedded/plugin boot, cheats/save states, saves, timing/audio and NOR require hardware checks. Original NOR polling/program-success reporting and single-copy metadata retain vendor limitations; deletion remains newest-title-only. SD artwork hints/cheat snapshots are best effort. Extra custom color/theme slots and DE/BLUE-specific hardware features are excluded.
 
@@ -49,7 +49,7 @@ Remaining: no Original OMEGA hardware reports at all. Installation, native/embed
 
 DSSMM frontend, name/transparency artwork, optimized menus, themes, settings, remembered cheats and themed NOR progress are integrated against BLUE-specific native64 MiB/5G loading, NOR allocation/catalog and firmware. Audit added the shared NES/state/native-capacity, CP936 paths, marked-BMP, save-load and format corrections. Its NES payload was already const in ROM; do not count832 bytes as newly freed here.
 
-Final packed Test2 candidate:3,982,696 bytes; heap15,760; user-stack reserve12,288; IWRAM overlay-to-IRQ gap1,656. SHA256ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710. ELF-aware packaging preserves vendor resources at1 MiB, firmware0x08195000, asset start0x08207000 and metadata boundary0x08780000. Raw development GBA is not an installable update.
+Published packed [BLUE Test2](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-blue-test2):3,982,696 bytes; heap15,760; user-stack reserve12,288; IWRAM overlay-to-IRQ gap1,656. SHA256ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710. ELF-aware packaging preserves vendor resources at1 MiB, firmware0x08195000, asset start0x08207000 and metadata boundary0x08780000. Raw development GBA is not an installable update.
 
 Remaining: no BLUE hardware reports. The unpublished updater's acceptance of the larger split image is unknown even though source/layout/resource checks pass. Native64 MiB/5G, SD/FPGA offload, saves, cheat engine and NOR readback are software-only evidence. Vendor polling has no timeout; catalog/allocation metadata are single-copy. Generic plugin combinations remain32 MiB; extra custom theme/color slots excluded.
 

@@ -1,6 +1,6 @@
 # BLUE port status
 
-Current audit delivery: software audit complete; hardware-untested Test2 is prepared with shared bounds/path/save/artwork fixes. See [audit findings and limits](../audits/cross-platform-2026-11.md) and [Test2 notes](../releases/blue-test2.md). Publication verification is in HANDOFF.md. Final packed kernel3,982,696 bytes; heap15,760; IRQ gap1,656; user reserve12,288 (static only). Its NES blob was already ROM-resident before this audit. Older sizes/next steps below are historical.
+Current audit delivery: software audit complete; hardware-untested Test2 is published and download-verified with shared bounds/path/save/artwork fixes. See [audit findings and limits](../audits/cross-platform-2026-11.md) and [Test2 notes](../releases/blue-test2.md). Publication verification is in HANDOFF.md. Final packed kernel3,982,696 bytes; heap15,760; IRQ gap1,656; user reserve12,288 (static only). Its NES blob was already ROM-resident before this audit. Older sizes/next steps below are historical.
 
 
 ## Current state — DS Style integrated, hardware untested
