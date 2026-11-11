@@ -8,6 +8,7 @@ typedef unsigned char u8;
 typedef unsigned int UINT;
 typedef char TCHAR;
 #define MAX_path_len 256
+#define MAX_NOR 64
 #define LAUNCHER_THUMB_BMP_HEADER 54
 #define FA_READ 1
 #define EWRAM_BSS
@@ -51,6 +52,10 @@ static unsigned Launcher_GetTotalEntries(void){return nor_page?1:folder_total+ga
 static unsigned Launcher_IsNORPage(void){return nor_page;}
 static unsigned Launcher_IsValidGameCodeBytes(const u8 *p){(void)p;return 1;}
 static unsigned Launcher_LoadThumbnailByGameCode(const u8 *p,u8 *d){(void)p;(void)d;return header;}
+static const char *nor_source;
+static char captured_source[514];
+static const char *Omega_ReadNorArtworkPath(unsigned slot){assert(slot<64);return nor_source;}
+static void Omega_SaveNorArtworkPath(unsigned slot,const char *path){assert(slot<64);snprintf(captured_source,sizeof captured_source,"%s",path);}
 #include "omega-artwork.impl.h"
 int main(void){
  u8 dst[64];char long_name[400];
@@ -76,6 +81,12 @@ int main(void){
  nor_page=1;strcpy(pNorFS[0].filename,"Sonic.gba");unsigned prior_stats=stats;
  assert(Launcher_LoadThumbDataForIndex(0,image+54));assert(!strcmp(seen,"/SYSTEM/IMGS/Sonic.bmp"));
  assert(stats==prior_stats);
+ Launcher_SaveNorArtworkSource(0,"/GAMES~1","SONIC~1.gg");
+ assert(!strcmp(captured_source,"/Game Collection/Sonic The Hedgehog.gg"));
+ nor_source="/GAMES~1/Sonic The Hedgehog.gg";
+ assert(Launcher_LoadThumbDataForIndex(0,image+54));
+ assert(!strcmp(seen,"/SYSTEM/IMGS/Game Collection/Sonic The Hedgehog.bmp"));
+ nor_source=NULL;
  strcpy(currentpath,"/Recently Played");missing_mirror=0;
  assert(Launcher_LoadOmegaThumbnailForDirectory("SONIC~1.gg","/GAMES~1",dst));assert(!strcmp(seen,"/SYSTEM/IMGS/Game Collection/Sonic The Hedgehog.bmp"));
  nor_page=0;recents_view_active=1;strcpy(currentpath,"/Recently Played");strcpy(p_recently_play[0],"/GAMES~1/SONIC~1.gg");

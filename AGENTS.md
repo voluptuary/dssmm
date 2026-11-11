@@ -12,6 +12,8 @@ Keep ezfomega isolated from ezfode. Record suspected ezfode defects with evidenc
 as deferred review items; do not fix them on ezfode during this port.
 Use automatic GitHub source archives; do not upload separate source ZIPs.
 Original Omega hardware is unavailable: validation is source/build/host only.
+Omega NOR artwork hints are SD-only OAR1 records in SYSTEM/NORART/*.oma;
+do not reserve extra cartridge metadata sectors without hardware evidence.
 On ezfomega use scripts/verify-omega-port.sh; do not treat DE tests or hardware
 reports as validation of this port. Do not publish it as hardware-qualified.
 The owner authorizes remaining compatible Omega backports and a new explicitly

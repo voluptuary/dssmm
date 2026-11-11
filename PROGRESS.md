@@ -1,5 +1,12 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 12:19 UTC — Omega NOR artwork sidecars validated
+
+- Added source/nor_artwork_sd.c/.h: optional full source-path hints in /SYSTEM/NORART/<rompage>.oma, tagged OAR1, checked against complete catalog-entry identity/hash, exact file length/read/close and checksum. No NOR sector/catalog/protocol change. Failed SD record writes are removed when detected; unavailable/stale/malformed records fall back to existing root/header artwork. Hints are best-effort, not transactional save data.
+- Both successful clean/addon installs resolve directory/file LFNs and save a hint after catalog publication; failed installs do not. NOR cache path consumes the hint before root-name fallback and does not need to read a source ROM.
+- Tests pass: actual record functions under ASan/UBSan (identity mismatch, corruption/truncation, lengths and I/O failures); production cache and source-capture integration (nested directory aliases, LFNs, old fallbacks). Build2,047,432 bytes (49,720 headroom); EWRAM heap19,424, IWRAM user-stack gap7,800 static. No hardware or flash-success claim; vendor APIs remain void.
+- Commit/push this milestone on Omega only. Next: finish enum settings/custom-only rounding/cache propagation and remaining shared loader fixes, then final verifier/test2 publication. Later three-branch audit remains outstanding.
+
 ## 2026-11-11 12:16 UTC — Omega boolean settings/wrap/Clean list parity
 
 - Ported shared on/off parsing and mutable Clean list setting with settings-menu/writer/startup wiring and row-cache invalidation. Carousel browser title renderers now honor Clean list; the focused cache test caught the third renderer still calling CleanTitle directly, and passed after correction. Retained Original Omega hardware settings.

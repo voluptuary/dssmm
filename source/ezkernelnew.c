@@ -32,6 +32,7 @@
 #include "file_transaction.h"
 #include "launcher_artwork_path.h"
 #include "launcher_setting_parse.h"
+#include "nor_artwork_sd.h"
 #include "thai620.h"
 #include "select_raw.h"
 
@@ -6401,6 +6402,27 @@ static u32 Launcher_LoadOmegaArtworkPath(const char *path, u8 *dst)
 	return result == FR_OK && got == size && close_result == FR_OK;
 }
 
+/* Capture resolved artwork identity after installation; do not change the
+   fixed on-cartridge catalog, save name, or allocation policy. */
+static void Launcher_SaveNorArtworkSource(u32 slot, const char *directory, const char *filename)
+{
+    LauncherOmegaArtworkWorkspace *work = &launcher_omega_artwork;
+    const char *resolved = directory;
+    const char *name = filename;
+    if(!directory || !filename || slot >= MAX_NOR) return;
+    if(LauncherArtworkResolveDirectoryPath(directory, work->directory,
+        sizeof(work->directory), work->component, sizeof(work->component),
+        Launcher_ResolveOmegaArtworkDirectory, work)) resolved = work->directory;
+    int length = snprintf(work->path, sizeof(work->path), "%s%s%s", directory,
+        strcmp(directory, "/") ? "/" : "", filename);
+    if(length < 0 || (u32)length >= sizeof(work->path)) return;
+    if(f_stat(work->path, &work->info) == FR_OK && !(work->info.fattrib & AM_DIR))
+        name = work->info.fname;
+    length = snprintf(work->path, sizeof(work->path), "%s%s%s", resolved,
+        strcmp(resolved, "/") ? "/" : "", name);
+    if(length > 0 && (u32)length < sizeof(work->path)) Omega_SaveNorArtworkPath(slot, work->path);
+}
+
 /* Mirror long directory/file names in artwork paths without changing ROM I/O. */
 static u32 Launcher_LoadFilenameThumbnailAt(const char *filename, const char *rom_dir, u8 *dst)
 {
@@ -8080,6 +8102,11 @@ static u32 Launcher_LoadThumbDataForIndex(u32 absolute_index, u8 *thumb_data)
 		if(!has_thumbnail && Launcher_IsValidGameCodeBytes((const u8*)&pNorFS[absolute_index].gamename[12]))
 			has_thumbnail = Launcher_LoadThumbnailByGameCode((const u8*)&pNorFS[absolute_index].gamename[12],
 			thumb_data - LAUNCHER_THUMB_BMP_HEADER);
+        if(!has_thumbnail) {
+            const char *source = Omega_ReadNorArtworkPath(absolute_index);
+            if(source) has_thumbnail = Launcher_LoadFilenameThumbnailAt(source, "/",
+                thumb_data - LAUNCHER_THUMB_BMP_HEADER);
+        }
 		if(!has_thumbnail && name)
 			has_thumbnail = Launcher_LoadFilenameThumbnailAt(name, NULL,
 				thumb_data - LAUNCHER_THUMB_BMP_HEADER);
@@ -17269,6 +17296,7 @@ load_file:
 				res = Loadfile2NOR(pfilename, gl_norOffset,0x0);
 				if(res==0)//ok
 				{
+                    Launcher_SaveNorArtworkSource(game_total_NOR, currentpath, pfilename);
 					if(gl_norOffset==0)//first game need set saveMODE
 					{
 						Set_saveMODE(SAVEMODE);
@@ -17316,6 +17344,7 @@ load_file:
 				//wait_btn();
 				if(res==0)
 				{
+                    Launcher_SaveNorArtworkSource(game_total_NOR, currentpath, pfilename);
 					if(gl_norOffset==0)//first game need set saveMODE
 					{
 						Set_saveMODE(SAVEMODE);

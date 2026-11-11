@@ -17,6 +17,7 @@ bash scripts/test-launcher-settings-readers-host.sh
 bash scripts/test-launcher-wrap-system-host.sh
 bash scripts/test-launcher-clean-list-cache-host.sh
 python3 tests/test-omega-index.py
+python3 tests/test-omega-nor-artwork.py
 bash scripts/test-fatfs-long-name-host.sh
 bash scripts/test-omega-artwork-host.sh
 bash scripts/test-omega-transparency-host.sh
