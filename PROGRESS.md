@@ -1,5 +1,12 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 13:51 UTC — DE launch I/O corrections validated
+
+- Actual production Copy_file baseline falsely succeeds after close failure; checked exact reads/writes, explicit sync, both independent closes, full-width size rejection and incomplete-output removal now pass fault fixture. Invalidates borrowed artwork workspace; forward declaration added after first build caught ordering. Rebuild then passes at2,025,016 bytes; IWRAM IRQ gap1,696, heap7,112, user reserve12,288 (static only).
+- Actual launch metadata baseline rejects one-byte plugin for lacking a GBA header. Nonempty plugins now bypass native-only header read; native GAMECODE validation and full-width/close failures remain checked. Tiny/native/empty/4 GiB+/short/read/close cases pass. Plugin arguments now use final path component instead of old /PLUGINS offset.
+- Both failed PSRAM-load callers now request directory rebuild (return1); caller contract/source checks pass. New test-launch-io-host.sh is part of DE glob suite. Linked boot and20,000 payload-policy tests re-pass after rebuild. No hardware or published artifact changes. Next marked-art parser, Windows output contract, then final full suites/static/pool review.
+
+
 ## 2026-11-11 13:44 UTC — DE plugin handoff corrected
 
 - Actual linked seven-mode Unicorn test now passes: native hard/soft choices retained, IRQ masked before mapping, EWRAM-clearing/plugin paths switch to IWRAM SP, raw copy remains in IWRAM and compressed plugin uses BIOS11h directly. Pogoshell words/arguments survive all non-native-clear modes. No post-map ROM fetch occurs. BIOS and cartridge effects are mocked; physical runtime remains unverified.

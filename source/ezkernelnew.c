@@ -38,6 +38,7 @@
 #include "select_raw.h"
 
 static void Launcher_SaveUnifiedSettings(void);
+static void Launcher_ResetThumbCache(void);
 static void Launcher_SaveSettingsInfo(void);
 void Show_error_num(u8 error_num);
 extern u16 gl_select_lang;
@@ -863,6 +864,7 @@ static u32 launcher_list_row_cache_file_select = 0;
 #define THEME_FILE "/SYSTEM/THEME.TXT"
 
 static void Launcher_SaveUnifiedSettings(void);
+static void Launcher_ResetThumbCache(void);
 static void Launcher_SaveMigratedSettingsIfNeeded(void);
 
 static char *Launcher_SettingsTrim(char *text)
@@ -1813,60 +1815,37 @@ static void Launcher_PrepareSettingsFlashWrite(void)
 }
 //---------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------
-u32 Copy_file(const char* src, const char* dst)
+u32 Copy_file(const TCHAR *src, const TCHAR *dst)
 {
-	UIAudio_StopForSharedBufferUse();
-	UINT read_ret;
-	UINT write_ret;
-	u32 filesize;
-	u32 res;
-	u32 blocknum;
-	u32 total_read = 0;
-	u32 total_written = 0;
-	FIL dst_file;
-
-	res = f_open(&gfile, src, FA_READ);
-	if (res == FR_OK)
-	{
-		res = f_open(&dst_file, dst, FA_WRITE | FA_CREATE_ALWAYS);
-		if (res == FR_OK)
-		{
-			filesize = f_size(&gfile);
-			res = f_lseek(&gfile, 0x0000);
-
-			for (blocknum = 0x0000; (res == FR_OK) && (blocknum < filesize); blocknum += 0x20000)
-			{
-				u32 chunk = filesize - blocknum;
-				if (chunk > 0x20000)
-					chunk = 0x20000;
-
-				res = f_read(&gfile, pReadCache, chunk, &read_ret);
-				if ((res != FR_OK) || (read_ret != chunk))
-					break;
-
-				total_read += read_ret;
-				res = f_write(&dst_file, pReadCache, read_ret, &write_ret);
-				if (write_ret != read_ret)
-					break;
-
-				total_written += write_ret;
-			}
-			if (res == FR_OK)
-				res = f_sync(&dst_file);
-			f_close(&dst_file);
-
-			if ((res == FR_OK) && (total_read == filesize) && (total_written == filesize))
-			{
-				f_close(&gfile);
-				return 1;
-			}
-
-			f_unlink(dst);
-		}
-		f_close(&gfile);
-	}
-
-	return 0;
+    UIAudio_StopForSharedBufferUse();
+    Launcher_ResetThumbCache();
+    FIL destination;
+    UINT read_size, written;
+    u32 copied = 0;
+    if(!src || !dst || !strcasecmp(src, dst)) return 0;
+    if(f_open(&gfile, src, FA_READ) != FR_OK) return 0;
+    FSIZE_t full_size = f_size(&gfile);
+    if(full_size > 0xFFFFFFFFUL) { f_close(&gfile); return 0; }
+    u32 size = (u32)full_size;
+    if(f_open(&destination, dst, FA_WRITE | FA_CREATE_ALWAYS) != FR_OK) {
+        f_close(&gfile); return 0;
+    }
+    u32 good = 1;
+    while(copied < size) {
+        u32 bytes = size - copied;
+        if(bytes > MAX_pReadCache_size) bytes = MAX_pReadCache_size;
+        read_size = written = 0;
+        if(f_read(&gfile, pReadCache, bytes, &read_size) != FR_OK || read_size != bytes ||
+           f_write(&destination, pReadCache, bytes, &written) != FR_OK || written != bytes) {
+            good = 0; break;
+        }
+        copied += bytes;
+    }
+    if(good && f_sync(&destination) != FR_OK) good = 0;
+    if(f_close(&destination) != FR_OK) good = 0;
+    if(f_close(&gfile) != FR_OK) good = 0;
+    if(!good) f_unlink(dst);
+    return good && copied == size;
 }
 u32 Is_bin_file(const TCHAR *name)
 {
@@ -6030,7 +6009,7 @@ u32 IWRAM_CODE LoadEMU2PSRAM(TCHAR *filename,u32 is_EMU)
 				plan.size != 0x58)
 				goto load_failed;
 			SetPSRampage(plan.page);
-			make_pogoshell_arguments(plugin + 9, filename, rom_start_address, filesize,
+			make_pogoshell_arguments(strrchr(plugin, '/') ? strrchr(plugin, '/') + 1 : plugin, filename, rom_start_address, filesize,
 				plan.window_offset, offset);
 		}
 
@@ -17463,8 +17442,9 @@ load_file:
 	//DrawHZText12(gl_Loading,0,(240-strlen(gl_Loading)*6)/2,74, gl_color_text,1);
 
 	u32 gamefilesize=0;
+	//u32 savefilesize=0;
+	UINT ret = 0;
 	FSIZE_t launch_file_size;
-	UINT header_bytes;
 	FRESULT close_result;
 	u32 have_pat=0;
 
@@ -17474,32 +17454,33 @@ load_file:
 
 	f_chdir(currentpath);//return to game folder
 	res = f_open(&gfile, pfilename, FA_READ);
-	if(res != FR_OK){
-		error_num = 1;
-		Show_error_num(error_num);
-		return 0;
-	}
+	if(res != FR_OK) { Show_error_num(1); return 0; }
 	launch_file_size = f_size(&gfile);
-	if(launch_file_size > (FSIZE_t)0xFFFFFFFFUL){
+	if(launch_file_size == 0 || launch_file_size > UINT32_MAX)
+	{
 		(void)f_close(&gfile);
-		Launcher_ShowLaunchError(gl_file_overflow);
-		wait_btn();
+		Show_error_num(1);
 		return 0;
 	}
-	if(launch_file_size < 0xB0 || f_lseek(&gfile, 0xAC) != FR_OK){
-		(void)f_close(&gfile);
-		error_num = 1;
-		Show_error_num(error_num);
-		return 0;
+	memset(GAMECODE, 'F', 4);
+	if(!is_EMU)
+	{
+		if(launch_file_size < 0xB0 || f_lseek(&gfile, 0xAC) != FR_OK)
+		{
+			(void)f_close(&gfile);
+			Show_error_num(1);
+			return 0;
+		}
+		res = f_read(&gfile, GAMECODE, 4, &ret);
+		if(res != FR_OK || ret != 4)
+		{
+			(void)f_close(&gfile);
+			Show_error_num(1);
+			return 0;
+		}
 	}
-	header_bytes = 0;
-	res = f_read(&gfile, GAMECODE, 4, &header_bytes);
 	close_result = f_close(&gfile);
-	if(res != FR_OK || header_bytes != 4 || close_result != FR_OK){
-		error_num = 1;
-		Show_error_num(error_num);
-		return 0;
-	}
+	if(close_result != FR_OK) { Show_error_num(1); return 0; }
 	gamefilesize = (u32)launch_file_size;
 
 	//check
@@ -17541,7 +17522,7 @@ load_file:
 		res=LoadEMU2PSRAM(pfilename,is_EMU);
 		if(res != 0){
 			Show_error_num(1);
-			return 0;
+			return 1;
 		}
 			int bootmode = ((is_EMU > 3) && (is_EMU < 9)) ?
 				((is_EMU == 6) ? 2
@@ -17628,7 +17609,7 @@ load_file:
 					res=Loadfile2PSRAM(pfilename);
 					if(res != 0){
 						Show_error_num(1);
-						return 0;
+						return 1;
 					}
 							ShowbootProgress(gl_make_pat);
 							Make_pat_file(pfilename);
