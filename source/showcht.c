@@ -92,20 +92,22 @@ static void CheatStatePath(char *path, const char *key)
 
 static void CheatContentHash(void)
 {
-	UINT count;
-	u32 remaining = f_size(&gfile);
-	cheat_hash_valid = 0;
-	cheat_active_hash = 2166136261u;
-	/* Bound work on damaged or unexpectedly large inputs. */
-	if(remaining > 1024 * 1024 || f_lseek(&gfile, 0) != FR_OK) return;
-	while(remaining)
-	{
-		UINT size = remaining > 256 ? 256 : remaining;
-		if(f_read(&gfile, buf, size, &count) != FR_OK || count != size) return;
-		cheat_active_hash = CheatHash(cheat_active_hash, buf, count);
-		remaining -= count;
-	}
-	cheat_hash_valid = f_lseek(&gfile, 0) == FR_OK;
+    UINT count;
+    FSIZE_t file_size = f_size(&gfile);
+    u32 remaining;
+    cheat_hash_valid = 0;
+    cheat_active_hash = 2166136261u;
+    /* Bound work on damaged or unexpectedly large inputs. */
+    if(file_size > 1024 * 1024 || f_lseek(&gfile, 0) != FR_OK) return;
+    remaining = (u32)file_size;
+    while(remaining)
+    {
+        UINT size = remaining > 256 ? 256 : remaining;
+        if(f_read(&gfile, buf, size, &count) != FR_OK || count != size) return;
+        cheat_active_hash = CheatHash(cheat_active_hash, buf, count);
+        remaining -= count;
+    }
+    cheat_hash_valid = f_lseek(&gfile, 0) == FR_OK;
 }
 
 static u32 CheatStateApply(u32 total)
@@ -1289,8 +1291,8 @@ u32 Check_cheat_file(TCHAR *gamefilename)
 		u32* tempbuff = (u32*)(pReadCache);
 		if(res == FR_OK)//have a file
 		{
-			filesize = f_size(&gfile);
-			if(filesize > 0x10000) filesize=0x10000;
+			FSIZE_t file_size = f_size(&gfile);
+			filesize = file_size > 0x10000 ? 0x10000 : (u32)file_size;
 			f_lseek(&gfile, 0x0);
 			res = f_read(&gfile, tempbuff, filesize, &ret);//pReadCache max 0x20000 Byte
 			if(res != FR_OK)

@@ -10,6 +10,11 @@ OMEGA Test2 are published. The active phase is now the authorized three-branch
 adversarial audit. Use isolated worktrees; apply only narrow validated common
 fixes to ezfode. Preserve target hardware protocols, release tags/assets and
 stable v8.3.1 latest. No hardware reports qualify the alternate platforms.
+Final audit delivery must report findings, fixes/optimizations and remaining
+issues separately for ezfode, ezfomega and ezfblue, with validation limitations.
+Filename policy uses the project fixed CP936 OEM encoding; preserve DBCS trail
+bytes when checking separators and review it if FF_CODE_PAGE changes.
+
 
 The `merkin-agent/ezfode-dssmm-kernel` fork has published version numbers that
 ran ahead of this repository's build number. In particular, its v8.4.1 release
