@@ -1,5 +1,11 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-11 05:08 UTC — BLUE publication-ready software validation
+
+- Full scripts/verify-blue-port.sh passed, including platform checks and all 24 shared suites. Post-format rebuild succeeds with identical image length. Integration f44c681 committed and pushed. Packed /tmp/dssmm-blue-test1/ezbluekernel.bin: 3,982,680 bytes, SHA256 638b50eed433ac8be1f4ddec5fb9a91847d8fe3800a64e4981375d58f51331b0. Publication notes explicitly state hardware and larger updater acceptance unverified. Preparing v8.3.1-blue-test1 prerelease, latest=false; no source ZIP.
+- Recorded PATCH-NES-02 for the subsequent cross-platform audit: legacy branch-derived detector/patch indices and stale is_Nes state need sanitizer reproductions and valid-input fixtures before a narrow correction. This is not a hardware claim or speculative rewrite.
+- Next: publish/verify asset and tag against this checkpoint, update documents with the actual release result, then switch to ezfomega for remaining software backports. DE remains isolated.
+
 ## 2026-11-11 05:06 UTC — BLUE complete frontend integration checkpoint
 
 - Focused NOR loader/catalog/readback/IRQ tests pass under ASan/UBSan, including erase/program failure stops and failed reserve/catalog persistence. Native all-bank and folder PSRAM tests pass; plugin/update copy/firmware checks and linked boot modes 0–6 pass. The 24 shared UI/software suites passed before final aggregate rerun, currently running. New actual-ELF packaging corruption/truncation tests pass (five groups total). NOR compressed background decodes byte-for-byte to its source/BMP.
