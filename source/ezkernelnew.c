@@ -38,7 +38,6 @@
 #include "select_raw.h"
 
 static void Launcher_SaveUnifiedSettings(void);
-static void Launcher_ResetThumbCache(void);
 static void Launcher_SaveSettingsInfo(void);
 void Show_error_num(u8 error_num);
 extern u16 gl_select_lang;
@@ -5079,9 +5078,8 @@ u32 IWRAM_CODE Loadsavefile(TCHAR *filename)
 	{
 		case FR_OK:
 		{
-			filesize = f_size(&file);
-			if(filesize > 128*1024)
-				filesize = 128*1024;
+            FSIZE_t full_size = f_size(&file);
+            filesize = full_size > 128*1024 ? 128*1024 : (UINT)full_size;
 
 			/* Stage the complete save before changing cartridge SRAM so a
 			   short or failed SD read cannot copy stale EWRAM contents. */
@@ -5090,8 +5088,9 @@ u32 IWRAM_CODE Loadsavefile(TCHAR *filename)
 				f_close(&file);
 				return 0;
 			}
-			f_close(&file);
-			SetRampage(0x0);
+            if(f_close(&file) != FR_OK)
+                return 0;
+            SetRampage(0x0);
 			if(filesize > 64*1024)
 			{
 				WriteSram(SRAMSaver, pReadCache, 64*1024);

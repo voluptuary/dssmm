@@ -23,3 +23,5 @@ Coverage limits: valid NES signatures are synthetic conformance fixtures, not ga
 ART-HEADER-01 (Low): actual marked parsers accepted invalid BMP signature/offset/DIB/planes. Fixed fixed-layout fields only; complete-header/malformed/canary tests pass on all targets. Opaque/header lookup paths unchanged.
 
 OEM-PATH-03 (Medium compatibility): inherited backup/artwork policies also split CP936 trail0x5C. Consolidated OEM-aware scanner; actual FatFs backup/directory, actual basename and full save-fault tests pass. DE Windows output-stem mismatch corrected by explicit target; statically validated, Windows runtime unavailable.
+
+SAVE-LOAD-04 (Low malformed input/recovery): full-width size was narrowed before128 KiB prefix clamp and close errors preceded SRAM writes. Both reproduced on all three actual functions; full-width clamp/close gate, bank/canary and failure tests now pass. Zero/ordinary/oversized-prefix semantics retained.

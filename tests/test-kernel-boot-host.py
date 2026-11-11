@@ -24,7 +24,7 @@ for index,line in enumerate(lines):
   if size:sections.append((vma,raw[offset:offset+size]))
 new='DE_BootHandoff' in symbols
 
-def run(mode,key=0,ignore_stack=False):
+def run(mode,key=0,ignore_stack=False,payload_size=8):
  uc=Uc(UC_ARCH_ARM,UC_MODE_ARM)
  for base,size in [(0x02000000,0x40000),(0x03000000,0x8000),(0x04000000,0x1000),(0x08000000,0x2000000)]:uc.mem_map(base,size)
  for address,data in sections:uc.mem_write(address,data)
@@ -32,7 +32,7 @@ def run(mode,key=0,ignore_stack=False):
  uc.mem_write(symbols['key_L'],struct.pack('<I',key))
  uc.mem_write(symbols['gl_ingame_RTC_open_status'],struct.pack('<H',0x0101))
  uc.mem_write(0x04000208,struct.pack('<H',1))
- payload=b'\xFE\xFF\xFF\xEA\x11\x22\x33\x44'
+ payload=b'\xFE\xFF\xFF\xEA'+bytes([0x5A])*(payload_size-4)
  rom=(b'\x10\x08\x00\x00\x00'+payload) if mode==4 else payload
  uc.mem_write(0x08000000,rom)
  uc.mem_write(0x0203FBF8,struct.pack('<II',123,0x08000000+len(payload)))
@@ -107,4 +107,7 @@ for mode,key in [(0,0),(1,0),(1,1),(2,0),(3,0),(4,0),(5,0)]:
    print('Legacy DE mode',mode,'reproduces:',error)
   else:raise AssertionError('legacy failure not reproduced')
  else:run(mode,key)
+if not args.expect_legacy:
+ run(2,payload_size=0x3FBF8)
+ run(255)
 print('DE linked boot validation passed with mocked BIOS/cartridge, not hardware qualification.')
