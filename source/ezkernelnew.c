@@ -31,10 +31,12 @@
 #include "blank/NOR_lz.h"
 #include "file_transaction.h"
 #include "launcher_artwork_path.h"
+#include "launcher_setting_parse.h"
 #include "thai620.h"
 #include "select_raw.h"
 
 static void Launcher_SaveUnifiedSettings(void);
+static u32 Launcher_BrowserWrapAroundEnabled(void);
 static void Launcher_SaveSettingsInfo(void);
 extern u16 gl_select_lang;
 
@@ -699,8 +701,11 @@ static u16 launcher_thumbnail_style = LAUNCHER_THUMB_STYLE_TITLE;
 static u16 launcher_sounds_enabled = 1;
 static u16 launcher_hide_system_files = 1;
 static u16 launcher_list_folders = 1;
-static const u16 launcher_clean_list = 1;
-static u16 launcher_wrap_around = 1;
+static u16 launcher_clean_list = 0;
+#define LAUNCHER_WRAP_OFF 0
+#define LAUNCHER_WRAP_ON 1
+#define LAUNCHER_WRAP_EXCEPT_SYSTEM 2
+static u16 launcher_wrap_around = LAUNCHER_WRAP_ON;
 static u16 launcher_carousel_animations = 1;
 static u16 launcher_carousel_equal_sides = 0;
 static u16 launcher_motion_input[4];
@@ -2004,6 +2009,11 @@ static void Launcher_GetListDisplayName(const TCHAR *src, char *dst, u32 dst_siz
 }
 
 static void Launcher_BuildFullPath(const TCHAR *path, const TCHAR *name, char *out, u32 out_size);
+
+static void Launcher_GetBrowserDisplayTitle(const TCHAR *src, char *dst, u32 dst_size)
+{
+	Launcher_GetListDisplayName(src, dst, dst_size);
+}
 
 static void Launcher_JoinDisplaySuffix(char *out, u32 capacity, const char *prefix, const char *suffix)
 {
@@ -4254,8 +4264,6 @@ static void Launcher_ReadStartSource(void)
 	char buf[32];
 	launcher_start_uses_favourites = 0;
 	launcher_legacy_start_screen_off = 0;
-	if(Launcher_SettingsReadValue("Clean list", buf, sizeof(buf)))
-		launcher_settings_migration_pending = 1;
 
 	memset(buf, 0, sizeof(buf));
 	if(Launcher_SettingsReadValue("Start screen", buf, sizeof(buf)))
@@ -7526,6 +7534,30 @@ static u32 Launcher_ActiveViewMode(void)
 	return gl_show_Thumbnail;
 }
 
+static void Launcher_SetCleanListEnabled(u16 enabled)
+{
+	if(launcher_clean_list == enabled)
+		return;
+	launcher_clean_list = enabled;
+	Launcher_InvalidateListRowCache();
+	launcher_force_full_redraw = 1;
+}
+
+static u32 Launcher_IsSystemBrowser(void)
+{
+	return launcher_active_page == SD_list && !recents_view_active &&
+		!strncasecmp(currentpath, "/SYSTEM", 7) &&
+		(!currentpath[7] || currentpath[7] == '/');
+}
+
+static u32 Launcher_BrowserWrapAroundEnabled(void)
+{
+	if(launcher_wrap_around == LAUNCHER_WRAP_OFF)
+		return 0;
+	return launcher_wrap_around != LAUNCHER_WRAP_EXCEPT_SYSTEM ||
+		!Launcher_IsSystemBrowser();
+}
+
 static void Launcher_UpdateEffectiveViewMode(void)
 {
 	u16 old_view = launcher_effective_show_thumbnail;
@@ -7575,7 +7607,7 @@ static u32 Launcher_ResolveListEntryIndex(u32 index)
 {
 	u32 total = Launcher_GetTotalEntries();
 
-	if(launcher_wrap_around && Launcher_IsListLikeMode() && (total > 10))
+	if(Launcher_BrowserWrapAroundEnabled() && Launcher_IsListLikeMode() && (total > 10))
 		return index % total;
 	return index;
 }
@@ -8598,11 +8630,11 @@ static void Launcher_BuildThumbCache(u32 center_index)
 
 	if(center_index > 0)
 		Launcher_LoadThumbCacheForIndex(&launcher_cache_prev, center_index - 1);
-	else if(launcher_wrap_around && Launcher_GetTotalEntries() > 1)
+	else if(Launcher_BrowserWrapAroundEnabled() && Launcher_GetTotalEntries() > 1)
 		Launcher_LoadThumbCacheForIndex(&launcher_cache_prev, Launcher_GetTotalEntries() - 1);
 	if((center_index + 1) < Launcher_GetTotalEntries())
 		Launcher_LoadThumbCacheForIndex(&launcher_cache_next, center_index + 1);
-	else if(launcher_wrap_around && Launcher_GetTotalEntries() > 1)
+	else if(Launcher_BrowserWrapAroundEnabled() && Launcher_GetTotalEntries() > 1)
 		Launcher_LoadThumbCacheForIndex(&launcher_cache_next, 0);
 
 	if(Launcher_ActiveViewMode() == 2)
@@ -8643,10 +8675,10 @@ static void Launcher_ShiftThumbCache(int move, u32 new_center_index)
 	}
 	Launcher_AnimateCarouselMove(move, new_center_index);
 	expected_next = launcher_cache_center_index + 1;
-	if(launcher_wrap_around && expected_next >= total_entries)
+	if(Launcher_BrowserWrapAroundEnabled() && expected_next >= total_entries)
 		expected_next = 0;
 	expected_prev = launcher_cache_center_index ? (launcher_cache_center_index - 1) :
-		((launcher_wrap_around && total_entries) ? (total_entries - 1) : 0xFFFFFFFF);
+		((Launcher_BrowserWrapAroundEnabled() && total_entries) ? (total_entries - 1) : 0xFFFFFFFF);
 
 	if(move > 0 && new_center_index == expected_next)
 	{
@@ -8667,7 +8699,7 @@ static void Launcher_ShiftThumbCache(int move, u32 new_center_index)
 		launcher_cache_next.has_thumbnail = 0;
 		if((new_center_index + 1) < total_entries)
 			Launcher_MotionLoadIncoming(&launcher_cache_next, new_center_index + 1);
-		else if(launcher_wrap_around && total_entries > 1)
+		else if(Launcher_BrowserWrapAroundEnabled() && total_entries > 1)
 			Launcher_MotionLoadIncoming(&launcher_cache_next, 0);
 
 		if(launcher_carousel_animations && launcher_motion_finished == new_center_index)
@@ -8708,7 +8740,7 @@ static void Launcher_ShiftThumbCache(int move, u32 new_center_index)
 		launcher_cache_prev.has_thumbnail = 0;
 		if(new_center_index > 0)
 			Launcher_MotionLoadIncoming(&launcher_cache_prev, new_center_index - 1);
-		else if(launcher_wrap_around && total_entries > 1)
+		else if(Launcher_BrowserWrapAroundEnabled() && total_entries > 1)
 			Launcher_MotionLoadIncoming(&launcher_cache_prev, total_entries - 1);
 
 		if(launcher_carousel_animations && launcher_motion_finished == new_center_index)
@@ -8809,9 +8841,9 @@ static void __attribute__((unused)) Draw_ModernLauncher_SD_State(u32 show_offset
 	u32 absolute_index = show_offset + file_select;
 	u32 total_entries = Launcher_GetTotalEntries();
 	u32 prev_index = absolute_index ? (absolute_index - 1) :
-		((launcher_wrap_around && total_entries > 1) ? (total_entries - 1) : 0xFFFFFFFF);
+		((Launcher_BrowserWrapAroundEnabled() && total_entries > 1) ? (total_entries - 1) : 0xFFFFFFFF);
 	u32 next_index = ((absolute_index + 1) < total_entries) ? (absolute_index + 1) :
-		((launcher_wrap_around && total_entries > 1) ? 0 : 0xFFFFFFFF);
+		((Launcher_BrowserWrapAroundEnabled() && total_entries > 1) ? 0 : 0xFFFFFFFF);
 	u32 prev_use_preview_panel;
 	u32 next_use_preview_panel;
 	u32 selected_use_preview_panel;
@@ -8851,7 +8883,7 @@ static void __attribute__((unused)) Draw_ModernLauncher_SD_State(u32 show_offset
 	selected_use_preview_panel = Launcher_ShouldUsePreviewPanel(&selected);
 
 	memset(cleaned, 0, sizeof(cleaned));
-	Launcher_GetDisplayTitleBounded(selected.name, cleaned, sizeof(cleaned));
+	Launcher_GetBrowserDisplayTitle(selected.name, cleaned, sizeof(cleaned));
 	line_count = Launcher_SplitTitle(cleaned, lines);
 
 	if(!Launcher_DrawMotionRest())
@@ -8960,9 +8992,9 @@ static void Draw_ModernLauncher_SD(u32 show_offset, u32 file_select, u32 haveThu
 	u32 absolute_index = show_offset + file_select;
 	u32 total_entries = Launcher_GetTotalEntries();
 	u32 prev_index = absolute_index ? (absolute_index - 1) :
-		((launcher_wrap_around && total_entries > 1) ? (total_entries - 1) : 0xFFFFFFFF);
+		((Launcher_BrowserWrapAroundEnabled() && total_entries > 1) ? (total_entries - 1) : 0xFFFFFFFF);
 	u32 next_index = ((absolute_index + 1) < total_entries) ? (absolute_index + 1) :
-		((launcher_wrap_around && total_entries > 1) ? 0 : 0xFFFFFFFF);
+		((Launcher_BrowserWrapAroundEnabled() && total_entries > 1) ? 0 : 0xFFFFFFFF);
 	u32 prev_use_preview_panel;
 	u32 next_use_preview_panel;
 	u32 selected_use_preview_panel;
@@ -9003,7 +9035,7 @@ static void Draw_ModernLauncher_SD(u32 show_offset, u32 file_select, u32 haveThu
 	selected_use_preview_panel = Launcher_ShouldUsePreviewPanel(&selected);
 
 	memset(cleaned, 0, sizeof(cleaned));
-	Launcher_GetDisplayTitleBounded(selected.name, cleaned, sizeof(cleaned));
+	Launcher_GetBrowserDisplayTitle(selected.name, cleaned, sizeof(cleaned));
 	line_count = Launcher_SplitTitle(cleaned, lines);
 
 	if(!Launcher_DrawMotionRest())
@@ -9097,9 +9129,9 @@ static void Draw_ModernLauncher_SD_Vertical_State(u32 show_offset, u32 file_sele
 	u32 absolute_index = show_offset + file_select;
 	u32 total_entries = Launcher_GetTotalEntries();
 	u32 prev_index = absolute_index ? (absolute_index - 1) :
-		((launcher_wrap_around && total_entries > 1) ? (total_entries - 1) : 0xFFFFFFFF);
+		((Launcher_BrowserWrapAroundEnabled() && total_entries > 1) ? (total_entries - 1) : 0xFFFFFFFF);
 	u32 next_index = ((absolute_index + 1) < total_entries) ? (absolute_index + 1) :
-		((launcher_wrap_around && total_entries > 1) ? 0 : 0xFFFFFFFF);
+		((Launcher_BrowserWrapAroundEnabled() && total_entries > 1) ? 0 : 0xFFFFFFFF);
 	int thumb_w = LAUNCHER_VERT_THUMB_W;
 	int thumb_h = LAUNCHER_VERT_THUMB_H;
 	int thumb_x = LAUNCHER_VERT_THUMB_X;
@@ -9273,7 +9305,7 @@ static void Draw_ModernLauncher_SD_Vertical_State(u32 show_offset, u32 file_sele
 	}
 	else Launcher_RestoreBGClip((u16*)Launcher_GetBGImage(), btn_x - 1, btn_y - 1, btn_w + 2, btn_h + 2);
 	memset(cleaned, 0, sizeof(cleaned));
-	Launcher_CleanTitle(selected.name, cleaned, sizeof(cleaned));
+	Launcher_GetBrowserDisplayTitle(selected.name, cleaned, sizeof(cleaned));
 	line_count = Launcher_SplitTitle(cleaned, lines);
 
 	text_y = btn_y + ((btn_h - (line_count * line_h)) / 2);
@@ -9346,7 +9378,7 @@ static void Launcher_CycleViewModeAndRedraw(u32 page_num, u32 *show_offset_ptr, 
 	u32 new_view;
 	u32 total = Launcher_GetTotalEntries();
 
-	if(launcher_wrap_around && (old_view == LAUNCHER_VIEW_LIST || old_view == LAUNCHER_VIEW_LIST_ART) && (total > 10))
+	if(Launcher_BrowserWrapAroundEnabled() && (old_view == LAUNCHER_VIEW_LIST || old_view == LAUNCHER_VIEW_LIST_ART) && (total > 10))
 		absolute_index %= total;
 
 	UIAudio_PlaySfx(UI_SFX_MENU);
@@ -10089,64 +10121,44 @@ static int Launcher_HorizontalSideY(int custom_y)
     return main_y + ((main_h - visible_h) / 2);
 }
 
+static void Launcher_ReadOnOffSetting(const char *key, u16 *target, u16 default_on)
+{
+    char buf[32];
+    unsigned migrate = 0;
+
+    *target = default_on;
+    memset(buf, 0, sizeof(buf));
+    if(Launcher_SettingsReadValue(key, buf, sizeof(buf)))
+    {
+        *target = (u16)Launcher_ParseOnOff(buf, DSTEXT_ON, DSTEXT_OFF, default_on, &migrate);
+        if(migrate)
+            launcher_settings_migration_pending = 1;
+    }
+}
+
 static void Launcher_ReadRememberCheatsSetting(void)
 {
-    char value[32];
-    gl_cheat_remember = 0;
-    if(Launcher_SettingsReadValue("Remember cheats", value, sizeof(value)))
-        gl_cheat_remember = !strcasecmp(value, "On") || !strcasecmp(value, "Yes") ||
-            !strcasecmp(value, DSTEXT_ON) || !strcmp(value, "1");
+    Launcher_ReadOnOffSetting("Remember cheats", &gl_cheat_remember, 0);
+}
+
+static void Launcher_ReadCleanListSetting(void)
+{
+    Launcher_ReadOnOffSetting("Clean list", &launcher_clean_list, 0);
 }
 
 static void Launcher_ReadSoundsSetting(void)
 {
-    char buf[32];
-
-    launcher_sounds_enabled = 1;
-    memset(buf, 0, sizeof(buf));
-    if(Launcher_SettingsReadValue("Sounds", buf, sizeof(buf)))
-    {
-        if(!strcasecmp(buf, "Off") || !strcasecmp(buf, "No") ||
-           !strcasecmp(buf, DSTEXT_OFF) || (buf[0] == '0'))
-            launcher_sounds_enabled = 0;
-        if(strcasecmp(buf, "On") && strcasecmp(buf, "Off"))
-            launcher_settings_migration_pending = 1;
-    }
+    Launcher_ReadOnOffSetting("Sounds", &launcher_sounds_enabled, 1);
 }
 
 static void Launcher_ReadHideSystemFilesSetting(void)
 {
-    char buf[32];
-
-    launcher_hide_system_files = 1;
-    memset(buf, 0, sizeof(buf));
-    if(Launcher_SettingsReadValue("Hide system files", buf, sizeof(buf)))
-    {
-        if(!strcasecmp(buf, "Off") || !strcasecmp(buf, "No") ||
-           !strcasecmp(buf, DSTEXT_OFF) || (buf[0] == '0'))
-            launcher_hide_system_files = 0;
-        if(strcasecmp(buf, "On") && strcasecmp(buf, "Off"))
-            launcher_settings_migration_pending = 1;
-    }
+    Launcher_ReadOnOffSetting("Hide system files", &launcher_hide_system_files, 1);
 }
 
 static void Launcher_ReadListFoldersSetting(void)
 {
-    char buf[32];
-
-    launcher_list_folders = 1;
-    memset(buf, 0, sizeof(buf));
-    if(Launcher_SettingsReadValue("List folders", buf, sizeof(buf)))
-    {
-        if(!strcasecmp(buf, "On") || !strcasecmp(buf, "Yes") ||
-           !strcasecmp(buf, DSTEXT_ON) || (buf[0] == '1'))
-            launcher_list_folders = 1;
-        else if(!strcasecmp(buf, "Off") || !strcasecmp(buf, "No") ||
-                !strcasecmp(buf, DSTEXT_OFF) || (buf[0] == '0'))
-            launcher_list_folders = 0;
-        if(strcasecmp(buf, "On") && strcasecmp(buf, "Off"))
-            launcher_settings_migration_pending = 1;
-    }
+    Launcher_ReadOnOffSetting("List folders", &launcher_list_folders, 0);
 }
 
 
@@ -10154,16 +10166,20 @@ static void Launcher_ReadListFoldersSetting(void)
 static void Launcher_ReadWrapAroundSetting(void)
 {
     char buf[32];
+    unsigned migrate = 0;
 
-    launcher_wrap_around = 1;
+    launcher_wrap_around = LAUNCHER_WRAP_ON;
     memset(buf, 0, sizeof(buf));
-    if(Launcher_SettingsReadValue("Wrap list", buf, sizeof(buf)))
-    {
-        launcher_wrap_around = !strcasecmp(buf, "On") || !strcasecmp(buf, "Yes") ||
-            !strcasecmp(buf, DSTEXT_ON) || (buf[0] == '1');
-        if(strcasecmp(buf, "On") && strcasecmp(buf, "Off"))
-            launcher_settings_migration_pending = 1;
-    }
+    if(!Launcher_SettingsReadValue("Wrap list", buf, sizeof(buf)) &&
+       !Launcher_SettingsReadValue("Wrap around", buf, sizeof(buf)))
+        return;
+    if(!strcasecmp(buf, "On, Not SYSTEM"))
+        launcher_wrap_around = LAUNCHER_WRAP_EXCEPT_SYSTEM;
+    else
+        launcher_wrap_around = (u16)Launcher_ParseOnOff(buf, DSTEXT_ON, DSTEXT_OFF,
+            LAUNCHER_WRAP_OFF, &migrate);
+    if(migrate)
+        launcher_settings_migration_pending = 1;
 }
 
 static void Launcher_ReadMotionSettings(void)
@@ -10516,8 +10532,9 @@ static void Launcher_SettingsGetLine(u32 item, char *out, u32 out_size)
         case SETTINGS_THEME_MODE: label = DSTEXT_SETTINGS_THEME; value = launcher_auto_theme ? Launcher_SettingsText(SETTINGS_TEXT_AUTO) : Launcher_ThemeModeName(); break;
         case SETTINGS_THEME: label = DSTEXT_SETTINGS_COLOUR; value = Launcher_ThemeName(); break;
         case SETTINGS_LOAD_STYLE: label = DSTEXT_SETTINGS_LOAD_STYLE; value = ">"; break;
+        case SETTINGS_CLEAN_LIST: label = DSTEXT_SETTINGS_CLEAN_LIST; value = Launcher_OnOffText(launcher_clean_list); break;
         case SETTINGS_LIST_FOLDERS: label = DSTEXT_SETTINGS_LIST_FOLDERS; value = Launcher_OnOffText(launcher_list_folders); break;
-        case SETTINGS_WRAP_AROUND: label = Launcher_SettingsText(SETTINGS_TEXT_WRAP); value = Launcher_OnOffText(launcher_wrap_around); break;
+        case SETTINGS_WRAP_AROUND: label = Launcher_SettingsText(SETTINGS_TEXT_WRAP); value = launcher_wrap_around == LAUNCHER_WRAP_EXCEPT_SYSTEM ? "On, Not SYSTEM" : Launcher_OnOffText(launcher_wrap_around); break;
         case SETTINGS_ANIMATIONS: label = Launcher_MotionText(0); value = Launcher_OnOffText(launcher_carousel_animations); break;
         case SETTINGS_SIDE_SIZE: label = Launcher_MotionText(1); value = Launcher_MotionText(launcher_carousel_equal_sides ? 3 : 2); break;
         case SETTINGS_BOOT_ENGINE: label = DSTEXT_SETTINGS_BOOT_ENGINE; value = Launcher_EngineText(); break;
@@ -11409,10 +11426,12 @@ static void Launcher_SaveUnifiedSettings(void)
         f_printf(&f, "\n# Options: On, Off\n");
         f_printf(&f, "# List folders keeps non-game folders in list view.\n");
         f_printf(&f, "List folders = %s\n", launcher_list_folders ? "On" : "Off");
-        f_printf(&f, "\n# Options: On, Off\n");
-        f_printf(&f, "\n# Options: On, Off\n");
+        f_printf(&f, "# Clean list removes filename extensions and extra title tags.\n");
+        f_printf(&f, "Clean list = %s\n", launcher_clean_list ? "On" : "Off");
+        f_printf(&f, "\n# Options: On, Off, On, Not SYSTEM\n");
+        f_printf(&f, "# On, Not SYSTEM keeps SYSTEM folder browsing from wrapping.\n");
         f_printf(&f, "# Wrap list also loops settings and popup menus between their first and last items.\n");
-        f_printf(&f, "Wrap list = %s\n", launcher_wrap_around ? "On" : "Off");
+        f_printf(&f, "Wrap list = %s\n", launcher_wrap_around == LAUNCHER_WRAP_EXCEPT_SYSTEM ? "On, Not SYSTEM" : (launcher_wrap_around ? "On" : "Off"));
         f_printf(&f, "# Animations and Side size affect the two carousel views.\n");
         f_printf(&f, "Animations = %s\n", launcher_carousel_animations ? "On" : "Off");
         f_printf(&f, "Side size = %s\n", launcher_carousel_equal_sides ? "Equal" : "Small");
@@ -12043,6 +12062,10 @@ static void Launcher_SettingsToggle(u32 item, int dir)
         case SETTINGS_LOAD_STYLE:
             Launcher_LoadStylePopup();
             break;
+        case SETTINGS_CLEAN_LIST:
+            Launcher_SetCleanListEnabled(!launcher_clean_list);
+            Launcher_SaveUnifiedSettings();
+            break;
         case SETTINGS_LIST_FOLDERS:
             launcher_list_folders ^= 1;
             Launcher_SaveUnifiedSettings();
@@ -12058,7 +12081,9 @@ static void Launcher_SettingsToggle(u32 item, int dir)
             Launcher_SaveUnifiedSettings();
             break;
         case SETTINGS_WRAP_AROUND:
-            launcher_wrap_around ^= 1;
+            launcher_wrap_around = dir < 0 ?
+                (launcher_wrap_around ? launcher_wrap_around - 1 : LAUNCHER_WRAP_EXCEPT_SYSTEM) :
+                (launcher_wrap_around + 1) % (LAUNCHER_WRAP_EXCEPT_SYSTEM + 1);
             Launcher_SaveUnifiedSettings();
             break;
         case SETTINGS_BOOT_ENGINE:
@@ -14164,7 +14189,7 @@ static const u32 launcher_settings_interface_items[] = {
     SETTINGS_THEME_MODE, SETTINGS_THEME, SETTINGS_LOAD_STYLE, SETTINGS_VIEW_MODE,
     SETTINGS_VIEW_OPTIONS, SETTINGS_WRAP_AROUND, SETTINGS_BOOT_TO, SETTINGS_START_SOURCE };
 static const u32 launcher_settings_view_items[] = {
-    SETTINGS_LIST_FOLDERS, SETTINGS_THUMBNAILS, SETTINGS_ART_POSITION, SETTINGS_ART_BORDER,
+    SETTINGS_LIST_FOLDERS, SETTINGS_CLEAN_LIST, SETTINGS_THUMBNAILS, SETTINGS_ART_POSITION, SETTINGS_ART_BORDER,
     SETTINGS_ROUNDED_CORNERS, SETTINGS_ANIMATIONS, SETTINGS_SIDE_SIZE };
 static u32 launcher_settings_visible_view[7];
 static const u32 launcher_settings_games_items[] = { SETTINGS_BOOT_ENGINE, SETTINGS_AUTO_SAVE, SETTINGS_AUTO_START, SETTINGS_ADDON_SETTINGS, SETTINGS_BOOT_MODE, SETTINGS_SLEEP_HOTKEY, SETTINGS_ADDON_HOTKEY, SETTINGS_FULL_INTRO, SETTINGS_BACKUP_SAVES, SETTINGS_REMEMBER_CHEATS };
@@ -14702,6 +14727,7 @@ int main(void) {
 	Launcher_ReadRememberCheatsSetting();
 	Launcher_ReadHideSystemFilesSetting();
 	Launcher_ReadListFoldersSetting();
+	Launcher_ReadCleanListSetting();
 	Launcher_ReadWrapAroundSetting();
 	Launcher_ReadMotionSettings();
 	Launcher_ReadClockFormatSetting();
@@ -14853,7 +14879,7 @@ refind_file:
 		/* Clamp restored SD selection after changing folders so the launcher
 		cannot point past the rebuilt directory contents and render blank. */
 		if((show_offset + file_select >= game_folder_total) &&
-		!(launcher_wrap_around && (game_folder_total > 10) && (show_offset < game_folder_total) && (file_select < 10)))
+		!(Launcher_BrowserWrapAroundEnabled() && (game_folder_total > 10) && (show_offset < game_folder_total) && (file_select < 10)))
 		{
 			if(game_folder_total == 0)
 			{
@@ -14878,7 +14904,7 @@ refind_file:
 		file_select = gl_nor_file_select_saved;
 		if(file_select > 9) file_select = 9;
 		if((show_offset + file_select >= game_total_NOR) &&
-		!(launcher_wrap_around && (game_total_NOR > 10) && (show_offset < game_total_NOR) && (file_select < 10)))
+		!(Launcher_BrowserWrapAroundEnabled() && (game_total_NOR > 10) && (show_offset < game_total_NOR) && (file_select < 10)))
 		{
 			if(game_total_NOR == 0)
 			{
@@ -15653,7 +15679,7 @@ re_showfile:
 							show_offset--;
 						changed = 1;
 					}
-					else if(launcher_wrap_around && (list_game_total > 1))
+					else if(Launcher_BrowserWrapAroundEnabled() && (list_game_total > 1))
 					{
 						if(move > 0)
 						{
@@ -15694,7 +15720,7 @@ re_showfile:
 
 					if(list_game_total)
 					{
-						if(launcher_wrap_around && (list_game_total > 1))
+						if(Launcher_BrowserWrapAroundEnabled() && (list_game_total > 1))
 						{
 							u32 jump = 10 % list_game_total;
 							if(!jump)
@@ -15729,7 +15755,7 @@ re_showfile:
 					u32 absolute_index = show_offset + file_select;
 					u32 new_absolute_index = 0;
 
-					if(launcher_wrap_around && (list_game_total > 1))
+					if(Launcher_BrowserWrapAroundEnabled() && (list_game_total > 1))
 					{
 						u32 jump = 10 % list_game_total;
 						if(!jump)
@@ -15777,7 +15803,7 @@ re_showfile:
 							show_offset--;
 						changed = 1;
 					}
-					else if(launcher_wrap_around && (list_game_total > 1))
+					else if(Launcher_BrowserWrapAroundEnabled() && (list_game_total > 1))
 					{
 						if(move > 0)
 						{
@@ -15818,7 +15844,7 @@ re_showfile:
 
 					if(list_game_total)
 					{
-						if(launcher_wrap_around && (list_game_total > 1))
+						if(Launcher_BrowserWrapAroundEnabled() && (list_game_total > 1))
 						{
 							u32 jump = 10 % list_game_total;
 							if(!jump)
@@ -15853,7 +15879,7 @@ re_showfile:
 					u32 absolute_index = show_offset + file_select;
 					u32 new_absolute_index = 0;
 
-					if(launcher_wrap_around && (list_game_total > 1))
+					if(Launcher_BrowserWrapAroundEnabled() && (list_game_total > 1))
 					{
 						u32 jump = 10 % list_game_total;
 						if(!jump)
@@ -15877,7 +15903,7 @@ re_showfile:
 					thumbnail_nav_handled = 1;
 				}
 			}
-			if(!thumbnail_nav_handled && launcher_wrap_around && Launcher_IsListLikeMode() && (list_game_total > 1) &&
+			if(!thumbnail_nav_handled && Launcher_BrowserWrapAroundEnabled() && Launcher_IsListLikeMode() && (list_game_total > 1) &&
 			(keysrepeat & (KEY_DOWN | KEY_UP | ((list_game_total > 10) ? (KEY_LEFT | KEY_RIGHT) : 0))))
 			{
 				launcher_wrap_old_file_select = file_select;
@@ -15936,7 +15962,7 @@ re_showfile:
 			}
 			/* A list shorter than one page has nowhere to page-jump.  Consume the
 			jump input without moving so holding it cannot flash between its ends. */
-			if(!thumbnail_nav_handled && launcher_wrap_around && Launcher_IsListLikeMode() &&
+			if(!thumbnail_nav_handled && Launcher_BrowserWrapAroundEnabled() && Launcher_IsListLikeMode() &&
 			(list_game_total <= 10) && (keysrepeat & (KEY_LEFT | KEY_RIGHT)))
 				thumbnail_nav_handled = 1;
 			if(!thumbnail_nav_handled && (keysrepeat  & KEY_DOWN)) {
@@ -15956,7 +15982,7 @@ re_showfile:
 					if(Launcher_IsListArtMode())
 						Launcher_ShiftThumbCache(1, show_offset + file_select);
 				}
-				else if(launcher_wrap_around && (list_game_total > 1))
+				else if(Launcher_BrowserWrapAroundEnabled() && (list_game_total > 1))
 				{
 					show_offset = 0;
 					file_select = 0;
@@ -15986,7 +16012,7 @@ re_showfile:
 				shift = 0;
 				if(Launcher_IsListArtMode() && ((updata == 3) || (updata == 5)))
 					Launcher_ShiftThumbCache(-1, show_offset + file_select);
-				if(!updata && launcher_wrap_around && (list_game_total > 1))
+				if(!updata && Launcher_BrowserWrapAroundEnabled() && (list_game_total > 1))
 				{
 					if(list_game_total > 10)
 					{
@@ -16025,7 +16051,7 @@ re_showfile:
 				UIAudio_PlaySfx(UI_SFX_MOVE);
 						launcher_nav_repeat_delay = Launcher_ListNavRepeatDelay();
 				}
-			else if(launcher_wrap_around && (list_game_total > 10))
+			else if(Launcher_BrowserWrapAroundEnabled() && (list_game_total > 10))
 			{
 				if(list_game_total > 10)
 				{
@@ -16059,7 +16085,7 @@ re_showfile:
 					UIAudio_PlaySfx(UI_SFX_MOVE);
 						launcher_nav_repeat_delay = Launcher_ListNavRepeatDelay();
 	}
-	else if(launcher_wrap_around && (list_game_total > 10) && (show_offset + file_select + 1 >= list_game_total))
+	else if(Launcher_BrowserWrapAroundEnabled() && (list_game_total > 10) && (show_offset + file_select + 1 >= list_game_total))
 	{
 		show_offset = 0;
 		file_select = 0;

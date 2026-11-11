@@ -1,5 +1,12 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 12:16 UTC — Omega boolean settings/wrap/Clean list parity
+
+- Ported shared on/off parsing and mutable Clean list setting with settings-menu/writer/startup wiring and row-cache invalidation. Carousel browser title renderers now honor Clean list; the focused cache test caught the third renderer still calling CleanTitle directly, and passed after correction. Retained Original Omega hardware settings.
+- Added Wrap list/Wrap around legacy-key parsing and On, Not SYSTEM option, scoped across browser/cache/navigation conditions while settings/popups retain nonzero wrap preference. Settings menu cycles all three values; writer retains the new value.
+- Tests passed: boolean readers1,285 comparable cases against v8.2.0 plus new wrap semantics; SYSTEM wrap scope; Clean list cache/title handling. Build2,046,248 bytes (50,904 headroom), EWRAM heap19,936/IWRAM-to-user-SP gap7,800. No compiler warning/error in this rebuild. Final comment/prototype cleanup does not change behavior; target verifier now includes these three suites.
+- Next: SD-only NOR artwork sidecars without changing Omega catalog/flash; then remaining enum/custom-only rounding/cache parity. No new test release until final validation; no DE/BLUE changes.
+
 ## 2026-11-11 12:12 UTC — Omega indexed identities validated
 
 - Fresh full scripts/verify-omega-port.sh passed end to end: cheat/save fault injection, patch/trim/NOR mocks, compressed background, native load policy, indexed-record/fast-open regression, real FatFs long-name scenarios, artwork paths, 766,800 renderer comparisons, build/size/layout. Final image2,045,344 bytes (51,808 below2 MiB); EWRAM heap19,936, IWRAM-to-user-SP gap8,208. No hardware results.
