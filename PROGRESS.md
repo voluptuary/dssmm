@@ -1,5 +1,20 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 14:29 UTC — Save loader validated; aggregate checkpoint
+
+- Actual save-load tests pass on all targets for0/1/511/512/64 KiB/cross-bank/128 KiB/oversized/4 GiB+4 inputs and read/short/close failures; SRAM unchanged on failures and bank-zero restoration checked. Builds pass: DE2,025,056, Omega2,049,416, BLUE3,982,696 bytes. Native bank protocols unchanged. This concerns filesystem input validation; supported games remain32 MiB DE/Omega,64 MiB native BLUE, not4 GiB.
+- DE aggregate40 host scripts, browser installer and JS syntax checks pass; added save-load suite also passes separately (now41 registered scripts). BLUE complete verifier passes target-specific checks,24 actual-source UI suites, new marked/OEM/save-load checks, packing and heap15,760/IRQgap1,656 guards. Final linked-boot checks repeat against current ELF because loader build changed. No physical qualification.
+- Omega aggregate caught missing capacity definition in an older extraction fixture (now extracted from actual target header); later run was disrupted by editing its still-running script, producing a truncated shell command. Product tests before that point passed. Final verifier restarted with scripts/source frozen; await clean completion. Broad per-target Cppcheck still running at lowered scheduling priority; no result claimed yet.
+- Commit/push save-loader milestone; next complete static triage, finalize architecture/residual/per-branch audit report and delivery. Releases/tags untouched. Current audit is not yet complete.
+
+
+## 2026-11-11 14:22 UTC — Save-loader full-width/failure follow-up
+
+- New actual Loadsavefile fixture reproduces size4 GiB+4 wrapping to4 before128 KiB prefix clamp on all targets, and read-only close failure still mutating SRAM. Low malformed-input/recovery severity; no physical save corruption report. Existing short/read errors already avoid writes.
+- Clamp full FSIZE_t before narrowing and require close success before first SRAM bank/write; preserve zero/ordinary/oversized-prefix behavior and each target bank protocol. Test includes both banks, final bounded byte/canary, huge size and all three I/O failures. Omega full suite also found stale patch fixture missing new capacity macro; fixture now extracts actual target definition. No product check disabled.
+- Full suites/static checks running; repeat only affected checks/builds after this milestone. No published assets changed.
+
+
 ## 2026-11-11 14:15 UTC — OEM path consolidation validated
 
 - Real-FatFs encoded backup write/open and artwork-directory resolution pass on all three actual targets; production custom-basename ASan/UBSan tests preserve CP9360x815C while detecting real separators and invalid lead sequences. Shared scanner now serves transaction, backup and artwork policies; complete transaction fault suites re-pass. Omega inherited NOR fixture does not match its ported loader; removed only this session's attempted changes to that inactive fixture and used the new target-aware actual basename test plus Omega artwork suite instead. DE/BLUE existing NOR fallback tests pass.
