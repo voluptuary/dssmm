@@ -1,5 +1,17 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 14:03 UTC — Marked-art correction validated
+
+- Shared actual-parser regression passes ASan/UBSan on every target: complete valid headers at both widths,26 individually malformed field bytes, all marker bytes, wrong orientation/length, pixel preservation and canaries. Existing production renderer differential passes on DE and Omega; original Omega transparency fixture now supplies a genuine valid header. All target builds pass; BLUE protected split passes.
+- Fixed only opt-in marked BMP format recognition. No per-pixel/header-lookup path change or performance claim. Preparing per-branch commit/push; published releases untouched. Next follow-up: CP936 trail-backslash in backup/artwork paths (same encoding issue beyond transaction policy), DE Windows output stem, final static/RAM/full suites.
+
+
+## 2026-11-11 13:57 UTC — Marked-art format validation
+
+- ART-HEADER-01 low-severity malformed-format handling reproduced with actual marker functions on all targets: accepted DST1 files missing BM signature, fixed54-byte pixel offset,40-byte DIB and single-plane declaration. Existing dimensions/depth/compression/span checks bound memory; no new out-of-bounds or security claim.
+- Add those missing fixed-layout fields only to the opt-in marked parser. Preserve opaque legacy files and header-art fast paths. New shared ASan/UBSan fixture covers both supported widths, each malformed field, sentinel pixels, unmarked preservation and trailing canary. Validate build/render comparisons before committing; published assets unchanged.
+
+
 ## 2026-11-11 13:22 UTC — Save-path compatibility and DE cheat-size fixes validated
 
 - All three complete real-FatFs save/settings fault suites now pass, including transactional write/readback for CP9360x815C filenames, mixed/lowercase fixed prefixes, actual separators after DBCS pairs, invalid-lead/forward-separator and empty targets. DE baseline failed its three ASCII policy cases; Omega/BLUE baselines failed the valid CP936 transaction. The corrected scanner matches the project fixed936 lead/trail ranges and preserves genuine single-basename restrictions. No journal format or interruption guarantee changed.

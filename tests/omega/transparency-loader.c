@@ -19,7 +19,7 @@ static void le32(u8 *p,u32 v){for(int i=0;i<4;i++)p[i]=(u8)(v>>(i*8));}
 int main(void){
  static u16 storage[(54+120*80*2)/2];u8 *bmp=(u8*)storage;u16 *pixels=(u16*)(bmp+54);
  for(width=80;width<=120;width+=40){
-  memset(storage,0,sizeof(storage));memcpy(bmp+6,"DST1",4);le32(bmp+18,width);le32(bmp+22,(u32)-80);bmp[28]=16;
+  memset(storage,0,sizeof(storage));bmp[0]='B';bmp[1]='M';le32(bmp+10,54);le32(bmp+14,40);bmp[26]=1;memcpy(bmp+6,"DST1",4);le32(bmp+18,width);le32(bmp+22,(u32)-80);bmp[28]=16;
   pixels[0]=0;pixels[1]=0x7fff;pixels[2]=0x8001;pixels[3]=0x8000;
   assert(Launcher_HasTransparentThumbnailMarker(bmp,Launcher_ThumbnailReadSize()));
   Launcher_TagTransparentThumbnailPixels(bmp,Launcher_ThumbnailReadSize());assert(pixels[0]==0x8000 && pixels[1]==0x7fff && pixels[2]==0x8001);
