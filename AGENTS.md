@@ -1,5 +1,16 @@
 # AUTONOMOUS KERNEL AUDIT — MASTER DIRECTIVE
 
+## Verified target boundary
+
+Compartmentalization and cleanup are complete. This branch owns only ezfblue.
+Its standalone hosted verifier and canonical dssmm three-target matrix are green;
+canonical snapshot provenance is pinned explicitly, never automatically synced.
+Do not merge another hardware branch/canonical layout here. CI is read-only;
+branches remain unprotected, so no absolute guarantee of future safe direct pushes
+or merges is claimed. Current DE stable is8.3.2; older8.3.1 holds are historical.
+No further implementation/release task is open; preserve all historical logs.
+
+
 ## Current target-only layout
 
 This standalone branch owns ezfblue; project.json is its hardware identity.
