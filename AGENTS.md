@@ -1,5 +1,28 @@
 # AUTONOMOUS KERNEL AUDIT — MASTER DIRECTIVE
 
+## Current target-only layout
+
+This standalone branch owns ezfomega; project.json is its hardware identity.
+Canonical dssmm stores this project's independent snapshot at targets/ezfomega.
+Use this branch's own Makefile and verifier. Sources/assets are never shared
+through symlinks or auto-merges. Root CI has contents:read only, verifies this
+target, and rejects known cross-target PRs. There is no Pages deployment on
+hardware branches. A common fix must be adapted/validated per project.
+All historical handoff/progress logs are preserved. Do not recreate ezfode/main.
+
+
+## Target isolation and compartmentalization
+
+This branch owns only Original EZ-FLASH OMEGA only. Canonical dssmm collects independent projects
+under targets/ezfomegade, targets/ezfomega and targets/ezfblue; never merge a
+hardware branch wholesale into dssmm or another hardware branch. Import/adapt
+changes deliberately within the appropriate target and revalidate. project.json
+is the target identity; root GitHub default is dssmm, never recreate ezfode/main.
+This branch retains its standalone build/verification environment. No automatic
+synchronization, cross-target pushes or release publication is part of cleanup.
+See docs/porting/target-cleanup.json for audited removals; preserve all logs.
+
+
 ## Current software-audit checkpoint (2026-11-11 23:15 UTC)
 
 The three-branch software audit and delivery are complete. See
@@ -23,7 +46,7 @@ listed in the report. Do not silently restart completed porting from old notes.
 The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
 (`https://github.com/voluptuary/ezfode-dssmm-kernel`). The Codespaces workspace
 may retain its original local directory name after the repository rename.
-The primary and GitHub default branch is `ezfode`. The owner completed the
+The GitHub default branch is `dssmm`. The owner completed the
 rename through GitHub; remote `main` no longer exists. Do not recreate it.
 `ezfomega` has completed the supported software backport and published
 hardware-untested v8.3.1-omega-test2. The active owner phase is now the separate

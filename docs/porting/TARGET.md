@@ -1,17 +1,7 @@
-# original EZ-FLASH OMEGA exploration
+# ezfomega target layout
 
-Branch: `ezfomega`
+Hardware identity is recorded in ../../project.json. This branch contains only its target's build/source/assets/tools and applicable tests; canonical dssmm keeps an independent snapshot under targets/ezfomega.
 
-Framework baseline: `691dc5ec0391cd30c537082a8428978b29c5500a`
+Run `python3 scripts/project.py build ezfomega` and `python3 scripts/project.py verify ezfomega` from the project root. See [OMEGA_STATUS.md](OMEGA_STATUS.md) for origin, hardware limits and historical milestones. No hardware qualification is implied.
 
-Reference: https://github.com/FrankieT19/omega-ds-style-kernel
-
-Pinned commit: `ef30b8ba78147943d95653dfa82f721b52096f67`
-
-Status: active Original Omega port, authorized by owner. Executable source/assets/Makefile now use the pinned Original Omega reference with selective Merkin Mix changes. No hardware validation or release yet. See OMEGA_STATUS.md.
-
-## First investigation when resumed
-
-Start with FrankieT19’s existing Omega adaptation: identify features already ported, then compare cartridge operations, save/export timing, reset, PSRAM geometry and memory reservations against Merkin Mix. Decide whether to use the Omega implementation as the eventual hardware baseline after the comparison.
-
-Follow [the shared preparation checklist](README.md). Produce a feature/provenance matrix and hardware/build inventory before changing code. Owner resumed implementation; keep all changes on ezfomega. Never merge/push these changes into ezfode.
+DE-only installer documentation, DE hardware tests and obsolete verification wrappers were removed. BLUE additionally removed its excluded DE donor source. Audited removals are in [target-cleanup.json](target-cleanup.json); all HANDOFF/PROGRESS records are preserved. Shared frontend tests and asset generation tools remain. No automatic push, synchronization, cross-target merge or release publication is configured.

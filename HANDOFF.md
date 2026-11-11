@@ -1,5 +1,20 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-11 23:45 UTC — Standalone target cleanup validated; ready to commit
+
+- ezfomega retains its complete standalone build environment, actual firmware/assets, required tools and applicable verifier fixtures. New project.json and read-only branch-aware CI/dispatcher identify the target explicitly. Root Pages deployment is removed from hardware branches. DE keeps41 host/browser/JS checks; Omega and BLUE full target verifiers pass. Policy tests reject wrong identity, foreign source directories, external source symlinks and direct known cross-target PRs. Workflow YAML and contents:read/no persisted checkout credentials validated.
+- Built binary is unchanged from published baseline: 2049416 bytes, SHA256 c1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52. Actual target source/assets were not edited. BLUE popup fixture now uses copied fixtures/private BLUE headers; its full verifier passes after the archived donor tree removal. Stale ignored BLUE compiler objects in the Omega workspace were removed; installed plugins and all audit logs retained.
+- GitHub reports all four branches currently unprotected. CI adds detection, not an enforceable guarantee against arbitrary bad direct pushes or future untested edits; no new required-review policy was imposed. No workflow pushes, merges, synchronizes branches or publishes kernel releases. Pages remains manual/default-only on canonical dssmm.
+- Next: commit/push this target-only cleanup; canonical dssmm imports this exact cleaned snapshot and validates relocated builds/byte identity. Keep8.3.2 and earlier port release tags/assets immutable; cleanup is not a new release or firmware change. All cross-project instructions/logs will be finalized after canonical validation.
+
+
+## 2026-11-11 23:36 UTC — Target-only cleanup in progress
+
+- Owner authorized dssmm compartmentalization, target-only cleanup of all hardware branches, working standalone/relocated builds, branch/PR isolation checks, and full commit/push. Initial independent snapshots exist under dssmm targets/ezfomegade, targets/ezfomega and targets/ezfblue; final cleaned snapshots/provenance will replace those before integration.
+- Removing168 tracked files from ezfomega: foreign DE browser installer/docs, unused DE hardware-only tests/wrappers; BLUE also removes its explicitly archived DE donor root/source. Kept actual target source, images, toolchain/asset tools and transitive verifier fixtures. Omega retains shared software-only UI tests in addition to its registered verifier. No HANDOFF/PROGRESS log may be removed; no hardware-driver or asset bytes are changed.
+- Exact deletion inventory retained in docs/porting/target-cleanup.json. Next: run complete target verifier and compare output to published test binary; resolve any missing dependency before committing. New root project.json identifies hardware for universal branch-aware CI. dssmm remains separate; no auto-sync/cross-target PR merge will be configured. Hardware/runtime limitations remain unchanged.
+
+
 ## 2026-11-11 23:21 UTC — Default-branch rename externally blocked
 
 - POST repos/voluptuary/ezfode-dssmm-kernel/branches/ezfode/rename with new_name=dssmm returned HTTP403, Resource not accessible by integration. Native rename is unavailable to the connected GitHub integration; no rename, fallback create/delete, default-setting edit, local branch rename, or active-reference rewrite was performed. This is an external permission restriction, not an unfinished code/audit task.

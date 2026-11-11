@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "id": "ezfomega",
+  "hardware": "Original EZ-FLASH OMEGA only",
+  "verification": "scripts/verify-omega-port.sh"
+}

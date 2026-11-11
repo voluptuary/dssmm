@@ -2,7 +2,7 @@
 
 Merkin Mix adds artwork transparency and name-matched artwork for supported systems beyond GBA, alongside highly optimized artwork lookup and menu rendering that retains transparency compatibility. This branch builds on **FrankieT19's Original OMEGA DS Style v8.0 fork**, with the EZ-FLASH and Sterophonick kernel foundations.
 
-**Original EZ-FLASH OMEGA only. Hardware untested.** These builds are incompatible with the older OMEGA Definitive Edition Rev. A/B and the newer OMEGA Definitive Edition B / BLUE. Those targets have separate [ezfode](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfode) and [ezfblue](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfblue) branches.
+**Original EZ-FLASH OMEGA only. Hardware untested.** These builds are incompatible with the older OMEGA Definitive Edition Rev. A/B and the newer OMEGA Definitive Edition B / BLUE. Those targets have separate [ezfomegade](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfomegade) and [ezfblue](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfblue) branches.
 
 The current development checkpoint identifies itself as `Merkin Mix 8.3.1-omega-test3`. It has source, build and host-test validation only. Installation, booting, gameplay, saving, plugins, cheats/save states and NOR operations still need testing on an Original OMEGA cartridge. [Original OMEGA Test 3](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test3) is the current hardware-untested prerelease.
 
@@ -29,3 +29,7 @@ bash scripts/verify-omega-port.sh
 The verifier requires a host C compiler, Python 3 and the devkitPro tools. The build enforces the 2 MiB kernel limit. Host tests check filesystem failures, artwork rendering, settings, caches, directory identities, loader policies and patch boundaries; they do not qualify physical hardware. See [port status and validation](docs/porting/OMEGA_STATUS.md).
 
 Thanks to **FrankieT19** for the Original OMEGA DS Style adaptation and interface work, **Sterophonick** and **EZ-FLASH** for the foundations, **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above, **aidiadayo** for Thai support, **Kekun** for the case-sensitive font include correction in the lineage, and **ChaN** for FatFs. Merkin Mix artwork and port work is maintained by **Merkin / voluptuary**, with AI assistance. [Detailed credits and provenance](CREDITS.md).
+
+## Repository isolation
+
+This hardware branch is standalone. The `dssmm` default branch holds an independent copy under `targets/ezfomega`. `project.json` identifies the hardware; `python3 scripts/project.py verify ezfomega` selects its full verifier. Never merge a different hardware branch or the whole canonical layout here. CI is read-only and target-specific; required-check enforcement still depends on branch protection. Published release tags are preserved.
