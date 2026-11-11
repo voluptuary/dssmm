@@ -1,5 +1,11 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-11 23:28 UTC —8.3.2 published and verified; compartmentalization authorized
+
+- Published stable/latest https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.2 from ezfomegade ffcdb17b6b53605e79534cd698cd441f474da9ac. Downloaded ezkernelnew.bin matches local bytes:2,025,056, SHA2566d7774ecbadc40e8c91d9e0e977fe09cd36abe8ff34462d362557f828f926f38. Tag, non-draft/non-prerelease/latest flags and single binary asset verified; docs/releases/8.3.2-verification.json persists evidence. Automatic source archives only; old releases preserved. All41 host suites/browser/JS/layout passed; no additional hardware claim.
+- Owner now requests compartmentalizing dssmm: all ezfomegade, ezfomega and ezfblue content in separate target directories, only genuinely universal root content, records updated across all branches. Finish this release documentation descendant, then import exact branch snapshots into isolated targets/ezfomegade, targets/ezfomega and targets/ezfblue on dssmm. Keep existing platform branch build layouts/code isolated; root documentation/dispatcher is universal. Validate each relocated project and record provenance SHAs before publication of the structural change. Do not merge hardware or change existing release tags/binaries.
+
+
 ## 2026-11-11 23:26 UTC —8.3.2 validated and ready for publication
 
 - Production build passed without diagnostics at2,025,056 bytes (72,096 headroom). All41 registered DE host scripts passed in43s, browser installer tests and all manager JS syntax checks passed. Input-fidelity regression and final layout guard passed: IWRAM IRQ gap1,688; EWRAM heap7,112; user reserve12,288. No new hardware claim. Only firmware source delta from validated a57b009 is launcher version8.3.1→8.3.2.

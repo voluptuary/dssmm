@@ -2,11 +2,11 @@
 
 ## Current release task (2026-11-11 23:24 UTC)
 
-The owner authorizes stable Definitive Edition8.3.2 publication from ezfomegade.
+Stable Definitive Edition8.3.2 is published and download-verified from ezfomegade.
 This supersedes the earlier hold on stable8.3.1. GitHub default is now dssmm;
 ezfode was renamed by the owner and must not be recreated. Use this isolated
 DE release worktree; do not merge release changes into other platform branches
-or dssmm. Verify software/build checks and downloaded release assets, keep
+or dssmm. Software/build checks and downloaded release assets passed; keep
 hardware limitations explicit, and upload only ezkernelnew.bin (automatic source
 archives). Preserve historical audit/release records below.
 
