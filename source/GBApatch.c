@@ -40,25 +40,44 @@ u32 spend_address;
 //------------------------------------------------------------------
 void Write(u32 romaddress, const u8* buffer, u32 size)
 {
+    if(!buffer || size < 2) {
+        if(!is_NORpatch) SetPSRampage(0);
+        return;
+    }
 	u32 x;
 	if(is_NORpatch)
 	{
-		if((romaddress >= windows_offset) && (romaddress < windows_offset+0x20000))
+		u32 source_word = 0;
+		u32 offset;
+		u32 bytes_to_copy;
+		/* Intersect the patch with this staged block, including a patch that
+		   began in the preceding block. Never write beyond the shared pool. */
+		if((romaddress | windows_offset) & 1) return;
+		if(romaddress < windows_offset)
 		{
-			for(x=0;x<size/2;x++){
-				((vu16*)(pReadCache+romaddress-windows_offset))[x] = ((vu16*)buffer)[x];
-			}
-			//DEBUG_printf("NORaddress{%x}:%x %x", romaddress,size ,((vu32*)buffer)[0]);
+			u32 skip = windows_offset - romaddress;
+			if(skip >= size) return;
+			source_word = skip / 2;
+			size -= skip;
+			romaddress = windows_offset;
 		}
+		offset = romaddress - windows_offset;
+		if(offset >= 0x20000) return;
+		bytes_to_copy = size & ~1UL;
+		if(bytes_to_copy > 0x20000 - offset)
+			bytes_to_copy = 0x20000 - offset;
+		for(x = 0; x < bytes_to_copy / 2; x++)
+			((vu16*)(pReadCache + offset))[x] = ((const u16*)buffer)[source_word + x];
 	}
 	else
 	{
 		u32 address = romaddress;
 		u32 source_word = 0;
 		u32 words_remaining = size / 2;
-		if(address & 1)
+		if((address & 1) || address >= PSRAM_CAPACITY_BYTES ||
+            words_remaining > (PSRAM_CAPACITY_BYTES - address) / 2)
 		{
-			/* PSRAM patch writes use halfwords and require an even address. */
+			/* Preflight the whole native range before touching a bank. */
 			SetPSRampage(0);
 			return;
 		}
