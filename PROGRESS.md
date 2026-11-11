@@ -1,5 +1,11 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 12:37 UTC — Omega Test2 publication-ready checkpoint
+
+- Final full scripts/verify-omega-port.sh passed with all target/new/shared suites. Code1c98bd2 is validated. Kernel2,049,144 bytes; SHA256 a256c3dce226b3d6abdf6f9b13790cf610dead2b2b42f19411cee1d0d3e5e9a8. Copied exact bytes to files/candidate/omega-8.3.1-test2/ezkernel.bin; no source ZIP. No hardware results.
+- README rewritten around Original OMEGA Merkin Mix with American English and positive provenance; current feature matrix supersedes historical pending labels. docs/releases/omega-test2.md uses prior changelog tone, actual Test1-to-Test2 changes plus cumulative features/fixes, explicit hardware/model restrictions and limitations. Maintenance actions excluded.
+- Next: commit/push docs-only descendant, publish v8.3.1-omega-test2 prerelease/latest=false, download/hash/tag verify and record result. Then authorized three-branch adversarial audit; stable DE v8.3.1 assets/latest unchanged.
+
 ## 2026-11-11 12:35 UTC — Omega final frontend inventory and Test2 validation
 
 - Extension-default CUSTOM/<extension>.bmp and full-size missing-art fallback now cover supported SD/plugin/recents previews. Existing CUSTOM/header/root/NOR fallbacks remain; production tests cover missing paths, extension defaults, actual fallback pixels/canaries, and non-game exclusion.

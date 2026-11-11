@@ -1,86 +1,31 @@
-# DS Style Merkin Mix for Original EZ-FLASH OMEGA — development
+# DS Style Merkin Mix — Original EZ-FLASH OMEGA
 
-DS Style is a custom kernel for the **original EZ-FLASH OMEGA**. It is based on the official EZ-FLASH OMEGA kernel source and Sterophonick's SimpleLight custom kernel and adapts the DS Style launcher experience for the original cartridge model.
+Merkin Mix adds artwork transparency and name-matched artwork for supported systems beyond GBA, alongside highly optimized artwork lookup and menu rendering that retains transparency compatibility. This branch builds on **FrankieT19's Original OMEGA DS Style v8.0 fork**, with the EZ-FLASH and Sterophonick kernel foundations.
 
-> [!WARNING]
-> This repository is for the **original EZ-FLASH OMEGA only**. Do not flash this build to the EZ-FLASH OMEGA Definitive Edition.
+**Original EZ-FLASH OMEGA only. Hardware untested.** These builds are incompatible with the older OMEGA Definitive Edition Rev. A/B and the newer OMEGA Definitive Edition B / BLUE. Those targets have separate [ezfode](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfode) and [ezfblue](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfblue) branches.
 
-## Development status
+The current development checkpoint identifies itself as `Merkin Mix 8.3.1-omega-test2`. It has source, build and host-test validation only. Installation, booting, gameplay, saving, plugins, cheats/save states and NOR operations still need testing on an Original OMEGA cartridge. [Test 1](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test1) remains available while Test 2 completes validation.
 
-This branch backports Merkin Mix onto FrankieT19's Original Omega DS Style v8.0 implementation. It is hardware-untested development code. The first hardware-untested prerelease is [Original Omega Test 1](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test1). It is a kernel-only test download, not a hardware-qualified release.
+Features include:
 
-Backported so far: filename/mirrored-LFN artwork in SYSTEM/IMGS or SYSTEM/IMGS2, marked transparency, clean external-plugin launch transitions, checked PSRAM/addon/NOR input handling, themed NOR writing progress with a dedicated background and top bar, staged SD save/settings replacement, and optional remembered cheats with collapsible groups. Marked artwork transparency is now implemented and host-tested; further Merkin Mix fixes are still being ported; see docs/porting/OMEGA_STATUS.md.
+- Name-matched and mirrored artwork folders, long-filename support, marked transparency, GBA header-code artwork and per-extension default images.
+- List, List + Art, horizontal and vertical carousels, title/box artwork, cached previews and optional CUSTOM Only rounded corners.
+- Favorites, recent and last-played games, configurable Start-screen behavior, Light/Dark/Auto themes, accent colors and menu sounds.
+- Clean list display, configurable wrapping including “On, Not SYSTEM,” multiple languages including Chinese and Thai, and the text/Markdown viewer.
+- Optional remembered per-game cheat selections and collapsible groups, adapted from **exploitz86's** work and **SkillerCMP's** group-menu foundation.
+- Staged SD save/settings replacement, checked loading and patch preparation, themed NOR writing progress with the normal clock/username, and remembered NOR artwork source paths on SD.
 
-Build: `make BUILD=build-omega TARGET=omega-port`. Original Omega uses `ezkernel.bin`, not the DE filename. Do not install this branch on DE/BLUE hardware.
+The Original OMEGA hardware drivers and game-time cheat engine remain the target foundation. Native PSRAM loading and generic plugin combinations are limited to 32 MiB. NOR deletes retain the newest-title restriction. NOR flash status and power-loss recovery remain limited by the original implementation; SD artwork hints and cheat snapshots are best-effort metadata. Extra custom theme/color slots remain excluded.
 
-## User Guide
+Download the Original OMEGA **`ezkernel.bin`** from its explicitly labeled prerelease and use an Original OMEGA-compatible `SYSTEM` setup. Back up your SD card and saves before testing. GitHub provides source archives automatically.
 
-Read the complete [DS Style User Guide](https://frankiet19.github.io/omega-de-ds-style-kernel/) for installation, everyday use, artwork, customisation and troubleshooting.
+Build with devkitPro/devkitARM and libgba:
 
-## Web
-
-- [DS Style homepage](https://frankiet19.github.io/omega-de-ds-style-kernel/project/)
-- [DS Style Manager](https://frankiet19.github.io/omega-de-ds-style-kernel/manager/) - guided installation, preferences, artwork and styles
-
-## Features
-
-- DS-style launcher interface
-- Multiple accent colours and Light, Dark or clock-based Auto theme
-- Customisable launcher assets through DS Style Customiser
-- List, List + Art, horizontal carousel, and vertical carousel file views
-- Title and box-art thumbnail modes
-- Favourite and recent game support
-- Multi-language launcher text, including Chinese and Thai
-- Bundled text and Markdown viewer with light and dark modes
-- Included title, box and console-folder artwork in the standard installation
-- UI sounds
-- Smooth carousel animations enabled by default, adjustable side-preview sizes and a launch pulse
-- Wrap-around browsing and menus enabled by default, with defensive file checks
-- Runtime settings stored in readable `SYSTEM/SETTINGS.TXT`
-
-## Building
-
-Install devkitPro/devkitARM, then run:
-
-```bat
-build.bat
+```sh
+make BUILD=build-omega TARGET=omega-port
+bash scripts/verify-omega-port.sh
 ```
 
-The build script outputs:
+The verifier requires a host C compiler, Python 3 and the devkitPro tools. The build enforces the 2 MiB kernel limit. Host tests check filesystem failures, artwork rendering, settings, caches, directory identities, loader policies and patch boundaries; they do not qualify physical hardware. See [port status and validation](docs/porting/OMEGA_STATUS.md).
 
-```text
-ezkernel.bin
-```
-
-Copy `ezkernel.bin` to the root of the SD card and boot the cartridge while holding **R** to update the kernel.
-
-## Skin Assets
-
-Theme image headers are generated from the files in `images/` using:
-
-```bat
-Grit\Build Skin Files.bat
-```
-
-Run this before building if you edit the theme BMP/PNG/JPG assets.
-
-## Customising
-
-For normal users, the recommended route is **DS Style Customiser**, which creates a private project copy, edits the assets/settings, and builds the kernel without modifying this source tree directly.
-
-The original OMEGA's smaller kernel size limit does not leave room for separate Custom Theme or Custom Colour slots. Edit one of the existing colour slots and its top bar and icons instead.
-
-## Credits
-
-- Original kernel source by EZ-FLASH
-- SimpleLight custom kernel by Sterophonick
-- DS Style custom kernel by FrankieT19
-- Contributions by Merkin
-- Contributions by timdmackey
-- Thai language support by aidiadayo
-- Case-sensitive `HZK12.h` include fix by Kekun
-- FatFs by ChaN, as used by the upstream kernel
-
-## License
-
-This project follows the license terms provided with the original EZ-FLASH kernel source. See `LICENSE`.
+Thanks to **FrankieT19** for the Original OMEGA DS Style adaptation and interface work, **Sterophonick** and **EZ-FLASH** for the foundations, **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above, **aidiadayo** for Thai support, **Kekun** for the case-sensitive font include correction in the lineage, and **ChaN** for FatFs. Merkin Mix artwork and port work is maintained by **Merkin / voluptuary**, with AI assistance. [Detailed credits and provenance](CREDITS.md).

@@ -1,5 +1,30 @@
 # Original Omega Merkin Mix port status
 
+## Current state — Test 2 software validated, publication pending
+
+Current target is Original OMEGA only. Earlier entries below are historical checkpoints; the current matrix supersedes their pending-feature labels. Hardware remains unavailable. Do not equate DE Rev. A/B or BLUE reports with an Original OMEGA test.
+
+| Area | Current implementation and evidence |
+| --- | --- |
+| UI/assets | Current Merkin splash/help, DS themes/start/list/carousels, cached transparency-aware motion, clean plugin transitions; lossless splash/NOR asset checks and renderer comparisons |
+| Artwork | Filename/mirrored/LFN/header lookup, marked transparency, indexed FAT fast-open with fallback, sorted CUSTOM manifest, extension defaults and full missing-art previews; actual production-path tests |
+| Identity/pools | Separate bounded display names and SFN identities; 512 records plus paired directory offsets within64 KiB PSRAM, staged sorting and input validation |
+| Settings | Shared boolean/enum matching and migration, editable/cache-aware Clean list, three-state wrap scope, CUSTOM Only rounded corners with cache provenance;1,285/33,600-case differential suites |
+| Language/popups | Complete13 x154 runtime language entries (Thai remembered-cheat gap corrected), localized prompts and readable management-popup confirm/back hints |
+| NOR art/progress | SD-only OAR1 full source-path hints checked against catalog identity and checksum; themed progress/background/clock/username; original append/newest-delete policy retained |
+| Saves/cheats | Staged SD save/settings replacement and remembered/collapsible selections with original runtime engine; real FatFs fault injection and identity/viewport tests |
+| Loading/patching |32 MiB target geometry, checked exact I/O/padding/ranges, staged patch intersections, failure-triggered directory rebuild, bounded raw/LZ EWRAM plugin payloads and distinct WRAM/VRAM BIOS wrappers |
+| Hardware-specific boundaries | Original Omega cartridge/SRAM/SD/reset/flash protocols retained. DE LEDs/Mode B/FRAM/firmware-update protocols and BLUE64 MiB mapping are not transplanted |
+
+Latest build2,049,144 bytes (48,008 below2 MiB). Static EWRAM heap19,424; IWRAM data-to-user-stack gap7,488. These are reservations, not measured runtime peaks. Full final verifier passed; no Test2 publication yet. Tests use mocks/sanitizers/real FatFs and linked disassembly, not cartridge hardware.
+
+Known limits: void raw NOR programming APIs and unbounded polling remain, metadata is not power-loss atomic, newest-title-only NOR deletion remains, and optional artwork hints/cheat snapshots are not transactional saves. Malformed-ROM patch-detector indices and other deferred shared findings are scheduled for the subsequent three-branch adversarial audit. Extra custom theme/color slots remain disabled as in the supported donor configuration.
+
+Next: verify/commit/package/publish Test2 as hardware-untested/non-latest, verify downloaded hash, then audit all three branches. Do not merge platform hardware code or change stable DE release assets as part of this port.
+
+## Historical port checkpoints
+
+
 ## Isolation and provenance
 
 Work only on ezfomega. Do not merge into ezfode, change DE release tags/assets, or use DE candidate filenames for this target. The owner explicitly requires branch isolation. Hardware source baseline: FrankieT19/omega-ds-style-kernel ef30b8ba78147943d95653dfa82f721b52096f67, DS Style v8.0; Merkin Mix source reference: this repository ezfode. Existing authorship/licenses remain in source/history. Wholesale hardware baseline replacement is intentional because this branch previously contained DE code, not an Omega port.
