@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include "fatfs_oem_path.h"
 
 typedef int (*LauncherArtworkResolveDirectoryComponent)(void *context,
 	const char *parent_path, const char *component,
@@ -49,7 +50,7 @@ static inline int LauncherArtworkResolveDirectoryPath(const char *path,
 		resolved_name[0] = '\0';
 		if(!resolve_component(context, out_path, component,
 			resolved_name, resolved_name_capacity) || !resolved_name[0] ||
-			strchr(resolved_name, '/') || strchr(resolved_name, '\\'))
+			FatFsPathLastSeparator(resolved_name))
 			goto fail;
 
 		out_length = strlen(out_path);

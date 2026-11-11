@@ -6340,7 +6340,6 @@ static void Launcher_CustomThumbFileName(const char *filename, char *name, u32 n
 {
 	const char *base;
 	const char *slash;
-	const char *backslash;
 	char *dot;
 
 	if(!name || !name_size)
@@ -6350,12 +6349,8 @@ static void Launcher_CustomThumbFileName(const char *filename, char *name, u32 n
 		return;
 
 	base = filename;
-	slash = strrchr(filename, '/');
-	backslash = strrchr(filename, '\\');
-	if(slash && (!backslash || (slash > backslash)))
-		base = slash + 1;
-	else if(backslash)
-		base = backslash + 1;
+    slash = FatFsPathLastSeparator(filename);
+    if(slash) base = slash + 1;
 
 	strncpy(name, base, name_size - 1);
 	name[name_size - 1] = '\0';
@@ -6476,9 +6471,7 @@ static u32 Launcher_LoadFilenameThumbnailAt(const char *filename, const char *ro
 		else directory = "/";
 	}
 	base = filename;
-	slash = strrchr(base, '/');
-	if(slash) base = slash + 1;
-	slash = strrchr(base, '\\');
+	slash = FatFsPathLastSeparator(base);
 	if(slash) base = slash + 1;
 	if(rom_dir && f_stat(filename, &work->info) == FR_OK && !(work->info.fattrib & AM_DIR))
 		base = work->info.fname;
@@ -6488,7 +6481,7 @@ static u32 Launcher_LoadFilenameThumbnailAt(const char *filename, const char *ro
 	dot = strrchr(work->name, '.');
 	if(!dot || dot == work->name || !dot[1]) return 0;
 	*dot = '\0';
-	if(strchr(work->name, '/') || strchr(work->name, '\\')) return 0;
+	if(FatFsPathLastSeparator(work->name)) return 0;
 
 	if(strcmp(directory, "/") && LauncherArtworkResolveDirectoryPath(directory,
 		work->directory, sizeof(work->directory), work->component, sizeof(work->component),

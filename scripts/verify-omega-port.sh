@@ -12,6 +12,7 @@ bash scripts/test-omega-patch-host.sh
 bash scripts/test-nes-patch-host.sh
 bash scripts/test-patch-write-host.sh
 bash scripts/test-marked-artwork-host.sh
+bash scripts/test-oem-path-host.sh
 bash scripts/test-omega-trim-host.sh
 bash scripts/test-omega-nor-scan-host.sh
 bash scripts/test-omega-nor-load-host.sh

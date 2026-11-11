@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "ff.h"
+#include "fatfs_oem_path.h"
 
 #ifndef EWRAM_BSS
 #define FILE_TXN_EWRAM_BSS
@@ -77,21 +78,7 @@ static int FileTxn_PathPrefixEqual(const char *path, const char *prefix)
 
 static int FileTxn_NameHasSeparator(const char *name)
 {
-    const unsigned char *cursor = (const unsigned char *)name;
-    for(; *cursor; cursor++)
-    {
-#if FF_CODE_PAGE == 936
-        /* Match ff.c TBL_DC936: a valid trail byte may equal ASCII backslash. */
-        if(*cursor >= 0x81 && *cursor <= 0xFE &&
-           cursor[1] >= 0x40 && cursor[1] <= 0xFE && cursor[1] != 0x7F)
-        {
-            cursor++;
-            continue;
-        }
-#endif
-        if(*cursor == '/' || *cursor == '\\') return 1;
-    }
-    return 0;
+    return FatFsPathLastSeparator(name) != NULL;
 }
 
 static int FileTxn_IsAllowedTarget(const char *path)
