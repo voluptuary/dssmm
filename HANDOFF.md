@@ -1,5 +1,11 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-11 23:53 UTC — DE host-runtime compatibility and candidate cleanup
+
+- Hosted DE build and all41 host suites pass after checkout-ownership correction; the remaining failure is Node18 treating browser .js modules as CommonJS. These files are already browser ES modules. Added docs/manager/js/package.json type:module so host verification is explicit and works across Node18/24, without changing browser or firmware code. Run browser/JS checks and hosted CI again; no check is skipped.
+- Removed obsolete8.3.1 candidate README records from active files/candidate; current8.3.2 retained, all audit/progress/handoff history preserved. No released artifact or target firmware/assets changed. Canonical DE snapshot will import this metadata-only update, then revalidate browser/JS and provenance.
+
+
 ## 2026-11-11 23:50 UTC — Hosted CI ownership fix and relocation verification
 
 - Initial hosted CI built each kernel successfully, then failed historical Git-based fixtures because checkout/container UIDs differed (dubious ownership). YAML, dependency installation and model identity passed. Workflow now trusts only exact GITHUB_WORKSPACE, never safe.directory=*; no access-control or verification check is disabled. BLUE test history uses explicit real GIT_DIR/GIT_WORK_TREE while actual functions/headers/fixtures remain private; focused popup/art-border tests pass. Await rerun before claiming hosted success.
