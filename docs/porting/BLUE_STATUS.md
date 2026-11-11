@@ -48,3 +48,9 @@ Correction to initial baseline checkpoint: the temporary vendor build succeeded,
 4. Review vendor ezbluekernel.c folder appends (overlapping sprintf), header/file-size probes, addon trim reads and LoadEMU2PSRAM, plus NOR allocation/catalog functions. Native checked loader does not make these paths safe automatically. Test each narrow correction and checkpoint it.
 5. Keep docs/porting/EZFODE_REVIEW_QUEUE.md updated for verified shared DE findings. Existing six entries were established on the unchanged DE commit during Omega work; vendor-only loader/path issues are not new DE bugs. No stable DE changes/merges/releases during BLUE work.
 6. Hardware verification remains outstanding for BLUE boot/SD, game saves/settings, plugins, cheats/RTS, 32/64 MiB games and NOR install/delete/format. Do not publish raw baseline as a finished DS Style build.
+
+## Fixed-resource layout proof recovered
+
+Run `python3 scripts/probe-blue-layout.py --report docs/porting/BLUE_LAYOUT_MEASUREMENTS.json`. It exports current DE into a temporary directory, builds before/after a ROM-only relink, checks every loaded section against the resource/metadata reservations, compares 103 artwork/font/audio objects byte-for-byte, and checks unchanged RAM sections. The replay passed at 3,978,912 bytes with 3,885,408 before metadata. Layout: executable prefix below 0x08100000; vendor image unchanged at 0x08100000..0x082069DC; DSSMM readonly data from 0x08207000; all load sections end below 0x08780000. No compression or extra RAM is required.
+
+This establishes non-overlap and feature-asset capacity, not updater size acceptance or functional BLUE behavior. The vendor repository includes no updater bootloader source. No update artifact is emitted by the probe. Next: use this split for the actual BLUE frontend while preserving BLUE-specific backend behavior and metadata.

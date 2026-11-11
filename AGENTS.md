@@ -6,7 +6,10 @@ may retain its original local directory name after the repository rename.
 The primary and GitHub default branch is `ezfode`. The owner completed the
 rename through GitHub; remote `main` no longer exists. Do not recreate it.
 `ezfblue` is the active BLUE port branch, resumed by the owner.
-Keep it isolated from ezfode and ezfomega: no merges or DE release changes.
+Keep platform ports isolated: no cross-platform merges or DE release changes
+during porting. Owner follow-up authorizes BLUE software-validated test release,
+remaining Omega backports/test release, then a separate adversarial audit of all
+three branches. Only that final audit may apply validated shared fixes to ezfode.
 Preserve target-specific flash/save/reset protocols. Record directly relevant
 ezfode defects in a branch-local deferred queue rather than changing ezfode.
 No BLUE hardware testing is available; never imply DE reports validate BLUE.

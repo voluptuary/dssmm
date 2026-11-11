@@ -1,5 +1,24 @@
 # DS Style Kernel Audit Progress
 
+## 2026-11-11 03:40 UTC — Recovered layout proof replay passed
+
+- scripts/probe-blue-layout.py replay passed using pinned DE 5f700c9 and existing BLUE resource SHA/firmware CRC. Report regenerated with current timestamp; 103 asset objects/1,692,278 bytes exact, RAM sections unchanged, negative overlap cases rejected, total 3,978,912 bytes before 0x780000 metadata. The first interrupted script's Python tar filter incompatibility had already been corrected by explicit regular-file/path-checked extraction; replay confirms actual result.
+- Committing/pushing recovered tooling and checkpoint before substantial frontend integration. The probe emits reports only, not flashable firmware. Expanded mission and branch isolation are now recorded in AGENTS.
+- Next: current DS frontend/filesystem-only helpers plus BLUE low-level source; adapt 64 MiB/native page 0x400, BLUE streaming patch APIs, catalog allocation/deletion/map persistence and settings/save interfaces. Build-only success will not be called functional parity; use per-feature integration tests and retain explicit updater/hardware uncertainty.
+
+## 2026-11-11 03:38 UTC — Timeout recovery and expanded owner mission
+
+- Reconciled ezfblue HEAD 8b0e159 and inherited uncommitted layout probe/report from interrupted session. Entire journal files accessed (HANDOFF 394401 chars, PROGRESS 718180 chars); latest operational state and historical findings reconciled against refs/source. Origin ezfode remains 5f700c9; ezfomega 439289b.
+- Recovered BLUE_LAYOUT_MEASUREMENTS.json: complete current DE donor links around unchanged BLUE resources in 3,978,912 bytes, 103 asset objects/1,692,278 bytes preserved, same RAM layout; 3,885,408 bytes before first metadata. This is DE donor placement evidence, not functional BLUE firmware or proof of updater max size. Re-run probe to verify surviving result before integration.
+- Owner requests autonomous sequence: (1) all supported BLUE DSSMM features with tests/docs and explicitly hardware-untested prerelease; (2) commit/push, then remaining Omega features/fixes and new test release if changed; (3) adversarial review all branches, allowing narrow validated shared fixes on DE at that stage. No hardware exists for either port; do not wait for user hardware feedback or conflate source/build testing with it. No source ZIP uploads; stable latest/release assets remain untouched.
+- Next: commit recovered layout work after replay; integrate current DS Style frontend against BLUE hardware backend in small checkpoints, preserving firmware/resource bytes, metadata format, 64 MiB launch/PSRAM and target patch/reset/flash. Re-evaluate feature matrix rather than claiming parity from compilation.
+
+## 2026-11-10 21:13 UTC — BLUE fixed-resource layout feasibility investigation
+
+- Owner asks whether a safe layout can be determined and whether DSSMM features can be ported. Investigate exact linked DS Style code/assets versus BLUE vendor image/firmware/address reservations. Do not equate source-level non-overlap with bootloader/hardware qualification.
+- Strategy: measure current stable donor in a temporary detached source export, identify fixed-address consumers, distinguish optional legacy artwork from live FPGA payload, and test a linker-enforced layout while retaining all vendor resource bytes if feasible. Preserve ezfode and ezfomega refs; no firmware update/release or public BLUE candidate during this investigation.
+- Next: inspect full ROM/RAM section sizes and vendor update packaging constraints; record validated layout candidates, remaining bootloader evidence gaps, and target API/feature compatibility boundaries.
+
 ## 2026-11-10 20:43 UTC — BLUE native-loader backport and first port checkpoint validated
 
 - Actual native Loadfile2PSRAM now checks full 64-bit file size before 64 MiB narrowing, exact seek/read/close, deterministic FF tail, bank/page geometry and selector restoration. Caller returns on failure before creating patch files, further patching or boot. Preserved BLUE streaming patch behavior and 0x400 game launch/8 MiB selector conventions; no flash commands/reset/firmware changes.
