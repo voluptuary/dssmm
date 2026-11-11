@@ -1,4 +1,6 @@
-build/
+**/build*/
+**/__pycache__/
+*.pyc
 *.elf
 *.gba
 *.bin
@@ -8,9 +10,6 @@ build/
 *.lst
 *.bak
 *.tmp
+.site/
 Thumbs.db
 desktop.ini
-
-# Browser installer payloads are release data, not compiler output.
-!docs/manager/packages/current/**/*.gba
-!docs/manager/packages/current/**/*.bin

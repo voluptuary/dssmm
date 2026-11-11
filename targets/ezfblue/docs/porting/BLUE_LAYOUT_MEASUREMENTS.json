@@ -1,0 +1,173 @@
+{
+  "donor_commit": "5f700c9a89768309f06993984bb6c3a3190d04ef",
+  "vendor_commit": "109f1a050d9c35008379ce61ae40d05dc528c614",
+  "measured_utc": "2026-11-11T03:38:50.289296+00:00",
+  "stock_linker_sha256": "f3da745130509f54ebbdb8e0c5ff09796483f8a45c592987569c928f24cccd7f",
+  "baseline_bytes": 2024344,
+  "layout_bytes": 3978912,
+  "asset_count": 103,
+  "asset_bytes": 1692278,
+  "vendor_resource_sha256": "be609b61939eaa19b97b81345f8e44e7c97b819fb76d230553d40f2d28688644",
+  "resource_start": 1048576,
+  "resource_end": 2124252,
+  "asset_start": 2125824,
+  "metadata_start": 7864320,
+  "remaining_before_metadata": 3885408,
+  "ram_sections": [
+    [
+      ".iwram",
+      15800,
+      50331648
+    ],
+    [
+      ".bss",
+      8212,
+      50347448
+    ],
+    [
+      ".data",
+      7572,
+      50355660
+    ],
+    [
+      ".init_array",
+      4,
+      50363232
+    ],
+    [
+      ".fini_array",
+      4,
+      50363236
+    ],
+    [
+      ".iwram0",
+      0,
+      50363240
+    ],
+    [
+      ".iwram1",
+      0,
+      50363240
+    ],
+    [
+      ".iwram2",
+      0,
+      50363240
+    ],
+    [
+      ".iwram3",
+      0,
+      50363240
+    ],
+    [
+      ".iwram4",
+      0,
+      50363240
+    ],
+    [
+      ".iwram5",
+      0,
+      50363240
+    ],
+    [
+      ".iwram6",
+      0,
+      50363240
+    ],
+    [
+      ".iwram7",
+      0,
+      50363240
+    ],
+    [
+      ".iwram8",
+      0,
+      50363240
+    ],
+    [
+      ".iwram9",
+      0,
+      50363240
+    ],
+    [
+      ".ewram",
+      0,
+      33554432
+    ],
+    [
+      ".sbss",
+      238648,
+      33554432
+    ],
+    [
+      ".pad",
+      8,
+      33793080
+    ]
+  ],
+  "load_sections": [
+    {
+      "name": ".crt0",
+      "start": 0,
+      "end": 528
+    },
+    {
+      "name": ".init",
+      "start": 528,
+      "end": 540
+    },
+    {
+      "name": ".text",
+      "start": 544,
+      "end": 168448
+    },
+    {
+      "name": "motion_code",
+      "start": 168448,
+      "end": 171244
+    },
+    {
+      "name": ".fini",
+      "start": 171244,
+      "end": 171256
+    },
+    {
+      "name": ".rodata",
+      "start": 2125824,
+      "end": 3955520
+    },
+    {
+      "name": ".eh_frame",
+      "start": 3955520,
+      "end": 3955524
+    },
+    {
+      "name": ".iwram",
+      "start": 3955524,
+      "end": 3971324
+    },
+    {
+      "name": ".data",
+      "start": 3971324,
+      "end": 3978896
+    },
+    {
+      "name": ".init_array",
+      "start": 3978896,
+      "end": 3978900
+    },
+    {
+      "name": ".fini_array",
+      "start": 3978900,
+      "end": 3978904
+    },
+    {
+      "name": ".pad",
+      "start": 3978904,
+      "end": 3978912
+    }
+  ],
+  "hardware_verified": false,
+  "updater_size_support_verified": false,
+  "scope": "Unmodified DE donor layout proof, not a functional BLUE port or flashable artifact"
+}

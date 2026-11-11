@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "id": "ezfblue",
+  "hardware": "EZ-FLASH OMEGA Definitive Edition B / BLUE only",
+  "verification": "scripts/verify-blue-port.sh"
+}

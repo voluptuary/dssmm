@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "projects": {
+    "ezfomegade": {
+      "directory": "targets/ezfomegade",
+      "branch": "ezfomegade",
+      "source_commit": "1c57b0e981a2294763d8fb7eadab298dbe0e5cd2"
+    },
+    "ezfomega": {
+      "directory": "targets/ezfomega",
+      "branch": "ezfomega",
+      "source_commit": "0f8b39d0abffe1e833722df1a42025dd368f3a6a"
+    },
+    "ezfblue": {
+      "directory": "targets/ezfblue",
+      "branch": "ezfblue",
+      "source_commit": "80728744404b8bf478bd8161b887b898ac48b2b0"
+    }
+  },
+  "policy": "Independent snapshots; no automatic synchronization or cross-platform merges.",
+  "relocation_baselines": [
+    {
+      "target": "ezfomegade",
+      "size": 2025056,
+      "sha256": "6d7774ecbadc40e8c91d9e0e977fe09cd36abe8ff34462d362557f828f926f38"
+    },
+    {
+      "target": "ezfomega",
+      "size": 2049416,
+      "sha256": "c1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52"
+    },
+    {
+      "target": "ezfblue",
+      "size": 3982696,
+      "sha256": "ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710"
+    }
+  ]
+}

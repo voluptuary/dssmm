@@ -1,0 +1,13 @@
+{
+  "target": "ezfblue",
+  "verified_utc": "2026-11-11 23:45 UTC",
+  "binary": {
+    "target": "ezfblue",
+    "size": 3982696,
+    "sha256": "ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710"
+  },
+  "source_change": "No actual target firmware/assets changed",
+  "verifier": "passed",
+  "hardware_qualification": false,
+  "branch_protection": "not enabled; CI is not mandatory enforcement"
+}

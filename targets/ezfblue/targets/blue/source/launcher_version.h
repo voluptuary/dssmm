@@ -1,0 +1,6 @@
+#ifndef LAUNCHER_VERSION_H
+#define LAUNCHER_VERSION_H
+
+#define LAUNCHER_VERSION_TEXT "8.3.1-blue-test2"
+
+#endif

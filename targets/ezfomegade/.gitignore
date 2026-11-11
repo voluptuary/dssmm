@@ -1,0 +1,16 @@
+build/
+*.elf
+*.gba
+*.bin
+*.map
+*.o
+*.d
+*.lst
+*.bak
+*.tmp
+Thumbs.db
+desktop.ini
+
+# Browser installer payloads are release data, not compiler output.
+!docs/manager/packages/current/**/*.gba
+!docs/manager/packages/current/**/*.bin

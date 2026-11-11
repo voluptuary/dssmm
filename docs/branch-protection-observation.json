@@ -1,0 +1,22 @@
+[
+  {
+    "branch": "dssmm",
+    "protected": false,
+    "head": "a57b0090fe79edceb6d26ee8c363afd72e4099a2"
+  },
+  {
+    "branch": "ezfomegade",
+    "protected": false,
+    "head": "08f007a98e472907f9d527d12fb6377d204b274c"
+  },
+  {
+    "branch": "ezfomega",
+    "protected": false,
+    "head": "2cb5596a5268fd6e2046b8ad8d00c8fddacd02fa"
+  },
+  {
+    "branch": "ezfblue",
+    "protected": false,
+    "head": "2e18e6d06168f6fd89055162e71b3a083700a058"
+  }
+]
