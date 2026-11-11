@@ -40,6 +40,10 @@ u32 spend_address;
 //------------------------------------------------------------------
 void Write(u32 romaddress, const u8* buffer, u32 size)
 {
+    if(!buffer || size < 2) {
+        if(!is_NORpatch) SetPSRampage(0);
+        return;
+    }
 	u32 x;
 	if(is_NORpatch)
 	{
@@ -70,9 +74,10 @@ void Write(u32 romaddress, const u8* buffer, u32 size)
 		u32 address = romaddress;
 		u32 source_word = 0;
 		u32 words_remaining = size / 2;
-		if(address & 1)
+		if((address & 1) || address >= PSRAM_CAPACITY_BYTES ||
+            words_remaining > (PSRAM_CAPACITY_BYTES - address) / 2)
 		{
-			/* PSRAM patch writes use halfwords and require an even address. */
+			/* Preflight the whole native range before touching a bank. */
 			SetPSRampage(0);
 			return;
 		}

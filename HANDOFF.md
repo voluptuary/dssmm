@@ -1,5 +1,19 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-11 13:04 UTC — Patch writer bounds and immutable RAM usage validated
+
+- DE Write now intersects copies with the128 KiB staged NOR window, including continuation from the preceding block. Six-byte/last-halfword reproducer and28 offset/length canary comparisons pass. All three writers preflight the whole native destination against their own32/64 MiB capacity before selecting a bank/copying; invalid ranges cannot partially modify the last bank. Null/no-halfword inputs are safe and page-zero restoration is retained. Native invalid-selector reproducer passed as expected before correction; producer reachability remains unverified (defense-in-depth/native guard, low severity).
+- Shared production writer regression passes seven scenarios: every bank boundary, exact final halfword, full-limit/overrun/huge/null rejection and staged intersections/canaries. No flash protocol or per-pixel/render code changed.
+- DE/Omega832-byte NES patch payload now aligned const ROM; byte-for-byte comparison to prior HEAD confirmed SHA256 cb7ba0c02daab7dd18701431e8e4fe4c86d8a89e2cb8ac4892c340c24ab4f9c7 on all targets, and nm shows ROM R symbols. Only existing ROM-resident stage/PSRAM writer consumes it; no flash-banked read was introduced. BLUE was already const.
+- Builds pass without diagnostics: DE2,024,624 bytes, IRQ gap1,888, heap7,112 and12 KiB user reserve; Omega2,049,360 bytes, user-stack gap8,320, heap19,424; BLUE3,982,696 bytes, split/resource guard passes. Gaps are static, not runtime high-water. Hot scale maps remain IWRAM.
+- Preparing per-branch commit/push. Next: DE deferred save-path, cheat-size and launch-copy/header/PSRAM-refresh/stack fixes, then full configured verifiers/static/browser checks. Published releases/tags/assets remain unchanged; no hardware reports added.
+
+## 2026-11-11 13:01 UTC — Patch-write capacity/staging reproduction
+
+- New shared production Write fixture reproduces DE128 KiB staging guard corruption at offset0x1FFFE with6-byte input; Omega/BLUE already had intersection clipping. All three Write implementations also reproduce an invalid PSRAM selector when called at their declared capacity (32 MiB DE/Omega,64 MiB BLUE), with no preflight capacity check. Source-verified helper defect, medium severity; upstream patch-generator reachability/physical impact not asserted.
+- Next: retain staged intersection behavior, preflight native destination capacity before any copy, keep page-zero restoration and target-specific selectors, and reject null/no-halfword copies safely. Shared test will cover all target bank boundaries, full-limit/span/huge/null inputs and staged canaries/intersections.
+- Immutable832-byte gba_nes_patch_bin is read only by the ROM-resident staging/PSRAM Write helper (never during banked flash commands). Move DE/Omega copies to aligned const ROM as BLUE already does; compare source bytes/symbol placement and preserve hot renderer maps. This reclaims scarce DE IRQ headroom without moving hot code/data. Validation pending; published firmware remains unchanged.
+
 ## 2026-11-11 12:56 UTC — PATCH-NES-02 fixed and validated on all targets
 
 - Verified medium-severity shared read-bound/state defect with actual production functions: valid variants pass before changes; eight branch/stale/unsupported-variant/probe/later-window/short/misaligned/pending cases fail under ASan or assertions on all three baselines. Branch fixture reads exactly one word past a128 KiB allocation. No physical compatibility claim.
