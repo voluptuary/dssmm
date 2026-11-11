@@ -1,10 +1,20 @@
 # AUTONOMOUS KERNEL AUDIT — MASTER DIRECTIVE
 
+## Verified canonical boundary
+
+Compartmentalization and standalone/relocated verification are complete. Canonical
+CI43123536185 passes this hardware plus the other independent targets. This
+project's source pin is 1c57b0e981a2294763d8fb7eadab298dbe0e5cd2; root docs/ci-verification.json
+records tested commits. Update only this target unless a separate cross-target
+adaptation is intended and validated. No auto-sync/merge/release is configured.
+Current DE stable release is8.3.2; old8.3.1 hold instructions are historical.
+
+
 ## Canonical dssmm location
 
 This project is isolated at targets/ezfomegade in the canonical branch. Treat this
 directory as the project root for its Makefile/scripts/fixtures. Snapshot source
-is 995fba4b43438fc67967c5934c49be09e291a40d from ezfomegade; root projects.json records provenance.
+is 1c57b0e981a2294763d8fb7eadab298dbe0e5cd2 from ezfomegade; root projects.json records provenance.
 Root universal orchestration may select this project but must not share or merge
 hardware-specific files with another project. Read root isolation instructions
 as well as this target's records. Both standalone and relocated verification

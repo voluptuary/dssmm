@@ -1,5 +1,15 @@
 # AUTONOMOUS KERNEL AUDIT — MASTER DIRECTIVE
 
+## Verified canonical boundary
+
+Compartmentalization and standalone/relocated verification are complete. Canonical
+CI43123536185 passes this hardware plus the other independent targets. This
+project's source pin is 0f8b39d0abffe1e833722df1a42025dd368f3a6a; root docs/ci-verification.json
+records tested commits. Update only this target unless a separate cross-target
+adaptation is intended and validated. No auto-sync/merge/release is configured.
+Current DE stable release is8.3.2; old8.3.1 hold instructions are historical.
+
+
 ## Canonical dssmm location
 
 This project is isolated at targets/ezfomega in the canonical branch. Treat this
