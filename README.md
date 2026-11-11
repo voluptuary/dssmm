@@ -53,3 +53,7 @@ bash scripts/rebuild-and-verify-audit.sh
 Merkin Mix is maintained by Merkin and builds on FrankieT19's DS Style v7.5 foundation and selected, separately authored v8.0 interface work. Merkin contributed the refreshed splash screens and system icons in the v8.0 lineage, along with Merkin Mix artwork and kernel improvements. EZ-FLASH, Sterophonick, Copilot, exploitz86 and SkillerCMP also contributed to the project's foundations and features; [CREDITS.md](CREDITS.md) records the specific provenance.
 
 The repository includes the [Apache License 2.0](LICENSE). Retain individual component licenses and attribution notices.
+
+## Repository isolation
+
+This hardware branch is standalone. The `dssmm` default branch holds an independent copy under `targets/ezfomegade`. `project.json` identifies the hardware; `python3 scripts/project.py verify ezfomegade` selects its full verifier. Never merge a different hardware branch or the whole canonical layout here. CI is read-only and target-specific; required-check enforcement still depends on branch protection. Published release tags are preserved.

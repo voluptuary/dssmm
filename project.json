@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "id": "ezfomegade",
+  "hardware": "EZ-FLASH OMEGA Definitive Edition Rev. A/B only",
+  "verification": "scripts/verify-ezfomegade.sh"
+}

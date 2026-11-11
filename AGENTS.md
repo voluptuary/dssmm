@@ -1,5 +1,16 @@
 # AUTONOMOUS KERNEL AUDIT — MASTER DIRECTIVE
 
+## Current target-only layout
+
+This standalone branch owns ezfomegade; project.json is its hardware identity.
+Canonical dssmm stores this project's independent snapshot at targets/ezfomegade.
+Use this branch's own Makefile and verifier. Sources/assets are never shared
+through symlinks or auto-merges. Root CI has contents:read only, verifies this
+target, and rejects known cross-target PRs. There is no Pages deployment on
+hardware branches. A common fix must be adapted/validated per project.
+All historical handoff/progress logs are preserved. Do not recreate ezfode/main.
+
+
 ## Current release task (2026-11-11 23:24 UTC)
 
 Stable Definitive Edition8.3.2 is published and download-verified from ezfomegade.
