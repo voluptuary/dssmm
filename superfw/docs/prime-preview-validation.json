@@ -1,0 +1,42 @@
+{
+  "checkpoint": "SD-browser selectable name-matched artwork preview",
+  "source_commit": "0596247d7f7af6b5fb3dc2f5ca0088b5b95702f6",
+  "hardware_tested": false,
+  "hosted_verifier": {
+    "result": "success",
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43280669644"
+  },
+  "local_tests": {
+    "sanitized_decoder_adapter_compositor": "pass (non-PIE ASan/UBSan)",
+    "settings": "pass",
+    "pinned_dsscc_writer": "pass"
+  },
+  "builds": {
+    "chis": {
+      "result": "pass",
+      "bytes": 1671680,
+      "sha256": "e589517b109b9f273b0793523a27d2d8ca0f1baae14f1542189cabe4cc45a619"
+    },
+    "sd": {
+      "result": "pass",
+      "bytes": 498688,
+      "sha256": "2de330d875ae164c4718d1db7bcfee2cac1e4f3dbad8b871057bef73e13efb51"
+    },
+    "lite": {
+      "result": "pass",
+      "bytes": 465920,
+      "sha256": "3f697eeabebfea3c017f29dd5375f6b27889e94f1302a5a1a5ab4eb59d9b74f9"
+    }
+  },
+  "chis_linked_memory_bytes": {
+    "iwram": 12008,
+    "ewram": 235676
+  },
+  "runtime_stack_measured": false,
+  "cartridge_sdram_preview_bytes": 9600,
+  "limitations": [
+    "physical visual/performance/gameplay validation pending",
+    "fixed palette quantization loses color precision",
+    "file mirrored/CUSTOM only; folder, code-based, NOR/recent and further fallbacks pending"
+  ]
+}
