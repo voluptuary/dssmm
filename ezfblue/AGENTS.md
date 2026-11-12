@@ -44,7 +44,7 @@ DSSMM 8.4.0 includes MiGoomba; earlier releases retain their previous emulator.
 ## BLUE development after 8.4.0
 
 Read docs/porting/FRANKIET19_BLUE_COMPARISON.md for the pinned upstream review.
-The 8.4.1-blue-dev build is firmware-free, contiguous and sealed at the stock
+The 8.4.1-blue-test4 build is firmware-free, contiguous and sealed at the stock
 2124252-byte update size. Use pack-blue-kernel.py with --elf; no active vendor
 resource insertion or firmware updater. Historical resource fixtures stay.
 Do not enable persistent NOR RTS without adapting/validating the matching runtime

@@ -1,3 +1,57 @@
+# DS Style Merkin Mix 8.4.1 — BLUE Test 4
+
+**NEWER EZ-FLASH OMEGA DEFINITIVE EDITION B / BLUE ONLY — HARDWARE UNTESTED. UPDATE AT YOUR OWN RISK.**
+
+Do not install on the older DE Rev. A/B, Original OMEGA, or another model.
+
+Software regression checks passed; installation, boot, saves, plugins, NOR timing and runtime stack peaks remain physically unverified. Stock-size bounds do not prove updater acceptance. Native 64 MiB clean loading remains; new large-ROM add-ons and physical warm return are unqualified. Flash polling and SD/NOR power-loss limits remain.
+
+Back up the SD card and `.esv` saves. Old emulator save states are not guaranteed compatible; prefer in-game battery saves when transitioning.
+
+FrankieT19's reviewed Test 5 also states that physical EZODE-B validation is outstanding. Our comparison and independent adaptations do not change that qualification. Load style now requires the new sealed DSSMM BLUE format.
+
+Download **`ezbluekernel.bin`** (2,124,252 bytes) with the correct model-compatible `SYSTEM` setup. GitHub supplies source archives automatically.
+
+Use the packed `.bin`, not the raw development `.gba`.
+
+SHA-256: `57db5bb4e9fd2cfacdbb1024b6d2d62dd7a83c562964f440d3e5cf02203549a3`
+
+### New features
+
+- Adopted a **firmware-free, stock-size BLUE update** informed by **FrankieT19's BLUE port**: 2,124,252 bytes instead of 3,988,120, with current artwork and MiGoomba retained. Use the official BLUE kernel for FPGA updates.
+- Added complete-image integrity checks for Load style. The new DSSMM BLUE seal checks the model/header, exact size and CRC before staging an update.
+
+### New fixes
+
+- Block new game/save loads and manual FRAM operations while an earlier battery-save backup is still pending.
+- Stop startup/NOR browsing from writing metadata; recognise factory-erased catalog/map data in RAM, require allocation-map agreement, preserve unknown reservations and sort entries by physical ROM page.
+- Reserve the full NOR add-on extent and reject invalid patch offsets or programming-block crossings; store launcher preferences separately from stock Mode B.
+- Correct SD save-state staging to BLUE's DDR memory, check exact size/signature and file errors, and create missing states without overwriting files after an I/O error.
+- Block new and existing **NOR add-ons with save states** until their persistent SD-sector maps and runtime are validated. Existing entries/files are preserved; turn save states off when writing NOR add-ons.
+
+### Summary of past features
+
+- **MiGoomba v0.1** by **michyprima** for GB/GBC, retaining per-game `.esv` paths and 64 KiB save handling; based on Jagoomba Color, Goomba Color and Goomba.
+- **FrankieT19's DS Style foundation and separate v8.0 interface work:** Start screen, themes, sounds, selection/launch effects, Auto theme, View grouping, Open SYSTEM, boot preferences and favorites behavior.
+- List, List + Art and horizontal/vertical carousels, title/box art and side previews; favorites, recents, last-played startup, accent colors and readable settings.
+- Name/header-code/mirrored artwork, long filenames, marked transparency and custom fallbacks; cached/scaled previews and optimized artwork lookup/rendering.
+- Optional remembered cheats, off by default, by **exploitz86**, with collapsible groups from **SkillerCMP**, adapted by **exploitz86**; multilingual support including Thai/Chinese and a text/Markdown viewer.
+- BLUE-native 64 MiB/5G handling, hardware drivers, in-game options and NOR allocation; themed NOR progress and SD-side NOR artwork paths.
+
+### Summary of past fixes
+
+- Guarded embedded-emulator payload sizes/alignment and tested exact game offsets, DMA copies and cache bounds.
+- Bounded NES detection/patch writes, full-width cheat/save sizes and malformed marked artwork; corrected Chinese paths and stopped save loading on close errors.
+- Checked game/plugin limits, SD reads/copies/closes, compressed payloads and stack-safe boot; restored small headerless plugins and directory records after failed loads.
+- Safer staged saves/settings and filename checks; bounded PSRAM/NOR patch copies, consistent block padding, NOR erase/program/catalog readback and reserve-before-publish ordering.
+- Preserved cheat-group selection/visible-row fixes and removed the black plugin-launch strip; checked kernel staging before replacing an update file.
+
+Thanks to **FrankieT19**, **EZ-FLASH**, **Sterophonick**, **exploitz86**, **SkillerCMP**, **aidiadayo**, **Kekun** and **ChaN**; and to **michyprima**, **Jaga / EvilJagaGenius**, **Dwedit** and **FluBBa** for the emulator lineage. Merkin Mix artwork and port work is maintained by **Merkin / voluptuary**. [Credits and provenance](https://github.com/voluptuary/dssmm/blob/v8.4.1-blue-test4/ezfblue/CREDITS.md).
+
+This project was developed with AI assistance.
+
+---
+
 # DS Style Merkin Mix 8.4.0 — BLUE Test 3
 
 **NEWER EZ-FLASH OMEGA DEFINITIVE EDITION B / BLUE ONLY — HARDWARE UNTESTED. UPDATE AT YOUR OWN RISK.**

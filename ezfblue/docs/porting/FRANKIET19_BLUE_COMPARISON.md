@@ -50,8 +50,8 @@ original authorship are not replaced by a blanket attribution to this project.
 ## Validation and limits
 
 See [frankiet19-blue-review.json](frankiet19-blue-review.json) for exact commits,
-build sizes, asset comparison and completed test results. The new development
-version is `8.4.1-blue-dev`; it is not a published release.
+build sizes, asset comparison and completed test results. The release-preparation version is `8.4.1-blue-test4`; publication follows final
+versioned CI at the owner's request.
 
 The focused fixture fails against `v8.4.0-blue-test3` because a pending save is
 not blocked, then passes against this implementation. Tests exercise the actual

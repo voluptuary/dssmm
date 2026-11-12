@@ -1,4 +1,4 @@
-# Current development — 8.4.1-blue-dev
+# Current development — 8.4.1-blue-test4
 
 The latest source adapts independently implemented improvements informed by
 FrankieT19's BLUE Test 3–5: firmware-free stock-size sealed images, pending-save
