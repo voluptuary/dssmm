@@ -38,6 +38,9 @@ project's source or assets. Pages composition requires a complete checkout.
 
 ## Development environment
 
+For a fresh local Ubuntu/Docker/VS Code setup and crash recovery, see
+[local development](local-development.md).
+
 Use the universal root devcontainer or an equivalent devkitPro installation
 with devkitARM, GBA rules, libgba, Maxmod and Make. Verifiers also need a host C
 compiler, Python3/Unicorn and Node. Root make commands dispatch to the private

@@ -84,3 +84,7 @@ Keep developer commands, sparse/branch/merge procedures and architecture details
 in docs/isolation.md and agent/journal files. Clearly distinguish all three
 cards and retain the OMEGA/BLUE hardware-untested, caution/own-risk notice.
 Keep credits positive and accurate; retain Merkin Mix's DS Style fork lineage.
+
+For local VS Code/Docker/Ubuntu setup and session recovery, read
+docs/local-development.md. Codespaces /tmp caches/process handles and ignored
+binaries are not portable; use committed evidence and rerun unfinished checks.
