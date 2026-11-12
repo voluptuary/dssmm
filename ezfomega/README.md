@@ -1,8 +1,3 @@
-<!-- Current workspace layout -->
-Build from the repository root with `make ezfomega` and validate with
-`make verify-ezfomega`. All hardware-specific paths below are relative to
-`ezfomega/`; universal development-container and CI files are at the Git root.
-
 # DS Style Merkin Mix — Original EZ-FLASH OMEGA
 
 Merkin Mix adds artwork transparency and name-matched artwork for supported systems beyond GBA, alongside highly optimized artwork lookup and menu rendering that retains transparency compatibility. This branch builds on **FrankieT19's Original OMEGA DS Style v8.0 fork**, with the EZ-FLASH and Sterophonick kernel foundations.
@@ -24,17 +19,6 @@ The Original OMEGA hardware drivers and game-time cheat engine remain the target
 
 Download the Original OMEGA **`ezkernel.bin`** from its explicitly labeled prerelease and use an Original OMEGA-compatible `SYSTEM` setup. Back up your SD card and saves before testing. GitHub provides source archives automatically.
 
-Build with devkitPro/devkitARM and libgba:
-
-```sh
-make BUILD=build-omega TARGET=omega-port
-bash scripts/verify-omega-port.sh
-```
-
-The verifier requires a host C compiler, Python 3 and the devkitPro tools. The build enforces the 2 MiB kernel limit. Host tests check filesystem failures, artwork rendering, settings, caches, directory identities, loader policies and patch boundaries; they do not qualify physical hardware. See [port status and validation](docs/porting/OMEGA_STATUS.md).
+See the [platform status](docs/porting/OMEGA_STATUS.md) for additional compatibility and testing limitations.
 
 Thanks to **FrankieT19** for the Original OMEGA DS Style adaptation and interface work, **Sterophonick** and **EZ-FLASH** for the foundations, **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above, **aidiadayo** for Thai support, **Kekun** for the case-sensitive font include correction in the lineage, and **ChaN** for FatFs. Merkin Mix artwork and port work is maintained by **Merkin / voluptuary**, with AI assistance. [Detailed credits and provenance](CREDITS.md).
-
-## Repository isolation
-
-All branches track the complete combined tree. Develop on `ezfomega` inside `ezfomega/`; optional worktree-local sparse checkout hides the other projects without removing them from Git. Run `make verify-ezfomega` from the Git root. Merge this hardware branch normally into `dssmm`, then merge `dssmm` back for integration sync. Keep platform progress in this directory's journals. Shared root changes belong on `dssmm`; see [the shared-tree workflow](../docs/isolation.md). Published release tags are preserved.

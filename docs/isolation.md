@@ -36,6 +36,18 @@ view; complete checkouts select all three. Layout checks distinguish real sparse
 index entries from accidentally deleted projects. Builds never borrow another
 project's source or assets. Pages composition requires a complete checkout.
 
+## Development environment
+
+Use the universal root devcontainer or an equivalent devkitPro installation
+with devkitARM, GBA rules, libgba, Maxmod and Make. Verifiers also need a host C
+compiler, Python3/Unicorn and Node. Root make commands dispatch to the private
+project with its correct flags (including Original OMEGA's omega-port target).
+Generated theme headers are checked in; when changing theme bitmaps, regenerate
+them using the owning project's Grit tools from that project directory.
+Hardware branch CI verifies its own kernel; trunk and integration-sync PRs
+verify all three. User-facing README files describe hardware and features, not
+the branch/build workflow.
+
 ## Merging
 
 Develop inside the hardware branch's own directory. Submit its normal PR into
