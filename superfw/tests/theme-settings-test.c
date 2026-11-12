@@ -47,11 +47,13 @@ int main(void) {
   assert(memcmp(&fallback, &themes[0], sizeof(fallback)) == 0);
   parse_ui_settings(0, "accent", "4"); assert(menu_accent == 4);
   parse_ui_settings(0, "accent", "5"); assert(menu_accent == 0);
-  menu_theme = THEME_DSSMM_DARK; menu_accent = 3;
+  parse_ui_settings(0, "artwork", "2"); assert(artwork_mode == 2);
+  parse_ui_settings(0, "artwork", "3"); assert(artwork_mode == 0);
+  menu_theme = THEME_DSSMM_DARK; menu_accent = 3; artwork_mode = 2;
   assert(save_ui_settings());
   assert(strstr(saved_settings, "theme=7\naccent=3\n"));
-  menu_theme = 0; menu_accent = 0;
+  menu_theme = 0; menu_accent = 0; artwork_mode = 0;
   parse_file(saved_settings, parse_ui_settings, 0);
-  assert(menu_theme == THEME_DSSMM_DARK && menu_accent == 3);
+  assert(menu_theme == THEME_DSSMM_DARK && menu_accent == 3 && artwork_mode == 2);
   return 0;
 }

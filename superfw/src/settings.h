@@ -48,6 +48,7 @@ extern const t_theme_colors themes[THEME_COUNT];
 #define ACCENT_COUNT 5
 extern const char * const accent_names[ACCENT_COUNT];
 extern uint8_t menu_accent;
+extern uint8_t artwork_mode; /* 0=list, 1=title, 2=box; Start in SD browser */
 t_theme_colors menu_theme_colors(unsigned theme, unsigned accent);
 
 extern const t_combo_key hotkey_list[13];

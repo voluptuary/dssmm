@@ -22,7 +22,7 @@ static uint8_t pixel_index(uint16_t pixel) {
 bool artwork_decode(artwork_read_fn read, void *context, uint32_t file_size,
                     uint8_t *pixels, size_t capacity, artwork_info *info) {
   uint8_t header[54], row[240];
-  if (!read || !pixels || !info || file_size < sizeof(header) ||
+  if (!read || !pixels || ((uintptr_t)pixels & 1) || !info || file_size < sizeof(header) ||
       !read(context, 0, header, sizeof(header))) return false;
   uint32_t width = le32(header + 18), offset = le32(header + 10);
   /* Fixed dimensions bound every size/offset calculation and scratch buffer. */
@@ -36,12 +36,33 @@ bool artwork_decode(artwork_read_fn read, void *context, uint32_t file_size,
   bool transparent = memcmp(header + 6, "DST1", 4) == 0;
   for (unsigned y = 0; y < 80; ++y) {
     if (!read(context, offset + y * width * 2, row, width * 2)) return false;
-    for (unsigned x = 0; x < width; ++x) {
-      uint16_t pixel = le16(row + x * 2);
-      if (pixel & 0x8000) return false;  /* Not a GBA RGB555 word. */
-      pixels[y * width + x] = transparent && !pixel ? 0 : pixel_index(pixel);
+    for (unsigned x = 0; x < width; x += 2) {
+      uint16_t a = le16(row + x * 2), b = le16(row + x * 2 + 2);
+      if ((a | b) & 0x8000) return false;
+      unsigned lo = transparent && !a ? 0 : pixel_index(a);
+      unsigned hi = transparent && !b ? 0 : pixel_index(b);
+      /* Cartridge SDRAM and GBA VRAM require halfword writes. */
+      ((volatile uint16_t *)pixels)[(y * width + x) / 2] = lo | (hi << 8);
     }
   }
   *info = (artwork_info){ width, 80, transparent };
+  return true;
+}
+
+bool artwork_blit_frame(volatile uint16_t *frame, const uint16_t *pixels,
+                       const artwork_info *info, unsigned x, unsigned y) {
+  if (!frame || !pixels || !info || ((uintptr_t)frame & 1) || ((uintptr_t)pixels & 1) ||
+      (x & 1) || (info->width != 80 && info->width != 120) || info->height != 80 ||
+      x > 240U - info->width || y > 160U - info->height) return false;
+  for (unsigned row = 0; row < info->height; ++row) {
+    volatile uint16_t *dst = frame + (y + row) * 120 + x / 2;
+    const uint16_t *src = pixels + row * info->width / 2;
+    for (unsigned col = 0; col < info->width / 2; ++col) {
+      uint16_t pair = src[col], bg = dst[col];
+      if (!(pair & 255)) pair |= bg & 255;
+      if (!(pair & 0xff00)) pair |= bg & 0xff00;
+      dst[col] = pair;
+    }
+  }
   return true;
 }

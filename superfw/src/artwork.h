@@ -14,9 +14,12 @@ typedef struct {
   uint16_t width, height;
   bool transparent;
 } artwork_info;
-/* Exact random-access reads; caller owns storage. Output is invalid on failure.
+/* Exact random-access reads; caller owns halfword-aligned storage. Output is invalid on failure.
  * Accept only DSSCC top-down, uncompressed 16-bit 120x80 or 80x80 BMPs. */
 bool artwork_decode(artwork_read_fn read, void *context, uint32_t file_size,
                     uint8_t *pixels, size_t capacity, artwork_info *info);
 uint16_t artwork_palette_color(unsigned index);
+/* Composite into a 240x160 indexed frame with halfword-only stores. */
+bool artwork_blit_frame(volatile uint16_t *frame, const uint16_t *pixels,
+                       const artwork_info *info, unsigned x, unsigned y);
 #endif

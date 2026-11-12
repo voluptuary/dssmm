@@ -8,3 +8,8 @@ gcc -std=c11 -Wall -Wextra -Werror -fsanitize=address,undefined -g \
   "$project_root/src/artwork.c" -o "$test_dir/artwork-test"
 "$test_dir/artwork-test"
 printf 'Artwork dimensions, channels, transparency, bounds and read faults passed.\n'
+gcc -std=c11 -Wall -Wextra -Werror -fsanitize=address,undefined -g \
+  -I "$project_root" -I "$project_root/src" "$project_root/tests/artwork-file-test.c" \
+  "$project_root/src/artwork.c" "$project_root/src/artwork_file.c" -o "$test_dir/artwork-file-test"
+"$test_dir/artwork-file-test"
+printf 'Artwork paths, fallback, exact reads and close failures passed.\n'

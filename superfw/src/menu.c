@@ -24,6 +24,7 @@
 #include "fatfs/ff.h"
 #include "common.h"
 #include "settings.h"
+#include "artwork_file.h"
 #include "util.h"
 #include "utf_util.h"
 #include "fonts/font_render.h"
@@ -389,6 +390,7 @@ typedef struct {
   t_centry fentries[BROWSER_MAXFN_CNT];
   t_rentry rentries[RECENT_MAXFN_CNT];
   t_reg_entry_max nordata;
+  uint16_t artwork_pixels[ARTWORK_MAX_PIXELS / 2];
 } t_sdram_state;
 
 _Static_assert (sizeof(t_sdram_state) <= 14.5*1024*1024, "scratch SDRAM doesn't exceed 14.5MB");
@@ -1113,7 +1115,13 @@ static void browser_reload_filter() {
 
 // Loads a new directory list in the ROM browser.
 // TODO: Implement filtering (.gba/.rom/.bin... etc) using settings
+static bool artwork_cached, artwork_valid;
+static char artwork_rom[MAX_FN_LEN];
+static unsigned artwork_cached_mode;
+static artwork_info preview_info;
+
 static void browser_reload() {
+  artwork_cached = false;
   smenu.anim_state = 0;
 
   unsigned fcount = 0;
@@ -1393,6 +1401,7 @@ void render_flashbrowser(volatile uint8_t *frame) {
 #endif
 
 void render_browser(volatile uint8_t *frame) {
+  unsigned list_width = artwork_mode ? 112 : SCREEN_WIDTH;
   // Render bar below to show path URI
   dma_memset16(&frame[240*144], dup8(FG_COLOR), 240*16/2);
 
@@ -1412,7 +1421,7 @@ void render_browser(volatile uint8_t *frame) {
 
       render_icon(2, (i+1)*16, iconidx);
 
-      if (!(e->attr & AM_DIR)) {
+      if (!artwork_mode && !(e->attr & AM_DIR)) {
         human_size(szstr, sizeof(szstr), e->filesize);
         draw_rightj_text(szstr, frame, SCREEN_WIDTH - 2, (1 + i) * 16);
       }
@@ -1420,17 +1429,38 @@ void render_browser(volatile uint8_t *frame) {
       // Animate the row entries if they are too long!
       if (i == smenu.browser.selector - smenu.browser.seloff)
         draw_text_ovf_rotate(e->fname, frame, 20, (1 + i) * 16,
-                             SCREEN_WIDTH - 26 - font_width(szstr), &smenu.anim_state);
+                             list_width - 26 - font_width(szstr), &smenu.anim_state);
       else
-        draw_text_ovf(e->fname, frame, 20, (1 + i) * 16, SCREEN_WIDTH - 26 - font_width(szstr));
+        draw_text_ovf(e->fname, frame, 20, (1 + i) * 16, list_width - 26 - font_width(szstr));
     }
 
-    for (unsigned i = 0; i < 240; i += 16)
+    for (unsigned i = 0; i < list_width; i += 16)
       render_icon_trans(i, (smenu.browser.selector - smenu.browser.seloff + 1)*16, 63);
   }
 
+  if (artwork_mode && smenu.browser.dispentries > 0 && smenu.browser.selector >= 0) {
+    const t_centry *selected = sdr_state->filefilter[smenu.browser.selector];
+    char rom[MAX_FN_LEN];
+    int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, selected->fname);
+    if (!selected->isdir && n > 0 && (unsigned)n < sizeof(rom)) {
+      if (!artwork_cached || artwork_cached_mode != artwork_mode || strcmp(artwork_rom, rom)) {
+        strbcpy(artwork_rom, rom, sizeof(artwork_rom));
+        artwork_cached_mode = artwork_mode;
+        artwork_valid = artwork_load(rom, artwork_mode - 1,
+          (uint8_t *)sdr_state->artwork_pixels, ARTWORK_MAX_PIXELS, &preview_info);
+        artwork_cached = true;  // Cache misses too; avoid SD probes every frame.
+      }
+      if (artwork_valid) {
+        unsigned xoff = 120 + (120 - preview_info.width) / 2;
+        artwork_blit_frame((volatile uint16_t *)frame, sdr_state->artwork_pixels,
+                           &preview_info, xoff, 40);
+      }
+    }
+  }
+
   // Draw path, cut left part if necessary.
-  draw_text_leftovf(smenu.browser.cpath, frame, 8, 144, SCREEN_WIDTH - 8);
+  draw_text_leftovf(smenu.browser.cpath, frame, 8, 144, SCREEN_WIDTH - 88);
+  draw_rightj_text("Start: Art", frame, SCREEN_WIDTH - 2, 144);
 
   char selinfo[16];
   npf_snprintf(selinfo, sizeof(selinfo), "%u/%d", smenu.browser.selector + 1, smenu.browser.dispentries);
@@ -2039,6 +2069,8 @@ void render_tools(volatile uint8_t *frame) {
 
 void reload_theme(unsigned thnum) {
   const t_theme_colors colors = menu_theme_colors(thnum, menu_accent);
+  for (unsigned i = 0; i < ARTWORK_PALETTE_SIZE; ++i)
+    MEM_PALETTE[ARTWORK_PALETTE_BASE + i] = artwork_palette_color(i);
   // Palette 0..15 contains the main menu template colors
   MEM_PALETTE[FG_COLOR] = colors.fg_color;
   MEM_PALETTE[BG_COLOR] = colors.bg_color;
@@ -2138,6 +2170,7 @@ void menu_flip() {
 }
 
 void menu_init(int sram_testres) {
+  artwork_cached = false;
   // Reset to ROM browser and SD card root.
   memset(&smenu, 0, sizeof(smenu));
   memset(&spop, 0, sizeof(spop));
@@ -2891,6 +2924,10 @@ static void keypress_menu_recent(unsigned newkeys) {
 }
 
 static void keypress_menu_browse(unsigned newkeys) {
+  if (newkeys & KEY_BUTTSTA) {
+    artwork_mode = (artwork_mode + 1) % 3;
+    artwork_cached = false;
+  }
   if (smenu.browser.dispentries) {
     // Move menu up and down
     if (newkeys & KEY_BUTTUP)
@@ -3220,6 +3257,9 @@ static void keypress_menu_info(unsigned newkeys) {
 
 
 void menu_keypress(unsigned newkeys) {
+  /* Actions/tools may reuse cartridge RAM; never reuse the preview afterward. */
+  if (newkeys & (KEY_BUTTA | KEY_BUTTSEL | KEY_BUTTL | KEY_BUTTR))
+    artwork_cached = false;
   if (spop.alert_msg) {
     // Modal message pop up!
     if (newkeys & (KEY_BUTTA | KEY_BUTTB))

@@ -55,6 +55,7 @@ static const uint16_t accent_colors[ACCENT_COUNT - 1][2] = {
   { RGB2GBA(0xc0a0e0), RGB2GBA(0x9878b8) },
 };
 uint8_t menu_accent = 0;
+uint8_t artwork_mode = 0;
 
 t_theme_colors menu_theme_colors(unsigned theme, unsigned accent) {
   t_theme_colors result = themes[theme < THEME_COUNT ? theme : 0];
@@ -157,11 +158,12 @@ bool save_ui_settings() {
   npf_snprintf(buf, sizeof(buf),
     "theme=%u\n"
     "accent=%u\n"
+    "artwork=%u\n"
     "langcode=%c%c\n"
     "recent_menu=%u\n"
     "anim_speed=%u\n"
     "hide_hidden=%u\n",
-    menu_theme, menu_accent, (lc & 0xFF), (lc >> 8), recent_menu, anim_speed, hide_hidden);
+    menu_theme, menu_accent, artwork_mode, (lc & 0xFF), (lc >> 8), recent_menu, anim_speed, hide_hidden);
 
   UINT wrbytes;
   FRESULT res = f_write(&fd, buf, strlen(buf), &wrbytes);
@@ -272,6 +274,7 @@ static void parse_ui_settings(void *usr, const char *var, const char *value) {
     } uintset[] = {
       { "theme",       &menu_theme,  THEME_COUNT },
       { "accent",      &menu_accent, ACCENT_COUNT },
+      { "artwork",     &artwork_mode, 3 },
       { "recent_menu", &recent_menu, 2 },
       { "hide_hidden", &hide_hidden, 2 },
       { "anim_speed",  &anim_speed,  animspd_cnt },
