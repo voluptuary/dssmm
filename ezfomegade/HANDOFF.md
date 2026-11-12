@@ -1,3 +1,7 @@
+## 2026-11-12 — End-user cleanup of 11 release notes
+
+- Removed GitHub source-archive notices, redundant binary filename/size instructions, raw development-file warnings and SHA-256 lines from this project's canonical notes. Model compatibility and hardware/save/update guidance remains. Prior published bodies and metadata are preserved in root docs/history/releases/before-end-user-cleanup-2026-11-12.json. Remote release-body synchronization and metadata verification are the remaining steps.
+
 ## 2026-11-12 16:11 UTC — All 11 platform release-note bodies published and verified
 
 - Completed owner-requested history-wide formatting for this platform. Every published body matches its canonical docs/releases/v*.md file, has the four requested ordered sections and no repeated build heading. Prior-build changes are condensed into the correct historical summaries; warnings, evidence limits, credits, filenames/digests and historical caveats retained. Original pre-edit bodies are archived at root.

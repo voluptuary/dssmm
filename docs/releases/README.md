@@ -5,9 +5,11 @@ fixes, Summary of past features, Summary of past fixes. GitHub displays the buil
 in its release title, so bodies begin with model/status information. Cumulative
 summaries describe only changes already present in that historical version.
 
-Original bodies and asset/release metadata from before the unified editorial
-pass are preserved in [the history archive](../history/releases/before-unified-notes-2026-11-12.json).
-Kernel source, tags, assets and release flags are unaffected by note edits.
+Original bodies are preserved in [the pre-unification archive](../history/releases/before-unified-notes-2026-11-12.json). The immediately prior public notes and metadata are preserved in [the end-user cleanup archive](../history/releases/before-end-user-cleanup-2026-11-12.json).
+Public notes focus on user-relevant changes and model guidance; GitHub already
+displays downloadable assets, so notes omit source-archive notices, redundant
+asset filenames/sizes, development-file warnings and checksums. Kernel source,
+tags, assets and release flags are unaffected by note edits.
 Older draft/report documents remain historical; the files below are canonical.
 
 | Release | Model | Canonical notes | GitHub |

@@ -1,3 +1,8 @@
+## 2026-11-12 — Trim redundant public release-note asset details
+
+- Owner requested removing end-user-unneeded release-body instructions. Updated all 4 ezfomega canonical notes to omit GitHub source-archive notices, binary size/filename lines, raw development `.gba` warnings and checksums. Kept model compatibility, hardware/save/update cautions, credits and changelog history.
+- Exact prior remote bodies and metadata are archived at root docs/history/releases/before-end-user-cleanup-2026-11-12.json. After remote publication, verify body equality and unchanged assets/tags/flags; no kernel source or tests changed.
+
 ## 2026-11-12 16:11 UTC — All 4 platform release-note bodies published and verified
 
 - Completed owner-requested history-wide formatting for this platform. Every published body matches its canonical docs/releases/v*.md file, has the four requested ordered sections and no repeated build heading. Prior-build changes are condensed into the correct historical summaries; warnings, evidence limits, credits, filenames/digests and historical caveats retained. Original pre-edit bodies are archived at root.

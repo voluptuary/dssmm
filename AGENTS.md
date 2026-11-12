@@ -99,8 +99,10 @@ Release notes use four ordered changelog sections: New features, New fixes,
 Summary of past features, Summary of past fixes. Keep cumulative summaries
 concise. Fold the immediately preceding release's new features/fixes into the
 appropriate past summary on the next release; do not leave them in additional
-per-version sections. Preserve accurate model/hardware warnings, credits,
-validation limits and download/hash details around those four sections.
+per-version sections. Preserve accurate model/hardware warnings, credits and validation limits. Keep
+public notes focused on user-relevant changes; omit GitHub source-archive notices,
+raw development-file warnings, asset byte counts and SHA-256 checksums (GitHub
+shows downloadable assets and the repository retains verification evidence).
 
 BLUE 8.4.1 Test4 is published after the FrankieT19 comparison and four passing
 final CI runs; docs/releases/blue-test4-publication.json records the release and
@@ -116,3 +118,8 @@ release history while keeping changes accurate for each historical build; mark
 undocumented fallback changes as undocumented, preserve model-specific warnings
 and evidence, and never add later features to older binaries. Original bodies
 are archived under docs/history/releases/ before a history-wide editorial pass.
+
+## 2026-11-12 — Trim redundant release-page asset instructions
+
+- Owner requests removing end-user-unneeded lines from release bodies, including GitHub's automatic source-archive notice, the packed `.bin` versus raw development `.gba` warning, and SHA-256 lines. Applied to all19 canonical notes and release bodies; removed redundant asset filenames/byte counts as well. Retained model compatibility, hardware-testing limits, save/update cautions, credits and the four ordered changelog sections.
+- Exact remote bodies and metadata before this cleanup are archived at docs/history/releases/before-end-user-cleanup-2026-11-12.json. Update docs/releases/unified-release-notes-2026-11-12.json after publication with new body hashes/word counts; verify all19 remote bodies match canonical files and release metadata/assets remain unchanged. Documentation only; no kernel tests are needed.
