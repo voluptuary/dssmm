@@ -17,3 +17,6 @@ desktop.ini
 # Target-private browser installer release inputs remain tracked.
 !*/docs/manager/packages/current/**/*.gba
 !*/docs/manager/packages/current/**/*.bin
+
+# SuperFW ships required emulator payloads as upstream source assets.
+!superfw/emu/*.gba.bin

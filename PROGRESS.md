@@ -3098,3 +3098,8 @@ Entries below record what was known at each stage. Do not use older branch hashe
 - Imported/pinned upstream SuperFW source and included its own directory, GPL text, provenance, contributors and journals. Project supports upstream `sd`, `lite`, `chis` variants; no OMEGA code is shared. Shared build dispatch, branch scope policy, sparse layout, CI matrix, devcontainer host dependencies and overview docs updated.
 - Validation so far: all three board builds pass locally; five upstream host-test groups pass. `make check-isolation`, five scope/identity fixtures, three real-Git merge/sparse fixtures, four project input baselines and site composition pass. SHA-256 upstream test and coverage reporting are not locally runnable because OpenSSL development headers/lcov are absent; CI config now installs both. No physical SuperCard hardware testing.
 - Next: commit/push trunk setup, confirm hosted all-project CI, create/push `superfw` lane, sync existing lanes and verify remote ref/tree equality.
+
+## 2026-11-12 — SuperFW build asset packaging correction
+
+- Hosted CI found that six upstream emulator `.gba.bin` payloads were present in the local clone but omitted from Git because root `.gitignore` excluded `*.bin`. SuperFW's Makefile consequently failed to find the GB emulator dependency in a clean checkout. Forced the exact upstream-tracked assets into `superfw/emu/`; add a narrow root ignore exception, refresh the project baseline to the target-lane asset commit, and rerun all CI.
+- No OMEGA kernel source/assets changed. Do not treat the initial build pass or failed CI as clean-checkout validation; the next hosted CI run is required.
