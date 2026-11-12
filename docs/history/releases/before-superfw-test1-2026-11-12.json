@@ -1,0 +1,423 @@
+{
+  "latest": "v8.4.0",
+  "releases": [
+    {
+      "id": 443174331,
+      "tag_name": "v8.4.1-blue-test4",
+      "name": "DS Style Merkin Mix 8.4.1 \u2014 BLUE Test 4 (Hardware Untested)",
+      "draft": false,
+      "prerelease": true,
+      "target_commitish": "dssmm",
+      "created_at": "2026-11-12T15:56:39Z",
+      "published_at": "2026-11-12T15:56:45Z",
+      "body_sha256": "308cfa53408e89a5e5cbc9e51fffe3f5e1a08910176ac97e04bbc1122bf7c1ab",
+      "assets": [
+        {
+          "id": 740088127,
+          "name": "ezbluekernel.bin",
+          "size": 2124252,
+          "digest": "sha256:57db5bb4e9fd2cfacdbb1024b6d2d62dd7a83c562964f440d3e5cf02203549a3",
+          "created_at": "2026-11-12T15:56:43Z",
+          "updated_at": "2026-11-12T15:56:45Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.4.1-blue-test4/ezbluekernel.bin"
+        }
+      ]
+    },
+    {
+      "id": 443130065,
+      "tag_name": "v8.4.0",
+      "name": "DS Style Merkin Mix 8.4.0 \u2014 EZ-FLASH OMEGA DE",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "dssmm",
+      "created_at": "2026-11-12T15:22:50Z",
+      "published_at": "2026-11-12T15:22:56Z",
+      "body_sha256": "07b39b272acabe9df333164067b9ab8b7f45c887f2a8d64a2296c9c0412d326b",
+      "assets": [
+        {
+          "id": 739978820,
+          "name": "ezkernelnew.bin",
+          "size": 2030600,
+          "digest": "sha256:5037473f5992f745e8d29d2df34e12996a76aaac2ccde51786f99b5432827d48",
+          "created_at": "2026-11-12T15:22:54Z",
+          "updated_at": "2026-11-12T15:22:56Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.4.0/ezkernelnew.bin"
+        }
+      ]
+    },
+    {
+      "id": 443130396,
+      "tag_name": "v8.4.0-omega-test4",
+      "name": "DS Style Merkin Mix 8.4.0 \u2014 Original OMEGA Test 4 (Hardware Untested)",
+      "draft": false,
+      "prerelease": true,
+      "target_commitish": "dssmm",
+      "created_at": "2026-11-12T15:22:50Z",
+      "published_at": "2026-11-12T15:23:13Z",
+      "body_sha256": "683f46ecbf5577871cd67b74384f4f7f3668ecf72d9ad22ccf007273c9267038",
+      "assets": [
+        {
+          "id": 739979995,
+          "name": "ezkernel.bin",
+          "size": 2054824,
+          "digest": "sha256:8d37e4f80e5c5cc68332406e95f3fbe345c3afeea9b4b11cb0df19b383baef00",
+          "created_at": "2026-11-12T15:23:10Z",
+          "updated_at": "2026-11-12T15:23:13Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.4.0-omega-test4/ezkernel.bin"
+        }
+      ]
+    },
+    {
+      "id": 443130494,
+      "tag_name": "v8.4.0-blue-test3",
+      "name": "DS Style Merkin Mix 8.4.0 \u2014 BLUE Test 3 (Hardware Untested)",
+      "draft": false,
+      "prerelease": true,
+      "target_commitish": "dssmm",
+      "created_at": "2026-11-12T15:22:50Z",
+      "published_at": "2026-11-12T15:23:19Z",
+      "body_sha256": "01998ead9926ad2901d801d4c6cf0227582ad721dc41e2ce90c995bcc9b925c6",
+      "assets": [
+        {
+          "id": 739980339,
+          "name": "ezbluekernel.bin",
+          "size": 3988120,
+          "digest": "sha256:340528034410e24101891a1a9c1a6ed6ccaadfa5a0786fa10910f52ee14245c2",
+          "created_at": "2026-11-12T15:23:15Z",
+          "updated_at": "2026-11-12T15:23:19Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.4.0-blue-test3/ezbluekernel.bin"
+        }
+      ]
+    },
+    {
+      "id": 442300349,
+      "tag_name": "v8.3.2",
+      "name": "DS Style Merkin Mix 8.3.2 \u2014 EZ-FLASH OMEGA DE",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "ffcdb17b6b53605e79534cd698cd441f474da9ac",
+      "created_at": "2026-11-11T23:26:32Z",
+      "published_at": "2026-11-11T23:26:43Z",
+      "body_sha256": "e7c3b154285b105002f2d082beaaed6364cfa5d07e666b2ee11dae24fe27f2b8",
+      "assets": [
+        {
+          "id": 737273353,
+          "name": "ezkernelnew.bin",
+          "size": 2025056,
+          "digest": "sha256:6d7774ecbadc40e8c91d9e0e977fe09cd36abe8ff34462d362557f828f926f38",
+          "created_at": "2026-11-11T23:26:42Z",
+          "updated_at": "2026-11-11T23:26:42Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.3.2/ezkernelnew.bin"
+        }
+      ]
+    },
+    {
+      "id": 441795557,
+      "tag_name": "v8.3.1-omega-test3",
+      "name": "DS Style Merkin Mix 8.3.1 \u2014 Original OMEGA Test 3 (Hardware Untested)",
+      "draft": false,
+      "prerelease": true,
+      "target_commitish": "b9307d42f099f049b00c66bfdf14f374a949b290",
+      "created_at": "2026-11-11T14:21:17Z",
+      "published_at": "2026-11-11T14:21:39Z",
+      "body_sha256": "e3bf5592d58fffe1b23665d33ca45d4f29c464d7de8aa116bb8ed73d094e75b8",
+      "assets": [
+        {
+          "id": 735785000,
+          "name": "ezkernel.bin",
+          "size": 2049416,
+          "digest": "sha256:c1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52",
+          "created_at": "2026-11-11T14:21:38Z",
+          "updated_at": "2026-11-11T14:21:38Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.3.1-omega-test3/ezkernel.bin"
+        }
+      ]
+    },
+    {
+      "id": 441674063,
+      "tag_name": "v8.3.1-omega-test2",
+      "name": "DS Style Merkin Mix 8.3.1 \u2014 Original OMEGA Test 2 (Hardware Untested)",
+      "draft": false,
+      "prerelease": true,
+      "target_commitish": "ezfomega",
+      "created_at": "2026-11-11T12:37:36Z",
+      "published_at": "2026-11-11T12:38:01Z",
+      "body_sha256": "6f6d9d213b3eeed38e6adb3434de6bb48396663f6266a658a72656d9db932f91",
+      "assets": [
+        {
+          "id": 735479023,
+          "name": "ezkernel.bin",
+          "size": 2049144,
+          "digest": "sha256:a256c3dce226b3d6abdf6f9b13790cf610dead2b2b42f19411cee1d0d3e5e9a8",
+          "created_at": "2026-11-11T12:38:00Z",
+          "updated_at": "2026-11-11T12:38:00Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.3.1-omega-test2/ezkernel.bin"
+        }
+      ]
+    },
+    {
+      "id": 441795693,
+      "tag_name": "v8.3.1-blue-test2",
+      "name": "DS Style Merkin Mix 8.3.1 \u2014 BLUE Test 2 (Hardware Untested)",
+      "draft": false,
+      "prerelease": true,
+      "target_commitish": "e5bf9a34c79fb6f869de9bbbe4146240da0c8299",
+      "created_at": "2026-11-11T14:21:26Z",
+      "published_at": "2026-11-11T14:21:48Z",
+      "body_sha256": "a83c4389b1ab55786e56f284d4b1afe0b636f29836ae1838099f8849722b3bf4",
+      "assets": [
+        {
+          "id": 735785331,
+          "name": "ezbluekernel.bin",
+          "size": 3982696,
+          "digest": "sha256:ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710",
+          "created_at": "2026-11-11T14:21:46Z",
+          "updated_at": "2026-11-11T14:21:47Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.3.1-blue-test2/ezbluekernel.bin"
+        }
+      ]
+    },
+    {
+      "id": 441262715,
+      "tag_name": "v8.3.1-blue-test1",
+      "name": "DS Style Merkin Mix 8.3.1 \u2014 BLUE Test 1 (Hardware Untested)",
+      "draft": false,
+      "prerelease": true,
+      "target_commitish": "ezfblue",
+      "created_at": "2026-11-11T05:08:12Z",
+      "published_at": "2026-11-11T05:08:26Z",
+      "body_sha256": "c17833fe74c1edc1d299dd304ccfa7570073e0cdb67b4517d7523ec57010a387",
+      "assets": [
+        {
+          "id": 734219515,
+          "name": "ezbluekernel.bin",
+          "size": 3982680,
+          "digest": "sha256:638b50eed433ac8be1f4ddec5fb9a91847d8fe3800a64e4981375d58f51331b0",
+          "created_at": "2026-11-11T05:08:24Z",
+          "updated_at": "2026-11-11T05:08:25Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.3.1-blue-test1/ezbluekernel.bin"
+        }
+      ]
+    },
+    {
+      "id": 440728671,
+      "tag_name": "v8.3.1",
+      "name": "DS Style Merkin Mix 8.3.1 \u2014 EZ-FLASH OMEGA DE",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "ezfode",
+      "created_at": "2026-11-10T18:57:05Z",
+      "published_at": "2026-11-10T18:10:38Z",
+      "body_sha256": "130ae287acdf172fdac3cff834b9089975f3648277bce61d31e6779320839320",
+      "assets": [
+        {
+          "id": 732578014,
+          "name": "ezkernelnew.bin",
+          "size": 2024344,
+          "digest": "sha256:8fb4cd6054679680d4b774275f114a885e66b00b07ebc9cbe98837726f1c9bf8",
+          "created_at": "2026-11-10T18:57:10Z",
+          "updated_at": "2026-11-10T18:57:10Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.3.1/ezkernelnew.bin"
+        }
+      ]
+    },
+    {
+      "id": 440877844,
+      "tag_name": "v8.3.1-omega-test1",
+      "name": "DS Style Merkin Mix 8.3.1 \u2014 Original OMEGA Test 1 (Hardware Untested)",
+      "draft": false,
+      "prerelease": true,
+      "target_commitish": "ezfode",
+      "created_at": "2026-11-10T20:32:11Z",
+      "published_at": "2026-11-10T20:32:15Z",
+      "body_sha256": "60359ab4551cd20fe1714f835944aee5c931c0eaf70ed6473322998a47a0e9b8",
+      "assets": [
+        {
+          "id": 732854577,
+          "name": "ezkernel.bin",
+          "size": 2044264,
+          "digest": "sha256:bb7a5302d7711b4340d595856e2e5eaf433bc6cad45c20fb0850f5dfc678c336",
+          "created_at": "2026-11-10T20:32:14Z",
+          "updated_at": "2026-11-10T20:32:15Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.3.1-omega-test1/ezkernel.bin"
+        }
+      ]
+    },
+    {
+      "id": 437656291,
+      "tag_name": "v8.3.0",
+      "name": "DS Style Merkin Mix 8.3.0 \u2014 EZ-FLASH OMEGA DE",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "main",
+      "created_at": "2026-11-07T17:42:07Z",
+      "published_at": "2026-11-07T15:22:07Z",
+      "body_sha256": "0c55c0ea252b80656d7c60f9dd72959aac6ef330e898ff7825d7418a0b60f717",
+      "assets": [
+        {
+          "id": 721436781,
+          "name": "ezkernelnew.bin",
+          "size": 2014248,
+          "digest": "sha256:bf5e34f5d26d6bad846fbce67704414238f38f3d90f68d3196133f780264a92f",
+          "created_at": "2026-11-07T17:42:09Z",
+          "updated_at": "2026-11-07T17:42:10Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.3.0/ezkernelnew.bin"
+        }
+      ]
+    },
+    {
+      "id": 433449402,
+      "tag_name": "v8.2.0",
+      "name": "EZFODE DS Style Merkin Mix Kernel - v8.2.0",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "9211e71bd435a14bdfac1ee5af57be4675d8a719",
+      "created_at": "2026-11-04T02:38:45Z",
+      "published_at": "2026-11-04T02:38:48Z",
+      "body_sha256": "3250401be6c93b7595a8512de22597d163486c28bd8dd46481f924639d56fea2",
+      "assets": [
+        {
+          "id": 707963272,
+          "name": "ezkernelnew.bin",
+          "size": 2064280,
+          "digest": "sha256:72201320f0e8fc7c332a715704fc11a8c1ad33e8400661d09bb45c411ac3d8fa",
+          "created_at": "2026-11-04T02:38:48Z",
+          "updated_at": "2026-11-04T02:38:48Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.2.0/ezkernelnew.bin"
+        }
+      ]
+    },
+    {
+      "id": 431498028,
+      "tag_name": "v8.1.0",
+      "name": "EZFODE DS Style Merkin Mix Kernel - v8.1.0",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "main",
+      "created_at": "2026-11-02T13:30:36Z",
+      "published_at": "2026-11-02T13:30:49Z",
+      "body_sha256": "7206325583e4a67249de8f846c91a16cc4bf0b5bf74667bc76367f9966cb74da",
+      "assets": [
+        {
+          "id": 701862276,
+          "name": "ezkernelnew.bin",
+          "size": 2066480,
+          "digest": "sha256:a43002724fca4792f21865e2c61eb02e4184d14809efad915dfcd90a8fc93541",
+          "created_at": "2026-11-02T13:30:48Z",
+          "updated_at": "2026-11-02T13:30:49Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.1.0/ezkernelnew.bin"
+        }
+      ]
+    },
+    {
+      "id": 430742555,
+      "tag_name": "v8.0.0",
+      "name": "EZFODE DS Style Merkin Mix Kernel - v8.0.0",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "main",
+      "created_at": "2026-11-01T17:33:34Z",
+      "published_at": "2026-11-01T17:33:46Z",
+      "body_sha256": "af9b2419889a5bf4c18ec4f47bc92ad63a5c02c099871f18141e65bbdcc324d8",
+      "assets": [
+        {
+          "id": 699017510,
+          "name": "ezkernelnew.bin",
+          "size": 2066312,
+          "digest": "sha256:f7b258acd3914f816bc69e8aaa49c270562015b9737e0490989c414fe8980cf2",
+          "created_at": "2026-11-01T17:33:45Z",
+          "updated_at": "2026-11-01T17:33:46Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v8.0.0/ezkernelnew.bin"
+        }
+      ]
+    },
+    {
+      "id": 430657653,
+      "tag_name": "v7.4.6b",
+      "name": "EZFODE DS Style Merkin Mix Kernel - v7.4.6b",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "main",
+      "created_at": "2026-11-01T15:04:39Z",
+      "published_at": "2026-11-01T15:04:48Z",
+      "body_sha256": "2b833d3e7af3851e10dad2d983da5716a6553f75be47b5c494a34b44f1743fe2",
+      "assets": [
+        {
+          "id": 698651121,
+          "name": "ezkernelnew.bin",
+          "size": 2066272,
+          "digest": "sha256:558e332d2aa7a0f8b3e90f9757ebe8e5e37477a75fd155798633e1d63b8e7f56",
+          "created_at": "2026-11-01T15:04:47Z",
+          "updated_at": "2026-11-01T15:04:48Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v7.4.6b/ezkernelnew.bin"
+        }
+      ]
+    },
+    {
+      "id": 414953200,
+      "tag_name": "v7.4.5",
+      "name": "DS Style v7.4.5 - Omega Definitive Edition",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "0f5fe5a417176160a3a40a7c1a946c0901f95301",
+      "created_at": "2026-10-16T14:34:30Z",
+      "published_at": "2026-10-16T12:44:07Z",
+      "body_sha256": "30bae9e78d696377bfb346f6ffd44afb5965a15313eccb453fbfa1b8b6c83e71",
+      "assets": [
+        {
+          "id": 647545471,
+          "name": "ezkernelnew.bin",
+          "size": 2096272,
+          "digest": "sha256:9e304e962f102e74959bdea4ff70d0b7325233a2a0fdc8a0887d7330721c7467",
+          "created_at": "2026-10-16T14:13:37Z",
+          "updated_at": "2026-10-16T14:13:37Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v7.4.5/ezkernelnew.bin"
+        }
+      ]
+    },
+    {
+      "id": 413299775,
+      "tag_name": "v7.4.3",
+      "name": "DS Style v7.4.3 - Omega Definitive Edition",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "feature/mirrored-artwork",
+      "created_at": "2026-10-15T00:28:37Z",
+      "published_at": "2026-10-15T00:30:08Z",
+      "body_sha256": "0f5cefa54a5bf188a071dcb3eb82b6748a182fa47f3616431d966b947e224b26",
+      "assets": [
+        {
+          "id": 642144766,
+          "name": "ezkernelnew.bin",
+          "size": 2090624,
+          "digest": "sha256:c6bc008f8d10919f0100dc5545ec86edfd78b437524a8d81832d046f9d4cf505",
+          "created_at": "2026-10-15T00:30:07Z",
+          "updated_at": "2026-10-15T00:30:07Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v7.4.3/ezkernelnew.bin"
+        }
+      ]
+    },
+    {
+      "id": 413064314,
+      "tag_name": "v7.4.2-fallback",
+      "name": "Fallback Build",
+      "draft": false,
+      "prerelease": false,
+      "target_commitish": "6bdf5588a9609e02a7d3ec57919291aec564c1c6",
+      "created_at": "2026-10-14T15:49:40Z",
+      "published_at": "2026-10-14T18:46:03Z",
+      "body_sha256": "4c190e3ecd3e5f778803f2bee3174e157f31b75d3d7aca991fc51955c148cbaf",
+      "assets": [
+        {
+          "id": 641309397,
+          "name": "ezkernelnew.bin",
+          "size": 2089664,
+          "digest": "sha256:9db6fa539c7e812e653bb4b4f9fbd60a48f0c938a63849b81a83e7c364944be7",
+          "created_at": "2026-10-14T18:46:01Z",
+          "updated_at": "2026-10-14T18:46:02Z",
+          "browser_download_url": "https://github.com/voluptuary/dssmm/releases/download/v7.4.2-fallback/ezkernelnew.bin"
+        }
+      ]
+    }
+  ]
+}

@@ -135,3 +135,5 @@ protocols with the OMEGA-family kernels. Read `superfw/AGENTS.md` and the projec
 current journals before SuperFW work. Local import is not hardware validation.
 
 SuperFW bootstrap is complete: upstream snapshot dabbf4909f85e556f7a12972cc8a7b94fc54ac51 is isolated under `superfw/`, and five-branch CI passed on 2026-11-12. `superfw/docs/bootstrap-validation.json` records builds/tests and the explicit no-hardware-validation limit. The lane has no DSSMM release yet; never imply physical SuperCard qualification from hosted builds/tests.
+
+SuperFW Test1 is now published as hardware-untested prerelease superfw-test1, source8a22da16c2d755de8fc12db7c5482657e6813ecd, with three board-specific .fw assets. Owner’s test card is SuperChis Prime v1.0 (chis). Read superfw/docs/releases/superfw-test1-publication.json and project journals. Preserve release/tag/assets and DEv8.4.0 latest stable; no physical qualification has been reported. Root README is an end-user overview including artwork setup, not development instructions.

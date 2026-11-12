@@ -14,6 +14,7 @@ Older draft/report documents remain historical; the files below are canonical.
 
 | Release | Model | Canonical notes | GitHub |
 | --- | --- | --- | --- |
+| superfw-test1 | superfw (SD/Lite/Chis) | [Notes](../../superfw/docs/releases/superfw-test1.md) | [Release](https://github.com/voluptuary/dssmm/releases/tag/superfw-test1) |
 | v8.4.1-blue-test4 | ezfblue | [Notes](../../ezfblue/docs/releases/v8.4.1-blue-test4.md) | [Release](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-blue-test4) |
 | v8.4.0 | ezfomegade | [Notes](../../ezfomegade/docs/releases/v8.4.0.md) | [Release](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0) |
 | v8.4.0-omega-test4 | ezfomega | [Notes](../../ezfomega/docs/releases/v8.4.0-omega-test4.md) | [Release](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-omega-test4) |
