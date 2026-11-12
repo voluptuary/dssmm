@@ -1,4 +1,11 @@
 
+## 2026-11-12 01:04 UTC — GitHub rename live; remote migration complete
+
+- Confirmed GitHub canonical repository `voluptuary/dssmm`, default branch dssmm and stable/latest release v8.3.2 at https://github.com/voluptuary/dssmm/releases/tag/v8.3.2. The previously recorded404/rename-pending condition is resolved.
+- Shared local origin updated to https://github.com/voluptuary/dssmm.git; fetch/prune and origin/HEAD=dssmm succeeded. Verified all four worktrees use this new origin and their clean local heads exactly match the matching remote branches before this documentation-only checkpoint. Existing upstream attribution remote is preserved.
+- Active docs already use the new repository name; no firmware/build/configuration, versions, published tags/assets or release notes changed. This completion checkpoint is committed/pushed directly on each branch; private journal overlays do not invalidate dssmm snapshot pins. No rename follow-up or implementation task remains. Future agents should use the new canonical repository; retain dated historical names as history.
+
+
 ## 2026-11-12 01:01 UTC — Canonical repository documentation validated
 
 - Active documentation/agent identity/credits and release/CI reference URLs now use `voluptuary/dssmm`; historical journals retain their original recorded identity under the rename checkpoint. All changed files are Markdown, HTML or documentation JSON. No firmware/build/test input, release version, tag or published asset changed.
