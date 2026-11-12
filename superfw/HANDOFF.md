@@ -9,3 +9,7 @@
 - Root ignore rules initially omitted six upstream emulator payloads; the first clean-checkout CI run failed. Added those exact upstream-tracked assets under `emu/`, added the root ignore exception, and refreshed the source baseline.
 - Corrected hosted SuperFW verification passed in run [43263202200](https://github.com/voluptuary/dssmm/actions/runs/43263202200): all three board builds plus the upstream coverage-enabled host tests. The full dssmm matrix, including SuperFW and all OMEGA projects, passed in run [43263181698](https://github.com/voluptuary/dssmm/actions/runs/43263181698). Local policy/merge/snapshot/site checks and three board builds also pass; five local host groups passed, while hosted CI covered the complete suite. `chis` has an upstream unused-variable warning. No physical SuperCard hardware validation was performed.
 - Branch `superfw` is live on origin and tracks the same integrated tree. Continue future SuperFW work only in this directory on its matching lane, then merge through dssmm.
+
+## 2026-11-12 — SuperChis Prime port planning
+
+Owner identifies physical test hardware as SuperChis Prime v1.0. Added docs/PORTING-PLAN.md: retain native SuperFW chis backend, build DSSMM presentation incrementally, classify transferable features, and gate runtime/NOR/emulator work on physical tests. Exact revision compatibility and recovery path remain unverified. Documentation only; no firmware behavior changed or new hardware tests claimed. Next: review installed firmware/board identity and inventory rendering/assets before first UI slice.
