@@ -7,7 +7,7 @@ case "$board" in
   sd|lite|chis) ;;
   *) echo "Unknown SuperFW board '$board' (choose sd, lite, or chis)." >&2; exit 2 ;;
 esac
-compression_ratio="${COMPRESSION_RATIO:-10}"
+compression_ratio="${COMPRESSION_RATIO:-4}"
 cd "$project_root"
 make clean
 make BOARD="$board" COMPRESSION_RATIO="$compression_ratio"
