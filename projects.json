@@ -1,0 +1,11 @@
+{
+  "schema": 2,
+  "projects": {
+    "ezfblue": {
+      "directory": "ezfblue",
+      "branch": "ezfblue"
+    }
+  },
+  "policy": "Independent snapshots; no automatic synchronization or cross-platform merges.",
+  "layout": "top-level projects with universal root infrastructure"
+}

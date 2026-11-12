@@ -1,17 +1,28 @@
-# DS Style Merkin Mix — BLUE test port
+# DS Style Merkin Mix
 
-Merkin Mix brings artwork transparency, name-matched artwork for supported systems beyond GBA, and the DS Style menus to the **EZ-FLASH OMEGA Definitive Edition B (BLUE)**. Menu rendering is highly optimized while retaining transparency compatibility.
+DSSMM keeps three independent flashcart kernel projects in one repository. Choose the exact hardware before building or installing; kernel files are not interchangeable.
 
-**[BLUE Test 2 prerelease](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-blue-test2) — hardware untested.** This branch targets the newer BLUE cartridge only. The older Definitive Edition Rev. A/B uses [ezfomegade](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfomegade); the original OMEGA uses [ezfomega](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfomega). Their kernel updates are not interchangeable.
+| Project | Hardware | Release branch |
+| --- | --- | --- |
+| [ezfomegade](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/dssmm/ezfomegade/README.md) | EZ-FLASH OMEGA Definitive Edition Rev. A/B | `ezfomegade` |
+| [ezfomega](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/dssmm/ezfomega/README.md) | Original EZ-FLASH OMEGA | `ezfomega` |
+| [ezfblue](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/dssmm/ezfblue/README.md) | Newer Definitive Edition B / BLUE | `ezfblue` |
 
-The BLUE frontend includes the current Merkin Mix themes, carousel/list views, favorites, recent and last-played games, artwork caches, remembered cheat selections, save/settings protections, and themed NOR progress. It retains BLUE's hardware drivers, firmware, native 64 MiB/5G handling, and NOR allocation format. Compatible plugins use the existing plugin interfaces; their runtime behavior still needs BLUE hardware testing.
+The `dssmm` default branch contains isolated snapshots directly at repository root. Each project owns its source, assets, build tools, tests, configuration and documentation. Root files are universal orchestration, environment and repository records. [projects.json](projects.json) records snapshot provenance. No automatic synchronization or cross-platform merge is configured.
 
-This is an experimental port with source, build, host-test and linked ARM/Thumb validation only. Boot, installation, saves, cheats/RTS, plugins and NOR operations remain untested on the cartridge. The larger split image preserves fixed resources, but acceptance by the unpublished BLUE updater is also unverified. See [port status and feature matrix](docs/porting/BLUE_STATUS.md) before testing.
+With devkitARM, libgba, Maxmod, a host C compiler, Python3/Unicorn and Node available:
 
-Build with devkitPro/devkitARM and libgba: `make`. Run `bash scripts/verify-blue-port.sh` for the full software checks (host C compiler, Python 3, `python3-unicorn` and `python3-distutils` required). Active source is under `targets/blue/source`; shared artwork is under `images`. The unused DE donor tree has been removed; only BLUE firmware is present. The raw `.gba` must be packed with its ELF and the vendor resources; it is **not a standalone update**. [Build and packaging instructions](targets/blue/README.md).
+```sh
+make ezfomegade
+make verify-ezfomegade
+make ezfomega
+make verify-ezfomega
+make ezfblue
+make verify-ezfblue
+```
 
-Merkin Mix builds on FrankieT19's DS Style fork and the EZ-FLASH/Sterophonick kernel lineage. FrankieT19's separately authored v8.0 UI refinements and exploitz86's remembered-cheat work are included in the frontend. BLUE hardware support comes from EZ-FLASH's published BLUE kernel. See [credits and provenance](CREDITS.md) for these and other contributions.
+`make` alone shows help and never selects hardware implicitly. `make build-all` and `make verify-all` select all projects explicitly. Each project also builds independently from its directory; each dedicated hardware branch contains only its matching project directory and the same universal root infrastructure. BLUE keeps its vendor linker/resource subproject internally; never install its raw development GBA as an update.
 
-## Repository isolation
+Changes belong to the appropriate target. Do not merge a whole hardware branch into another hardware branch or into the default branch wholesale. Adapt/import intended changes in its target directory and run that target's verifier. CI checks layout and target identity and rejects known cross-platform branch PRs; it cannot prove arbitrary future edits regression-free or enforce required reviews without branch protection.
 
-This hardware branch is standalone. The `dssmm` default branch holds an independent copy under `targets/ezfblue`. `project.json` identifies the hardware; `python3 scripts/project.py verify ezfblue` selects its full verifier. Never merge a different hardware branch or the whole canonical layout here. CI is read-only and target-specific; required-check enforcement still depends on branch protection. Published release tags are preserved.
+The hardware-specific READMEs contain features, credits, download/install instructions and remaining validation limits. Original OMEGA and BLUE releases remain hardware-untested. Source archives are supplied automatically by GitHub; no separate source ZIP is maintained.
