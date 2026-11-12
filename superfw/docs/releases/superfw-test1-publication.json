@@ -50,11 +50,12 @@
   "published_at": "2026-11-12T18:47:02Z",
   "prerelease": true,
   "draft": false,
-  "body_sha256": "adc1d458c3a714a19580e3d4fb3425237528def28011e8505a1a4f7767ead982",
+  "body_sha256": "71296e21ff61523b81d1e2ddcb71f575ae7f1d17aa2e004bbc0a77dc719497aa",
   "downloaded_bytes_verified": true,
   "prior_releases_verified_unchanged": 19,
   "latest_stable": "v8.4.0",
   "previous_tags_unchanged": true,
   "notes_corrected_at": "2026-11-12",
-  "hardware_observation": "docs/prime-test1-hardware-observation.json"
+  "hardware_observation": "docs/prime-test1-hardware-observation.json",
+  "canonical_notes_sha256": "adc1d458c3a714a19580e3d4fb3425237528def28011e8505a1a4f7767ead982"
 }
