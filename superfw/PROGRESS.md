@@ -89,3 +89,9 @@ Owner corrected the initial report: the stock kernel reports version 0.20, while
 ## 2026-11-12 — Owner clarification: Test 1 boots successfully
 
 SuperChis Prime v1.0 chain-loads the Test1 Chis image and reports SuperFW 0.22 (stock kernel reports 0.20); manual themes are available. The menu remains mostly upstream SuperFW, and the full DSSMM-style layout is still in progress. This supersedes the immediately preceding mistaken failed-boot interpretation. Only boot/version/theme availability are physically reported; do not infer artwork, gameplay, save, NOR, install, SD or Lite validation. See `docs/prime-test1-hardware-observation.json`.
+
+## 2026-11-12 — Identify DSSMM builds and name themes
+
+- Info page now reports `SuperFW 0.22 (DSSMM)` from the compile-time `VERSION_WORD`, so the text follows whichever SuperFW version is configured at build time. The short source build identifier and SD/Lite/Chis variant remain visible.
+- UI theme choices now use palette names (White, Orange, Blue, Green, Purple, Stock Dark, Light, Dark) instead of numbers. This removes the confusing visible “6” option without renumbering or invalidating persisted IDs 0–7.
+- `scripts/test-theme-settings.sh` and `scripts/test-artwork.sh` pass; `git diff --check` passes. `scripts/verify.sh` cannot run in this container because `arm-none-eabi-gcc` is unavailable. Firmware builds and hosted CI remain pending.

@@ -1961,14 +1961,14 @@ void render_settings(volatile uint8_t *frame) {
 }
 
 void render_ui_settings(volatile uint8_t *frame) {
+  static const char * const theme_names[THEME_COUNT] = {
+    "White", "Orange", "Blue", "Green", "Purple", "Stock Dark",
+    "Light", "Dark"
+  };
   const unsigned colx = 170;
   char tmpbuf[64];
-  if (menu_theme == THEME_DSSMM_LIGHT)
-    npf_snprintf(tmpbuf, sizeof(tmpbuf), "< Light >");
-  else if (menu_theme == THEME_DSSMM_DARK)
-    npf_snprintf(tmpbuf, sizeof(tmpbuf), "< Dark >");
-  else
-    npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %u >", menu_theme + 1U);
+  const char *theme_name = menu_theme < THEME_COUNT ? theme_names[menu_theme] : theme_names[0];
+  npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", theme_name);
   draw_text_ovf(msgs[lang_id][MSG_UIS_THEME], frame, 8, 22, 224);
   draw_central_text(tmpbuf, frame, colx, 22 );
 
@@ -2009,8 +2009,9 @@ void render_info(volatile uint8_t *frame) {
 
   switch (smenu.info.selector) {
   case 0:
-    draw_central_text("by davidgf", frame, 120, 70);
-    npf_snprintf(tmp, sizeof(tmp), "Version %lu.%lu (%08lx)", vmaj, vmin, gitver);
+    npf_snprintf(tmp, sizeof(tmp), "SuperFW %lu.%lu (DSSMM)", vmaj, vmin);
+    draw_central_text(tmp, frame, 120, 70);
+    npf_snprintf(tmp, sizeof(tmp), "Build %08lx", gitver);
     draw_central_text(tmp, frame, 120, 95);
     draw_central_text(FW_FLAVOUR " variant", frame, 120, 114);
     break;
