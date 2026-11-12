@@ -3103,3 +3103,10 @@ Entries below record what was known at each stage. Do not use older branch hashe
 
 - Hosted CI found that six upstream emulator `.gba.bin` payloads were present in the local clone but omitted from Git because root `.gitignore` excluded `*.bin`. SuperFW's Makefile consequently failed to find the GB emulator dependency in a clean checkout. Forced the exact upstream-tracked assets into `superfw/emu/`; add a narrow root ignore exception, refresh the project baseline to the target-lane asset commit, and rerun all CI.
 - No OMEGA kernel source/assets changed. Do not treat the initial build pass or failed CI as clean-checkout validation; the next hosted CI run is required.
+
+
+## 2026-11-12 — SuperFW branch and project integrated
+
+- Added a fourth isolated project based on upstream SuperFW for the SuperCard GBA family. The complete upstream source/assets/licenses/tests are under `superfw/`; local root dispatch supports `make superfw BOARD=sd|lite|chis` and `make verify-superfw`. New `superfw` lane is published on origin.
+- Validation: all three board builds and the upstream coverage-enabled host suite pass in hosted run43263766334; all four projects pass the dssmm matrix in run43263181698. Project identity/branch scope/merge-sparse fixtures, source baselines and site composition pass. Initial CI omission of six upstream emulator assets was corrected, and the baseline is refreshed. Physical SuperCard behavior is not tested here.
+- Remaining: push the final shared validation logs, fast-forward all three existing hardware lanes to trunk and verify all five local/remote heads.

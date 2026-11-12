@@ -107,10 +107,12 @@ and reverse integration syncs, checks other project trees remain intact and
 rejects a cross-project rename. Actual-repository merge rehearsals are recorded
 separately from these small fixtures.
 
-Published releases/tags/assets stay unchanged. DE8.3.2 remains stable/latest;
-Original OMEGA Test3 and BLUE Test2 remain hardware-untested. Existing flash/SD
-atomicity, chip timing, parser and runtime-stack limits are in the private audit
-reports. Repository architecture does not add physical hardware qualification.
+Published releases/tags/assets stay unchanged by project-architecture work. DE
+8.4.0 remains stable/latest; Original OMEGA8.4.0 Test4 and BLUE8.4.1 Test4 are
+hardware-untested prereleases. The imported SuperFW source has passed CI builds
+and host tests but has no DSSMM release or physical hardware validation. Existing
+flash/SD atomicity, chip timing, parser and runtime-stack limits remain in private
+audit reports. Repository architecture does not add physical qualification.
 
 SuperFW's imported upstream subtree retains its own GPL-3.0-or-later license,
 component notices, tools and tests. It is not shared with or built through the

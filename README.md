@@ -48,10 +48,10 @@ The repository also tracks [SuperFW](https://github.com/davidgfnet/superfw), an
 independent GPL-licensed firmware for SuperCard GBA flash carts and derivatives.
 Its `sd`, `lite` and `chis` board variants live in the isolated [`superfw/`](superfw/)
 project and use a separate `superfw` development branch. SuperFW is not an
-OMEGA-family kernel. The `sd`, `lite` and `chis` source builds passed locally, along with five
-upstream host-test groups. The full coverage-enabled suite is pending CI; physical
-SuperCard behavior has not been tested here. There is no DSSMM SuperFW release
-in this repository. Follow the upstream installation
+OMEGA-family kernel. The `sd`, `lite` and `chis` builds and the full upstream coverage-enabled host
+test suite pass in hosted CI. Physical SuperCard behavior has not been tested as
+part of this repository setup. There is no DSSMM SuperFW release in this
+repository. Follow the upstream installation
 instructions and use the matching SuperFW variant.
 
 ## GB/GBC emulator update

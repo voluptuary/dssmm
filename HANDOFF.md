@@ -1995,3 +1995,10 @@ The release was created and subsequently corrected to use the cartridge-required
 
 - First hosted SuperFW run43262545176 failed during the `sd` build because the repository-wide `*.bin` ignore rule excluded six upstream-tracked emulator payloads. The local clone had their physical files, masking the packaging omission. Added all six under `superfw/emu/` on the SuperFW lane (commit e65447d) and allowlisted this upstream source-asset path in root `.gitignore`.
 - Refresh SuperFW's input baseline to e65447d and rerun snapshots/build/policy checks before pushing. The failed CI was a genuine missing-input failure; rerun the full hosted matrix/lane checks after correction. No OMEGA kernel source or releases changed.
+
+
+## 2026-11-12 — SuperFW lane setup complete
+
+- Imported upstream SuperFW commit `dabbf4909f85e556f7a12972cc8a7b94fc54ac51` as an isolated, GPL-licensed `superfw/` project with provenance and upstream assets. Created and pushed the `superfw` branch. It builds the upstream `sd`, `lite`, and `chis` variants via `make superfw BOARD=...`; `make verify-superfw` runs all variants and upstream host tests.
+- Corrected hosted CI after its first run exposed six upstream `.gba.bin` emulator assets hidden by root ignore rules; all six are now tracked and `projects.json` pins the refreshed baseline. Final lane verification passed run [43263766334](https://github.com/voluptuary/dssmm/actions/runs/43263766334); four-project dssmm matrix passed run [43263181698](https://github.com/voluptuary/dssmm/actions/runs/43263181698). Shared isolation, scope, merge/sparse, snapshot and site checks pass. No physical SuperCard validation is claimed.
+- Integrated the lane's validation record normally into dssmm; final step is push trunk, fast-forward/sync all other lanes, verify all five remote heads and record completion. Preserve all OMEGA-family sources/releases and the existing untracked devcontainer lock.
