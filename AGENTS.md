@@ -1,6 +1,6 @@
 # DSSMM repository isolation instructions
 
-The repository is voluptuary/ezfode-dssmm-kernel. GitHub default is `dssmm`;
+The repository is voluptuary/dssmm. GitHub default is `dssmm`;
 retired `ezfode` and `main` branches must not be recreated.
 
 ## Project boundaries
