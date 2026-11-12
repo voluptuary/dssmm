@@ -45,6 +45,10 @@ enum {
   THEME_COUNT
 };
 extern const t_theme_colors themes[THEME_COUNT];
+#define ACCENT_COUNT 5
+extern const char * const accent_names[ACCENT_COUNT];
+extern uint8_t menu_accent;
+t_theme_colors menu_theme_colors(unsigned theme, unsigned accent);
 
 extern const t_combo_key hotkey_list[13];
 #define hotkey_listcnt (sizeof(hotkey_list)/sizeof(hotkey_list[0]))

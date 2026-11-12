@@ -2,6 +2,17 @@
 #include "../src/settings.c"
 unsigned lang_lookup(uint16_t code) { (void)code; return 0; }
 uint16_t lang_getcode(void) { return 0x6e65; }
+static char saved_settings[512];
+FRESULT f_mkdir(const TCHAR *path) { (void)path; return FR_OK; }
+FRESULT f_open(FIL *fp, const TCHAR *path, BYTE mode) {
+  (void)fp; (void)path; (void)mode; return FR_OK;
+}
+FRESULT f_close(FIL *fp) { (void)fp; return FR_OK; }
+FRESULT f_write(FIL *fp, const void *data, UINT size, UINT *written) {
+  (void)fp; assert(size < sizeof(saved_settings));
+  memcpy(saved_settings, data, size); saved_settings[size] = 0;
+  *written = size; return FR_OK;
+}
 int main(void) {
 #ifdef SUPERCHIS_IO
   assert(menu_theme == THEME_DSSMM_LIGHT);
@@ -19,5 +30,28 @@ int main(void) {
   parse_ui_settings(0, "theme", "255"); assert(menu_theme == 0);
   assert(themes[0].bg_color == RGB2GBA(0xffffff));
   assert(themes[5].bg_color == RGB2GBA(0x444444));
+  assert(menu_accent == 0);
+  for (unsigned theme = 0; theme < THEME_COUNT; ++theme) {
+    t_theme_colors original = menu_theme_colors(theme, 0);
+    assert(memcmp(&original, &themes[theme], sizeof(original)) == 0);
+    for (unsigned accent = 1; accent < ACCENT_COUNT; ++accent) {
+      t_theme_colors colors = menu_theme_colors(theme, accent);
+      assert(colors.bg_color == original.bg_color);
+      assert(colors.ft_color == original.ft_color);
+      assert(colors.fg_color == original.fg_color);
+      assert(colors.sh_color == original.sh_color);
+      assert(colors.hi_color != colors.bg_color);
+    }
+  }
+  t_theme_colors fallback = menu_theme_colors(255, 255);
+  assert(memcmp(&fallback, &themes[0], sizeof(fallback)) == 0);
+  parse_ui_settings(0, "accent", "4"); assert(menu_accent == 4);
+  parse_ui_settings(0, "accent", "5"); assert(menu_accent == 0);
+  menu_theme = THEME_DSSMM_DARK; menu_accent = 3;
+  assert(save_ui_settings());
+  assert(strstr(saved_settings, "theme=7\naccent=3\n"));
+  menu_theme = 0; menu_accent = 0;
+  parse_file(saved_settings, parse_ui_settings, 0);
+  assert(menu_theme == THEME_DSSMM_DARK && menu_accent == 3);
   return 0;
 }
