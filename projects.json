@@ -1,20 +1,23 @@
 {
-  "schema": 1,
+  "schema": 2,
   "projects": {
     "ezfomegade": {
-      "directory": "targets/ezfomegade",
+      "directory": "ezfomegade",
       "branch": "ezfomegade",
-      "source_commit": "1c57b0e981a2294763d8fb7eadab298dbe0e5cd2"
+      "source_commit": "5fd30c8bbf5c256ffee88d31d2e475ee86d89c31",
+      "source_directory": "ezfomegade"
     },
     "ezfomega": {
-      "directory": "targets/ezfomega",
+      "directory": "ezfomega",
       "branch": "ezfomega",
-      "source_commit": "0f8b39d0abffe1e833722df1a42025dd368f3a6a"
+      "source_commit": "25e4caf3e7c815796c3272e281a39f2405e7ab54",
+      "source_directory": "ezfomega"
     },
     "ezfblue": {
-      "directory": "targets/ezfblue",
+      "directory": "ezfblue",
       "branch": "ezfblue",
-      "source_commit": "80728744404b8bf478bd8161b887b898ac48b2b0"
+      "source_commit": "45c1480314d1ce2b13cf05f228eee11f5266d435",
+      "source_directory": "ezfblue"
     }
   },
   "policy": "Independent snapshots; no automatic synchronization or cross-platform merges.",
@@ -34,5 +37,6 @@
       "size": 3982696,
       "sha256": "ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710"
     }
-  ]
+  ],
+  "layout": "top-level projects with universal root infrastructure"
 }

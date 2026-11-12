@@ -50,11 +50,12 @@ jobs:
       - name: Check hardware identity and PR direction
         env:
           KERNEL_TARGET: ${{ matrix.target }}
+          CI_BRANCH: ${{ github.base_ref || github.ref_name }}
           PR_BASE: ${{ github.base_ref }}
           PR_HEAD: ${{ github.head_ref }}
         run: |
           python3 tests/test-project-isolation.py
-          python3 scripts/project_policy.py --expected-target "$KERNEL_TARGET" --base-branch "$PR_BASE" --head-branch "$PR_HEAD"
+          python3 scripts/project_policy.py --expected-target "$KERNEL_TARGET" --branch "$CI_BRANCH" --base-branch "$PR_BASE" --head-branch "$PR_HEAD"
       - name: Verify selected hardware
         env:
           KERNEL_TARGET: ${{ matrix.target }}

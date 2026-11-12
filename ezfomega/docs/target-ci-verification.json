@@ -1,0 +1,48 @@
+{
+  "verified_utc": "2026-11-11 23:59 UTC",
+  "standalone_run": {
+    "databaseId": 43122839615,
+    "headBranch": "ezfomega",
+    "headSha": "0f8b39d0abffe1e833722df1a42025dd368f3a6a",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43122839615",
+    "jobs": [
+      {
+        "name": "select",
+        "conclusion": "success"
+      },
+      {
+        "name": "kernel (ezfomega)",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "canonical_run": {
+    "databaseId": 43123536185,
+    "headBranch": "dssmm",
+    "headSha": "9cfc7b2e9c1069f78501a43d401947ae229f7e15",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43123536185",
+    "jobs": [
+      {
+        "name": "select",
+        "conclusion": "success"
+      },
+      {
+        "name": "kernel (ezfblue)",
+        "conclusion": "success"
+      },
+      {
+        "name": "kernel (ezfomega)",
+        "conclusion": "success"
+      },
+      {
+        "name": "kernel (ezfomegade)",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "validation_limit": "No new hardware qualification; branch protection not enabled."
+}

@@ -1,4 +1,33 @@
+
+## 2026-11-12 00:39 UTC — Corrected compartmentalization fully validated locally
+
+- dssmm now contains ezfomega/, ezfomegade/ and ezfblue/ directly at root. Each dedicated branch uses exactly the same matching private directory plus universal root environment/dispatch/CI. All candidates removed, all journals preserved, obsolete root object cache and unused detached audit checkout removed. No private firmware/assets or tests are shared between models.
+- All hardware-branch full verifiers and dssmm `make verify-all` exited0. Root policy/five adversarial layout tests pass on every branch. Site composition, YAML/JSON parsing, new-root whitespace checks pass. Moved firmware/assets/tests match pre-move Git blobs; DE Makefile alone pins its published GBA title to remove folder-derived header variation. No C/assembly/asset change.
+- Fresh complete installable images on both layouts match downloaded releases byte-for-byte: DE8.3.2 SHA6d7774ecbadc40e8c91d9e0e977fe09cd36abe8ff34462d362557f828f926f38; OMEGA Test3 SHAc1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52; packed BLUE Test2 SHAce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710. Detailed direct-download comparisons in docs/top-level-binary-verification.json supersede the earlier DE header exception. Released assets/tags remain unchanged.
+- Hardware restructuring commits pushed: DE5fd30c8, Omega25e4caf, BLUE45c1480. projects.json pins their matching directory subtrees; check-snapshots.py passes and docs/top-level-snapshot-verification.json records checked blobs. Added previously omitted target-ci-verification.json records from each hardware branch; only AGENTS/HANDOFF/PROGRESS overlays may differ.
+- Next: commit/push dssmm, inspect hosted CI on all four restructuring heads, address any real path/tool issue, record final evidence and verify clean synchronized branches. Builds/mocks do not add physical hardware qualification; existing flash/SD/stack limits remain in private audit reports. No release/publication or protection changes required.
+
+
+## 2026-11-12 00:37 UTC — Published hash reproducibility correction
+
+- Owner requests fresh branch kernels match their published release hashes exactly. Downloaded DE8.3.2, OmegaTest3 and BLUETest2 assets and verified their recorded hashes. Fresh OMEGA and packed BLUE already match; DE differs at exactly11 header-title/checksum bytes because gbafix defaulted to the checkout directory basename. All other bytes match.
+- Narrow build-only correction: DE Makefile explicitly exports GAME_TITLE=dssmm-releas, preserving the existing published8.3.2 header instead of deriving it from the directory name. No C/assembly/assets or runtime behavior changes. Regenerate GBA output and compare complete files directly with downloaded release bytes. Full DE verifier already passed before this metadata correction; recheck the build and header checksum afterward. Releases/tags remain unchanged.
+
+
+## 2026-11-12 00:34 UTC — Corrected layout implemented; candidate cleanup
+
+- Branch dssmm: private projects are direct root children named ezfomega, ezfomegade and/or ezfblue according to projects.json. Hardware branches contain only their own model; dssmm contains all three. Universal environment/CI/dispatch/policy is at root, with no duplicated private development containers or dispatcher tools. BLUE keeps its internal vendor targets/blue subproject. No firmware source or asset edits.
+- Removed every active candidate directory (DE8.3.2, OmegaTest3, BLUETest2), the ignored old root Omega candidate binary, and the clean obsolete detached audit checkout containing duplicate historical candidates. Persistent journals, embedded plugin resources, installer inputs and published GitHub releases remain intact. Candidate build folders are no longer maintained.
+- All four actual root layout checks and the five policy regression tests pass. Full production verifiers are running with logs /tmp/dssmm-top-{layout,de,omega,blue}-verify.log; interrupted/running checks are not passes. Next: collect exit results, compare output binaries, update pinned snapshot checker and evidence, commit/push independently and verify hosted CI.
+
 # DS Style Kernel Audit — Standalone Handoff
+
+## 2026-11-12 00:26 UTC — Owner correction: common top-level project layout on every branch
+
+- Owner clarified the required layout: on dssmm, ezfomega/, ezfomegade/ and ezfblue/ directly at repository root, plus only strictly universal root infrastructure. The earlier targets/ wrapper and flat standalone hardware branches were the agent's misunderstanding. Hardware branches must use the SAME matching top-level project directory plus universal root files, not their own flat source/assets layout. Owner corrected ezfomenga typo to ezfomega explicitly.
+- Reorganize without firmware/asset/protocol edits, preserve every handoff/progress log, keep root shared build/environment/CI and per-project instructions/history. Each hardware branch contains only its matching project directory; dssmm contains all three. Root dispatch/identity/isolation/provenance tests, docs and CI must understand both one-project and three-project manifests using this same schema.
+- Next: move canonical directories to top level; remove duplicated universal infrastructure inside projects; wrap each hardware branch's target-specific files under its own directory while copying only universal orchestration/environment to its root. Update active paths/references (retain dated historical journals), run all four branch builds/verifiers and hosted CI, compare firmware outputs, then commit/push all changes. No new release/tag or branch protection changes. Source baselines remain DE8.3.2, OMEGA Test3, BLUE Test2; physical qualification limits remain unchanged.
+
 
 ## 2026-11-12 00:02 UTC — Final workspace orientation
 

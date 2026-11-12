@@ -5,9 +5,9 @@ retired `ezfode` and `main` branches must not be recreated.
 
 ## Project boundaries
 
-- `targets/ezfomegade`: EZ-FLASH OMEGA Definitive Edition Rev. A/B.
-- `targets/ezfomega`: Original EZ-FLASH OMEGA.
-- `targets/ezfblue`: newer Definitive Edition B / BLUE.
+- `ezfomegade`: EZ-FLASH OMEGA Definitive Edition Rev. A/B.
+- `ezfomega`: Original EZ-FLASH OMEGA.
+- `ezfblue`: newer Definitive Edition B / BLUE.
 
 Each directory is a complete independent project with its own AGENTS.md,
 HANDOFF.md, PROGRESS.md, sources, assets, configuration, build tools and tests.
@@ -15,7 +15,7 @@ Read that project's instructions/journals before editing it. Root contains only
 universal orchestration, environment, licensing/provenance and repository logs.
 Never move hardware-specific source, assets or settings into the root.
 
-The standalone hardware branches use their own root layouts. `projects.json`
+Every hardware branch uses the same matching top-level project directory and universal root infrastructure; only dssmm contains all three projects. `projects.json`
 records imported source commits; it does not authorize automatic synchronization.
 Never merge a whole hardware branch into another hardware branch or into this
 differently structured canonical branch. Adapt/import intended changes only
@@ -46,7 +46,12 @@ hardware timing, saving, flash success or runtime stack peaks. Never transplant
 flash/save/reset protocols or claim polling/power-loss atomicity is solved
 without evidence. Use automatic GitHub source archives; no extra source ZIPs.
 
-Compartmentalization is a structural change: validate standalone and relocated
+Compartmentalization is a structural change: validate hardware-branch and default-branch
 builds, compare binaries to their published baselines, and inspect all target
 root instructions and active references before committing/pushing. Follow the
 current root HANDOFF.md/PROGRESS.md for work still in progress.
+
+Candidate build folders were removed at the owner's request. Preserve published
+releases and tracked plugin/installer inputs. Build outputs belong only inside
+their project. Compare complete installable binaries with downloaded releases;
+DE explicitly pins its existing release header title for reproducible output.

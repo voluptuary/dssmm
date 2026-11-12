@@ -10,7 +10,13 @@ allowed_records = {'AGENTS.md', 'HANDOFF.md', 'PROGRESS.md'}
 results = []
 for target, record in json.loads((ROOT/'projects.json').read_text())['projects'].items():
     directory = ROOT/record['directory']
-    entries = subprocess.check_output(['git','-C',str(ROOT),'ls-tree','-rz',record['source_commit']])
+    if 'source_commit' not in record:
+        results.append({'target':target,'status':'live hardware project; no imported snapshot pin'})
+        continue
+    source_prefix = record['source_directory'].rstrip('/') + '/'
+    entries = subprocess.check_output(['git','-C',str(ROOT),'ls-tree','-rz',record['source_commit'],'--',source_prefix])
+    if not entries:
+        raise SystemExit('Pinned project directory is empty: '+target)
     checked = 0
     expected_names = set()
     for entry in entries.split(b'\0'):
@@ -19,6 +25,9 @@ for target, record in json.loads((ROOT/'projects.json').read_text())['projects']
         metadata, name = entry.split(b'\t',1)
         mode, kind, expected = metadata.decode().split()
         name = name.decode()
+        if not name.startswith(source_prefix):
+            raise SystemExit("Source escaped project prefix")
+        name = name[len(source_prefix):]
         expected_names.add(name)
         if name in allowed_records:
             continue
@@ -42,4 +51,7 @@ for target, record in json.loads((ROOT/'projects.json').read_text())['projects']
         raise SystemExit('Unexpected tracked snapshot files: '+target+': '+', '.join(sorted(extra)))
     results.append({'target':target,'source_commit':record['source_commit'],'unchanged_files':checked})
 print(json.dumps(results,indent=2))
-print('Imported source/assets/tools match Git blobs (including declared EOL filters); only local instructions/journals may differ.', file=sys.stderr)
+if any('source_commit' in result for result in results):
+    print('Imported source/assets/tools match Git blobs (including declared EOL filters); only local instructions/journals may differ.', file=sys.stderr)
+else:
+    print('Live hardware branch: no imported snapshot claim; run its project verifier.', file=sys.stderr)
