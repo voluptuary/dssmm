@@ -68,7 +68,7 @@ not a merge gate. Refresh root baseline references on trunk at validated release
 checkpoints, never as a root edit in a hardware PR. Retain historical reports.
 
 For the published 8.4.0 release, DE is stable/latest for Definitive Edition
-Rev.A/B. Original OMEGA Test4 and BLUE Test3 remain hardware-untested prereleases. Builds, mocks and
+Rev.A/B. Original OMEGA8.4.0 Test4 and BLUE8.4.1 Test4 remain hardware-untested prereleases. Builds, mocks and
 static layout bounds do not qualify physical flash/save timing or runtime stack
 peaks. No release changes are authorized merely by architecture maintenance.
 Preserve credits, tags/assets, user edits and all journals. Use automatic GitHub
@@ -101,3 +101,11 @@ concise. Fold the immediately preceding release's new features/fixes into the
 appropriate past summary on the next release; do not leave them in additional
 per-version sections. Preserve accurate model/hardware warnings, credits,
 validation limits and download/hash details around those four sections.
+
+BLUE 8.4.1 Test4 is published after the FrankieT19 comparison and four passing
+final CI runs; docs/releases/blue-test4-publication.json records the release and
+owner-authorized condensed corrections to all three preceding8.4.0 note bodies.
+BLUE uses a stock-size firmware-free image with full-image seal; use the official
+BLUE kernel for FPGA updates. Persistent NOR RTS combinations remain blocked
+pending a compatible validated runtime. Neither upstream Test5 nor our combined
+port has confirmed physical BLUE validation. Read private BLUE guidance first.
