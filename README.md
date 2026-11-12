@@ -42,17 +42,43 @@ and follow that release's installation instructions.
 > Back up your SD card and save files before testing. Avoid powering off during
 > kernel updates, save writes or NOR operations.
 
-## SuperCard firmware project
+## SuperCard and SuperChis
 
-The repository also tracks [SuperFW](https://github.com/davidgfnet/superfw), an
-independent GPL-licensed firmware for SuperCard GBA flash carts and derivatives.
-Its `sd`, `lite` and `chis` board variants live in the isolated [`superfw/`](superfw/)
-project and use a separate `superfw` development branch. SuperFW is not an
-OMEGA-family kernel. The `sd`, `lite` and `chis` builds and the full upstream coverage-enabled host
-test suite pass in hosted CI. Physical SuperCard behavior has not been tested as
-part of this repository setup. There is no DSSMM SuperFW release in this
-repository. Follow the upstream installation
-instructions and use the matching SuperFW variant.
+[DSSMM SuperFW Test 1](https://github.com/voluptuary/dssmm/releases/tag/superfw-test1)
+is an early menu port for SuperCard-family flashcards, built on
+[David Guillen Fandos’s SuperFW](https://github.com/davidgfnet/superfw). It adds
+manual Light/Dark themes, accent colors and name-matched title/box artwork to
+SuperFW’s game browser. The full DS-style layout is still being developed.
+
+| Your cartridge | Test 1 download |
+| --- | --- |
+| **SuperChis / SuperChis Prime** (including the intended Prime v1.0 test card) | [superfw-chis.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test1/superfw-chis.fw) |
+| **SuperCard SD** | [superfw-sd.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test1/superfw-sd.fw) |
+| **SuperCard Lite** | [superfw-lite.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test1/superfw-lite.fw) |
+
+**All three are hardware-untested prerelease builds.** Choose the file for your
+exact card and back up your SD card, saves and current firmware before testing.
+Follow [SuperFW’s installation and recovery guide](https://superfw.davidgf.net/docs/install/flash/).
+Use only the matching SuperCard-family build; the OMEGA downloads above target
+different hardware. Prime has no hardware RTC or rumble, and this port offers
+manual themes rather than automatic switching. Its bundled emulators remain
+upstream versions; MiGoomba is currently an OMEGA-family update.
+
+### Make and add artwork
+
+1. Open [DS Style Card Companion (DSSCC)](https://github.com/voluptuary/dsscc/releases/latest),
+   use **Custom Art → Scan SD Card…**, and select your SD-card root. Enable
+   **Include Game Boy Advance files** if wanted, and choose both thumbnail sizes.
+2. Check the images, choose **Mirrored** output and select **Build Pack**.
+3. Copy the generated `IMGS` and `IMGS2` contents into `SYSTEM/IMGS` and
+   `SYSTEM/IMGS2` on the SD card, preserving all subfolders.
+4. In SuperFW’s **SD browser**, press **Start** to cycle List → title artwork →
+   box artwork. Use **UI settings → Save** to remember the mode.
+
+See [the artwork setup guide](superfw/docs/ARTWORK-SETUP.md) for an exact folder
+example, custom images and troubleshooting. Test 1 supports mirrored and CUSTOM
+name-matched files; folder artwork, GBA code-based packs and NOR/recent previews
+are still to come. Artwork colors are reduced in this early renderer.
 
 ## GB/GBC emulator update
 
@@ -89,7 +115,8 @@ writes retain known limitations, so keep backups even when using a stable build.
 For OMEGA-family features, artwork requirements and known limitations, see the
 [Definitive Edition Rev. A/B guide](ezfomegade/README.md),
 [Original OMEGA guide](ezfomega/README.md) or [BLUE guide](ezfblue/README.md).
-SuperCard development and license details are in [the SuperFW project](superfw/README.md).
+SuperCard setup is covered in [the artwork guide](superfw/docs/ARTWORK-SETUP.md) and
+[the SuperFW manual](https://superfw.davidgf.net/).
 [DS Style Card Companion](https://github.com/voluptuary/dsscc) is the separate
 companion application for finding and preparing artwork.
 

@@ -3116,3 +3116,7 @@ Entries below record what was known at each stage. Do not use older branch hashe
 - `superfw/` now holds the pinned upstream SuperFW codebase, bundled build assets, GPL/component notices, project-specific instructions, provenance and journals. The remote `superfw` branch is created. Build and verification commands, shared registry, merge/sparse isolation, CI matrix and user/developer docs are updated.
 - All four upstream variants/projects pass the final hosted matrix: trunk43264263765, SuperFW43264311895, DE43264291574, OMEGA43264297735, BLUE43264305111. Root isolation and real-Git merge fixtures, source-baseline checks and site composition pass. Physical SuperCard behavior remains untested in this repository; no release was made.
 - All five local/remote heads are at970285c03801163273b2c63e2947a8969741a80c. Setup complete.
+
+## 2026-11-12 — SuperFW Test 1 release integration checkpoint
+
+Owner requests an end-user root README, three SuperFW builds in one prerelease, and artwork pack creation/install instructions. Normally merged the SuperFW lane; rewrote only its root README section with card-specific downloads, real feature scope, hardware warning and DSSCC workflow linked to the detailed setup guide. Refreshed SuperFW registry baseline at validated source checkpoint1b2f6c4. No OMEGA source/release changes. Next: commit/push/sync lanes, collect full matrix and final three local builds, publish superfw-test1 as prerelease with latest=false, compare downloaded assets and preserve all prior release metadata/assets.
