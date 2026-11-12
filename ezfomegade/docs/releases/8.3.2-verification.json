@@ -9,7 +9,7 @@
   "prerelease": false,
   "draft": false,
   "latest": true,
-  "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.2",
+  "url": "https://github.com/voluptuary/dssmm/releases/tag/v8.3.2",
   "hardware": "EZ-FLASH OMEGA Definitive Edition Rev. A/B only",
   "validation": "41 host suites, browser installer, JS syntax and static layout passed; no new physical hardware report"
 }

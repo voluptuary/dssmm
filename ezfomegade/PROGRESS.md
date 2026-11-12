@@ -1,4 +1,19 @@
 
+## 2026-11-12 01:01 UTC — Canonical repository documentation validated
+
+- Active documentation/agent identity/credits and release/CI reference URLs now use `voluptuary/dssmm`; historical journals retain their original recorded identity under the rename checkpoint. All changed files are Markdown, HTML or documentation JSON. No firmware/build/test input, release version, tag or published asset changed.
+- Validation passed: changed JSON parses, git diff --check, root layout policy, five isolation regression tests, site composition and active-document old-name scan on all four branches. No kernel rebuild or replacement release is needed for these URL-only edits.
+- This branch's documentation commit is ready for direct push to the working origin. dssmm will pin this matching private subtree after the independent branch commit. GitHub's new repository endpoint still returned404 at last check; use the existing origin until the owner's rename becomes visible, then run `git remote set-url origin https://github.com/voluptuary/dssmm.git` once (shared by these worktrees). Do not perform the GitHub rename for the owner.
+
+
+## 2026-11-12 01:00 UTC — Repository rename documentation update
+
+- Owner is renaming this same repository to `voluptuary/dssmm` (https://github.com/voluptuary/dssmm). Default branch remains dssmm; hardware branches/directories remain ezfomegade, ezfomega and ezfblue. Update all active documentation, credits, project/release/CI links and agent identity references to the new canonical repository URL. Historical HANDOFF/PROGRESS entries retain their original names/URLs as historical evidence; this checkpoint supersedes their current-repository identity. Workspace directory names are local paths and do not change automatically.
+- Scope is documentation and snapshot provenance only; no firmware, assets, Makefiles, test/build scripts, version strings, Git tags or release assets/notes will change. No README PR is needed: commit/push these independent branch changes directly. Preserve branch isolation and source credits.
+- Initial check: new repository URL returned404; do not rename the repository on the owner's behalf or point origin at an unavailable URL. Continue using the existing working origin until GitHub exposes the new name; then update the shared local origin once and verify all four remote heads.
+- Validation/next: scan active docs for old references, parse changed JSON, run branch layout/policy checks and compose the site. Commit hardware documentation first, pin those private subtrees in dssmm projects.json, verify snapshots and unchanged firmware inputs, then commit/push dssmm. If the owner rename is still pending, report that precisely; no release rebuild/publication is warranted for URL-only edits.
+
+
 ## 2026-11-12 00:41 UTC — Corrected layout delivery complete for ezfomegade
 
 - Structural implementation 5fd30c8bbf5c256ffee88d31d2e475ee86d89c31 is committed/pushed. Hosted Actions run 43128765779 succeeded: https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128765779. Full local verifier, policy tests and direct published-download binary comparison also pass. Shared root environment/dispatch/policy/CI files match dssmm exactly.

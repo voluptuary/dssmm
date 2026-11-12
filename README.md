@@ -4,9 +4,9 @@ DSSMM keeps three independent flashcart kernel projects in one repository. Choos
 
 | Project | Hardware | Release branch |
 | --- | --- | --- |
-| [ezfomegade](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/dssmm/ezfomegade/README.md) | EZ-FLASH OMEGA Definitive Edition Rev. A/B | `ezfomegade` |
-| [ezfomega](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/dssmm/ezfomega/README.md) | Original EZ-FLASH OMEGA | `ezfomega` |
-| [ezfblue](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/dssmm/ezfblue/README.md) | Newer Definitive Edition B / BLUE | `ezfblue` |
+| [ezfomegade](https://github.com/voluptuary/dssmm/blob/dssmm/ezfomegade/README.md) | EZ-FLASH OMEGA Definitive Edition Rev. A/B | `ezfomegade` |
+| [ezfomega](https://github.com/voluptuary/dssmm/blob/dssmm/ezfomega/README.md) | Original EZ-FLASH OMEGA | `ezfomega` |
+| [ezfblue](https://github.com/voluptuary/dssmm/blob/dssmm/ezfblue/README.md) | Newer Definitive Edition B / BLUE | `ezfblue` |
 
 The `dssmm` default branch contains isolated snapshots directly at repository root. Each project owns its source, assets, build tools, tests, configuration and documentation. Root files are universal orchestration, environment and repository records. [projects.json](projects.json) records snapshot provenance. No automatic synchronization or cross-platform merge is configured.
 

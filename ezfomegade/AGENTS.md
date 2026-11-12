@@ -64,8 +64,8 @@ follow-up hardware, flash timing/atomicity and parser-work-budget limits are
 listed in the report. Do not silently restart completed porting from old notes.
 
 
-The current GitHub repository is `voluptuary/ezfode-dssmm-kernel`
-(`https://github.com/voluptuary/ezfode-dssmm-kernel`). The Codespaces workspace
+The current GitHub repository is `voluptuary/dssmm`
+(`https://github.com/voluptuary/dssmm`). The Codespaces workspace
 may retain its original local directory name after the repository rename.
 The GitHub default branch is `dssmm`; the DE release branch is `ezfomegade`. The owner completed the
 rename through GitHub; remote `main` no longer exists. Do not recreate it.
