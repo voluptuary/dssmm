@@ -1,11 +1,10 @@
 # Bundled MiGoomba GB/GBC emulator
 
-Development code uses [MiGoomba v0.1](https://github.com/michyprima/migoomba/tree/4b401e2ac7876aed9f89face867fd43d89ce189d)
+DSSMM 8.4.0 uses [MiGoomba v0.1](https://github.com/michyprima/migoomba/tree/4b401e2ac7876aed9f89face867fd43d89ce189d)
 by michyprima, based on Jaga's Jagoomba Color, Dwedit's Goomba Color and FluBBa's
 Goomba. Source commit: `4b401e2ac7876aed9f89face867fd43d89ce189d`.
 The pinned upstream source is unmodified. Payload metadata/digests and compiler
-identity are in [migoomba.json](migoomba.json). Published kernel releases still
-contain their previous emulator until a new kernel release is explicitly made.
+identity are in [migoomba.json](migoomba.json). DSSMM 8.4.0 embeds this payload; earlier releases retain their previous emulator.
 
 ## Hardware variant and saves
 
@@ -56,8 +55,8 @@ python3 tests/test-migoomba-save-compat.py --upstream /path/to/migoomba
 ```
 
 This uses generated homebrew test ROMs and temporary saves, never commercial
-games or the user's save files. Kernel test images remain unreleased under the
-ignored build-migoomba-test directory; existing release tags/assets are untouched.
+games or the user's save files. Release build artifacts are staged under the ignored build-migoomba-test directory.
+See migoomba-release-validation.json and the versioned release notes for current evidence.
 
 ## Attribution
 

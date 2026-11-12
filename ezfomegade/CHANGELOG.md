@@ -1,3 +1,19 @@
+# DS Style Merkin Mix 8.4.0
+
+**EZ-FLASH OMEGA Definitive Edition Rev. A/B only.**
+
+### New features and improvements
+
+- Replaced the built-in GB/GBC emulator with **MiGoomba v0.1** by **michyprima**, based on Jagoomba Color, Goomba Color and Goomba. Both Game Boy and Game Boy Color use the DE-specific build.
+- Retained existing per-game `.esv` paths and 64 KiB kernel save handling. Back up saves before updating; old emulator save-state compatibility is not established. Prefer in-game battery saves when transitioning.
+- Added reproducible payload checks and loader regression tests for exact ROM append offsets, DMA alignment, cache bounds and invalid payload sizes.
+
+### Validation and known limitations
+
+Software validation covers the kernel and generated-ROM emulator save workflows. The new DSSMM/MiGoomba integration has not been tested on physical hardware; game compatibility, cartridge timing and runtime stack peaks remain unqualified. Existing flash-polling and interrupted NOR-catalog/SD-file replacement limits remain. Avoid powering off during writes.
+
+Thanks to **michyprima**, **Jaga / EvilJagaGenius**, **Dwedit** and **FluBBa** for the emulator lineage, alongside the contributors credited below and in CREDITS.md.
+
 # Changelog
 
 ## DS Style Merkin Mix 8.3.1
