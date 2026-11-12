@@ -2,6 +2,7 @@
 set -euo pipefail
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
+python3 tests/test-migoomba-payload.py
 omega_test_dir="$(mktemp -d)"
 trap 'rm -rf "$omega_test_dir"' EXIT
 # Keep target validation separate from the inherited DE audit wrapper.

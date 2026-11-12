@@ -22,3 +22,11 @@ Download the Original OMEGA **`ezkernel.bin`** from its explicitly labeled prere
 See the [platform status](docs/porting/OMEGA_STATUS.md) for additional compatibility and testing limitations.
 
 Thanks to **FrankieT19** for the Original OMEGA DS Style adaptation and interface work, **Sterophonick** and **EZ-FLASH** for the foundations, **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above, **aidiadayo** for Thai support, **Kekun** for the case-sensitive font include correction in the lineage, and **ChaN** for FatFs. Merkin Mix artwork and port work is maintained by **Merkin / voluptuary**, with AI assistance. [Detailed credits and provenance](CREDITS.md).
+
+## GB/GBC emulator in development builds
+
+Development code now bundles [MiGoomba](https://github.com/michyprima/migoomba)
+for Game Boy and Game Boy Color games. The published release linked above still
+uses its previous emulator. This replacement has source/build/software testing,
+but needs hardware testing in DSSMM. Back up `.esv` saves before testing; old
+emulator save states are not guaranteed compatible.
