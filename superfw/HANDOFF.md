@@ -17,3 +17,7 @@ Owner identifies physical test hardware as SuperChis Prime v1.0. Added docs/PORT
 ## 2026-11-12 — Designer-thread evidence
 
 Added the owner-provided ChisBread Prime introduction to docs/PORTING-PLAN.md. Refined clock/rumble exclusions, separate NOR/SDRAM qualification, chip/console identification and distinction between original SuperCard HDL and Prime specifications. Designer claims remain separate from local physical evidence. Documentation only; diff whitespace checked.
+
+## 2026-11-12 — Unsupported-feature scope decision
+
+Owner authorizes dropping features unsupported by Prime hardware, including automatic themes. Updated docs/PORTING-PLAN.md: manual Light/Dark/accent controls remain; absent hardware controls are omitted. Existing game software-RTC support is a separate native capability. Documentation only; git diff --check passed.

@@ -23,13 +23,13 @@ Do not transplant OMEGA drivers, patch payloads, save-state formats or flash lay
 | Horizontal/vertical carousels and transparent artwork | Later renderer work; prototype RAM use, image decoding and SD latency before promising parity. Reuse artwork naming conventions where practical. |
 | Favorites, recents, last-played and startup shortcuts | Carry over behavior; retain native recent/save lifecycle and add versioned settings where needed. |
 | Menu sounds and localization | Feasible, but audit audio/interrupt ownership and preserve SuperFW UTF/font support. |
-| Clock-based Auto theme | Prime has no hardware RTC according to its designer. Manual themes first; any Auto mode needs an explicit software-clock policy. |
+| Clock-based Auto theme | Omit on Prime. Keep manual Light/Dark themes and accent selection; do not add a software clock solely to reproduce automatic themes. |
 | GBA loading and save management | Preserve native patch engine, battery SRAM recovery and direct-saving modes. Validate each save technology and power-cycle recovery. |
 | Cheats and remembered selections | Present DSSMM-like controls over SuperFW’s engine. Audit code formats and per-game identifiers; no assumed database compatibility. |
 | In-game menu and save states | Retain SuperFW mechanisms and their game-dependent limitations. OMEGA state files/runtime payloads are incompatible unless separately demonstrated. Style this small runtime menu later within its own memory limits. |
 | NOR library and themed progress | SuperFW chis already has NOR support. Adapt UI around native allocation/mapping/write/erase; do not reuse OMEGA sector maps. |
 | MiGoomba and other emulators/plugins | Separate integration project. First preserve bundled upstream emulators. Audit append/load conventions, save paths, return/reset and memory limits before MiGoomba adoption. OMEGA plugin binaries have no blanket compatibility. |
-| OMEGA-specific rumble, cartridge modes and firmware/FPGA update flows | Prime has no rumble or hardware RTC according to its designer. Other cartridge modes and update flows require native implementations. |
+| OMEGA-specific rumble, cartridge modes and firmware/FPGA update flows | Omit rumble, hardware-clock UI and unsupported OMEGA cartridge modes on Prime. Keep only native SuperFW update and hardware controls supported by the target. |
 
 ## Visual target
 
@@ -53,3 +53,7 @@ Inventory menu rendering, theme tables, resource sizes and DSSMM asset licenses;
 Source: [ChisBread’s Prime introduction, January 12, 2026](https://gbatemp.net/threads/superchis-prime-how-i-fixed-the-supercard-sds-flaws-on-a-budget.678808/), reviewed November 12, 2026. These are designer statements, not our hardware results.
 
 Prime combines NOR execution with retained SDRAM and fragmented flash allocation. Test both launch paths separately; make the NOR library a first-class UI destination. Flash-chip variants and reported GBA motherboard-02 power issues make chip/console identification part of qualification. Standard saves use battery-backed SRAM; EEPROM/Flash handling depends on firmware patches, with ROM hacks needing particular attention. No hardware RTC or rumble is provided. The designer identifies SuperFW support, strengthening the native-backend choice without qualifying our build or the owner’s revision. The linked HDL repository is described as the original SuperCard implementation, so it must not be treated as a complete Prime hardware specification.
+
+## Owner scope decision — omit unsupported hardware features
+
+Automatic clock-based themes are excluded from the Prime port. Retain manual Light/Dark themes and accent colors. Omit controls for absent rumble, hardware RTC and unsupported cartridge modes rather than display disabled placeholders or emulate hardware solely for menu parity. Preserve SuperFW’s existing software RTC game-patching support where applicable; that is independent of menu theme scheduling. Scope the visible interface to target capabilities, including variant-specific builds. Visual consistency means a common design and navigation style, not identical feature counts across cards.
