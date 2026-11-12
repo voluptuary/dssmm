@@ -30,3 +30,13 @@ stable/latest; OMEGA Test3 and BLUE Test2 remain hardware-untested prereleases.
 Do not recreate candidates, replace releases or upload manual source ZIPs for
 repository maintenance. Never claim arbitrary future same-file changes cannot
 conflict; test merges and builds relevant to the actual change.
+
+## MiGoomba integration
+
+GB/GBC development payload is MiGoomba v0.1 at4b401e2, variant generic.
+See docs/plugins/MIGOOMBA.md and migoomba.json for exact source/digests, variant
+limitations and reproduction. Do not edit the generated migoomba.h manually or
+reuse another card's variant. Run the focused payload/loader test and full
+project verifier for changes; preserve64KiB .esv handling and cache bounds.
+Do not claim old save-state compatibility or hardware qualification from mocks.
+Published release assets retain the prior emulator until explicitly updated.

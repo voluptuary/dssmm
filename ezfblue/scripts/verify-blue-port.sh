@@ -2,6 +2,7 @@
 set -euo pipefail
 repo_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_dir"
+python3 tests/test-migoomba-payload.py
 make
 make check
 bash scripts/test-blue-ui.sh
