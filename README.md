@@ -1,35 +1,28 @@
-# DS Style Merkin Mix — Original EZ-FLASH OMEGA
+# DS Style Merkin Mix
 
-Merkin Mix adds artwork transparency and name-matched artwork for supported systems beyond GBA, alongside highly optimized artwork lookup and menu rendering that retains transparency compatibility. This branch builds on **FrankieT19's Original OMEGA DS Style v8.0 fork**, with the EZ-FLASH and Sterophonick kernel foundations.
+DSSMM keeps three independent flashcart kernel projects in one repository. Choose the exact hardware before building or installing; kernel files are not interchangeable.
 
-**Original EZ-FLASH OMEGA only. Hardware untested.** These builds are incompatible with the older OMEGA Definitive Edition Rev. A/B and the newer OMEGA Definitive Edition B / BLUE. Those targets have separate [ezfomegade](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfomegade) and [ezfblue](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfblue) branches.
+| Project | Hardware | Release branch |
+| --- | --- | --- |
+| [ezfomegade](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/dssmm/ezfomegade/README.md) | EZ-FLASH OMEGA Definitive Edition Rev. A/B | `ezfomegade` |
+| [ezfomega](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/dssmm/ezfomega/README.md) | Original EZ-FLASH OMEGA | `ezfomega` |
+| [ezfblue](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/dssmm/ezfblue/README.md) | Newer Definitive Edition B / BLUE | `ezfblue` |
 
-The current development checkpoint identifies itself as `Merkin Mix 8.3.1-omega-test3`. It has source, build and host-test validation only. Installation, booting, gameplay, saving, plugins, cheats/save states and NOR operations still need testing on an Original OMEGA cartridge. [Original OMEGA Test 3](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test3) is the current hardware-untested prerelease.
+The `dssmm` default branch contains isolated snapshots directly at repository root. Each project owns its source, assets, build tools, tests, configuration and documentation. Root files are universal orchestration, environment and repository records. [projects.json](projects.json) records snapshot provenance. No automatic synchronization or cross-platform merge is configured.
 
-Features include:
-
-- Name-matched and mirrored artwork folders, long-filename support, marked transparency, GBA header-code artwork and per-extension default images.
-- List, List + Art, horizontal and vertical carousels, title/box artwork, cached previews and optional CUSTOM Only rounded corners.
-- Favorites, recent and last-played games, configurable Start-screen behavior, Light/Dark/Auto themes, accent colors and menu sounds.
-- Clean list display, configurable wrapping including “On, Not SYSTEM,” multiple languages including Chinese and Thai, and the text/Markdown viewer.
-- Optional remembered per-game cheat selections and collapsible groups, adapted from **exploitz86's** work and **SkillerCMP's** group-menu foundation.
-- Staged SD save/settings replacement, checked loading and patch preparation, themed NOR writing progress with the normal clock/username, and remembered NOR artwork source paths on SD.
-
-The Original OMEGA hardware drivers and game-time cheat engine remain the target foundation. Native PSRAM loading and generic plugin combinations are limited to 32 MiB. NOR deletes retain the newest-title restriction. NOR flash status and power-loss recovery remain limited by the original implementation; SD artwork hints and cheat snapshots are best-effort metadata. Extra custom theme/color slots remain excluded.
-
-Download the Original OMEGA **`ezkernel.bin`** from its explicitly labeled prerelease and use an Original OMEGA-compatible `SYSTEM` setup. Back up your SD card and saves before testing. GitHub provides source archives automatically.
-
-Build with devkitPro/devkitARM and libgba:
+With devkitARM, libgba, Maxmod, a host C compiler, Python3/Unicorn and Node available:
 
 ```sh
-make BUILD=build-omega TARGET=omega-port
-bash scripts/verify-omega-port.sh
+make ezfomegade
+make verify-ezfomegade
+make ezfomega
+make verify-ezfomega
+make ezfblue
+make verify-ezfblue
 ```
 
-The verifier requires a host C compiler, Python 3 and the devkitPro tools. The build enforces the 2 MiB kernel limit. Host tests check filesystem failures, artwork rendering, settings, caches, directory identities, loader policies and patch boundaries; they do not qualify physical hardware. See [port status and validation](docs/porting/OMEGA_STATUS.md).
+`make` alone shows help and never selects hardware implicitly. `make build-all` and `make verify-all` select all projects explicitly. Each project also builds independently from its directory; each dedicated hardware branch contains only its matching project directory and the same universal root infrastructure. BLUE keeps its vendor linker/resource subproject internally; never install its raw development GBA as an update.
 
-Thanks to **FrankieT19** for the Original OMEGA DS Style adaptation and interface work, **Sterophonick** and **EZ-FLASH** for the foundations, **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above, **aidiadayo** for Thai support, **Kekun** for the case-sensitive font include correction in the lineage, and **ChaN** for FatFs. Merkin Mix artwork and port work is maintained by **Merkin / voluptuary**, with AI assistance. [Detailed credits and provenance](CREDITS.md).
+Changes belong to the appropriate target. Do not merge a whole hardware branch into another hardware branch or into the default branch wholesale. Adapt/import intended changes in its target directory and run that target's verifier. CI checks layout and target identity and rejects known cross-platform branch PRs; it cannot prove arbitrary future edits regression-free or enforce required reviews without branch protection.
 
-## Repository isolation
-
-This hardware branch is standalone. The `dssmm` default branch holds an independent copy under `targets/ezfomega`. `project.json` identifies the hardware; `python3 scripts/project.py verify ezfomega` selects its full verifier. Never merge a different hardware branch or the whole canonical layout here. CI is read-only and target-specific; required-check enforcement still depends on branch protection. Published release tags are preserved.
+The hardware-specific READMEs contain features, credits, download/install instructions and remaining validation limits. Original OMEGA and BLUE releases remain hardware-untested. Source archives are supplied automatically by GitHub; no separate source ZIP is maintained.
