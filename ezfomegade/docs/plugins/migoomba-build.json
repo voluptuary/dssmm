@@ -3,6 +3,7 @@
   "file": "ezkernelnew.bin",
   "bytes": 2030600,
   "sha256": "5037473f5992f745e8d29d2df34e12996a76aaac2ccde51786f99b5432827d48",
-  "status": "8.4.0 release prepared; software checks passed; new integration needs hardware testing",
-  "published_release_modified": false
+  "status": "Published v8.4.0; software/emulator checks passed; new integration needs hardware testing",
+  "published_release_modified": false,
+  "release_url": "https://github.com/voluptuary/dssmm/releases/tag/v8.4.0"
 }
