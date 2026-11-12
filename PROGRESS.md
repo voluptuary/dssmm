@@ -1,3 +1,9 @@
+## 2026-11-12 15:14 UTC — MiGoomba release validation checkpoint
+
+- Owner authorizes completing MiGoomba validation and publishing all three kernels with platform-specific release notes matching prior releases. Owner explicitly selects DE 8.4.0 as stable with hardware-testing limits stated; Original OMEGA 8.4.0 Test 4 and BLUE 8.4.0 Test 3 remain hardware-untested prereleases. Preserve earlier tags/assets and README edits.
+- Fresh local make verify-ezfomegade, make verify-ezfomega and make verify-ezfblue all exited 0. DE includes all 41 host suites/browser/IWRAM checks; BLUE includes 24 UI suites, packaging and protected resources. Shared isolation and all seven policy/merge fixtures passed. Focused ARM-preprocessed Cppcheck completed on each active kernel unit; existing SDK signed-shift/lock and unchanged constant UI-condition diagnostics remain, with no diagnostic in the MiGoomba changes.
+- Pinned upstream 4b401e2 rebuilt in all three variants with exact committed payload SHA-256 matches. Fresh mGBA harness compilation and save/conversion/legacy replay are pending; running commands are not passes. Continue per-directory release metadata/version/build evidence on the owning hardware lane, merge normally into dssmm, sync lanes and verify hosted CI before publishing. Record actual release asset digests and download comparisons. No physical hardware qualification is claimed.
+
 
 ## 2026-11-12 14:44 UTC — Local migration ready; source safely integrated on all lanes
 
