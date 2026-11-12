@@ -25,5 +25,9 @@
       "bytes": 464384,
       "sha256": "d7929e6096c6fd1d335d54feb23cd16ff293debdafaf493ad73e44d9e6af3027"
     }
+  },
+  "hosted_full_verifier": {
+    "result": "success",
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43272095902"
   }
 }
