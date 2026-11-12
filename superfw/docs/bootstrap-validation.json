@@ -41,5 +41,25 @@
     "upstream linker emits RWX LOAD-segment warnings",
     "upstream chis build reports an unused err variable in src/menu.c"
   ],
-  "hardware_validation": "not_performed"
+  "hardware_validation": "not_performed",
+  "hosted_ci": {
+    "superfw_lane": {
+      "run_id": 43263202200,
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43263202200",
+      "result": "passed",
+      "coverage_enabled_host_tests": true,
+      "all_board_builds": true
+    },
+    "integration_matrix": {
+      "run_id": 43263181698,
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43263181698",
+      "result": "passed",
+      "all_projects": true
+    },
+    "initial_clean_checkout_failure": {
+      "run_id": 43262545176,
+      "result": "failed",
+      "cause": "Six upstream emulator payloads were excluded by the repository-wide *.bin ignore pattern; tracked in superfw/emu and root exception added."
+    }
+  }
 }
