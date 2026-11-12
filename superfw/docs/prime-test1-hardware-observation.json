@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-12",
+  "release": "superfw-test1",
+  "tested_asset": "superfw-chis.fw",
+  "hardware": "SuperChis Prime v1.0",
+  "source_commit": "8a22da16c2d755de8fc12db7c5482657e6813ecd",
+  "reported_by": "repository owner",
+  "results": {
+    "chain_load": "successful",
+    "reported_superfw_version": "0.22",
+    "manual_themes": "available",
+    "menu_appearance": "mostly upstream SuperFW; full DSSMM-style layout not yet implemented"
+  },
+  "scope": "Initial physical boot/theme smoke test only.",
+  "not_tested": [
+    "SuperCard SD build",
+    "SuperCard Lite build",
+    "artwork rendering",
+    "gameplay",
+    "save behavior",
+    "NOR operations",
+    "internal-flash installation",
+    "full menu/layout validation"
+  ]
+}
