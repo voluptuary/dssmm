@@ -21,9 +21,9 @@ cartridge model before downloading or flashing an update.**
 
 | Your cartridge | Kernel download | Update file | Status |
 | --- | --- | --- | --- |
-| EZ-FLASH OMEGA **Definitive Edition Rev. A or Rev. B** | [DSSMM 8.3.2](https://github.com/voluptuary/dssmm/releases/tag/v8.3.2) | `ezkernelnew.bin` | Stable release |
-| **Original EZ-FLASH OMEGA** | [DSSMM 8.3.1 — OMEGA Test 3](https://github.com/voluptuary/dssmm/releases/tag/v8.3.1-omega-test3) | `ezkernel.bin` | Experimental; not hardware-verified |
-| Newer EZ-FLASH OMEGA **Definitive Edition B / BLUE** | [DSSMM 8.3.1 — BLUE Test 2](https://github.com/voluptuary/dssmm/releases/tag/v8.3.1-blue-test2) | `ezbluekernel.bin` | Experimental; not hardware-verified |
+| EZ-FLASH OMEGA **Definitive Edition Rev. A or Rev. B** | [DSSMM 8.4.0](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0) | `ezkernelnew.bin` | Stable release |
+| **Original EZ-FLASH OMEGA** | [DSSMM 8.4.0 — OMEGA Test 4](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-omega-test4) | `ezkernel.bin` | Experimental; not hardware-verified |
+| Newer EZ-FLASH OMEGA **Definitive Edition B / BLUE** | [DSSMM 8.4.0 — BLUE Test 3](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-blue-test3) | `ezbluekernel.bin` | Experimental; not hardware-verified |
 
 **The older Definitive Edition Rev. B and the newer Definitive Edition B / BLUE
 are different cards.** The Rev. A/B release is also incompatible with the original
@@ -41,12 +41,12 @@ and follow that release's installation instructions.
 > Back up your SD card and save files before testing. Avoid powering off during
 > kernel updates, save writes or NOR operations.
 
-## GB/GBC emulator development update
+## GB/GBC emulator update
 
-Unreleased development code now uses [MiGoomba](https://github.com/michyprima/migoomba)
-for GB/GBC games. The published downloads above still contain their previous
-emulator. This integration needs hardware testing; back up `.esv` saves before
-testing and do not assume old emulator save states are compatible.
+DSSMM 8.4.0 uses [MiGoomba](https://github.com/michyprima/migoomba)
+for GB/GBC games. Software regression and save-compatibility checks passed;
+this integration still needs hardware testing. Back up `.esv` saves before
+updating and do not assume old emulator save states are compatible.
 
 ## What DSSMM offers
 
@@ -100,7 +100,7 @@ DSSMM builds on the work of the following contributors:
 - **Kekun** — the font-header capitalization correction used for compatibility
   with case-sensitive build systems.
 - **ChaN** — FatFs, the filesystem library used by the kernels.
-- **michyprima** — MiGoomba, the GB/GBC emulator in development builds, based on
+- **michyprima** — MiGoomba, the GB/GBC emulator in DSSMM 8.4.0, based on
   **Jaga / EvilJagaGenius**'s Jagoomba Color, **Dwedit**'s Goomba Color and
   **FluBBa**'s Goomba. Its upstream acknowledgments also credit **Minucce**,
   **Nuvie**, **Radimerry**, **Therealteamplayer** and **Endrift / mGBA**.

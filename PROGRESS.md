@@ -1,3 +1,10 @@
+## 2026-11-12 15:19 UTC — All local release checks passed; hosted CI pending
+
+- Independently prepared/committed each owning lane and merged normally into dssmm. Versioned 8.4.0 kernels, cumulative platform release notes, private validation JSON and fresh kernel-input registry baselines are committed. DE is stable by explicit owner choice; OMEGA Test4 and BLUE Test3 remain prereleases. No earlier tag/asset is changed.
+- Full local verifiers all exited 0. Fresh emulator payloads match the pinned commit and all 30 save/state/menu, 12 conversion and three legacy-battery-container replays passed. Focused Cppcheck completed on all active kernel units; only existing SDK/unchanged UI diagnostics. Versioned builds, payload tests, static layout guards and BLUE packaging/resource tests passed. Shared isolation/merge fixtures, baseline comparison and site composition passed. No physical hardware qualification or old saved-state guarantee.
+- Assets: DE ezkernelnew.bin 2030600 bytes SHA256 5037473f5992f745e8d29d2df34e12996a76aaac2ccde51786f99b5432827d48; OMEGA ezkernel.bin 2054824 bytes SHA256 8d37e4f80e5c5cc68332406e95f3fbe345c3afeea9b4b11cb0df19b383baef00; BLUE ezbluekernel.bin 3988120 bytes SHA256 340528034410e24101891a1a9c1a6ed6ccaadfa5a0786fa10910f52ee14245c2.
+- Next: push trunk first, fast-forward/push all lanes, wait for final hosted three-model CI. Then publish v8.4.0 stable/latest plus v8.4.0-omega-test4 and v8.4.0-blue-test3 prereleases with the committed notes; download assets and verify byte identity, release flags and immutable prior assets. Publication has not yet occurred.
+
 ## 2026-11-12 15:14 UTC — MiGoomba release validation checkpoint
 
 - Owner authorizes completing MiGoomba validation and publishing all three kernels with platform-specific release notes matching prior releases. Owner explicitly selects DE 8.4.0 as stable with hardware-testing limits stated; Original OMEGA 8.4.0 Test 4 and BLUE 8.4.0 Test 3 remain hardware-untested prereleases. Preserve earlier tags/assets and README edits.

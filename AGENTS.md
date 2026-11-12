@@ -67,8 +67,8 @@ not live documentation. Differences during feature work are expected; this is
 not a merge gate. Refresh root baseline references on trunk at validated release
 checkpoints, never as a root edit in a hardware PR. Retain historical reports.
 
-DE8.3.2 remains stable/latest for Definitive Edition Rev.A/B. Original OMEGA
-Test3 and BLUE Test2 remain hardware-untested prereleases. Builds, mocks and
+For the authorized 8.4.0 release, DE is stable/latest for Definitive Edition
+Rev.A/B. Original OMEGA Test4 and BLUE Test3 remain hardware-untested prereleases. Builds, mocks and
 static layout bounds do not qualify physical flash/save timing or runtime stack
 peaks. No release changes are authorized merely by architecture maintenance.
 Preserve credits, tags/assets, user edits and all journals. Use automatic GitHub
@@ -89,8 +89,8 @@ For local VS Code/Docker/Ubuntu setup and session recovery, read
 docs/local-development.md. Codespaces /tmp caches/process handles and ignored
 binaries are not portable; use committed evidence and rerun unfinished checks.
 
-Current functional continuation is MiGoomba integration validation, not another
-architecture audit. Read current HANDOFF and docs/local-development.md. The
-three generated payloads are committed; full verifier/replay/Cppcheck completion
-was not recovered after session loss and must be confirmed locally. Preserve
-user README commit e72b9be and all published releases while doing so.
+MiGoomba full local verifiers, replay and focused Cppcheck completed on 2026-11-12;
+see current HANDOFF and per-project migoomba-release-validation.json. Owner
+authorizes publishing 8.4.0 (DE stable, OMEGA Test4/BLUE Test3 prereleases) after
+final CI. New hardware qualification and old saved-state compatibility are not
+claimed. Preserve user README commit e72b9be and all earlier published releases.

@@ -124,11 +124,11 @@ payloads: DE uses `ezode`, Original OMEGA uses `ezo`, BLUE uses `generic` to avo
 unverified DE rumble register writes. Existing .esv paths/64KiB kernel save
 handling remain; back up saves. Old saved-state compatibility is not established.
 
-Earlier successful evidence is in the committed per-target JSON reports. The
-session limit discarded live process handles and `/tmp` logs; the last full
-verifier, optional replay and Cppcheck runs were NOT recorded as completed.
-Run the full verifier for each platform locally and record actual exit results.
-Do not infer success from an interrupted command or a previous build report.
+Earlier successful evidence is in the committed per-target JSON reports. The migration session lost its process handles and `/tmp` logs. Fresh local
+runs on 2026-11-12 completed all three full verifiers, save/conversion/legacy
+replays and focused Cppcheck. Per-target `migoomba-release-validation.json`
+records the results for 8.4.0. Rerun checks after relevant changes; interrupted
+commands never count as passes.
 
 Optional emulator/save tests need a separate pinned MiGoomba source checkout and
 its mGBA harness. Follow the project's MIGOOMBA.md, including zlib headers and
@@ -140,5 +140,6 @@ Generated `.elf`, `.gba`, `.bin` and `build*` outputs are ignored and must be
 rebuilt locally if unavailable. Do not recreate candidate folders or upload an
 extra source ZIP. Kernel source is modified intentionally, so the optional
 historical release-input baseline check may report differences; it is not a
-merge gate. Existing published DE8.3.2 / OMEGA Test3 / BLUE Test2 releases remain
-unchanged and must not be overwritten as part of environment migration.
+merge gate. Earlier DE8.3.2 / OMEGA Test3 / BLUE Test2 releases remain unchanged. The owner
+subsequently authorized 8.4.0: DE stable, OMEGA Test4 and BLUE Test3 prereleases;
+see current journals and release notes. Do not overwrite earlier releases.
