@@ -1,3 +1,17 @@
+# DS Style Merkin Mix 8.4.0 — Original OMEGA Test 4
+
+**ORIGINAL EZ-FLASH OMEGA ONLY — HARDWARE UNTESTED. UPDATE AT YOUR OWN RISK.**
+
+### New features and improvements
+
+- Replaced the built-in GB/GBC emulator with **MiGoomba v0.1** by **michyprima**, using the Original OMEGA ezo variant. Based on Jagoomba Color, Goomba Color and Goomba.
+- Retained per-game `.esv` paths and 64 KiB kernel save handling. Back up saves; old emulator save states are not qualified. Prefer in-game battery saves when transitioning.
+- Added reproducible payload and actual-loader regression checks for offsets, DMA alignment, cache bounds and invalid payload sizes.
+
+### Validation and limitations
+
+Full platform software checks and generated-ROM save/conversion/legacy-battery replay tests passed. No physical Original OMEGA test is claimed; installation, boot, game/save compatibility, plugins, NOR operations and runtime stack peaks remain unqualified. Upstream ezo intentionally does not save emulator settings on menu exit. Native hardware drivers and flash/save/reset protocols are unchanged.
+
 # Changelog
 
 ## DS Style Merkin Mix 8.3.0

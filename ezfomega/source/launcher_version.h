@@ -1,6 +1,6 @@
 #ifndef LAUNCHER_VERSION_H
 #define LAUNCHER_VERSION_H
 
-#define LAUNCHER_VERSION_TEXT "Merkin Mix 8.3.1-omega-test3"
+#define LAUNCHER_VERSION_TEXT "Merkin Mix 8.4.0-omega-test4"
 
 #endif

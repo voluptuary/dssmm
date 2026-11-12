@@ -1,3 +1,10 @@
+## 2026-11-12 15:17 UTC — 8.4.0-omega-test4 release prepared and software validation complete
+
+- Owner authorizes publication; DE 8.4.0 is stable by explicit request, while Original OMEGA Test 4 and BLUE Test 3 remain hardware-untested prereleases. This lane changes only ezfomega/. New release notes follow the previous platform release's cumulative style, model warnings, credits and limitations.
+- Fresh full verifier exited 0; focused ARM-preprocessed Cppcheck completed with only existing SDK/unchanged UI diagnostics. Exact pinned upstream payload rebuilt; all 10 variant save/state/menu rows, four conversion rows and legacy Jagoomba battery-save replay passed, independently checked for printed failures. Across variants: 30 + 12 + 3 checks. No physical hardware or old saved-state compatibility claim.
+- Versioned kernel built and packaged: ezkernel.bin, 2054824 bytes, SHA-256 8d37e4f80e5c5cc68332406e95f3fbe345c3afeea9b4b11cb0df19b383baef00. Artifact/validation details: docs/plugins/migoomba-release-validation.json; notes: docs/releases/v8.4.0-omega-test4.md. Only the version header changes executable inputs after the full verifier; payload/loader logic is unchanged. Retain earlier reports/releases.
+- Next: merge lane normally into dssmm, sync all lanes, verify final hosted CI, publish authorized release and download/compare its asset. Publication is not yet claimed by this checkpoint.
+
 
 ## 2026-11-12 14:39 UTC — Urgent local/Docker migration checkpoint
 

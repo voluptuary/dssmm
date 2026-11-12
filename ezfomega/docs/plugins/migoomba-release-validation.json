@@ -1,0 +1,55 @@
+{
+  "verified_utc": "2026-11-12 15:17 UTC",
+  "target": "ezfomega",
+  "version": "8.4.0-omega-test4",
+  "upstream_commit": "4b401e2ac7876aed9f89face867fd43d89ce189d",
+  "variant": "ezo",
+  "full_platform_verifier": {
+    "command": "make verify-ezfomega",
+    "exit_code": 0,
+    "log_sha256": "80fa9acf9b18fb9bf2fecc9ae7d312e88a119199b6171697af78df0ad8da5403"
+  },
+  "battery_state_menu_tests": [
+    "mbc2 32K SRAM power cycle        OK    {'session1': [0, 1, 2], 'session2_boot': 2, 'session2_after_A': 3, 'session3_boot': 3}",
+    "mbc2 32K SRAM savestate          OK    {'session1': [0, 1, 2], 'after_quickload_and_A': 2, 'next_boot': 2, 'restored_ram': True, 'persisted': True}",
+    "mbc2 32K SRAM menu               OK    {'session1': [0, 1, 2], 'next_boot': 2}",
+    "mbc2 64K SRAM power cycle        OK    {'session1': [0, 1, 2], 'session2_boot': 2, 'session2_after_A': 3, 'session3_boot': 3}",
+    "mbc2 64K SRAM savestate          OK    {'session1': [0, 1, 2], 'after_quickload_and_A': 2, 'next_boot': 2, 'restored_ram': True, 'persisted': True}",
+    "mbc2 64K SRAM menu               OK    {'session1': [0, 1, 2], 'next_boot': 2}",
+    "mbc5_32k 64K SRAM power cycle    OK    {'session1': [0, 1, 2], 'session2_boot': 2, 'session2_after_A': 3, 'session3_boot': 3}",
+    "mbc5_32k 64K SRAM savestate      OK    {'session1': [0, 1, 2], 'after_quickload_and_A': 2, 'next_boot': 2, 'restored_ram': True, 'persisted': True}",
+    "mbc5_32k 64K SRAM menu           OK    {'session1': [0, 1, 2], 'next_boot': 2}",
+    "mbc5_32k 32K SRAM menu           OK    {'session1': [0, 1, 2], 'next_boot': 1}"
+  ],
+  "plain_save_conversion_tests": [
+    "mbc2 32K SRAM      OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}",
+    "mbc2 64K SRAM      OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}",
+    "mbc5_32k 64K SRAM  OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}",
+    "mbc5_32k 32K SRAM  OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}"
+  ],
+  "legacy_container_replay": "Legacy Jagoomba -> MiGoomba: generated MBC5 battery save loads and survives a simulated power cycle; old saved states not covered.",
+  "cppcheck": {
+    "exit_code": 0,
+    "scope": "ARM-preprocessed active kernel C unit; immutable payload arrays opaque",
+    "diagnostics": [
+      "/opt/devkitpro/devkitARM/arm-none-eabi/include/sys/lock.h:50:9: warning: Found an exit path from function with non-void return type that has missing return statement [missingReturn]",
+      "/workspaces/dssmm/ezfomega/source/ezkernelnew.c:13546:26: warning: Logical conjunction always evaluates to false: !0 && 0 != 0. [incorrectLogicOperator]",
+      "/workspaces/dssmm/ezfomega/source/ezkernelnew.c:13585:26: warning: Logical conjunction always evaluates to false: !0 && 0 != 0. [incorrectLogicOperator]",
+      "/opt/devkitpro/libgba/include/gba_dma.h:87:127: warning: Shifting signed 32-bit value by 31 bits is implementation-defined behaviour [shiftTooManyBitsSigned]",
+      "/workspaces/dssmm/ezfomega/source/menu_fade.h:22:150: warning: Shifting signed 32-bit value by 31 bits is implementation-defined behaviour [shiftTooManyBitsSigned]",
+      "/workspaces/dssmm/ezfomega/source/ezkernelnew.c:2616:128: warning: Shifting signed 32-bit value by 31 bits is implementation-defined behaviour [shiftTooManyBitsSigned]",
+      "/workspaces/dssmm/ezfomega/source/carousel_motion.h:376:183: warning: Shifting signed 32-bit value by 31 bits is implementation-defined behaviour [shiftTooManyBitsSigned]",
+      "/opt/devkitpro/libgba/include/gba_dma.h:87:127: warning: Signed integer overflow for expression '1<<31'. [integerOverflow]",
+      "/workspaces/dssmm/ezfomega/source/menu_fade.h:22:150: warning: Signed integer overflow for expression '1<<31'. [integerOverflow]",
+      "/workspaces/dssmm/ezfomega/source/ezkernelnew.c:2616:128: warning: Signed integer overflow for expression '1<<31'. [integerOverflow]",
+      "/workspaces/dssmm/ezfomega/source/carousel_motion.h:376:183: warning: Signed integer overflow for expression '1<<31'. [integerOverflow]"
+    ],
+    "assessment": "Existing SDK lock/DMA macro and unchanged constant UI-condition diagnostics; none in MiGoomba changes."
+  },
+  "artifact": {
+    "file": "ezkernel.bin",
+    "bytes": 2054824,
+    "sha256": "8d37e4f80e5c5cc68332406e95f3fbe345c3afeea9b4b11cb0df19b383baef00"
+  },
+  "hardware_validation": "No new physical hardware report; old emulator save states not qualified."
+}
