@@ -1,3 +1,7 @@
+## 2026-11-12 16:00 UTC — Remove redundant release-body build headings
+
+- Owner requests displaying the build/version only in GitHub's release title. Removed the repeated opening build heading from v8.4.0.md; retain the model warning and four ordered changelog sections. Update the corresponding published bodies; no title/tag/asset/flag or kernel input changes.
+
 ## 2026-11-12 15:58 UTC — Release-note correction published and verified
 
 - Updated https://github.com/voluptuary/dssmm/releases/tag/v8.4.0 body to the requested four ordered categories, with the immediately prior build folded into condensed cumulative summaries (429words). Published body matches docs/releases/v8.4.0.md. Contributors, warnings, limitations, download/hash information retained.
