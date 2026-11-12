@@ -109,3 +109,10 @@ BLUE uses a stock-size firmware-free image with full-image seal; use the officia
 BLUE kernel for FPGA updates. Persistent NOR RTS combinations remain blocked
 pending a compatible validated runtime. Neither upstream Test5 nor our combined
 port has confirmed physical BLUE validation. Read private BLUE guidance first.
+
+GitHub already displays each release title/version. Do not repeat that build
+heading in the note body. Apply the four-section style consistently to the full
+release history while keeping changes accurate for each historical build; mark
+undocumented fallback changes as undocumented, preserve model-specific warnings
+and evidence, and never add later features to older binaries. Original bodies
+are archived under docs/history/releases/ before a history-wide editorial pass.

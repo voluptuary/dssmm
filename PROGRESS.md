@@ -1,3 +1,9 @@
+## 2026-11-12 16:04 UTC — All 19 release bodies unified by owner request: preparation
+
+- Owner expands editorial scope to ALL GitHub release notes and forbids repeated build headings beneath GitHub's own release title. Inventory19releases, including historical DE/fallback and Original OMEGA/BLUE tests. Archive exact pre-edit bodies plus release/asset metadata in docs/history/releases/before-unified-notes-2026-11-12.json. Existing four body-heading removals are committed locally; remaining histories will be rewritten in their owning lanes.
+- Required order: New features, New fixes, Summary of past features, Summary of past fixes. Keep summaries concise and fold directly preceding changes into them. Preserve version-appropriate hardware/validation limits, credits, download/hash details and historical caveats (withdrawn7.4.4,7.4.6follow-up test, unknown fallback changes). No kernel/tag/asset/flag changes; documentation-only checks suffice.
+- Next: prepare/review all19 canonical bodies, commit per-project notes/journals, integrate normally, publish body-only edits, verify exact content/section order and unchanged titles/tags/flags/asset identities/digests/timestamps across all19. Preserve original publication and comparison evidence as dated history.
+
 ## 2026-11-12 15:59 UTC — BLUE improvements published; three release-note corrections verified
 
 - Published https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-blue-test4 as hardware-untested prerelease, source 8d854ed8e2117a6a1df8c380dc8a598e964ffffb. Final hosted CI passed: trunk43252891961 (all models), BLUE43252942241, DE43252949084, OMEGA43252956663. Downloaded ezbluekernel.bin matches local2124252byte file SHA256 57db5bb4e9fd2cfacdbb1024b6d2d62dd7a83c562964f440d3e5cf02203549a3. DEv8.4.0 remains latest stable. Annotated new tag and unchanged older tags verified remotely.
