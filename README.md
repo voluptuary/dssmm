@@ -56,8 +56,12 @@ SuperFW’s game browser. The full DS-style layout is still being developed.
 | **SuperCard SD** | [superfw-sd.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test1/superfw-sd.fw) |
 | **SuperCard Lite** | [superfw-lite.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test1/superfw-lite.fw) |
 
-**All three are hardware-untested prerelease builds.** Choose the file for your
-exact card and back up your SD card, saves and current firmware before testing.
+**Initial Chis testing:** the owner reports that `superfw-chis.fw` chain-loads on a
+SuperChis Prime v1.0, reports SuperFW 0.22 (the stock kernel reports 0.20), and
+provides the manual themes. This is a boot/theme smoke test only; gameplay, saves,
+artwork, NOR and installation are not validated. The SD and Lite builds remain
+hardware-untested. These are prerelease builds: choose the file for your exact
+card and back up your SD card, saves and current firmware before testing.
 Follow [SuperFW’s installation and recovery guide](https://superfw.davidgf.net/docs/install/flash/).
 Use only the matching SuperCard-family build; the OMEGA downloads above target
 different hardware. Prime has no hardware RTC or rumble, and this port offers
