@@ -9,7 +9,7 @@ DS Style Merkin Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Editi
 
 ## Download and install
 
-Get the stable [DS Style Merkin Mix 8.3.2 release](https://github.com/voluptuary/dssmm/releases/tag/v8.3.2). Copy `ezkernelnew.bin` to the root of the SD card, then start the cartridge while holding **R** to install the kernel. Back up saves before updating.
+Get the stable [DS Style Merkin Mix 8.4.0 release](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0). Copy `ezkernelnew.bin` to the root of the SD card, then start the cartridge while holding **R** to install the kernel. Back up saves before updating.
 
 ## What it offers
 
@@ -36,10 +36,9 @@ Merkin Mix is maintained by Merkin and builds on FrankieT19's DS Style v7.5 foun
 
 The repository includes the [Apache License 2.0](../LICENSE). Retain individual component licenses and attribution notices.
 
-## GB/GBC emulator in development builds
+## GB/GBC emulator
 
-Development code now bundles [MiGoomba](https://github.com/michyprima/migoomba)
-for Game Boy and Game Boy Color games. The published release linked above still
-uses its previous emulator. This replacement has source/build/software testing,
+This release bundles [MiGoomba](https://github.com/michyprima/migoomba)
+for Game Boy and Game Boy Color games. This replacement has source/build/software testing,
 but needs hardware testing in DSSMM. Back up `.esv` saves before testing; old
 emulator save states are not guaranteed compatible.
