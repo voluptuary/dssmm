@@ -25,18 +25,18 @@ snapshot and blanket merge prohibitions are historical, superseded by this
 architecture. Current project HANDOFF/PROGRESS preserve their complete history.
 
 Preserve hardware-specific flash/save/reset protocols, all credits and logs.
-Source/build/host checks do not qualify physical hardware. DE8.3.2 remains
-stable/latest; OMEGA Test3 and BLUE Test2 remain hardware-untested prereleases.
+Source/build/host checks do not qualify physical hardware. For the authorized 8.4.0 publication, DE is stable; OMEGA Test4 and BLUE Test3
+remain hardware-untested prereleases. New MiGoomba integration needs hardware testing.
 Do not recreate candidates, replace releases or upload manual source ZIPs for
 repository maintenance. Never claim arbitrary future same-file changes cannot
 conflict; test merges and builds relevant to the actual change.
 
 ## MiGoomba integration
 
-GB/GBC development payload is MiGoomba v0.1 at4b401e2, variant ezode.
+GB/GBC payload is MiGoomba v0.1 at4b401e2, variant ezode.
 See docs/plugins/MIGOOMBA.md and migoomba.json for exact source/digests, variant
 limitations and reproduction. Do not edit the generated migoomba.h manually or
 reuse another card's variant. Run the focused payload/loader test and full
 project verifier for changes; preserve64KiB .esv handling and cache bounds.
 Do not claim old save-state compatibility or hardware qualification from mocks.
-Published release assets retain the prior emulator until explicitly updated.
+DSSMM 8.4.0 includes MiGoomba; earlier releases retain their previous emulator.
