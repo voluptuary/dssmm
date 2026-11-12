@@ -1,0 +1,34 @@
+{
+  "verified_utc": "2026-11-12 02:21 UTC",
+  "upstream_commit": "4b401e2ac7876aed9f89face867fd43d89ce189d",
+  "variant": "ezode",
+  "battery_state_menu_tests": [
+    "mbc2 32K SRAM power cycle        OK    {'session1': [0, 1, 2], 'session2_boot': 2, 'session2_after_A': 3, 'session3_boot': 3}",
+    "mbc2 32K SRAM savestate          OK    {'session1': [0, 1, 2], 'after_quickload_and_A': 2, 'next_boot': 2, 'restored_ram': True, 'persisted': True}",
+    "mbc2 32K SRAM menu               OK    {'session1': [0, 1, 2], 'next_boot': 2}",
+    "mbc2 64K SRAM power cycle        OK    {'session1': [0, 1, 2], 'session2_boot': 2, 'session2_after_A': 3, 'session3_boot': 3}",
+    "mbc2 64K SRAM savestate          OK    {'session1': [0, 1, 2], 'after_quickload_and_A': 2, 'next_boot': 2, 'restored_ram': True, 'persisted': True}",
+    "mbc2 64K SRAM menu               OK    {'session1': [0, 1, 2], 'next_boot': 2}",
+    "mbc5_32k 64K SRAM power cycle    OK    {'session1': [0, 1, 2], 'session2_boot': 2, 'session2_after_A': 3, 'session3_boot': 3}",
+    "mbc5_32k 64K SRAM savestate      OK    {'session1': [0, 1, 2], 'after_quickload_and_A': 2, 'next_boot': 2, 'restored_ram': True, 'persisted': True}",
+    "mbc5_32k 64K SRAM menu           OK    {'session1': [0, 1, 2], 'next_boot': 2}",
+    "mbc5_32k 32K SRAM menu           OK    {'session1': [0, 1, 2], 'next_boot': 1}"
+  ],
+  "plain_save_conversion_tests": [
+    "mbc2 32K SRAM      OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}",
+    "mbc2 64K SRAM      OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}",
+    "mbc5_32k 64K SRAM  OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}",
+    "mbc5_32k 32K SRAM  OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}"
+  ],
+  "legacy_container_test": {
+    "variant": "ezode",
+    "old_battery_value": 1,
+    "loaded": 1,
+    "after_edit": 2,
+    "next_power_cycle": 2,
+    "container_bytes": 65536,
+    "result": "passed"
+  },
+  "validation": "mGBA/source/build/host only; no new hardware report",
+  "old_saved_states": "not qualified; back up .esv and prefer in-game battery saves"
+}

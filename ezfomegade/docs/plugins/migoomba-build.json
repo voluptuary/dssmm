@@ -1,0 +1,8 @@
+{
+  "target": "ezfomegade",
+  "file": "ezkernelnew.bin",
+  "bytes": 2030600,
+  "sha256": "f28b614b91dd276b6445902f10717611778771313e40fa51d643013a2d97aa35",
+  "status": "unreleased MiGoomba development integration; hardware testing needed",
+  "published_release_modified": false
+}
