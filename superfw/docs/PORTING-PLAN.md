@@ -23,13 +23,13 @@ Do not transplant OMEGA drivers, patch payloads, save-state formats or flash lay
 | Horizontal/vertical carousels and transparent artwork | Later renderer work; prototype RAM use, image decoding and SD latency before promising parity. Reuse artwork naming conventions where practical. |
 | Favorites, recents, last-played and startup shortcuts | Carry over behavior; retain native recent/save lifecycle and add versioned settings where needed. |
 | Menu sounds and localization | Feasible, but audit audio/interrupt ownership and preserve SuperFW UTF/font support. |
-| Clock-based Auto theme | Conditional on a reliable time source on the actual board. Emulated game RTC support does not prove a physical menu clock. Manual themes first. |
+| Clock-based Auto theme | Prime has no hardware RTC according to its designer. Manual themes first; any Auto mode needs an explicit software-clock policy. |
 | GBA loading and save management | Preserve native patch engine, battery SRAM recovery and direct-saving modes. Validate each save technology and power-cycle recovery. |
 | Cheats and remembered selections | Present DSSMM-like controls over SuperFW’s engine. Audit code formats and per-game identifiers; no assumed database compatibility. |
 | In-game menu and save states | Retain SuperFW mechanisms and their game-dependent limitations. OMEGA state files/runtime payloads are incompatible unless separately demonstrated. Style this small runtime menu later within its own memory limits. |
 | NOR library and themed progress | SuperFW chis already has NOR support. Adapt UI around native allocation/mapping/write/erase; do not reuse OMEGA sector maps. |
 | MiGoomba and other emulators/plugins | Separate integration project. First preserve bundled upstream emulators. Audit append/load conventions, save paths, return/reset and memory limits before MiGoomba adoption. OMEGA plugin binaries have no blanket compatibility. |
-| OMEGA-specific rumble, cartridge modes and firmware/FPGA update flows | No direct transfer. Expose only capabilities confirmed for Prime and implemented through its own backend. |
+| OMEGA-specific rumble, cartridge modes and firmware/FPGA update flows | Prime has no rumble or hardware RTC according to its designer. Other cartridge modes and update flows require native implementations. |
 
 ## Visual target
 
@@ -47,3 +47,9 @@ Aim for a closely recognizable DSSMM main browser: matching overall composition,
 ## First implementation slice
 
 Inventory menu rendering, theme tables, resource sizes and DSSMM asset licenses; define browser/render/action interfaces; produce a list-mode DSSMM skin without changing patch/save/flash code. Before distributing the first hardware candidate, obtain the owner’s installed firmware/recovery details. Keep the pinned baseline available for A/B testing and record every physical observation in a dedicated validation log.
+
+## Designer-thread supplement
+
+Source: [ChisBread’s Prime introduction, January 12, 2026](https://gbatemp.net/threads/superchis-prime-how-i-fixed-the-supercard-sds-flaws-on-a-budget.678808/), reviewed November 12, 2026. These are designer statements, not our hardware results.
+
+Prime combines NOR execution with retained SDRAM and fragmented flash allocation. Test both launch paths separately; make the NOR library a first-class UI destination. Flash-chip variants and reported GBA motherboard-02 power issues make chip/console identification part of qualification. Standard saves use battery-backed SRAM; EEPROM/Flash handling depends on firmware patches, with ROM hacks needing particular attention. No hardware RTC or rumble is provided. The designer identifies SuperFW support, strengthening the native-backend choice without qualifying our build or the owner’s revision. The linked HDL repository is described as the original SuperCard implementation, so it must not be treated as a complete Prime hardware specification.
