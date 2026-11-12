@@ -88,3 +88,9 @@ Keep credits positive and accurate; retain Merkin Mix's DS Style fork lineage.
 For local VS Code/Docker/Ubuntu setup and session recovery, read
 docs/local-development.md. Codespaces /tmp caches/process handles and ignored
 binaries are not portable; use committed evidence and rerun unfinished checks.
+
+Current functional continuation is MiGoomba integration validation, not another
+architecture audit. Read current HANDOFF and docs/local-development.md. The
+three generated payloads are committed; full verifier/replay/Cppcheck completion
+was not recovered after session loss and must be confirmed locally. Preserve
+user README commit e72b9be and all published releases while doing so.

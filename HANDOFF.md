@@ -1,4 +1,12 @@
 
+## 2026-11-12 14:44 UTC — Local migration ready; source safely integrated on all lanes
+
+- All MiGoomba lane commits are integrated through normal merge commits into trunk2778a99, and all four local/remote branch heads were synchronized there. Urgent migration docs are pushed; no source changes depend on the expiring Codespace. Owner README edits e72b9be are preserved; root development note/credits distinguish unreleased MiGoomba from published downloads.
+- Clone https://github.com/voluptuary/dssmm.git ON THE LOCAL Ubuntu/WSL computer, open that folder in local VS Code, then use Dev Containers: Reopen in Container. Detailed commands/dependencies and recovery are in docs/local-development.md. The existing Dockerfile/config are tracked and now include the optional mGBA/static-analysis tools; a fresh local Docker build still needs verification. No Docker binary is available here.
+- Next work is precisely the per-platform full verifiers, optional saved-container replay and Cppcheck checks described in the previous migration checkpoint and target docs/plugins/MIGOOMBA.md. Existing metadata records earlier completed tests/build hashes; lost process handles/logs must not be treated as passes. No hardware qualification, release overwrite, new tag or manual source archive is authorized/claimed by this checkpoint.
+- After this final shared documentation commit, fast-forward/push all lanes and verify clean refs. Local development needs one clone/container, not the Codespace's absolute /workspaces sibling worktree paths. Generated build artifacts are ignored and can be rebuilt; embedded MiGoomba headers are already committed, so normal builds do not require fetching the external emulator.
+
+
 ## 2026-11-12 14:42 UTC — Urgent Codespaces-to-local recovery handoff
 
 - Owner is near monthly Codespaces exhaustion and requests fast preparation for local VS Code + Docker + Ubuntu. MiGoomba source work is SAFE in independently committed/pushed lanes: DEf9fc5db, OMEGA8007d4b, BLUE966f808. These modify only their owning project. Trunk will merge them normally; do not cherry-pick/rewrite platform drivers or rebuild old snapshot architecture. Owner root README commit e72b9be is preserved.

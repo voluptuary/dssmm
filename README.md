@@ -41,6 +41,13 @@ and follow that release's installation instructions.
 > Back up your SD card and save files before testing. Avoid powering off during
 > kernel updates, save writes or NOR operations.
 
+## GB/GBC emulator development update
+
+Unreleased development code now uses [MiGoomba](https://github.com/michyprima/migoomba)
+for GB/GBC games. The published downloads above still contain their previous
+emulator. This integration needs hardware testing; back up `.esv` saves before
+testing and do not assume old emulator save states are compatible.
+
 ## What DSSMM offers
 
 - **Artwork beyond GBA:** name-matched images for supported systems, title or box
@@ -93,6 +100,10 @@ DSSMM builds on the work of the following contributors:
 - **Kekun** — the font-header capitalization correction used for compatibility
   with case-sensitive build systems.
 - **ChaN** — FatFs, the filesystem library used by the kernels.
+- **michyprima** — MiGoomba, the GB/GBC emulator in development builds, based on
+  **Jaga / EvilJagaGenius**'s Jagoomba Color, **Dwedit**'s Goomba Color and
+  **FluBBa**'s Goomba. Its upstream acknowledgments also credit **Minucce**,
+  **Nuvie**, **Radimerry**, **Therealteamplayer** and **Endrift / mGBA**.
 - **Copilot, ChatGPT, and Claude** — contributions to interface integration, testing and
   release documentation. Other AI-assisted development work
   are recorded in the project history.

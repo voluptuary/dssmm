@@ -24,7 +24,10 @@ Official setup references:
 
 ## 2. Clone and reopen in the container
 
-In the Ubuntu terminal:
+In the Ubuntu terminal ON YOUR COMPUTER, not this Codespace terminal. Open a
+local VS Code window rather than continuing in the Codespace window. Git must
+be installed in Ubuntu (`sudo apt-get install git` if needed).
+
 
 ```sh
 mkdir -p ~/src
