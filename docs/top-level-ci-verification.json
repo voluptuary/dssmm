@@ -31,7 +31,7 @@
           "status": "completed"
         }
       ],
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128767379/job/130887428894"
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43128767379/job/130887428894"
     },
     {
       "completedAt": "2026-11-12T00:39:50Z",
@@ -102,9 +102,9 @@
           "status": "completed"
         }
       ],
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128767379/job/130887455055"
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43128767379/job/130887455055"
     }
   ],
   "status": "completed",
-  "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128767379"
+  "url": "https://github.com/voluptuary/dssmm/actions/runs/43128767379"
 }

@@ -7,9 +7,9 @@ Build from the repository root with `make ezfomega` and validate with
 
 Merkin Mix adds artwork transparency and name-matched artwork for supported systems beyond GBA, alongside highly optimized artwork lookup and menu rendering that retains transparency compatibility. This branch builds on **FrankieT19's Original OMEGA DS Style v8.0 fork**, with the EZ-FLASH and Sterophonick kernel foundations.
 
-**Original EZ-FLASH OMEGA only. Hardware untested.** These builds are incompatible with the older OMEGA Definitive Edition Rev. A/B and the newer OMEGA Definitive Edition B / BLUE. Those targets have separate [ezfomegade](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfomegade) and [ezfblue](https://github.com/voluptuary/ezfode-dssmm-kernel/tree/ezfblue) branches.
+**Original EZ-FLASH OMEGA only. Hardware untested.** These builds are incompatible with the older OMEGA Definitive Edition Rev. A/B and the newer OMEGA Definitive Edition B / BLUE. Those targets have separate [ezfomegade](https://github.com/voluptuary/dssmm/tree/ezfomegade) and [ezfblue](https://github.com/voluptuary/dssmm/tree/ezfblue) branches.
 
-The current development checkpoint identifies itself as `Merkin Mix 8.3.1-omega-test3`. It has source, build and host-test validation only. Installation, booting, gameplay, saving, plugins, cheats/save states and NOR operations still need testing on an Original OMEGA cartridge. [Original OMEGA Test 3](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test3) is the current hardware-untested prerelease.
+The current development checkpoint identifies itself as `Merkin Mix 8.3.1-omega-test3`. It has source, build and host-test validation only. Installation, booting, gameplay, saving, plugins, cheats/save states and NOR operations still need testing on an Original OMEGA cartridge. [Original OMEGA Test 3](https://github.com/voluptuary/dssmm/releases/tag/v8.3.1-omega-test3) is the current hardware-untested prerelease.
 
 Features include:
 
