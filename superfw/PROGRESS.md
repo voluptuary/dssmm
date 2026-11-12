@@ -95,3 +95,8 @@ SuperChis Prime v1.0 chain-loads the Test1 Chis image and reports SuperFW 0.22 (
 - Info page now reports `SuperFW 0.22 (DSSMM)` from the compile-time `VERSION_WORD`, so the text follows whichever SuperFW version is configured at build time. The short source build identifier and SD/Lite/Chis variant remain visible.
 - UI theme choices now use palette names (White, Orange, Blue, Green, Purple, Stock Dark, Light, Dark) instead of numbers. This removes the confusing visible “6” option without renumbering or invalidating persisted IDs 0–7.
 - `scripts/test-theme-settings.sh` and `scripts/test-artwork.sh` pass; `git diff --check` passes. `scripts/verify.sh` cannot run in this container because `arm-none-eabi-gcc` is unavailable. Firmware builds and hosted CI remain pending.
+
+## 2026-11-12 — DSSMM build number replaces displayed hash
+
+- Info page now shows `DSSMM Build N` from a compile-time `DSSMM_BUILD_NUMBER`, defaulting to the count of commits reachable from HEAD in the shared repository. This avoids showing a raw hash and gives future integrated builds a monotonic repository build number. CI uses full-history checkout; reproducible builds may set the number explicitly. `VERSION_SLUG_WORD` remains unchanged in firmware metadata.
+- Dry-run Chis build confirms the compiler receives build number 506 at this pre-commit checkpoint. `git diff --check` passes. Firmware build unavailable locally because `arm-none-eabi-gcc` is missing; hosted all-project CI will verify. No release or hardware test.

@@ -1,5 +1,7 @@
 
 VERSION_WORD := 0x00000016
+# Stable sequential DSSMM build number from the complete shared repository history.
+DSSMM_BUILD_NUMBER ?= $(shell git rev-list --count HEAD 2>/dev/null || echo 0)
 VERSION_SLUG_WORD := $(shell git rev-parse --short=8 HEAD || echo FFFFFFFF)
 
 PREFIX		:= arm-none-eabi-
@@ -77,6 +79,7 @@ CFLAGS=-O2 -ggdb \
        -DSD_PREERASE_BLOCKS_WRITE \
        -DVERSION_WORD="$(VERSION_WORD)" \
        -DVERSION_SLUG_WORD="0x$(VERSION_SLUG_WORD)" \
+       -DDSSMM_BUILD_NUMBER="$(DSSMM_BUILD_NUMBER)" \
        -Wall -Isrc -I. -mthumb -flto -flto-partition=none
 
 

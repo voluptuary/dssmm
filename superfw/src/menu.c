@@ -2001,7 +2001,6 @@ void render_ui_settings(volatile uint8_t *frame) {
 void render_info(volatile uint8_t *frame) {
   uint32_t vmaj = VERSION_WORD >> 16;
   uint32_t vmin = VERSION_WORD & 0xFFFF;
-  uint32_t gitver = VERSION_SLUG_WORD;
   char tmp[64], tmp2[32];
 
   init_logo_palette(&MEM_PALETTE[1]);
@@ -2011,7 +2010,7 @@ void render_info(volatile uint8_t *frame) {
   case 0:
     npf_snprintf(tmp, sizeof(tmp), "SuperFW %lu.%lu (DSSMM)", vmaj, vmin);
     draw_central_text(tmp, frame, 120, 70);
-    npf_snprintf(tmp, sizeof(tmp), "Build %08lx", gitver);
+    npf_snprintf(tmp, sizeof(tmp), "DSSMM Build %lu", (unsigned long)DSSMM_BUILD_NUMBER);
     draw_central_text(tmp, frame, 120, 95);
     draw_central_text(FW_FLAVOUR " variant", frame, 120, 114);
     break;
