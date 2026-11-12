@@ -1,3 +1,8 @@
+## 2026-11-12 16:07 UTC — All four BLUE release bodies prepared in unified format
+
+- Owner expands formatting to every release. Prepared canonical v8.3.1-blue-test1/Test2, v8.4.0-blue-test3 and v8.4.1-blue-test4 notes without repeated build headings (four BLUE releases). Each uses New features, New fixes, Summary of past features, Summary of past fixes; historical additions stay in the correct version and preceding changes are folded into concise summaries. Retained larger-image vs stock-size warnings, physical-testing limits, original resources/firmware distinctions, credits and actual asset hashes.
+- This is editorial only; no BLUE binary/source/tag/asset/flag changes. Root pre-unification archive preserves exact original text and metadata. Publish all19 repository bodies together after reviewing every canonical file, then verify unchanged metadata and exact remote/local text. Scope counts corrected by the generated inventory: BLUE has four releases.
+
 ## 2026-11-12 16:00 UTC — Remove redundant release-body build headings
 
 - Owner requests displaying the build/version only in GitHub's release title. Removed the repeated opening build heading from v8.4.0-blue-test3.md, v8.4.1-blue-test4.md; retain the model warning and four ordered changelog sections. Update the corresponding published bodies; no title/tag/asset/flag or kernel input changes.
