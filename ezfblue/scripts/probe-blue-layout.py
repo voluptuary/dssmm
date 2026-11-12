@@ -19,7 +19,7 @@ ROM = 0x08000000
 RESOURCE_START = 0x100000
 ASSET_START = 0x207000
 METADATA_START = 0x780000
-ASSETS = re.compile(r"^(gImage_|acHZK12$|oem2uni936$|uni2oem936$|goomba_gba$|launcher_.*_lz$|.*_raw$)")
+ASSETS = re.compile(r"^(gImage_|acHZK12$|oem2uni936$|uni2oem936$|migoomba_gba$|launcher_.*_lz$|.*_raw$)")
 
 
 def sections(elf, objdump):

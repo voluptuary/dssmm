@@ -1,0 +1,8 @@
+{
+  "target": "ezfblue",
+  "file": "ezbluekernel.bin",
+  "bytes": 3988120,
+  "sha256": "7626f3db12cbdfc656d5692ea8b2f2a321ce1670055d33355cdd9c818ace539d",
+  "status": "unreleased MiGoomba development integration; hardware testing needed",
+  "published_release_modified": false
+}

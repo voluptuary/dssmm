@@ -12,3 +12,11 @@ Only install the packed **ezbluekernel.bin** from the BLUE release. The raw deve
 
 
 Merkin Mix builds on FrankieT19's DS Style fork and the EZ-FLASH/Sterophonick kernel lineage. FrankieT19's separately authored v8.0 UI refinements and exploitz86's remembered-cheat work are included in the frontend. BLUE hardware support comes from EZ-FLASH's published BLUE kernel. See [credits and provenance](CREDITS.md) for these and other contributions.
+
+## GB/GBC emulator in development builds
+
+Development code now bundles [MiGoomba](https://github.com/michyprima/migoomba)
+for Game Boy and Game Boy Color games. The published release linked above still
+uses its previous emulator. This replacement has source/build/software testing,
+but needs hardware testing in DSSMM. Back up `.esv` saves before testing; old
+emulator save states are not guaranteed compatible.
