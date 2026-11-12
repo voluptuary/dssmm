@@ -1,3 +1,8 @@
+## 2026-11-12 15:54 UTC — Owner-requested release-note correction
+
+- Rewrote docs/releases/v8.4.0-omega-test4.md into New features, New fixes, Summary of past features, Summary of past fixes. Folded the directly preceding Test3 RAM improvement and NES/save/path/artwork fixes into condensed cumulative summaries; retained hardware-untested/model warnings,32MiB/NOR limits, MiGoomba caveats, contributor credits and exact asset hash.
+- Notes only: no Original OMEGA source/assets/build/tests/version/tag/binary changes. Update the existing release body after integrated checks and verify its asset IDs/sizes/digests and flags remain unchanged. Historical publication evidence is retained; this is the later owner-authorized editorial correction.
+
 ## 2026-11-12 15:24 UTC — v8.4.0-omega-test4 published and downloaded asset verified
 
 - Published https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-omega-test4 from CI-tested source 8e637e3238926fb667d336b99db7ed7c7fcbb9dc. Release is a hardware-untested prerelease. All four hosted release-source CI runs passed, including trunk's three-model matrix. Earlier v8.3.1-omega-test3 notes, flags and asset identities/sizes/timestamps remain unchanged.
