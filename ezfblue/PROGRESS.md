@@ -1,3 +1,7 @@
+## 2026-11-12 16:00 UTC — Remove redundant release-body build headings
+
+- Owner requests displaying the build/version only in GitHub's release title. Removed the repeated opening build heading from v8.4.0-blue-test3.md, v8.4.1-blue-test4.md; retain the model warning and four ordered changelog sections. Update the corresponding published bodies; no title/tag/asset/flag or kernel input changes.
+
 ## 2026-11-12 15:58 UTC — BLUE Test4 published; current release notes corrected
 
 - Published https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-blue-test4 as hardware-untested prerelease from CI-tested 8d854ed8e2117a6a1df8c380dc8a598e964ffffb. All four final versioned CI runs passed, including trunk's all-model matrix. Downloaded ezbluekernel.bin matches the local release byte-for-byte:2124252bytes SHA256 57db5bb4e9fd2cfacdbb1024b6d2d62dd7a83c562964f440d3e5cf02203549a3. DE8.4.0 remains latest stable. Earlier kernel assets/tags/flags remain unchanged.
