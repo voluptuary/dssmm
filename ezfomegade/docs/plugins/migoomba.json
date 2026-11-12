@@ -1,0 +1,22 @@
+{
+  "upstream": "https://github.com/michyprima/migoomba",
+  "version": "v0.1",
+  "upstream_commit": "4b401e2ac7876aed9f89face867fd43d89ce189d",
+  "variant": "ezode",
+  "upstream_binary": "migoomba_ezode.gba",
+  "bytes": 82012,
+  "sha256": "b6b255ccb10f1a106f742bf74f6a916110df7f35413958d6ce9528feca0b334a",
+  "embedded_header": "source/migoomba.h",
+  "kernel_source": "source/ezkernelnew.c",
+  "build_command": "make VARIANT=ezode",
+  "compiler": "arm-none-eabi-gcc (devkitARM) 16.1.0",
+  "previous_payload": {
+    "description": "Jagoomba Color v0.5 ezode",
+    "bytes": 76472,
+    "sha256": "54e6ceef0e57202affe2a1833f596d6baa02d8508a03bb08af934c29c3b690bd",
+    "commit": "e72b9be803f3ea49034daa582549ade5c1b74ef2",
+    "header": "ezfomegade/source/goomba.h"
+  },
+  "save_container": "Existing per-game 64 KiB .esv path and kernel save handling retained",
+  "hardware_status": "New DSSMM integration is not hardware verified"
+}

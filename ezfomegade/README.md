@@ -35,3 +35,11 @@ Transparent thumbnails require the `DST1` marker in BMP header bytes 6–9. Use 
 Merkin Mix is maintained by Merkin and builds on FrankieT19's DS Style v7.5 foundation and selected, separately authored v8.0 interface work. Merkin contributed the refreshed splash screens and system icons in the v8.0 lineage, along with Merkin Mix artwork and kernel improvements. EZ-FLASH, Sterophonick, Copilot, exploitz86 and SkillerCMP also contributed to the project's foundations and features; [CREDITS.md](CREDITS.md) records the specific provenance.
 
 The repository includes the [Apache License 2.0](../LICENSE). Retain individual component licenses and attribution notices.
+
+## GB/GBC emulator in development builds
+
+Development code now bundles [MiGoomba](https://github.com/michyprima/migoomba)
+for Game Boy and Game Boy Color games. The published release linked above still
+uses its previous emulator. This replacement has source/build/software testing,
+but needs hardware testing in DSSMM. Back up `.esv` saves before testing; old
+emulator save states are not guaranteed compatible.

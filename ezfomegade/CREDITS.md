@@ -18,3 +18,11 @@ Merkin Mix adapts that work to its existing parser and one-option-per-section be
 [DS Style Card Companion (`voluptuary/dsscc`)](https://github.com/voluptuary/dsscc) is a separate companion application, forked from FrankieT19's DS Style Thumbnail Scraper. Its `feature/mirrored-artwork-retry-cache` branch contains Merkin's companion changes. It is not the source of the kernel cheat work.
 
 This document supplements existing source notices; it does not replace component licenses or claim authorship of unimported changes.
+
+## Bundled GB/GBC emulator (development builds)
+
+[MiGoomba](https://github.com/michyprima/migoomba), by **michyprima**, replaces
+the previous Jagoomba payload in development code. It builds on **Jaga /
+EvilJagaGenius**, **Dwedit** and **FluBBa**. Upstream also credits **Minucce**,
+**Sterophonick**, **EZ-FLASH**, **Nuvie**, **Radimerry**, **Therealteamplayer**
+and **Endrift / mGBA**. [Pinned source, hardware variant and validation](docs/plugins/MIGOOMBA.md).
