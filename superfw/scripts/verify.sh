@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_root="$(cd "$(dirname "$0")/.." && pwd)"
+for tool in arm-none-eabi-gcc arm-none-eabi-g++ gcc g++ lcov; do
+  command -v "$tool" >/dev/null || { echo "Missing required validation tool: $tool" >&2; exit 2; }
+done
+for board in sd lite chis; do
+  bash "$project_root/scripts/build.sh" "$board"
+done
+make -C "$project_root/tests" clean
+make -C "$project_root/tests" all

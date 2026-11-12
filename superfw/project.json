@@ -1,0 +1,9 @@
+{
+  "id": "superfw",
+  "name": "SuperFW",
+  "hardware": "SuperCard GBA flash carts and derivatives/clones",
+  "upstream": "https://github.com/davidgfnet/superfw",
+  "upstream_commit": "dabbf4909f85e556f7a12972cc8a7b94fc54ac51",
+  "default_board": "sd",
+  "boards": ["sd", "lite", "chis"]
+}

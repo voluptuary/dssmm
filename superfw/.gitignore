@@ -1,0 +1,17 @@
+*.gba
+*.elf
+*.comp
+*.map
+*.payload
+*.gcda
+*.gcno
+*.info
+*.i
+
+# DSSMM-local build and verification output
+build/
+*.fw
+*.dldi
+coverage/
+src/menu_messages.h
+src/messages_data.h
