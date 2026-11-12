@@ -1,0 +1,99 @@
+{
+  "verified_utc": "2026-11-12T15:24:08.275538+00:00",
+  "latest_stable": "v8.4.0",
+  "tested_commit": "8e637e3238926fb667d336b99db7ed7c7fcbb9dc",
+  "hosted_ci": [
+    {
+      "conclusion": "success",
+      "databaseId": 43246779893,
+      "headBranch": "ezfblue",
+      "headSha": "8e637e3238926fb667d336b99db7ed7c7fcbb9dc",
+      "status": "completed",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43246779893"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 43246772741,
+      "headBranch": "ezfomega",
+      "headSha": "8e637e3238926fb667d336b99db7ed7c7fcbb9dc",
+      "status": "completed",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43246772741"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 43246763240,
+      "headBranch": "ezfomegade",
+      "headSha": "8e637e3238926fb667d336b99db7ed7c7fcbb9dc",
+      "status": "completed",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43246763240"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 43246724950,
+      "headBranch": "dssmm",
+      "headSha": "8e637e3238926fb667d336b99db7ed7c7fcbb9dc",
+      "status": "completed",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43246724950"
+    }
+  ],
+  "releases": [
+    {
+      "target": "ezfomegade",
+      "tag": "v8.4.0",
+      "url": "https://github.com/voluptuary/dssmm/releases/tag/v8.4.0",
+      "release_id": 443130065,
+      "published_at": "2026-11-12T15:22:56Z",
+      "prerelease": false,
+      "source_commit": "8e637e3238926fb667d336b99db7ed7c7fcbb9dc",
+      "asset": {
+        "name": "ezkernelnew.bin",
+        "id": 739978820,
+        "bytes": 2030600,
+        "sha256": "5037473f5992f745e8d29d2df34e12996a76aaac2ccde51786f99b5432827d48",
+        "url": "https://github.com/voluptuary/dssmm/releases/download/v8.4.0/ezkernelnew.bin",
+        "download_matches_local": true
+      },
+      "notes_match_committed_file": true,
+      "previous_release_preserved": "v8.3.2"
+    },
+    {
+      "target": "ezfomega",
+      "tag": "v8.4.0-omega-test4",
+      "url": "https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-omega-test4",
+      "release_id": 443130396,
+      "published_at": "2026-11-12T15:23:13Z",
+      "prerelease": true,
+      "source_commit": "8e637e3238926fb667d336b99db7ed7c7fcbb9dc",
+      "asset": {
+        "name": "ezkernel.bin",
+        "id": 739979995,
+        "bytes": 2054824,
+        "sha256": "8d37e4f80e5c5cc68332406e95f3fbe345c3afeea9b4b11cb0df19b383baef00",
+        "url": "https://github.com/voluptuary/dssmm/releases/download/v8.4.0-omega-test4/ezkernel.bin",
+        "download_matches_local": true
+      },
+      "notes_match_committed_file": true,
+      "previous_release_preserved": "v8.3.1-omega-test3"
+    },
+    {
+      "target": "ezfblue",
+      "tag": "v8.4.0-blue-test3",
+      "url": "https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-blue-test3",
+      "release_id": 443130494,
+      "published_at": "2026-11-12T15:23:19Z",
+      "prerelease": true,
+      "source_commit": "8e637e3238926fb667d336b99db7ed7c7fcbb9dc",
+      "asset": {
+        "name": "ezbluekernel.bin",
+        "id": 739980339,
+        "bytes": 3988120,
+        "sha256": "340528034410e24101891a1a9c1a6ed6ccaadfa5a0786fa10910f52ee14245c2",
+        "url": "https://github.com/voluptuary/dssmm/releases/download/v8.4.0-blue-test3/ezbluekernel.bin",
+        "download_matches_local": true
+      },
+      "notes_match_committed_file": true,
+      "previous_release_preserved": "v8.3.1-blue-test2"
+    }
+  ],
+  "qualification": "Software/source/build/emulator checks only; new MiGoomba integration needs physical hardware testing; old emulator save states not qualified."
+}

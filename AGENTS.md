@@ -67,7 +67,7 @@ not live documentation. Differences during feature work are expected; this is
 not a merge gate. Refresh root baseline references on trunk at validated release
 checkpoints, never as a root edit in a hardware PR. Retain historical reports.
 
-For the authorized 8.4.0 release, DE is stable/latest for Definitive Edition
+For the published 8.4.0 release, DE is stable/latest for Definitive Edition
 Rev.A/B. Original OMEGA Test4 and BLUE Test3 remain hardware-untested prereleases. Builds, mocks and
 static layout bounds do not qualify physical flash/save timing or runtime stack
 peaks. No release changes are authorized merely by architecture maintenance.
@@ -90,7 +90,7 @@ docs/local-development.md. Codespaces /tmp caches/process handles and ignored
 binaries are not portable; use committed evidence and rerun unfinished checks.
 
 MiGoomba full local verifiers, replay and focused Cppcheck completed on 2026-11-12;
-see current HANDOFF and per-project migoomba-release-validation.json. Owner
-authorizes publishing 8.4.0 (DE stable, OMEGA Test4/BLUE Test3 prereleases) after
-final CI. New hardware qualification and old saved-state compatibility are not
+see current HANDOFF and per-project migoomba-release-validation.json. All four hosted CI runs passed, and 8.4.0 is published
+(DE stable/latest, OMEGA Test4/BLUE Test3 prereleases); downloaded assets match
+the local files. See docs/releases/8.4.0-publication.json. New hardware qualification and old saved-state compatibility are not
 claimed. Preserve user README commit e72b9be and all earlier published releases.
