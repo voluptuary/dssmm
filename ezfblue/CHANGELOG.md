@@ -1,3 +1,17 @@
+# DS Style Merkin Mix 8.4.0 — BLUE Test 3
+
+**NEWER EZ-FLASH OMEGA DEFINITIVE EDITION B / BLUE ONLY — HARDWARE UNTESTED. UPDATE AT YOUR OWN RISK.**
+
+### New features and improvements
+
+- Replaced the built-in GB/GBC emulator with **MiGoomba v0.1** by **michyprima**, using the generic variant to avoid unverified DE-specific rumble register writes. Based on Jagoomba Color, Goomba Color and Goomba.
+- Retained per-game `.esv` paths and 64 KiB kernel save handling. Back up saves; old emulator save states are not qualified. Prefer in-game battery saves when transitioning.
+- Added reproducible payload and actual-loader regression checks for offsets, DMA alignment, cache bounds and invalid payload sizes.
+
+### Validation and limitations
+
+Full platform software checks and generated-ROM save/conversion/legacy-battery replay tests passed. Packed vendor resources and linked layout checks pass. No physical BLUE test is claimed; updater acceptance, installation, boot, game/save compatibility, plugins, NOR operations and runtime stack peaks remain unqualified. Native BLUE drivers, FPGA firmware and flash/save/reset protocols are unchanged.
+
 # Changelog
 
 ## DS Style Merkin Mix 8.3.0

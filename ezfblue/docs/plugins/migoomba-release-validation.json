@@ -1,0 +1,55 @@
+{
+  "verified_utc": "2026-11-12 15:18 UTC",
+  "target": "ezfblue",
+  "version": "8.4.0-blue-test3",
+  "upstream_commit": "4b401e2ac7876aed9f89face867fd43d89ce189d",
+  "variant": "generic",
+  "full_platform_verifier": {
+    "command": "make verify-ezfblue",
+    "exit_code": 0,
+    "log_sha256": "be65872932463eaccc4bad674b6b04ed9026d2abbb2c29cbbf893e343c73d4a8"
+  },
+  "battery_state_menu_tests": [
+    "mbc2 32K SRAM power cycle        OK    {'session1': [0, 1, 2], 'session2_boot': 2, 'session2_after_A': 3, 'session3_boot': 3}",
+    "mbc2 32K SRAM savestate          OK    {'session1': [0, 1, 2], 'after_quickload_and_A': 2, 'next_boot': 2, 'restored_ram': True, 'persisted': True}",
+    "mbc2 32K SRAM menu               OK    {'session1': [0, 1, 2], 'next_boot': 2}",
+    "mbc2 64K SRAM power cycle        OK    {'session1': [0, 1, 2], 'session2_boot': 2, 'session2_after_A': 3, 'session3_boot': 3}",
+    "mbc2 64K SRAM savestate          OK    {'session1': [0, 1, 2], 'after_quickload_and_A': 2, 'next_boot': 2, 'restored_ram': True, 'persisted': True}",
+    "mbc2 64K SRAM menu               OK    {'session1': [0, 1, 2], 'next_boot': 2}",
+    "mbc5_32k 64K SRAM power cycle    OK    {'session1': [0, 1, 2], 'session2_boot': 2, 'session2_after_A': 3, 'session3_boot': 3}",
+    "mbc5_32k 64K SRAM savestate      OK    {'session1': [0, 1, 2], 'after_quickload_and_A': 2, 'next_boot': 2, 'restored_ram': True, 'persisted': True}",
+    "mbc5_32k 64K SRAM menu           OK    {'session1': [0, 1, 2], 'next_boot': 2}",
+    "mbc5_32k 32K SRAM menu           OK    {'session1': [0, 1, 2], 'next_boot': 1}"
+  ],
+  "plain_save_conversion_tests": [
+    "mbc2 32K SRAM      OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}",
+    "mbc2 64K SRAM      OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}",
+    "mbc5_32k 64K SRAM  OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}",
+    "mbc5_32k 32K SRAM  OK    {'written': [0, 1, 2], 'exported': 2, 'after_import': [7, 8], 'next_boot': 8, 'fresh': 7}"
+  ],
+  "legacy_container_replay": "Legacy Jagoomba -> MiGoomba: generated MBC5 battery save loads and survives a simulated power cycle; old saved states not covered.",
+  "cppcheck": {
+    "exit_code": 0,
+    "scope": "ARM-preprocessed active kernel C unit; immutable payload arrays opaque",
+    "diagnostics": [
+      "/opt/devkitpro/devkitARM/arm-none-eabi/include/sys/lock.h:50:9: warning: Found an exit path from function with non-void return type that has missing return statement [missingReturn]",
+      "/workspaces/dssmm/ezfblue/targets/blue/source/ezbluekernel.c:13584:26: warning: Logical conjunction always evaluates to false: !0 && 0 != 0. [incorrectLogicOperator]",
+      "/workspaces/dssmm/ezfblue/targets/blue/source/ezbluekernel.c:13623:26: warning: Logical conjunction always evaluates to false: !0 && 0 != 0. [incorrectLogicOperator]",
+      "/opt/devkitpro/libgba/include/gba_dma.h:87:127: warning: Shifting signed 32-bit value by 31 bits is implementation-defined behaviour [shiftTooManyBitsSigned]",
+      "/workspaces/dssmm/ezfblue/targets/blue/source/menu_fade.h:22:150: warning: Shifting signed 32-bit value by 31 bits is implementation-defined behaviour [shiftTooManyBitsSigned]",
+      "/workspaces/dssmm/ezfblue/targets/blue/source/ezbluekernel.c:2611:128: warning: Shifting signed 32-bit value by 31 bits is implementation-defined behaviour [shiftTooManyBitsSigned]",
+      "/workspaces/dssmm/ezfblue/targets/blue/source/carousel_motion.h:376:183: warning: Shifting signed 32-bit value by 31 bits is implementation-defined behaviour [shiftTooManyBitsSigned]",
+      "/opt/devkitpro/libgba/include/gba_dma.h:87:127: warning: Signed integer overflow for expression '1<<31'. [integerOverflow]",
+      "/workspaces/dssmm/ezfblue/targets/blue/source/menu_fade.h:22:150: warning: Signed integer overflow for expression '1<<31'. [integerOverflow]",
+      "/workspaces/dssmm/ezfblue/targets/blue/source/ezbluekernel.c:2611:128: warning: Signed integer overflow for expression '1<<31'. [integerOverflow]",
+      "/workspaces/dssmm/ezfblue/targets/blue/source/carousel_motion.h:376:183: warning: Signed integer overflow for expression '1<<31'. [integerOverflow]"
+    ],
+    "assessment": "Existing SDK lock/DMA macro and unchanged constant UI-condition diagnostics; none in MiGoomba changes."
+  },
+  "artifact": {
+    "file": "ezbluekernel.bin",
+    "bytes": 3988120,
+    "sha256": "340528034410e24101891a1a9c1a6ed6ccaadfa5a0786fa10910f52ee14245c2"
+  },
+  "hardware_validation": "No new physical hardware report; old emulator save states not qualified."
+}
