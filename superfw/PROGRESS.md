@@ -100,3 +100,8 @@ SuperChis Prime v1.0 chain-loads the Test1 Chis image and reports SuperFW 0.22 (
 
 - Info page now shows `DSSMM Build N` from a compile-time `DSSMM_BUILD_NUMBER`, defaulting to the count of commits reachable from HEAD in the shared repository. This avoids showing a raw hash and gives future integrated builds a monotonic repository build number. CI uses full-history checkout; reproducible builds may set the number explicitly. `VERSION_SLUG_WORD` remains unchanged in firmware metadata.
 - Dry-run Chis build confirms the compiler receives build number 506 at this pre-commit checkpoint. `git diff --check` passes. Firmware build unavailable locally because `arm-none-eabi-gcc` is missing; hosted all-project CI will verify. No release or hardware test.
+
+## 2026-11-12 — First visible DSSMM browser skin pass
+
+- Added “DSSMM” branding in the existing top tab strip, active-theme selected-row fill in the file browser, and a framed title/box artwork panel. The list data, up/down navigation, artwork lookup/cache and launch path remain the existing SuperFW implementation. No cross-project assets or hardware drivers were imported.
+- Corrected `docs/PORTING-PLAN.md` to reflect the owner-reported Prime boot/theme smoke test and mark porting active. `scripts/test-theme-settings.sh`, `scripts/test-artwork.sh`, and `git diff --check` pass. No hardware screenshot or visual acceptance test yet; local full verifier unavailable without arm-none-eabi-gcc. Hosted matrix pending.

@@ -102,3 +102,7 @@ Updated the Info page identity to `SuperFW <VERSION_WORD major.minor> (DSSMM)`, 
 ## 2026-11-12 — Display DSSMM build number
 
 Replaced the Info-page short commit hash with `DSSMM Build N`, where `N` comes from `git rev-list --count HEAD` across full shared repository history. The existing firmware metadata still embeds `VERSION_SLUG_WORD` as the upstream commit identifier. CI already fetches full history. `make -n -C superfw BOARD=chis` confirms `-DDSSMM_BUILD_NUMBER="506"` for the current pre-commit checkout; `git diff --check` passes. No local ARM compiler is available, so await hosted matrix to validate all board builds before completion. No release was requested.
+
+## 2026-11-12 — First visible DSSMM browser skin pass
+
+Added a DSSMM wordmark to the tab strip, a full-width active-color selected row, and a framed artwork preview panel. The browser's selection/navigation, filesystem lookup/cache, and SuperFW launch actions are unchanged. Updated `docs/PORTING-PLAN.md`; its earlier “no physical result” status is corrected to the owner-reported boot/theme smoke test. Theme settings and sanitized artwork host tests pass; `git diff --check` passes. Physical visual validation and ARM builds remain outstanding (local devkitARM compiler unavailable). Next: hosted matrix, then inspect screenshot feedback and continue translating DSSMM browser composition; do not call this complete skin parity.
