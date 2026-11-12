@@ -1,4 +1,11 @@
 
+## 2026-11-12 01:21 UTC — Actual combined-tree merge rehearsals passed
+
+- Common-tree implementation e67e32d is committed. Three one-time ancestry bridges record the old hardware heads already verified/imported; resulting baseline430a251 has the exact same combined tree, and all original branch commits remain ancestors. No history rewrite or force push. Source history transition uses ours only for this documented one-time reconciliation; no future merge driver/strategy override is configured.
+- In disposable worktrees of the ACTUAL repository, committed one target-private journal edit per lane, merged each into the full combined tree using ordinary Git merge, and verified the two unrelated project subtree hashes stayed unchanged. Synced the integrated tree back into all three sparse worktrees with ordinary Git merge; complete tracked tree hashes matched, hidden projects stayed hidden/tracked, source baseline checks passed, and primary full view stayed unchanged. Scratch worktrees were removed. Evidence: docs/shared-tree-merge-rehearsal.json.
+- Next: fast-forward the real hardware lanes to the common baseline and enable worktree-local sparse views, validate each actual layout/build/verifier and all release hashes, then record final results on trunk and fast-forward lanes again. Push trunk before lanes so the lane push-scope check compares with the new shared origin/dssmm. Keep all branches' tracked layouts identical at this checkpoint; future lane changes belong only inside their own directory.
+
+
 ## 2026-11-12 01:19 UTC — Shared-tree implementation validated before ancestry bridge
 
 - Live schema3 registry tracks all three directories on every branch. Root layout checks validate Git's tracked tree and permit fully excluded skip-worktree projects, while rejecting accidental deletions, project identity/source escapes and hidden selected targets. build-all/verify-all select materialized projects; site composition explicitly requires the complete tree. Kernel input baselines replace frozen full-document snapshots; docs/history preserves prior registry/provenance.

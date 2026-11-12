@@ -1,0 +1,36 @@
+{
+  "baseline_commit": "430a25115d47c6bc802d823fa268c13ef9627863",
+  "actual_repository_rehearsals": [
+    {
+      "lane": "ezfblue",
+      "normal_merge": "passed",
+      "changed_paths": [
+        "ezfblue/PROGRESS.md"
+      ],
+      "unrelated_project_trees_unchanged": true,
+      "reverse_sync_in_sparse_worktree": "passed; hidden projects remain tracked and hidden"
+    },
+    {
+      "lane": "ezfomega",
+      "normal_merge": "passed",
+      "changed_paths": [
+        "ezfomega/PROGRESS.md"
+      ],
+      "unrelated_project_trees_unchanged": true,
+      "reverse_sync_in_sparse_worktree": "passed; hidden projects remain tracked and hidden"
+    },
+    {
+      "lane": "ezfomegade",
+      "normal_merge": "passed",
+      "changed_paths": [
+        "ezfomegade/PROGRESS.md"
+      ],
+      "unrelated_project_trees_unchanged": true,
+      "reverse_sync_in_sparse_worktree": "passed; hidden projects remain tracked and hidden"
+    }
+  ],
+  "complete_tracked_tree_after_reverse_sync": "a32b61e6ccf16d1cc6dca0d927016e61a1421274",
+  "main_full_view_unchanged": true,
+  "scratch_worktrees": "removed after successful rehearsal",
+  "no_merge_drivers_or_strategy_overrides_used_in_rehearsals": true
+}

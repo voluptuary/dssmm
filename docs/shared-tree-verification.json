@@ -17,6 +17,7 @@
     "initial_failure": "Git diff ambiguous branch/directory name; fixed with trailing -- and fixture rerun passed"
   },
   "kernel_inputs": "All 426 DE, 419 OMEGA and 424 BLUE kernel/build/test inputs match recorded baselines",
-  "actual_repository_rehearsal": "pending",
-  "common_tree_conversion": "pending"
+  "actual_repository_rehearsal": "Passed all three ordinary lane merges and reverse sparse syncs; docs/shared-tree-merge-rehearsal.json",
+  "common_tree_conversion": "Validated baseline committed; hardware worktrees will fast-forward and focus next",
+  "ancestry_bridge_commit": "430a25115d47c6bc802d823fa268c13ef9627863"
 }
