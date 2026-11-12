@@ -1,6 +1,6 @@
 # Current BLUE development layout
 
-The active 8.4.1-blue-dev build uses contiguous live code/assets and produces a
+The active 8.4.1-blue-test4 build uses contiguous live code/assets and produces a
 stock-size 2,124,252-byte update with the DSSMM full-image CRC seal. FPGA firmware
 and its updater are omitted; use the official BLUE kernel for firmware updates.
 The historical vendor resource below remains only as a baseline test input.

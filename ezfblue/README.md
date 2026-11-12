@@ -22,7 +22,7 @@ emulator save states are not guaranteed compatible.
 
 ## BLUE development improvements
 
-Current development (`8.4.1-blue-dev`) adapts findings from **FrankieT19's BLUE
+Current development (`8.4.1-blue-test4`) adapts findings from **FrankieT19's BLUE
 DS Style port**: a stock-size firmware-free update, complete-image checks,
 pending-save protection, read-only NOR browsing, allocation/patch bounds,
 separate Mode B preferences and corrected BLUE DDR state loading. It also blocks

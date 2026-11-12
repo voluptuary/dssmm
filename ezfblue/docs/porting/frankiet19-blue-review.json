@@ -194,6 +194,51 @@
     "Native 64 MiB clean loading retained; no new claim of large-ROM add-on support",
     "Existing flash polling/SD rename/NOR metadata power-loss limitations remain"
   ],
-  "hosted_ci": "pending after commit/push; do not treat as passed",
-  "published_releases_modified": false
+  "hosted_ci": {
+    "tested_commit": "69229f897522f0f36d5074099b06151107150b65",
+    "runs": [
+      {
+        "conclusion": "success",
+        "databaseId": 43251822733,
+        "headBranch": "ezfomega",
+        "headSha": "69229f897522f0f36d5074099b06151107150b65",
+        "status": "completed",
+        "url": "https://github.com/voluptuary/dssmm/actions/runs/43251822733"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 43251816937,
+        "headBranch": "ezfomegade",
+        "headSha": "69229f897522f0f36d5074099b06151107150b65",
+        "status": "completed",
+        "url": "https://github.com/voluptuary/dssmm/actions/runs/43251816937"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 43251811355,
+        "headBranch": "ezfblue",
+        "headSha": "69229f897522f0f36d5074099b06151107150b65",
+        "status": "completed",
+        "url": "https://github.com/voluptuary/dssmm/actions/runs/43251811355"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 43251806604,
+        "headBranch": "dssmm",
+        "headSha": "69229f897522f0f36d5074099b06151107150b65",
+        "status": "completed",
+        "url": "https://github.com/voluptuary/dssmm/actions/runs/43251806604"
+      }
+    ]
+  },
+  "published_releases_modified": false,
+  "release_preparation": {
+    "tag": "v8.4.1-blue-test4",
+    "prerelease": true,
+    "file": "build-blue-review/test4/ezbluekernel.bin",
+    "bytes": 2124252,
+    "sha256": "57db5bb4e9fd2cfacdbb1024b6d2d62dd7a83c562964f440d3e5cf02203549a3",
+    "version_build_and_focused_packaging_save_and_staging_tests": "passed",
+    "publication": "pending final versioned CI"
+  }
 }

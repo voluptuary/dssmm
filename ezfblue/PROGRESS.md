@@ -1,3 +1,9 @@
+## 2026-11-12 15:53 UTC — BLUE Test4 release and condensed notes authorized
+
+- Owner explicitly requests publication when checks pass and four ordered release-note categories: New features, New fixes, Summary of past features, Summary of past fixes. Condense prior changes and merge the immediately preceding build into those summaries. Correct the three current 8.4.0 release bodies without changing their tags/assets; prepare new v8.4.1-blue-test4 for the reviewed BLUE changes.
+- Integrated reviewed source69229f8 passed hosted CI on trunk (all models)43251806604, BLUE43251811355, DE43251816937 and OMEGA43251822733. Source remains physically unverified; upstream Test5 explicitly says the same. Final new-version build/packaging/save/staging fixtures passed. Installable file2124252bytes SHA256 57db5bb4e9fd2cfacdbb1024b6d2d62dd7a83c562964f440d3e5cf02203549a3. Existing release notes rewritten to440words and new Test4 notes638words; Test3's MiGoomba and loader fixes are now in the past-feature/past-fix summaries.
+- Next: commit this owning-directory preparation, integrate normally; finish DE/OMEGA notes-only corrections in their lanes and root release-style guidance on trunk. Verify final hosted CI before publishing Test4, update only the three existing release bodies, and verify tags/assets/flags and downloaded new bytes. Preserve historical release reports as dated evidence; record the authorized later note edits separately.
+
 ## 2026-11-12 15:47 UTC — FrankieT19 BLUE adaptations validated locally
 
 - Compared pinned upstream 08ab566c420641b0f33ffb914e37c35a7e32857a (Test5), explicitly physically unverified. Credited FrankieT19 in CREDITS and docs/porting/FRANKIET19_BLUE_COMPARISON.md. Independently implemented fixes/design adaptations over our own vendor-derived code; no Slot GPL runtime, trampoline or emulator source copied. Existing MiGoomba and Merkin assets retained.
