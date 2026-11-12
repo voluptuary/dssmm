@@ -19,3 +19,9 @@ A fixed 6×6×6 RGB cube occupies background palette entries 20–235, leaving n
 scripts/test-artwork.sh runs actual decoder tests under address/undefined sanitizers for both dimensions, markers, channels, output canaries, malformed headers, buffer limits and read failures. tests/test-dsscc-writer.py optionally executes the pinned upstream writer function with a small image adapter and checks actual generated BMPs using the production decoder, without Pillow or network. Both pass locally at this checkpoint. Native menu theme tests also pass. The optional check takes an external DSSCC source checkout; normal CI has no dependency on it.
 
 Next: finish name/manifest lookup audit, add exact FatFs reads, decide bounded cache lifetime in cartridge RAM and wire a selectable List + Art prototype. Validate palette upload and opaque/transparent composition on an emulator or hardware before claiming visual compatibility. The fixed cube may need refinement after screenshots; retain the external DSSCC files unchanged.
+
+## Lookup findings for the next slice
+
+Current DE source Launcher_LoadCustomThumbManifest builds a runtime hash index by scanning CUSTOM; it does not require a separate on-disk manifest file. Its bounded index has 256 entries per style and ASCII-lowercased FNV-1a hashes, followed by exact-path file opens. Prime can avoid inheriting that RAM/index limit by using bounded direct candidate opens; decide after measuring SD latency. Preserve pack filenames rather than invent a new manifest requirement.
+
+Pinned DSSCC thumbnail_output_paths.py mirrors relative ROM directories below IMGS/IMGS2 and strips the ROM extension by default. The standalone CUSTOM helper creates <validated-name>.bmp and rejects names longer than96characters and invalid path characters. Kernel fallback/extension precedence and encoding differences still require review; these findings alone do not define complete compatibility.
