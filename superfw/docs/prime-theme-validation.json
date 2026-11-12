@@ -1,0 +1,23 @@
+{
+  "checkpoint": "Prime manual palette foundation",
+  "hardware_tested": false,
+  "theme_settings_test": "passed native and SUPERCHIS_IO",
+  "full_local_suite": "not run: lcov unavailable",
+  "builds": {
+    "chis": {
+      "result": "pass",
+      "bytes": 1671680,
+      "sha256": "9be4b68e5f4df31ac4be1eba671e817109475c3dac3e76dae830c1e87d7246b5"
+    },
+    "sd": {
+      "result": "pass",
+      "bytes": 497152,
+      "sha256": "ba6fbd29afeac72201b9f1f7a835b2f5a254eea1c9ace9ae555bb38f6114472f"
+    },
+    "lite": {
+      "result": "pass",
+      "bytes": 464384,
+      "sha256": "bf996a03947212b0766c587130c9a9571095b657ee0c029aa45b529777dc219d"
+    }
+  }
+}

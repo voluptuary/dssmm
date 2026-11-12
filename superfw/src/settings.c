@@ -37,6 +37,11 @@ const t_theme_colors themes[THEME_COUNT] = {
   { RGB2GBA(0x308855), RGB2GBA(0x88aa99), RGB2GBA(0x000000), RGB2GBA(0x778888), RGB2GBA(0x777777), RGB2GBA(0x606060) }, // Green
   { RGB2GBA(0xad11c8), RGB2GBA(0xe47af6), RGB2GBA(0x000000), RGB2GBA(0xad5dc6), RGB2GBA(0x724095), RGB2GBA(0x72667a) }, // Purple
   { RGB2GBA(0x222222), RGB2GBA(0x444444), RGB2GBA(0xeeeeee), RGB2GBA(0x737573), RGB2GBA(0xaaaaaa), RGB2GBA(0x606060) }, // Dark
+  /* DSSMM presentation starts here; native palette roles remain unchanged.
+   * These original palettes require no borrowed graphics or extra RAM buffers.
+   * Accents stay readable with the renderer's existing black/white UI masks. */
+  [THEME_DSSMM_LIGHT] = { RGB2GBA(0xd8e0e8), RGB2GBA(0xf8f8f8), RGB2GBA(0x182028), RGB2GBA(0x80b8e8), RGB2GBA(0x90b8d8), RGB2GBA(0x788088) },
+  [THEME_DSSMM_DARK] = { RGB2GBA(0x303840), RGB2GBA(0x182028), RGB2GBA(0xf0f0f0), RGB2GBA(0x5088b8), RGB2GBA(0x406080), RGB2GBA(0x889098) },
 };
 
 const t_combo_key hotkey_list[] = {
@@ -79,7 +84,11 @@ const uint8_t animspd_lut[] = {
 };
 
 // Menu settings
+#ifdef SUPERCHIS_IO
+uint8_t menu_theme = THEME_DSSMM_LIGHT;
+#else
 uint8_t menu_theme = 0;
+#endif
 uint8_t lang_id = 0;
 uint8_t recent_menu = 1;
 uint8_t hide_hidden = 0;
