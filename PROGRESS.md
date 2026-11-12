@@ -1,4 +1,11 @@
 
+## 2026-11-12 00:41 UTC — Corrected layout delivery complete for ezfblue
+
+- Structural implementation 45c1480314d1ce2b13cf05f228eee11f5266d435 is committed/pushed. Hosted Actions run 43128770326 succeeded: https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128770326. Full local verifier, policy tests and direct published-download binary comparison also pass. Shared root environment/dispatch/policy/CI files match dssmm exactly.
+- Current branch has only ezfblue/ plus universal root infrastructure. All candidate folders retired, journals retained, hardware-specific source/assets untouched. Installable binary matches its published release byte-for-byte; evidence docs/top-level-binary-verification.json. DE title pin is a build-metadata correction only. No hardware qualification or release asset/tag changes.
+- This completion commit adds only CI evidence and journal records. No implementation task remains. No automatic cross-branch synchronization is configured; dssmm projects.json pins the tested structural commit, allowing local journal overlays. Final delivery verifies clean local/remote heads after this documentation push. Future work must read root and private instructions/journals and validate only the intended hardware project.
+
+
 ## 2026-11-12 00:38 UTC — Hardware-branch layout and release comparison verified
 
 - Full `make verify-ezfblue` completed successfully from universal Git root with private ezfblue/ project. Root policy and five isolation regression tests pass. Workflow YAML/registries and universal site composition parse/build. No firmware C/assembly/asset changes; hundreds of moved source/build/test inputs were compared to pre-move Git blobs. DE's sole intentional Makefile change pins its existing published header title.
