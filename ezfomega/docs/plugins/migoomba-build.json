@@ -3,6 +3,7 @@
   "file": "ezkernel.bin",
   "bytes": 2054824,
   "sha256": "8d37e4f80e5c5cc68332406e95f3fbe345c3afeea9b4b11cb0df19b383baef00",
-  "status": "8.4.0 release prepared; software checks passed; new integration needs hardware testing",
-  "published_release_modified": false
+  "status": "Published v8.4.0-omega-test4; software/emulator checks passed; new integration needs hardware testing",
+  "published_release_modified": false,
+  "release_url": "https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-omega-test4"
 }
