@@ -98,3 +98,7 @@ SuperChis Prime v1.0 chain-loads the Test1 Chis image and reports SuperFW 0.22 (
 ## 2026-11-12 — Identify DSSMM builds and name themes
 
 Updated the Info page identity to `SuperFW <VERSION_WORD major.minor> (DSSMM)`, retaining the commit identifier and board variant. The displayed version comes from the existing SuperFW `VERSION_WORD` build input (currently 0.22). Replaced numeric theme labels with palette names, removing the visible `< 6 >` while retaining IDs 0–7 and saved settings compatibility. Local theme settings and artwork host checks pass; `git diff --check` passes. Full verifier/build unavailable locally because `arm-none-eabi-gcc` is missing. Next: hosted SuperFW CI, then integrate through dssmm and sync lanes; no release or physical validation implied.
+
+## 2026-11-12 — Display DSSMM build number
+
+Replaced the Info-page short commit hash with `DSSMM Build N`, where `N` comes from `git rev-list --count HEAD` across full shared repository history. The existing firmware metadata still embeds `VERSION_SLUG_WORD` as the upstream commit identifier. CI already fetches full history. `make -n -C superfw BOARD=chis` confirms `-DDSSMM_BUILD_NUMBER="506"` for the current pre-commit checkout; `git diff --check` passes. No local ARM compiler is available, so await hosted matrix to validate all board builds before completion. No release was requested.
