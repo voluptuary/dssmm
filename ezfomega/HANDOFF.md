@@ -1,3 +1,8 @@
+## 2026-11-12 15:58 UTC — Release-note correction published and verified
+
+- Updated https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-omega-test4 body to the requested four ordered categories, with the immediately prior build folded into condensed cumulative summaries (433words). Published body matches docs/releases/v8.4.0-omega-test4.md. Contributors, warnings, limitations, download/hash information retained.
+- Verified existing release ID/title/tag/flags/publication time and asset ID/size/digest/creation/update timestamps/URL are unchanged. No kernel source/build/test/asset changes. All four integrated versioned CI runs passed; BLUE Test4 is now separately published and DE8.4.0 remains latest stable. Root docs/releases/blue-test4-publication.json records this authorized later note edit separately from original publication history. Scope complete.
+
 ## 2026-11-12 15:54 UTC — Owner-requested release-note correction
 
 - Rewrote docs/releases/v8.4.0-omega-test4.md into New features, New fixes, Summary of past features, Summary of past fixes. Folded the directly preceding Test3 RAM improvement and NES/save/path/artwork fixes into condensed cumulative summaries; retained hardware-untested/model warnings,32MiB/NOR limits, MiGoomba caveats, contributor credits and exact asset hash.
