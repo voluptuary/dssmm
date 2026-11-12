@@ -37,7 +37,34 @@ const t_theme_colors themes[THEME_COUNT] = {
   { RGB2GBA(0x308855), RGB2GBA(0x88aa99), RGB2GBA(0x000000), RGB2GBA(0x778888), RGB2GBA(0x777777), RGB2GBA(0x606060) }, // Green
   { RGB2GBA(0xad11c8), RGB2GBA(0xe47af6), RGB2GBA(0x000000), RGB2GBA(0xad5dc6), RGB2GBA(0x724095), RGB2GBA(0x72667a) }, // Purple
   { RGB2GBA(0x222222), RGB2GBA(0x444444), RGB2GBA(0xeeeeee), RGB2GBA(0x737573), RGB2GBA(0xaaaaaa), RGB2GBA(0x606060) }, // Dark
+  /* DSSMM presentation starts here; native palette roles remain unchanged.
+   * These original palettes require no borrowed graphics or extra RAM buffers.
+   * Accents stay readable with the renderer's existing black/white UI masks. */
+  [THEME_DSSMM_LIGHT] = { RGB2GBA(0xd8e0e8), RGB2GBA(0xf8f8f8), RGB2GBA(0x182028), RGB2GBA(0x80b8e8), RGB2GBA(0x90b8d8), RGB2GBA(0x788088) },
+  [THEME_DSSMM_DARK] = { RGB2GBA(0x303840), RGB2GBA(0x182028), RGB2GBA(0xf0f0f0), RGB2GBA(0x5088b8), RGB2GBA(0x406080), RGB2GBA(0x889098) },
 };
+
+/* Default preserves every upstream palette. Accent changes only selection roles. */
+const char * const accent_names[ACCENT_COUNT] = {
+  "Default", "Blue", "Green", "Orange", "Purple"
+};
+static const uint16_t accent_colors[ACCENT_COUNT - 1][2] = {
+  { RGB2GBA(0x80b8e8), RGB2GBA(0x6098c8) },
+  { RGB2GBA(0x88c898), RGB2GBA(0x589868) },
+  { RGB2GBA(0xe8b878), RGB2GBA(0xb88848) },
+  { RGB2GBA(0xc0a0e0), RGB2GBA(0x9878b8) },
+};
+uint8_t menu_accent = 0;
+uint8_t artwork_mode = 0;
+
+t_theme_colors menu_theme_colors(unsigned theme, unsigned accent) {
+  t_theme_colors result = themes[theme < THEME_COUNT ? theme : 0];
+  if (accent > 0 && accent < ACCENT_COUNT) {
+    result.hi_color = accent_colors[accent - 1][0];
+    result.hi_blend = accent_colors[accent - 1][1];
+  }
+  return result;
+}
 
 const t_combo_key hotkey_list[] = {
   {"L+R+Start",     0x00F7},
@@ -79,7 +106,11 @@ const uint8_t animspd_lut[] = {
 };
 
 // Menu settings
+#ifdef SUPERCHIS_IO
+uint8_t menu_theme = THEME_DSSMM_LIGHT;
+#else
 uint8_t menu_theme = 0;
+#endif
 uint8_t lang_id = 0;
 uint8_t recent_menu = 1;
 uint8_t hide_hidden = 0;
@@ -126,11 +157,13 @@ bool save_ui_settings() {
   char buf[512];
   npf_snprintf(buf, sizeof(buf),
     "theme=%u\n"
+    "accent=%u\n"
+    "artwork=%u\n"
     "langcode=%c%c\n"
     "recent_menu=%u\n"
     "anim_speed=%u\n"
     "hide_hidden=%u\n",
-    menu_theme, (lc & 0xFF), (lc >> 8), recent_menu, anim_speed, hide_hidden);
+    menu_theme, menu_accent, artwork_mode, (lc & 0xFF), (lc >> 8), recent_menu, anim_speed, hide_hidden);
 
   UINT wrbytes;
   FRESULT res = f_write(&fd, buf, strlen(buf), &wrbytes);
@@ -240,6 +273,8 @@ static void parse_ui_settings(void *usr, const char *var, const char *value) {
       unsigned maxval;
     } uintset[] = {
       { "theme",       &menu_theme,  THEME_COUNT },
+      { "accent",      &menu_accent, ACCENT_COUNT },
+      { "artwork",     &artwork_mode, 3 },
       { "recent_menu", &recent_menu, 2 },
       { "hide_hidden", &hide_hidden, 2 },
       { "anim_speed",  &anim_speed,  animspd_cnt },

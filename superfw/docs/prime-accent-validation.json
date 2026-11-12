@@ -1,0 +1,27 @@
+{
+  "checkpoint": "Independent manual accents",
+  "source_commit": "ed92ca16d115d6a513c327f83ece003c055f0581",
+  "hardware_tested": false,
+  "hosted_full_verifier": {
+    "result": "success",
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43271213482"
+  },
+  "theme_settings_tests": "passed native and chis, including mocked save/reload",
+  "builds": {
+    "chis": {
+      "result": "pass",
+      "bytes": 1671680,
+      "sha256": "7413c268627fbb675976a17d7678883676875aaf6b48b6b89f8379fc10376e84"
+    },
+    "sd": {
+      "result": "pass",
+      "bytes": 497152,
+      "sha256": "c471a733559e34a38eef7aaf68becbbc3d8a6c81863ef8cdff924e337b6d5dd5"
+    },
+    "lite": {
+      "result": "pass",
+      "bytes": 464896,
+      "sha256": "d7749aa03fb2f6b11d87170910ec06f6ff2d9069cf1cdbeee7f734e66ba324d1"
+    }
+  }
+}

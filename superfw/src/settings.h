@@ -38,8 +38,18 @@ typedef struct {
   uint16_t sh_color;     // Menu shadow/disabled color
 } t_theme_colors;
 
-#define THEME_COUNT 6
+/* Keep upstream numeric IDs stable for existing ui-settings.txt files. */
+enum {
+  THEME_DSSMM_LIGHT = 6,
+  THEME_DSSMM_DARK,
+  THEME_COUNT
+};
 extern const t_theme_colors themes[THEME_COUNT];
+#define ACCENT_COUNT 5
+extern const char * const accent_names[ACCENT_COUNT];
+extern uint8_t menu_accent;
+extern uint8_t artwork_mode; /* 0=list, 1=title, 2=box; Start in SD browser */
+t_theme_colors menu_theme_colors(unsigned theme, unsigned accent);
 
 extern const t_combo_key hotkey_list[13];
 #define hotkey_listcnt (sizeof(hotkey_list)/sizeof(hotkey_list[0]))
