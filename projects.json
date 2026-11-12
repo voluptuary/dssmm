@@ -1,0 +1,11 @@
+{
+  "schema": 2,
+  "projects": {
+    "ezfomegade": {
+      "directory": "ezfomegade",
+      "branch": "ezfomegade"
+    }
+  },
+  "policy": "Independent snapshots; no automatic synchronization or cross-platform merges.",
+  "layout": "top-level projects with universal root infrastructure"
+}
