@@ -13,7 +13,8 @@ physical EZODE-B. Its releases describe hardware **test builds** and ask for
 results; no issues or hardware-result reports were present when reviewed.
 A request to test hardware is not a successful hardware report. Neither that
 upstream port nor this combined development build is hardware-qualified by this
-review. The existing public DSSMM BLUE Test 3 remains an unmodified prerelease.
+review. The existing BLUE Test 3 kernel/tag remain unchanged; its notes were later
+condensed at the owner's request.
 
 ## Improvements adapted into DSSMM development code
 
@@ -50,8 +51,8 @@ original authorship are not replaced by a blanket attribution to this project.
 ## Validation and limits
 
 See [frankiet19-blue-review.json](frankiet19-blue-review.json) for exact commits,
-build sizes, asset comparison and completed test results. The release-preparation version is `8.4.1-blue-test4`; publication follows final
-versioned CI at the owner's request.
+build sizes, asset comparison and completed test results. The current version is [8.4.1 BLUE Test4](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-blue-test4),
+published as a hardware-untested prerelease after final versioned CI passed.
 
 The focused fixture fails against `v8.4.0-blue-test3` because a pending save is
 not blocked, then passes against this implementation. Tests exercise the actual

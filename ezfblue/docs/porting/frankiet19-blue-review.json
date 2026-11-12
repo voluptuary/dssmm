@@ -8,7 +8,7 @@
   },
   "dssmm_baseline": "v8.4.0-blue-test3",
   "task_start_commit": "44813162250f011799736374aee7e0f5cb721eea",
-  "version": "8.4.1-blue-dev",
+  "version": "8.4.1-blue-test4",
   "implementation": "Independent adaptations informed by FrankieT19; no Slot-derived GPL runtime/trampoline/emulator code copied.",
   "validation": {
     "full_blue_verifier": {
@@ -185,7 +185,8 @@
     "sha256": "365f94de4cb04cc7a8dff0d4124dc7d8362294f4e7df6c36c4412e4c9c4c0e12",
     "published": false,
     "firmware_payload_included": false,
-    "seal": "DSSMBL1, CRC32 plus complement over bytes before the final 16-byte seal"
+    "seal": "DSSMBL1, CRC32 plus complement over bytes before the final 16-byte seal",
+    "version": "8.4.1-blue-dev"
   },
   "limitations": [
     "No physical BLUE validation; stock-size capacity is not updater acceptance proof",
@@ -231,7 +232,6 @@
       }
     ]
   },
-  "published_releases_modified": false,
   "release_preparation": {
     "tag": "v8.4.1-blue-test4",
     "prerelease": true,
@@ -239,6 +239,64 @@
     "bytes": 2124252,
     "sha256": "57db5bb4e9fd2cfacdbb1024b6d2d62dd7a83c562964f440d3e5cf02203549a3",
     "version_build_and_focused_packaging_save_and_staging_tests": "passed",
-    "publication": "pending final versioned CI"
-  }
+    "publication": "Published and downloaded asset verified"
+  },
+  "publication": {
+    "tag": "v8.4.1-blue-test4",
+    "url": "https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-blue-test4",
+    "release_id": 443174331,
+    "prerelease": true,
+    "draft": false,
+    "source_commit": "8d854ed8e2117a6a1df8c380dc8a598e964ffffb",
+    "published_at": "2026-11-12T15:56:45Z",
+    "notes_match_committed_file": true,
+    "asset": {
+      "name": "ezbluekernel.bin",
+      "id": 740088127,
+      "bytes": 2124252,
+      "sha256": "57db5bb4e9fd2cfacdbb1024b6d2d62dd7a83c562964f440d3e5cf02203549a3",
+      "url": "https://github.com/voluptuary/dssmm/releases/download/v8.4.1-blue-test4/ezbluekernel.bin",
+      "download_matches_local": true
+    }
+  },
+  "release_ci": [
+    {
+      "conclusion": "success",
+      "databaseId": 43252956663,
+      "headBranch": "ezfomega",
+      "headSha": "8d854ed8e2117a6a1df8c380dc8a598e964ffffb",
+      "status": "completed",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43252956663"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 43252949084,
+      "headBranch": "ezfomegade",
+      "headSha": "8d854ed8e2117a6a1df8c380dc8a598e964ffffb",
+      "status": "completed",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43252949084"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 43252942241,
+      "headBranch": "ezfblue",
+      "headSha": "8d854ed8e2117a6a1df8c380dc8a598e964ffffb",
+      "status": "completed",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43252942241"
+    },
+    {
+      "conclusion": "success",
+      "databaseId": 43252891961,
+      "headBranch": "dssmm",
+      "headSha": "8d854ed8e2117a6a1df8c380dc8a598e964ffffb",
+      "status": "completed",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43252891961"
+    }
+  ],
+  "existing_release_binaries_or_tags_modified": false,
+  "owner_authorized_release_note_corrections": [
+    "v8.4.0",
+    "v8.4.0-omega-test4",
+    "v8.4.0-blue-test3"
+  ]
 }
