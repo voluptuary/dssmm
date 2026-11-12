@@ -51,5 +51,24 @@
     "bytes": 3988120,
     "sha256": "340528034410e24101891a1a9c1a6ed6ccaadfa5a0786fa10910f52ee14245c2"
   },
-  "hardware_validation": "No new physical hardware report; old emulator save states not qualified."
+  "hardware_validation": "No new physical hardware report; old emulator save states not qualified.",
+  "publication": {
+    "target": "ezfblue",
+    "tag": "v8.4.0-blue-test3",
+    "url": "https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-blue-test3",
+    "release_id": 443130494,
+    "published_at": "2026-11-12T15:23:19Z",
+    "prerelease": true,
+    "source_commit": "8e637e3238926fb667d336b99db7ed7c7fcbb9dc",
+    "asset": {
+      "name": "ezbluekernel.bin",
+      "id": 739980339,
+      "bytes": 3988120,
+      "sha256": "340528034410e24101891a1a9c1a6ed6ccaadfa5a0786fa10910f52ee14245c2",
+      "url": "https://github.com/voluptuary/dssmm/releases/download/v8.4.0-blue-test3/ezbluekernel.bin",
+      "download_matches_local": true
+    },
+    "notes_match_committed_file": true,
+    "previous_release_preserved": "v8.3.1-blue-test2"
+  }
 }

@@ -1,3 +1,9 @@
+## 2026-11-12 15:24 UTC — v8.4.0-blue-test3 published and downloaded asset verified
+
+- Published https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-blue-test3 from CI-tested source 8e637e3238926fb667d336b99db7ed7c7fcbb9dc. Release is a hardware-untested prerelease. All four hosted release-source CI runs passed, including trunk's three-model matrix. Earlier v8.3.1-blue-test2 notes, flags and asset identities/sizes/timestamps remain unchanged.
+- Downloaded ezbluekernel.bin matches the local release file byte-for-byte: 3988120 bytes, SHA-256 340528034410e24101891a1a9c1a6ed6ccaadfa5a0786fa10910f52ee14245c2. GitHub digest, release notes, correct model/variant, annotated tag and publication flags verified. Only the installable kernel is attached; GitHub supplies automatic source archives.
+- Full verifier, focused Cppcheck, save/conversion/legacy replay evidence is in docs/plugins/migoomba-release-validation.json. No software regression was found in these checks; no physical hardware or old emulator saved-state qualification is claimed. Back up .esv saves and prefer in-game battery saves when transitioning. No remaining publication task for this release.
+
 ## 2026-11-12 15:18 UTC — 8.4.0-blue-test3 release prepared and software validation complete
 
 - Owner authorizes publication; DE 8.4.0 is stable by explicit request, while Original OMEGA Test 4 and BLUE Test 3 remain hardware-untested prereleases. This lane changes only ezfblue/. New release notes follow the previous platform release's cumulative style, model warnings, credits and limitations.

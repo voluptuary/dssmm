@@ -3,6 +3,7 @@
   "file": "ezbluekernel.bin",
   "bytes": 3988120,
   "sha256": "340528034410e24101891a1a9c1a6ed6ccaadfa5a0786fa10910f52ee14245c2",
-  "status": "8.4.0 release prepared; software checks passed; new integration needs hardware testing",
-  "published_release_modified": false
+  "status": "Published v8.4.0-blue-test3; software/emulator checks passed; new integration needs hardware testing",
+  "published_release_modified": false,
+  "release_url": "https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-blue-test3"
 }
