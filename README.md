@@ -67,7 +67,7 @@ upstream versions; MiGoomba is currently an OMEGA-family update.
 ### Make and add artwork
 
 1. Open [DS Style Card Companion (DSSCC)](https://github.com/voluptuary/dsscc/releases/latest),
-   use **Custom Art → Scan SD Card…**, and select your SD-card root. Enable
+   use **Custom Pack → Scan SD Card…** (Custom Art in older versions), and select your SD-card root. Enable
    **Include Game Boy Advance files** if wanted, and choose both thumbnail sizes.
 2. Check the images, choose **Mirrored** output and select **Build Pack**.
 3. Copy the generated `IMGS` and `IMGS2` contents into `SYSTEM/IMGS` and
