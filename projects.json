@@ -1,26 +1,26 @@
 {
-  "schema": 2,
+  "schema": 3,
   "projects": {
     "ezfomegade": {
       "directory": "ezfomegade",
       "branch": "ezfomegade",
-      "source_commit": "d3c9c31591faff7c56e7562b481f062473d26665",
-      "source_directory": "ezfomegade"
+      "baseline_commit": "d3c9c31591faff7c56e7562b481f062473d26665",
+      "baseline_directory": "ezfomegade"
     },
     "ezfomega": {
       "directory": "ezfomega",
       "branch": "ezfomega",
-      "source_commit": "a05ccc7b221f4bd31382bb55339556e618e728a4",
-      "source_directory": "ezfomega"
+      "baseline_commit": "a05ccc7b221f4bd31382bb55339556e618e728a4",
+      "baseline_directory": "ezfomega"
     },
     "ezfblue": {
       "directory": "ezfblue",
       "branch": "ezfblue",
-      "source_commit": "71bc344a3015ed4e24ddfe5d4b49a40788104f26",
-      "source_directory": "ezfblue"
+      "baseline_commit": "71bc344a3015ed4e24ddfe5d4b49a40788104f26",
+      "baseline_directory": "ezfblue"
     }
   },
-  "policy": "Independent snapshots; no automatic synchronization or cross-platform merges.",
+  "policy": "Normal hardware-to-dssmm merges confined to the matching directory; merge dssmm back for integration sync.",
   "relocation_baselines": [
     {
       "target": "ezfomegade",
@@ -38,5 +38,5 @@
       "sha256": "ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710"
     }
   ],
-  "layout": "top-level projects with universal root infrastructure"
+  "layout": "identical combined tracked tree; optional worktree-local sparse views"
 }

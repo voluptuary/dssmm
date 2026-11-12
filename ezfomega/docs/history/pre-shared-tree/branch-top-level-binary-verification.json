@@ -1,0 +1,9 @@
+[
+  {
+    "branch": "ezfomega",
+    "project": "ezfomega",
+    "size": 2049416,
+    "sha256": "c1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52",
+    "matches_downloaded_published_release_byte_for_byte": true
+  }
+]

@@ -1,34 +1,91 @@
-# Hardware project isolation
+# Shared layout and hardware isolation
 
-The default `dssmm` branch owns three independent projects. The `ezfomegade`, `ezfomega` and `ezfblue` branches use the same top-level project paths and universal root environment, each containing only its own hardware project.
+All four branches (`dssmm`, `ezfomegade`, `ezfomega`, `ezfblue`) track the same
+combined repository layout. There are three independent projects at root:
 
-| Hardware | Canonical project | Project-local verification |
+| Directory | Hardware | Project-local verifier |
 | --- | --- | --- |
-| Definitive Edition Rev. A/B | ezfomegade | scripts/verify-ezfomegade.sh |
-| Original OMEGA | ezfomega | scripts/verify-omega-port.sh |
-| Newer Definitive Edition B / BLUE | ezfblue | scripts/verify-blue-port.sh |
+| ezfomegade/ | Definitive Edition Rev. A/B | scripts/verify-ezfomegade.sh |
+| ezfomega/ | Original OMEGA | scripts/verify-omega-port.sh |
+| ezfblue/ | Newer Definitive Edition B / BLUE | scripts/verify-blue-port.sh |
 
-Each project owns its source, assets, tools, tests, settings, documentation and historical records. BLUE preserves its vendor linker/resources subproject internally. No mutable source/asset symlinks connect projects. Root contains only shared orchestration/environment, licensing/provenance and overview/audit records. `projects.json` pins imported commits; there is no automatic branch synchronization.
+Source, assets, hardware protocols, settings, tools, tests and platform journals
+belong to their own project. Root holds only universal infrastructure and shared
+records. BLUE retains its private vendor targets/blue linker/resource subproject.
+All projects remain visible in GitHub's tree on every branch. A hardware branch
+is a development lane; it does not delete the other projects from Git.
 
-## Validation evidence
+## Focus a working tree
 
-The dedicated hardware branch verifiers pass from their matching top-level directories; dssmm runs the same project verifiers. Snapshot source/tool/asset files match their pinned Git blobs; declared Windows batch EOL attributes are respected. Local AGENTS/HANDOFF/PROGRESS overlays record canonical ownership. Use `python3 scripts/check-snapshots.py` to check imported provenance, and `make check-isolation` plus `python3 tests/test-project-isolation.py` to test layout/PR boundaries.
+In the hardware branch's own worktree:
 
-[Current binary comparisons](https://github.com/voluptuary/dssmm/blob/dssmm/docs/top-level-binary-verification.json) show all three builds on dssmm and on their dedicated hardware branches are byte-identical to the downloaded published releases. DE now explicitly preserves its published GBA header title, making its complete image independent of the checkout directory. The earlier relocation report documents the superseded directory-derived title difference. No firmware C/assembly, graphics, FPGA resources or hardware protocols changed. [Snapshot records](https://github.com/voluptuary/dssmm/blob/dssmm/docs/snapshot-source-verification.json) list source commits and checked files.
+```sh
+git sparse-checkout set --cone .devcontainer .github docs scripts tests ezfomega
+make ezfomega
+make verify-ezfomega
+```
 
-The root shared site is composed with `python3 scripts/build-site.py` into ignored `.site/` from universal pages and project-private documentation. Pages deployment is manual and restricted to dssmm; a hardware branch cannot overwrite the shared site through its workflow.
+Replace ezfomega with the appropriate project. Sparse checkout is local to the
+worktree and leaves all hidden files tracked. Root files stay visible; common
+CI, environment, scripts, tests and docs are included explicitly. Use
+`git sparse-checkout disable` to restore all three projects. The full dssmm
+workspace remains unchanged when another worktree is focused.
 
-## Commits, pushes and pull requests
+`make build-all` and `make verify-all` operate on projects present in that working
+view; complete checkouts select all three. Layout checks distinguish real sparse
+index entries from accidentally deleted projects. Builds never borrow another
+project's source or assets. Pages composition requires a complete checkout.
 
-- A push advances only its explicitly named branch. No workflow/script pushes another branch, merges platform branches, synchronizes sources or publishes a kernel release. CI has only `contents: read` and checkout credentials are not persisted.
-- Push/PR checks choose hardware from the branch or PR base: one target on a hardware branch, all three projects on dssmm. Historical test baselines require a full Git checkout; CI fetches full history/tags.
-- Direct known hardware-branch PRs into another hardware branch or dssmm are rejected. A whole multi-project PR into a single-project branch is also rejected. Adapt intended fixes on a feature branch based on the correct destination, within its matching project.
-- Policy tests reject mixed identities, foreign root/project directories, misplaced root hardware tools and cross-project source symlinks. Tests/builds can detect regressions; they do not prove that every future edit or merge will be safe.
+## Merging
 
-[GitHub observations](https://github.com/voluptuary/dssmm/blob/dssmm/docs/branch-protection-observation.json) show all four branches were unprotected at inspection. These CI checks are therefore not mandatory server-side protection against arbitrary direct pushes, skipped/edited workflows or merges made despite failures. Required checks/reviews must be configured through repository settings by an authorized administrator if enforcement is desired. No protection gate was bypassed or unrequested review requirement imposed.
+Develop inside the hardware branch's own directory. Submit its normal PR into
+dssmm or merge it locally with ordinary Git merge. The PR scope check compares
+changes since the merge base, includes deletions and both sides of renames, and
+rejects hardware PRs that touch another project or root infrastructure. Feature
+PRs into a hardware lane have the same directory restriction; direct hardware
+pushes are checked for their unintegrated changes relative to origin/dssmm. dssmm PRs
+verify all three hardware projects. Merge dssmm back into hardware branches to
+synchronize the integrated tree; those integration syncs are allowed.
 
-Initial hosted runs failed on container/checkout UID ownership in historical Git fixtures, after successful kernel builds. The corrected workflow trusts only the exact GITHUB_WORKSPACE, never a wildcard. BLUE now keeps real Git history rooted in the checkout while its copied fixtures/headers use only actual BLUE source. The final CI disposition is recorded in HANDOFF/PROGRESS.
+Shared root changes belong on dssmm or a shared feature branch. Keep routine
+platform progress in that project's HANDOFF/PROGRESS files, not the root logs.
+This prevents routine project edits from competing for the same shared files.
+Direct hardware-to-other-hardware PRs are rejected; integrate through dssmm.
+No workflow automatically pushes, merges or publishes a kernel. CI has read-only
+contents permission and does not persist checkout credentials. Pages deployment
+is manual and restricted to dssmm.
 
-## Remaining limitations
+The common tracked baseline and ancestry remove the old layout conflicts: an
+ordinary target-only merge preserves other project directories, including in a
+sparse checkout. Same-file edits can still conflict, and arbitrary deletion or
+cross-platform driver changes are not made safe by directory names. Required
+server-side enforcement still depends on repository branch protection settings.
 
-Hardware validation remains model-specific. Original OMEGA and BLUE still have no physical qualification; BLUE larger-image updater acceptance remains unverified. Static RAM gaps are not runtime stack peaks. Existing flash polling, power-loss metadata limits, rare NES layouts and large-cheat parsing limits remain in each project's audit documentation. Structural cleanup is not a new kernel release; all published tags/assets remain immutable.
+## Transition and evidence
+
+Before conversion, nonjournal project files on the hardware branches were
+verified equal to the combined versions. Exact prior branch root/project logs,
+instructions, manifests and variant CI records are preserved in each project's
+`docs/history/pre-shared-tree/`. The old registry is retained in root
+`docs/history/pre-shared-tree/projects.json`. A one-time ancestry bridge records
+those already-imported historical heads; it is not an ongoing merge policy.
+Future merges use normal Git behavior, without ours/theirs merge drivers.
+
+The common live projects.json registry records kernel-input baselines rather
+than freezing project documentation. `python3 scripts/check-snapshots.py` compares
+those source/assets/build/test inputs. Live project docs and journals can evolve
+normally without requiring an unrelated registry edit for each hardware change.
+Earlier snapshot/CI/binary reports remain historical evidence; current transition
+results are recorded in HANDOFF/PROGRESS and the shared-tree verification report.
+
+Run `python3 tests/test-project-isolation.py` and
+`python3 tests/test-project-merges.py`. The latter uses real repositories and
+worktree-local sparse checkout, performs ordinary independent hardware merges
+and reverse integration syncs, checks other project trees remain intact and
+rejects a cross-project rename. Actual-repository merge rehearsals are recorded
+separately from these small fixtures.
+
+Published releases/tags/assets stay unchanged. DE8.3.2 remains stable/latest;
+Original OMEGA Test3 and BLUE Test2 remain hardware-untested. Existing flash/SD
+atomicity, chip timing, parser and runtime-stack limits are in the private audit
+reports. Repository architecture does not add physical hardware qualification.

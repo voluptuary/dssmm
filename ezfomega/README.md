@@ -37,4 +37,4 @@ Thanks to **FrankieT19** for the Original OMEGA DS Style adaptation and interfac
 
 ## Repository isolation
 
-The `ezfomega` branch contains only `ezfomega/` plus universal root infrastructure. The `dssmm` branch uses the same directory path alongside the other projects. Private `project.json` identifies the hardware; run `make verify-ezfomega` from the Git root for its full verifier. Never merge a different hardware branch or the whole canonical layout here. CI is read-only and target-specific; required-check enforcement still depends on branch protection. Published release tags are preserved.
+All branches track the complete combined tree. Develop on `ezfomega` inside `ezfomega/`; optional worktree-local sparse checkout hides the other projects without removing them from Git. Run `make verify-ezfomega` from the Git root. Merge this hardware branch normally into `dssmm`, then merge `dssmm` back for integration sync. Keep platform progress in this directory's journals. Shared root changes belong on `dssmm`; see [the shared-tree workflow](../docs/isolation.md). Published release tags are preserved.

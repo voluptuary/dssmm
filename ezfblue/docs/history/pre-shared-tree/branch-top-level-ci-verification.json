@@ -1,0 +1,110 @@
+{
+  "conclusion": "success",
+  "databaseId": 43128770326,
+  "headBranch": "ezfblue",
+  "headSha": "45c1480314d1ce2b13cf05f228eee11f5266d435",
+  "jobs": [
+    {
+      "completedAt": "2026-11-12T00:39:44Z",
+      "conclusion": "success",
+      "databaseId": 130887437295,
+      "name": "select",
+      "startedAt": "2026-11-12T00:38:39Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run python3 - <<'PY'",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 3,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43128770326/job/130887437295"
+    },
+    {
+      "completedAt": "2026-11-12T00:39:44Z",
+      "conclusion": "success",
+      "databaseId": 130887473174,
+      "name": "kernel (ezfblue)",
+      "startedAt": "2026-11-12T00:38:45Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Initialize containers",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@v4",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install host validation dependencies",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Configure checked-out repository ownership",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Check hardware identity and PR direction",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Verify selected hardware",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v4",
+          "number": 13,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Stop containers",
+          "number": 14,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43128770326/job/130887473174"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/voluptuary/dssmm/actions/runs/43128770326"
+}

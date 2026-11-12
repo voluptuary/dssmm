@@ -1,0 +1,42 @@
+{
+  "schema": 2,
+  "projects": {
+    "ezfomegade": {
+      "directory": "ezfomegade",
+      "branch": "ezfomegade",
+      "source_commit": "d3c9c31591faff7c56e7562b481f062473d26665",
+      "source_directory": "ezfomegade"
+    },
+    "ezfomega": {
+      "directory": "ezfomega",
+      "branch": "ezfomega",
+      "source_commit": "a05ccc7b221f4bd31382bb55339556e618e728a4",
+      "source_directory": "ezfomega"
+    },
+    "ezfblue": {
+      "directory": "ezfblue",
+      "branch": "ezfblue",
+      "source_commit": "71bc344a3015ed4e24ddfe5d4b49a40788104f26",
+      "source_directory": "ezfblue"
+    }
+  },
+  "policy": "Independent snapshots; no automatic synchronization or cross-platform merges.",
+  "relocation_baselines": [
+    {
+      "target": "ezfomegade",
+      "size": 2025056,
+      "sha256": "6d7774ecbadc40e8c91d9e0e977fe09cd36abe8ff34462d362557f828f926f38"
+    },
+    {
+      "target": "ezfomega",
+      "size": 2049416,
+      "sha256": "c1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52"
+    },
+    {
+      "target": "ezfblue",
+      "size": 3982696,
+      "sha256": "ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710"
+    }
+  ],
+  "layout": "top-level projects with universal root infrastructure"
+}

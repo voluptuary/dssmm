@@ -16,12 +16,13 @@ jobs:
       - id: targets
         env:
           BASE_BRANCH: ${{ github.base_ref || github.ref_name }}
+          HEAD_BRANCH: ${{ github.head_ref }}
         run: |
           python3 - <<'PY'
           import json, os
           branch = os.environ['BASE_BRANCH']
           targets = ['ezfomegade', 'ezfomega', 'ezfblue']
-          if branch != 'dssmm':
+          if branch != 'dssmm' and os.environ['HEAD_BRANCH'] != 'dssmm':
               if branch not in targets:
                   raise SystemExit('Select dssmm or a hardware branch')
               targets = [branch]
@@ -53,9 +54,12 @@ jobs:
           CI_BRANCH: ${{ github.base_ref || github.ref_name }}
           PR_BASE: ${{ github.base_ref }}
           PR_HEAD: ${{ github.head_ref }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           python3 tests/test-project-isolation.py
-          python3 scripts/project_policy.py --expected-target "$KERNEL_TARGET" --branch "$CI_BRANCH" --base-branch "$PR_BASE" --head-branch "$PR_HEAD"
+          python3 tests/test-project-merges.py
+          python3 scripts/project_policy.py --expected-target "$KERNEL_TARGET" --branch "$CI_BRANCH" --base-branch "$PR_BASE" --head-branch "$PR_HEAD" --base-ref "$PR_BASE_SHA" --head-ref "$PR_HEAD_SHA" --integration-ref origin/dssmm
       - name: Verify selected hardware
         env:
           KERNEL_TARGET: ${{ matrix.target }}

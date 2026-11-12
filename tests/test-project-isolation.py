@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject misplaced firmware, mixed branches, duplicate tools and project escapes."""
+"""Exercise the common registry, hardware boundaries and PR changed-path checks."""
 from pathlib import Path
 import json
 import runpy
@@ -11,12 +11,15 @@ ROOT = Path(__file__).resolve().parents[1]
 policy = runpy.run_path(str(ROOT / 'scripts/project_policy.py'))
 
 
-def fixture(root, targets):
-    records = {t: {'directory': t} for t in targets}
+def fixture(root):
+    records = {t: {'directory': t} for t in sorted(policy['TARGETS'])}
     (root / 'projects.json').write_text(json.dumps({'projects': records}))
-    for name in ('AGENTS.md', 'HANDOFF.md', 'PROGRESS.md', 'Makefile', 'LICENSE'):
+    for name in ('AGENTS.md', 'HANDOFF.md', 'PROGRESS.md', 'Makefile', 'LICENSE', 'README.md'):
         (root / name).write_text('')
-    for target in targets:
+    for directory in ('docs', 'scripts', 'tests', '.devcontainer', '.github'):
+        (root / directory).mkdir()
+        (root / directory / '.gitkeep').write_text('') if directory != 'scripts' else None
+    for target in records:
         project = root / target
         project.mkdir()
         (project / 'project.json').write_text(json.dumps({'id': target}))
@@ -28,56 +31,47 @@ def fixture(root, targets):
 
 
 class Isolation(unittest.TestCase):
-    def validate(self, root, expected=None, branch=None, tracked='README.md\nprojects.json\n'):
+    def validate(self, root, expected=None, branch=None, extra=None):
+        names = [str(p.relative_to(root)) for p in root.rglob('*') if p.is_file() or p.is_symlink()]
+        names.extend(extra or [])
+        tracked = b''.join(b'H ' + name.encode() + b'\0' for name in names)
         with patch.object(policy['subprocess'], 'check_output', return_value=tracked):
             policy['validate_layout'](root, expected, branch)
 
-    def test_pr_boundaries(self):
-        for head in policy['TARGETS']:
-            for base in policy['TARGETS'] | {'dssmm'}:
-                if base == head:
-                    policy['validate_pr'](base, head)
-                else:
-                    with self.assertRaises(ValueError):
-                        policy['validate_pr'](base, head)
-            with self.assertRaises(ValueError):
-                policy['validate_pr'](head, 'dssmm')
-            policy['validate_pr'](head, 'feature/proposed-fix')
-
-    def test_single_project_branches(self):
+    def test_pr_boundaries_and_scope(self):
         for target in policy['TARGETS']:
-            with tempfile.TemporaryDirectory() as folder:
-                root = Path(folder)
-                fixture(root, [target])
-                self.validate(root, target, target)
+            policy['validate_pr']('dssmm', target, [target + '/source/fix.c', target + '/PROGRESS.md'])
+            policy['validate_pr'](target, 'dssmm')
+            policy['validate_pr'](target, 'feature/proposed-fix', [target + '/source/fix.c'])
+            with self.assertRaises(ValueError):
+                policy['validate_pr'](target, 'feature/proposed-fix', ['README.md'])
+            with self.assertRaises(ValueError):
+                policy['validate_pr']('dssmm', target)
+            for path in ['README.md', 'scripts/project.py', next(t for t in policy['TARGETS'] if t != target) + '/source/file.c']:
                 with self.assertRaises(ValueError):
-                    self.validate(root, branch='dssmm')
-                other = next(t for t in policy['TARGETS'] if t != target)
+                    policy['validate_pr']('dssmm', target, [path])
+            for other in policy['TARGETS'] - {target}:
                 with self.assertRaises(ValueError):
-                    self.validate(root, other)
-                (root / other).mkdir()
-                with self.assertRaises(ValueError):
-                    self.validate(root, target, target)
+                    policy['validate_pr'](other, target, [])
 
-    def test_canonical(self):
+    def test_identical_layout_on_all_branches(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            fixture(root, policy['TARGETS'])
-            self.validate(root, branch='dssmm')
+            fixture(root)
+            for branch in policy['TARGETS'] | {'dssmm'}:
+                self.validate(root, branch=branch)
+            for path in ['source/driver.c', 'scripts/flash-de.py', 'targets/ezfomega/Makefile']:
+                with self.assertRaises(ValueError):
+                    self.validate(root, extra=[path])
+            records = {'ezfomega': {'directory': 'ezfomega'}}
+            (root / 'projects.json').write_text(json.dumps({'projects': records}))
             with self.assertRaises(ValueError):
                 self.validate(root, branch='ezfomega')
-            for misplaced in ('source/driver.c', 'scripts/flash-de.py', 'targets/ezfomega/Makefile'):
-                with self.assertRaises(ValueError):
-                    self.validate(root, tracked=misplaced+'\n')
-            link = root / 'ezfomega/source/external'
-            link.symlink_to(root / 'ezfomegade/source', target_is_directory=True)
-            with self.assertRaises(ValueError):
-                self.validate(root)
 
-    def test_identity_and_duplicate_infrastructure(self):
+    def test_identity_duplicates_and_symlink_escape(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            fixture(root, ['ezfomega'])
+            fixture(root)
             project = root / 'ezfomega'
             (project / '.github').mkdir()
             with self.assertRaises(ValueError):
@@ -86,19 +80,22 @@ class Isolation(unittest.TestCase):
             (project / 'project.json').write_text('{"id":"ezfomegade"}')
             with self.assertRaises(ValueError):
                 self.validate(root)
+            (project / 'project.json').write_text('{"id":"ezfomega"}')
+            (project / 'source/external').symlink_to(root / 'ezfomegade/source', target_is_directory=True)
+            with self.assertRaises(ValueError):
+                self.validate(root)
 
-    def test_old_wrapper_and_symlink_directory(self):
+    def test_deleted_directory_is_not_sparse_checkout(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            fixture(root, ['ezfomega'])
-            (root / 'projects.json').write_text('{"projects":{"ezfomega":{"directory":"targets/ezfomega"}}}')
-            with self.assertRaises(ValueError):
-                self.validate(root)
-            (root / 'projects.json').write_text('{"projects":{"ezfomega":{"directory":"ezfomega"}}}')
-            (root / 'ezfomega').rename(root / 'real')
-            (root / 'ezfomega').symlink_to(root / 'real', target_is_directory=True)
-            with self.assertRaises(ValueError):
-                self.validate(root)
+            fixture(root)
+            names = [str(p.relative_to(root)) for p in root.rglob('*') if p.is_file()]
+            import shutil
+            shutil.rmtree(root / 'ezfblue')
+            tracked = b''.join(b'H ' + name.encode() + b'\0' for name in names)
+            with patch.object(policy['subprocess'], 'check_output', return_value=tracked):
+                with self.assertRaises(ValueError):
+                    policy['validate_layout'](root)
 
 
 if __name__ == '__main__':

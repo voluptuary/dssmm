@@ -18,6 +18,8 @@ def project_root(target):
     path = (ROOT / record['directory']).resolve()
     if record['directory'] != target or path.parent != ROOT or (ROOT / target).is_symlink():
         raise ValueError('Project must be its own direct child directory')
+    if not (path / 'project.json').is_file():
+        raise ValueError('Project is outside this sparse view; run git sparse-checkout add ' + target)
     return path
 
 
@@ -42,4 +44,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except ValueError as error:
+        raise SystemExit(str(error))

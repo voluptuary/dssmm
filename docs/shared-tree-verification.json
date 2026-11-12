@@ -1,0 +1,22 @@
+{
+  "recorded_utc": "2026-11-12 01:12 UTC",
+  "before_heads": {
+    "ezfomegade": "30d74c09286cbd5819985dcd23ba1490fa284cc6",
+    "ezfomega": "c6629d4eeaa0ef8a45853235a0b747a3522a3773",
+    "ezfblue": "f6d4be86ad41bfe0ea112e700dd63b9cc14a4581"
+  },
+  "private_nonjournal_files_equal_before_conversion": {
+    "ezfomegade": 586,
+    "ezfomega": 434,
+    "ezfblue": 438
+  },
+  "dssmm_before": "4ba835ad46081fa65b465629a17f4e3ecda0009c",
+  "fixture_tests": {
+    "layout_policy": "4 tests passed",
+    "ordinary_merge_sparse_git": "3 tests passed",
+    "initial_failure": "Git diff ambiguous branch/directory name; fixed with trailing -- and fixture rerun passed"
+  },
+  "kernel_inputs": "All 426 DE, 419 OMEGA and 424 BLUE kernel/build/test inputs match recorded baselines",
+  "actual_repository_rehearsal": "pending",
+  "common_tree_conversion": "pending"
+}
