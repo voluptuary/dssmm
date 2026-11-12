@@ -1,3 +1,10 @@
+## 2026-11-12 15:32 UTC — FrankieT19 BLUE comparison checkpoint
+
+- Owner requests comparison/import of improvements from FrankieT19/omega-blue-ds-style-kernel. Reviewed pinned HEAD 08ab566 and preceding Test3/Test4 changes against our v8.4.0-blue-test3. Upstream README explicitly says Test5 has not been physically verified; releases request hardware tests and the issue list is empty. Do not claim upstream or combined-build hardware validation.
+- Confirmed improvement targets: stock-size firmware-free update image with full-image integrity; pending battery-save overwrite prevention; read-only NOR browsing/factory-erased handling and allocation preservation; patch extent bounds; separate launcher preference from stock Mode B. Also review BLUE DDR RTS staging and error propagation. Retain current MiGoomba, artwork safeguards, transactional saves, NOR readback and ordinary hardware protocols.
+- Upstream NOTICE marks its combined Slot-derived runtime GPL-3.0-or-later. Do not copy Slot return/emulator/runtime code into our existing Apache-derived kernel. Implement independently from vendor formats and our existing code, credit FrankieT19 for the comparison/design findings, and document deferred coupled features. Preserve upstream immutable commit links and all historical resources/reports/releases. No new release is requested here.
+- Next: implement focused corrections only inside ezfblue/, add failing-before/passing-after production-function tests, run full BLUE verifier/layout/packaging checks, commit/push lane and integrate normally via dssmm. Other platform directories and root journals stay untouched for this routine BLUE work.
+
 ## 2026-11-12 15:24 UTC — v8.4.0-blue-test3 published and downloaded asset verified
 
 - Published https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-blue-test3 from CI-tested source 8e637e3238926fb667d336b99db7ed7c7fcbb9dc. Release is a hardware-untested prerelease. All four hosted release-source CI runs passed, including trunk's three-model matrix. Earlier v8.3.1-blue-test2 notes, flags and asset identities/sizes/timestamps remain unchanged.
