@@ -26,7 +26,7 @@
 | SuperCard SD | `superfw-sd.fw` |
 | SuperCard Lite | `superfw-lite.fw` |
 
-Back up your SD card, saves and current firmware. For a first test, use [upstream’s chain-loading instructions](https://superfw.davidgf.net/docs/install/flash/#no-installation) if supported by your installed firmware; a copy of the matching `.fw` renamed to `.gba` can be launched as homebrew. Confirm your recovery method before installing to internal flash, and never interrupt save or flash writes.
+Back up your SD card, saves and current firmware. The first reported test on SuperChis Prime v1.0 showed a loading bar, then returned to the default loader; this build has not booted successfully on that card. Chain-loading is not yet a verified route for this build. Review [upstream installation and recovery guidance](https://superfw.davidgf.net/docs/install/flash/) before considering another method. Confirm your recovery method before any internal-flash write, and never interrupt save or flash writes.
 
 For step-by-step pack creation and installation, see [the artwork setup guide](https://github.com/voluptuary/dssmm/blob/superfw-test1/superfw/docs/ARTWORK-SETUP.md). For a short hardware test checklist, see [the preview guide](https://github.com/voluptuary/dssmm/blob/superfw-test1/superfw/docs/ARTWORK-PREVIEW.md). Folder artwork, GBA code-based packs, additional lookup fallbacks, NOR/recent previews and carousels are not implemented in this prototype. No automatic themes, hardware RTC or rumble controls are offered for Prime.
 
