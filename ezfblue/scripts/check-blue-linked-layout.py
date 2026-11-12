@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check all BLUE ELF load sections against the resource and metadata reservations."""
+"""Check all BLUE ELF load sections against the firmware-free stock update capacity."""
 import argparse
 import importlib.util
 import os
@@ -21,7 +21,8 @@ def validate(elf, code=None):
             continue
         start = section['lma'] - probe.ROM
         end = start + section['size']
-        probe.require_clear(start, end)
+        if start < 0 or end > 0x2069CC:
+            raise ValueError("BLUE load section exceeds stock update payload capacity")
         if code is not None:
             if end > len(code):
                 raise ValueError('Raw BLUE code omits an ELF load section')
@@ -31,8 +32,8 @@ def validate(elf, code=None):
             if code[start + skip:end] != expected:
                 raise ValueError('Raw BLUE bytes do not match ELF section ' + section['name'])
         loaded.append((section['name'], start, end))
-    if not loaded or not any(name == '.rodata' and start == probe.ASSET_START for name, start, end in loaded):
-        raise ValueError('BLUE split resource layout is absent')
+    if not loaded or not any(name == '.rodata' and start < 0x100000 for name, start, end in loaded):
+        raise ValueError('BLUE compact ROM layout is absent')
     if code is not None and len(code) != max(end for name, start, end in loaded):
         raise ValueError('Unexpected trailing/truncated BLUE image contents')
     return loaded
@@ -43,4 +44,4 @@ if __name__ == '__main__':
     parser.add_argument('elf', type=Path)
     args = parser.parse_args()
     result = validate(args.elf, args.elf.with_suffix('.gba').read_bytes())
-    print(f'BLUE split layout: {max(end for name, start, end in result)} bytes; fixed resources and metadata protected.')
+    print(f'BLUE compact payload: {max(end for name, start, end in result)} bytes; stock-size capacity and metadata protected.')

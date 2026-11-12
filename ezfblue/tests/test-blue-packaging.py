@@ -7,6 +7,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import struct
+import zlib
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/pack-blue-kernel.py"
@@ -27,23 +29,25 @@ class PackagingTest(unittest.TestCase):
         self.assertEqual(result[0x100000:], resource)
         self.assertEqual(result[0x195000:0x2066A0], resource[0x95000:0x1066A0])
 
-    def test_actual_split_layout(self):
+    def test_actual_compact_layout(self):
         elf = ROOT / "targets/blue/ezbluekernel-development.elf"
         code = elf.with_suffix(".gba").read_bytes()
-        resource = RESOURCE.read_bytes()
-        result = packer.pack(code, resource, elf)
-        self.assertEqual(len(result), len(code))
-        self.assertEqual(result[:0x100000], code[:0x100000])
-        self.assertEqual(result[0x100000:0x2069DC], resource)
-        self.assertEqual(result[0x207000:], code[0x207000:])
-        for offset in (0x220, 0x207000, len(code) - 1):
-            damaged = bytearray(code)
-            damaged[offset] ^= 1
+        result = packer.pack(code, elf=elf)
+        self.assertEqual(len(result), 2124252)
+        self.assertEqual(result[:len(code)], code)
+        self.assertEqual(result[len(code):packer.SEAL_OFFSET], bytes(packer.SEAL_OFFSET-len(code)))
+        magic, crc, inverse = struct.unpack_from('<8sII', result, packer.SEAL_OFFSET)
+        self.assertEqual(magic, packer.SEAL_MAGIC)
+        self.assertEqual(crc, zlib.crc32(result[:packer.SEAL_OFFSET]))
+        self.assertEqual(inverse, crc ^ 0xffffffff)
+        firmware = RESOURCE.read_bytes()[packer.FIRMWARE_OFFSET:packer.FIRMWARE_OFFSET+packer.FIRMWARE_SIZE]
+        self.assertNotIn(firmware, result)
+        for offset in (0x220, 0x40000, len(code)-1):
+            damaged = bytearray(code); damaged[offset] ^= 1
             with self.subTest(offset=offset), self.assertRaises(ValueError):
-                packer.pack(bytes(damaged), resource, elf)
-        for invalid in (code[:-1], code + b"x"):
-            with self.assertRaises(ValueError):
-                packer.pack(invalid, resource, elf)
+                packer.pack(bytes(damaged), elf=elf)
+        for invalid in (code[:-1], code+b'x'):
+            with self.assertRaises(ValueError): packer.pack(invalid, elf=elf)
 
     def test_boundary(self):
         resource = RESOURCE.read_bytes()

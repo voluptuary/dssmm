@@ -22,6 +22,7 @@ PRE=r'''
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include "blue_image_policy.h"
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -58,7 +59,6 @@ static int f_open(FIL *file,const char *name,int mode) {
     if(file->destination)output_size=0;
     return 0;
 }
-static int f_lseek(FIL *file,unsigned position) {file->position=position;return 0;}
 static int f_read(FIL *file,void *buffer,unsigned bytes,unsigned *received) {
     assert(!file->destination);reads++;*received=0;
     if(fail_read)return 1;
@@ -105,25 +105,35 @@ int main(int argc,char **argv) {
     reset(0xC0);short_read=1;assert(!Blue_ReadLaunchMetadata("input",0,&bytes,code,&flag));
     reset(0xC0);fail_close=1;assert(!Blue_ReadLaunchMetadata("input",0,&bytes,code,&flag));
 
-    FILE *resource=fopen(argv[1],"rb");assert(resource);
-    assert(fread(input+0x100000,1,1075676,resource)==1075676);assert(!fclose(resource));
-    input[0xB2]=0x96;reset(input_capacity);assert(Blue_ValidateKernelCandidate("input"));
-    input[0x195004]^=1;reset(input_capacity);assert(!Blue_ValidateKernelCandidate("input"));input[0x195004]^=1;
-    input[0xB2]=0;reset(input_capacity);assert(!Blue_ValidateKernelCandidate("input"));input[0xB2]=0x96;
+    FILE *image=fopen(argv[1],"rb");assert(image);
+    assert(fread(input,1,input_capacity,image)==input_capacity);assert(!fclose(image));
+    reset(input_capacity);assert(Blue_ValidateKernelCandidate("input"));
+    unsigned damage[]={0,0xA0,0xBD,0x220,0x195004,BLUE_IMAGE_SEAL_OFFSET-1,
+                       BLUE_IMAGE_SEAL_OFFSET,BLUE_IMAGE_BYTES-1};
+    for(unsigned i=0;i<sizeof(damage)/sizeof(damage[0]);i++) {
+        input[damage[i]]^=1;reset(input_capacity);assert(!Blue_ValidateKernelCandidate("input"));input[damage[i]]^=1;
+    }
     reset(input_capacity-1);assert(!Blue_ValidateKernelCandidate("input"));
+    reset(input_capacity+1);assert(!Blue_ValidateKernelCandidate("input"));
     reset(UINT64_C(0x100000001));assert(!Blue_ValidateKernelCandidate("input"));
     reset(input_capacity);short_read=1;assert(!Blue_ValidateKernelCandidate("input"));
+    reset(input_capacity);fail_read=1;assert(!Blue_ValidateKernelCandidate("input"));
     reset(input_capacity);fail_close=1;assert(!Blue_ValidateKernelCandidate("input"));
     free(input);
-    puts("BLUE launch/update: tiny plugin input, native 64 MiB flags, exact copies/close failures and firmware identity passed.");
+    puts("BLUE launch/update: tiny plugin input, native 64 MiB flags, exact copies/close failures and complete stock-size BLUE image integrity passed.");
 }
 '''
 with tempfile.TemporaryDirectory() as folder:
     c=Path(folder)/'test.c';binary=Path(folder)/'test'
     c.write_text(PRE+copy+candidate+probe+POST)
     subprocess.run([os.environ.get('CC','cc'),'-std=gnu11','-O1','-Wall','-Wextra','-Werror',
-                    '-fsanitize=address,undefined','-fno-pie','-no-pie',str(c),'-o',str(binary)],check=True)
-    subprocess.run([str(binary),str(ROOT/'targets/blue/resources/image.bin')],check=True)
+                    '-fsanitize=address,undefined','-fno-pie','-no-pie','-I',str(ROOT/'targets/blue/source'),str(c),'-o',str(binary)],check=True)
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('pack_blue',ROOT/'scripts/pack-blue-kernel.py')
+    packer=importlib.util.module_from_spec(spec);spec.loader.exec_module(packer)
+    elf=ROOT/'targets/blue/ezbluekernel-development.elf'
+    image=Path(folder)/'kernel.bin';image.write_bytes(packer.pack(elf.with_suffix('.gba').read_bytes(),elf=elf))
+    subprocess.run([str(binary),str(image)],check=True)
 if len(sys.argv)==1:
     stage=main[main.index('u32 Stage_kernel_update('):main.index('//---------------------------------------------------------------------------------',main.index('u32 Stage_kernel_update('))]
     assert '"/ezbluekernel.bin"' in stage and '"/ezkernelnew.bin"' not in stage

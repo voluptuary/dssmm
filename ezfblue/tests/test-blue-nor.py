@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 source = (ROOT / 'targets/blue/source/NORflash_OP.c').read_text()
 start = source.index('u32 BlueVendor_Loadfile2NOR(')
 end = source.index('void* IWRAM_CODE my_memcpy', start)
-function = source[start:end]
+function = source[source.index('u8 Blue_NorCatalogMatchesMap('):source.index('//-----------------------------------------------------------',source.index('void Check_NOR_flash('))] + source[start:end]
 header = (ROOT / 'targets/blue/source/ezkernel.h').read_text()
 catalog = header[header.index('typedef struct FM_NOR_FILE_SECT'):header.index('typedef struct FM_Folder_SECT')]
 
@@ -67,6 +67,7 @@ static int f_read(FIL *file, void *buffer, unsigned bytes, UINT *received) {
 }
 static int f_close(FIL *file) { (void)file; closed++; return fail_close; }
 static void Read_NORgame_info(void) {}
+static void Read_NOR_FAT_info(void) {}
 static unsigned GetFileListFromNor(void) { return initial_count; }
 static unsigned Find_NOR_space(unsigned bytes) { return BlueNorFindFree(NOR_FAT_buffer,bytes); }
 static void Launcher_DrawNORWriteBackground(void) {}
@@ -97,6 +98,7 @@ static void reset(uint64_t size) {
     gl_reset_on=gl_rts_on=gl_sleep_on=gl_cheat_on=0;
     opened=closed=reads=seeks=erased=programmed=published=progress=0;
     fail_read=short_read=fail_seek=0; fail_open=fail_close=bad_chip=fail_erase=fail_program=0;
+    memset(NOR_FAT_buffer,0,sizeof NOR_FAT_buffer);
     memset(pNorFS,0,sizeof pNorFS); memset(pReadCache,0x77,sizeof pReadCache);
 }
 int main(void) {
@@ -151,10 +153,27 @@ int main(void) {
     assert(BlueVendor_Loadfile2NOR("x",0,0,0,0)==1 && !published && closed==1);
     reset(0xC0); initial_count=64;
     assert(BlueVendor_Loadfile2NOR("x",0,0,0,0)==2 && !erased && closed==1);
-    reset(0xC0); initial_count=1; pNorFS[0].rompage=64; pNorFS[0].filesize=0x40000;
+    reset(0xC0); initial_count=1; pNorFS[0].rompage=64; pNorFS[0].filesize=0x40000; NOR_FAT_buffer[0]=NOR_FAT_buffer[1]=0xFF;
     assert(BlueVendor_Loadfile2NOR("x",0,0,0,0)==0 && pNorFS[1].rompage==66);
     reset(0x40000); iTrimSize=0x40000; gl_reset_on=1;
     assert(BlueVendor_Loadfile2NOR("x",0,1,0,1)==0 && programmed==4);
+    reset(0xC0); NOR_FAT_buffer[10]=0xFF;
+    assert(BlueVendor_Loadfile2NOR("x",0,0,0,0)==1 && !erased && !published && NOR_FAT_buffer[10]==0xFF);
+    reset(0xC0); initial_count=1;pNorFS[0].rompage=64;pNorFS[0].filesize=0x40000;
+    assert(BlueVendor_Loadfile2NOR("x",0,0,0,0)==1 && !erased && !published);
+    reset(0xC0); memset(pNorFS,0xFF,sizeof pNorFS);memset(NOR_FAT_buffer,0xFF,sizeof NOR_FAT_buffer);
+    Check_NOR_flash(); for(unsigned i=0;i<NOR_FAT_SIZE;i++) assert(!NOR_FAT_buffer[i]);
+    assert(!erased && !published);
+    reset(0xC0);memset(NOR_FAT_buffer,0xFF,sizeof NOR_FAT_buffer);
+    Check_NOR_flash();assert(NOR_FAT_buffer[0]==0xFF && !erased && !published);
+    unsigned allocation;
+    assert(BlueNorAllocation(0x3E010,1,0x40000,&allocation) && allocation==0x80000);
+    assert(!BlueNorAllocation(0x40000,1,0x3FFF0,&allocation));
+    assert(!BlueNorAllocation(0x4000000,1,0x2000000,&allocation));
+    assert(BlueNorAllocation(0x4000000,1,0x1FFE000,&allocation) && allocation==0x4000000);
+    assert(!BlueNorAllocation(0xC0,1,0xC1,&allocation));
+    reset(0x40000);gl_rts_on=1;
+    assert(BlueVendor_Loadfile2NOR("x",0,1,0,0)==1 && !opened && !erased && !published);
     puts("BLUE NOR policy/load: allocation, bounds, exact I/O, padding and publication ordering passed (flash mocked).");
 }
 '''

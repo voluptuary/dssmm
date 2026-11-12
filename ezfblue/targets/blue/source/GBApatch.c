@@ -1032,64 +1032,41 @@ u8 Make_mde_file(TCHAR* gamefilename,u8 Save_num)
 	return res;
 }
 //------------------------------------------------------------------
-u32 Check_RTS(TCHAR* gamefilename)
+u32 Check_RTS(TCHAR *gamefilename)
 {
-	//UINT  ret;
-	//u32 find_the_patfile;
-	u32 rtsfilesize;
-	u32 res;
-	
-	TCHAR rtsnamebuf[100];
-	memcpy(rtsnamebuf,gamefilename,100);
-	u32 len=strlen(rtsnamebuf);
-	rtsnamebuf[len-3] = 'r';
-	rtsnamebuf[len-2] = 't';
-	rtsnamebuf[len-1] = 's';	
-	
-	res = f_mkdir("/RTS");
-	res=f_chdir("/RTS");
-	if(res != FR_OK){
-		return 0;
-	}
-	
-	res = f_open(&gfile,rtsnamebuf, FA_OPEN_EXISTING);
-	
-	if(res == FR_OK)//have a old rts file
-	{
-		rtsfilesize = f_size(&gfile);
-		f_close(&gfile);
-	}					
-	else //make a new one
-	{
-		ShowbootProgress(gl_make_RTS);
-		res=f_open(&gfile, rtsnamebuf, FA_WRITE | FA_OPEN_ALWAYS);
-		if(res==FR_OK)
-		{
-			int i;
-			unsigned int written;
-			memset(pReadCache,0xFF,0x200*4);
-			for(i=0;i<(0x70000)/0x800 ;i++)
-			{
-	      f_write(&gfile, pReadCache, 0x200*4, (UINT*)&written);
-	      if(written != 0x200*4) break;
-	    }
-	    f_close(&gfile);
-
-	    rtsfilesize = 0x70000;
-		}
-		else 
-			rtsfilesize = 0;
-	}
-	LoadRTSfile(rtsnamebuf);
-	if(rtsfilesize)
-	{
-		res = Check_game_RTS_FAT(rtsnamebuf,3);//rts FAT
-		if(res == 0xffffffff){
-			rtsfilesize = 0;
-		}														
-	}
-	
-	return rtsfilesize;
+    TCHAR name[256];
+    FIL file;
+    UINT written;
+    FRESULT result;
+    if(!gamefilename || strlen(gamefilename) >= sizeof(name)) return 0;
+    strcpy(name, gamefilename);
+    char *extension = strrchr(name, '.');
+    if(!extension || (unsigned)(extension - name) + 4 >= sizeof(name)) return 0;
+    strcpy(extension + 1, "rts");
+    result = f_mkdir("/RTS");
+    if((result != FR_OK && result != FR_EXIST) || f_chdir("/RTS") != FR_OK) return 0;
+    result = f_open(&file, name, FA_READ);
+    if(result == FR_OK) {
+        int valid_size = f_size(&file) == 0x70000;
+        if(f_close(&file) != FR_OK || !valid_size) return 0;
+    } else if(result == FR_NO_FILE) {
+        ShowbootProgress(gl_make_RTS);
+        if(f_open(&file, name, FA_WRITE | FA_CREATE_NEW) != FR_OK) return 0;
+        memset(pReadCache, 0xFF, MAX_pReadCache_size);
+        int complete = 1;
+        for(u32 offset = 0; offset < 0x70000; offset += MAX_pReadCache_size) {
+            UINT bytes = 0x70000 - offset;
+            if(bytes > MAX_pReadCache_size) bytes = MAX_pReadCache_size;
+            if(f_write(&file, pReadCache, bytes, &written) != FR_OK || written != bytes) {
+                complete = 0;
+                break;
+            }
+        }
+        if(f_close(&file) != FR_OK) complete = 0;
+        if(!complete) { f_unlink(name); return 0; }
+    } else return 0;
+    if(!LoadRTSfile(name) || Check_game_RTS_FAT(name, 3) == 0xFFFFFFFF) return 0;
+    return 0x70000;
 }
 //------------------------------------------------------------------
 u32 use_internal_engine(u8 gamecode[])

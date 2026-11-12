@@ -51,7 +51,7 @@ ENTRY(_start)
 
 MEMORY {
 
-	rom	: ORIGIN = 0x08000000, LENGTH = 0x780000
+	rom	: ORIGIN = 0x08000000, LENGTH = 0x2069CC
 	iwram	: ORIGIN = 0x03000000, LENGTH = 32K
 	ewram	: ORIGIN = 0x02000000, LENGTH = 256K
 }
@@ -103,7 +103,7 @@ SECTIONS
 		. = ALIGN(4);  /* REQUIRED. LD is flaky without it. */
 	} >rom =0
 
-	.rodata 0x08207000 :
+	.rodata :
 	{
 		*(.rodata)
 		*all.rodata*(*)
@@ -316,6 +316,5 @@ SECTIONS
   /DISCARD/ : { *(.note.GNU-stack) }
 }
 
-ASSERT(ADDR(.fini) + SIZEOF(.fini) <= 0x08100000, "BLUE code overlaps vendor resources")
-ASSERT(ADDR(.rodata) >= 0x08207000, "BLUE assets overlap vendor resources")
-ASSERT(__rom_end__ <= 0x08780000, "BLUE load image overlaps save metadata")
+/* Firmware-free stock-size image; final 16 bytes belong to the integrity seal. */
+ASSERT(__rom_end__ <= 0x082069CC, "BLUE kernel exceeds stock update payload capacity")

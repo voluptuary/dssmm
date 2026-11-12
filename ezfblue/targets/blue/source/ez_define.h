@@ -102,24 +102,10 @@ void Launcher_UpdateNORWriteClock(unsigned int force);
 #define assress_toggle_backup 24
 
 #define assress_saveMODE 64
-#define assress_max 65
+#define assress_blue_boot_pref 65
+#define assress_max 66
 
-#define newomega_top_bin_size  0x535bc////0x536d0//0x534A8//
-#define newomega_top_bin_address (void*)0x08195000
-
-
-#define LX9_FW_built_in_ver 5
-#define LX16_FW_built_in_ver 3
-
-#define LX9_newomega_top_bin_address (void*)0x08195000
-#define LX9_newomega_top_bin_size  0x535bc////0x536d0//0x534A8//
-#define LX9_wirte_address 0x80000
-#define LX9_FW_crc32 0x7E33C4FB //0x76352215:fw4
-
-#define LX16_newomega_top_bin_address (void*)0x08195000
-#define LX16_newomega_top_bin_size  0x716A0
-#define LX16_wirte_address 0x100000
-#define LX16_FW_crc32 0x22DD74FA
+/* Firmware payload/update constants were retired; use the official BLUE kernel. */
 
 extern const unsigned char gImage_English_manual[9800]__attribute__((aligned(4)));
 extern const unsigned char gImage_Chinese_manual[9800]__attribute__((aligned(4)));

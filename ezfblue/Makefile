@@ -7,6 +7,7 @@ all:
 clean:
 	$(MAKE) -C targets/blue clean
 check:
+	python3 tests/test-blue-save-rts.py
 	python3 tests/test-blue-packaging.py
 	python3 tests/test-blue-psram-load.py
 	bash scripts/test-nes-patch-host.sh

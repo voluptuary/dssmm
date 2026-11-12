@@ -19,3 +19,13 @@ This release bundles [MiGoomba](https://github.com/michyprima/migoomba)
 for Game Boy and Game Boy Color games. This replacement has source/build/software testing,
 but needs hardware testing in DSSMM. Back up `.esv` saves before testing; old
 emulator save states are not guaranteed compatible.
+
+## BLUE development improvements
+
+Current development (`8.4.1-blue-dev`) adapts findings from **FrankieT19's BLUE
+DS Style port**: a stock-size firmware-free update, complete-image checks,
+pending-save protection, read-only NOR browsing, allocation/patch bounds,
+separate Mode B preferences and corrected BLUE DDR state loading. It also blocks
+unverified persistent NOR save-state patches. Use the official BLUE kernel for
+FPGA updates. These changes are not in the Test 3 download linked above and have
+not been tested on a cartridge. [Comparison, credit and validation](docs/porting/FRANKIET19_BLUE_COMPARISON.md).

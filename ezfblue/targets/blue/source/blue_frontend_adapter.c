@@ -10,6 +10,7 @@
 #include "NORflash_OP.h"
 #include "draw.h"
 #include "blue_nor_policy.h"
+#include "blue_image_policy.h"
 #include "kernel_boot_policy.h"
 
 extern u32 game_total_NOR;
@@ -223,34 +224,32 @@ u8 FormatNor(void)
 u8 Blue_ValidateKernelCandidate(const char *path)
 {
     FIL file;
-    UINT received = 0;
-    u8 fixed;
-    u32 crc = 0xFFFFFFFFUL;
+    u8 header[0xC0];
+    struct { char magic[8]; u32 crc, inverse; } seal;
+    UINT received;
+    u32 crc = 0xFFFFFFFFu;
+    u8 checksum = 0x19;
+    u8 valid = 0;
     if(!path || f_open(&file, path, FA_READ) != FR_OK) return 0;
-    FSIZE_t size = f_size(&file);
-    if(size < 0x2069DC || size > SAVE_info_offset ||
-       f_lseek(&file, 0xB2) != FR_OK ||
-       f_read(&file, &fixed, 1, &received) != FR_OK || received != 1 || fixed != 0x96 ||
-       f_lseek(&file, 0x195000) != FR_OK) {
-        f_close(&file); return 0;
-    }
-    for(u32 offset = 0; offset < LX16_newomega_top_bin_size;) {
-        u32 bytes = LX16_newomega_top_bin_size - offset;
+    if(f_size(&file) != BLUE_IMAGE_BYTES ||
+       f_read(&file, header, sizeof(header), &received) != FR_OK || received != sizeof(header) ||
+       memcmp(header + 0xA0, "ezbluekernel", 12) || header[0xB2] != 0x96 || header[3] != 0xEA)
+        goto done;
+    for(u32 i = 0xA0; i < 0xBE; i++) checksum += header[i];
+    if(checksum) goto done;
+    crc = BlueImageCrc(crc, header, sizeof(header));
+    for(u32 offset = sizeof(header); offset < BLUE_IMAGE_SEAL_OFFSET;) {
+        UINT bytes = BLUE_IMAGE_SEAL_OFFSET - offset;
         if(bytes > MAX_pReadCache_size) bytes = MAX_pReadCache_size;
-        received = 0;
-        if(f_read(&file, pReadCache, bytes, &received) != FR_OK || received != bytes) {
-            f_close(&file); return 0;
-        }
-        for(u32 index = 0; index < bytes; index++) {
-            crc ^= pReadCache[index];
-            for(u32 bit = 0; bit < 8; bit++)
-                crc = (crc >> 1) ^ ((crc & 1) ? 0xEDB88320UL : 0);
-        }
+        if(f_read(&file, pReadCache, bytes, &received) != FR_OK || received != bytes) goto done;
+        crc = BlueImageCrc(crc, pReadCache, bytes);
         offset += bytes;
     }
-    FRESULT closed = f_close(&file);
-    crc = ~crc;
-    return closed == FR_OK && crc == (u32)LX16_FW_crc32;
+    if(f_read(&file, &seal, sizeof(seal), &received) != FR_OK || received != sizeof(seal)) goto done;
+    valid = !memcmp(seal.magic, BLUE_IMAGE_SEAL_MAGIC, sizeof(seal.magic)) &&
+            seal.crc == ~crc && seal.inverse == ~seal.crc;
+done:
+    return f_close(&file) == FR_OK && valid;
 }
 
 void Blue_BootNative(u16 page, u32 hard_reset)

@@ -40,3 +40,13 @@ reuse another card's variant. Run the focused payload/loader test and full
 project verifier for changes; preserve64KiB .esv handling and cache bounds.
 Do not claim old save-state compatibility or hardware qualification from mocks.
 DSSMM 8.4.0 includes MiGoomba; earlier releases retain their previous emulator.
+
+## BLUE development after 8.4.0
+
+Read docs/porting/FRANKIET19_BLUE_COMPARISON.md for the pinned upstream review.
+The 8.4.1-blue-dev build is firmware-free, contiguous and sealed at the stock
+2124252-byte update size. Use pack-blue-kernel.py with --elf; no active vendor
+resource insertion or firmware updater. Historical resource fixtures stay.
+Do not enable persistent NOR RTS without adapting/validating the matching runtime
+and SD sector-map behavior. Upstream Test5 and this integration remain physically
+unverified. Preserve the published 8.4.0 Test3 artifact and its evidence.
