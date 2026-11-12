@@ -63,6 +63,6 @@ The packed kernel is **3,982,696 bytes**. Protected layout/resource checks, five
 
 SHA-256: `ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710`
 
-Thanks to **FrankieT19** for the DS Style foundation and interface work; **Sterophonick** and the **EZ-FLASH team** for the kernel foundations and BLUE source; **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above; **aidiadayo** for Thai language support; **Kekun** for the case-sensitive font include correction in the project lineage; **ChaN** for FatFs; and the other contributors credited in the project. Merkin Mix artwork and port work is maintained by **Merkin / voluptuary**. See [CREDITS.md](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/v8.3.1-blue-test2/CREDITS.md) for provenance.
+Thanks to **FrankieT19** for the DS Style foundation and interface work; **Sterophonick** and the **EZ-FLASH team** for the kernel foundations and BLUE source; **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above; **aidiadayo** for Thai language support; **Kekun** for the case-sensitive font include correction in the project lineage; **ChaN** for FatFs; and the other contributors credited in the project. Merkin Mix artwork and port work is maintained by **Merkin / voluptuary**. See [CREDITS.md](https://github.com/voluptuary/dssmm/blob/v8.3.1-blue-test2/CREDITS.md) for provenance.
 
 This project was developed with AI assistance.

@@ -19,7 +19,7 @@ Current target is Original OMEGA only. Earlier entries below are historical chec
 | Loading/patching |32 MiB target geometry, checked exact I/O/padding/ranges, staged patch intersections, failure-triggered directory rebuild, bounded raw/LZ EWRAM plugin payloads and distinct WRAM/VRAM BIOS wrappers |
 | Hardware-specific boundaries | Original Omega cartridge/SRAM/SD/reset/flash protocols retained. DE LEDs/Mode B/FRAM/firmware-update protocols and BLUE64 MiB mapping are not transplanted |
 
-Latest build2,049,144 bytes (48,008 below2 MiB). Static EWRAM heap19,424; IWRAM data-to-user-stack gap7,488. These are reservations, not measured runtime peaks. Full final verifier passed; [Test2](https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test2) is published and its downloaded asset hash verified. Tests use mocks/sanitizers/real FatFs and linked disassembly, not cartridge hardware.
+Latest build2,049,144 bytes (48,008 below2 MiB). Static EWRAM heap19,424; IWRAM data-to-user-stack gap7,488. These are reservations, not measured runtime peaks. Full final verifier passed; [Test2](https://github.com/voluptuary/dssmm/releases/tag/v8.3.1-omega-test2) is published and its downloaded asset hash verified. Tests use mocks/sanitizers/real FatFs and linked disassembly, not cartridge hardware.
 
 Known limits: void raw NOR programming APIs and unbounded polling remain, metadata is not power-loss atomic, newest-title-only NOR deletion remains, and optional artwork hints/cheat snapshots are not transactional saves. Malformed-ROM patch-detector indices and other deferred shared findings are scheduled for the subsequent three-branch adversarial audit. Extra custom theme/color slots remain disabled as in the supported donor configuration.
 

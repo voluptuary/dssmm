@@ -74,6 +74,6 @@ The kernel is **2,049,416 bytes**, below the 2 MiB limit. The complete target ve
 
 SHA-256: `c1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52`
 
-Thanks to **FrankieT19** for his Original OMEGA DS Style adaptation and interface work; **Sterophonick** and the **EZ-FLASH team** for the kernel foundations; **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above; **aidiadayo** for Thai language support; **Kekun** for the case-sensitive font include correction in the lineage; **ChaN** for FatFs; and the other contributors credited in the project. Merkin Mix artwork and backport work is maintained by **Merkin / voluptuary**. See [CREDITS.md](https://github.com/voluptuary/ezfode-dssmm-kernel/blob/v8.3.1-omega-test3/CREDITS.md) for provenance.
+Thanks to **FrankieT19** for his Original OMEGA DS Style adaptation and interface work; **Sterophonick** and the **EZ-FLASH team** for the kernel foundations; **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above; **aidiadayo** for Thai language support; **Kekun** for the case-sensitive font include correction in the lineage; **ChaN** for FatFs; and the other contributors credited in the project. Merkin Mix artwork and backport work is maintained by **Merkin / voluptuary**. See [CREDITS.md](https://github.com/voluptuary/dssmm/blob/v8.3.1-omega-test3/CREDITS.md) for provenance.
 
 This project was developed with AI assistance.

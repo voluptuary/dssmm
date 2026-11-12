@@ -7,7 +7,7 @@
       "headSha": "9cfc7b2e9c1069f78501a43d401947ae229f7e15",
       "status": "completed",
       "conclusion": "success",
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43123536185",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43123536185",
       "jobs": [
         {
           "name": "select",
@@ -33,7 +33,7 @@
       "headSha": "1c57b0e981a2294763d8fb7eadab298dbe0e5cd2",
       "status": "completed",
       "conclusion": "success",
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43123265306",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43123265306",
       "jobs": [
         {
           "name": "select",
@@ -51,7 +51,7 @@
       "headSha": "0f8b39d0abffe1e833722df1a42025dd368f3a6a",
       "status": "completed",
       "conclusion": "success",
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43122839615",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43122839615",
       "jobs": [
         {
           "name": "select",
@@ -69,7 +69,7 @@
       "headSha": "80728744404b8bf478bd8161b887b898ac48b2b0",
       "status": "completed",
       "conclusion": "success",
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43122841514",
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43122841514",
       "jobs": [
         {
           "name": "select",

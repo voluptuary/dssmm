@@ -34,7 +34,7 @@
               "status": "completed"
             }
           ],
-          "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128765779/job/130887423849"
+          "url": "https://github.com/voluptuary/dssmm/actions/runs/43128765779/job/130887423849"
         },
         {
           "completedAt": "2026-11-12T00:39:41Z",
@@ -105,11 +105,11 @@
               "status": "completed"
             }
           ],
-          "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128765779/job/130887459533"
+          "url": "https://github.com/voluptuary/dssmm/actions/runs/43128765779/job/130887459533"
         }
       ],
       "status": "completed",
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128765779"
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43128765779"
     },
     {
       "conclusion": "success",
@@ -144,7 +144,7 @@
               "status": "completed"
             }
           ],
-          "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128767379/job/130887428894"
+          "url": "https://github.com/voluptuary/dssmm/actions/runs/43128767379/job/130887428894"
         },
         {
           "completedAt": "2026-11-12T00:39:50Z",
@@ -215,11 +215,11 @@
               "status": "completed"
             }
           ],
-          "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128767379/job/130887455055"
+          "url": "https://github.com/voluptuary/dssmm/actions/runs/43128767379/job/130887455055"
         }
       ],
       "status": "completed",
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128767379"
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43128767379"
     },
     {
       "conclusion": "success",
@@ -254,7 +254,7 @@
               "status": "completed"
             }
           ],
-          "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128770326/job/130887437295"
+          "url": "https://github.com/voluptuary/dssmm/actions/runs/43128770326/job/130887437295"
         },
         {
           "completedAt": "2026-11-12T00:39:44Z",
@@ -325,11 +325,11 @@
               "status": "completed"
             }
           ],
-          "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128770326/job/130887473174"
+          "url": "https://github.com/voluptuary/dssmm/actions/runs/43128770326/job/130887473174"
         }
       ],
       "status": "completed",
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128770326"
+      "url": "https://github.com/voluptuary/dssmm/actions/runs/43128770326"
     }
   ],
   "dssmm": {
@@ -365,7 +365,7 @@
             "status": "completed"
           }
         ],
-        "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128879948/job/130887795447"
+        "url": "https://github.com/voluptuary/dssmm/actions/runs/43128879948/job/130887795447"
       },
       {
         "completedAt": "2026-11-12T00:40:45Z",
@@ -436,7 +436,7 @@
             "status": "completed"
           }
         ],
-        "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128879948/job/130887821389"
+        "url": "https://github.com/voluptuary/dssmm/actions/runs/43128879948/job/130887821389"
       },
       {
         "completedAt": "2026-11-12T00:40:45Z",
@@ -507,7 +507,7 @@
             "status": "completed"
           }
         ],
-        "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128879948/job/130887821415"
+        "url": "https://github.com/voluptuary/dssmm/actions/runs/43128879948/job/130887821415"
       },
       {
         "completedAt": "2026-11-12T00:40:45Z",
@@ -578,10 +578,10 @@
             "status": "completed"
           }
         ],
-        "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128879948/job/130887821442"
+        "url": "https://github.com/voluptuary/dssmm/actions/runs/43128879948/job/130887821442"
       }
     ],
     "status": "completed",
-    "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/actions/runs/43128879948"
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43128879948"
   }
 }

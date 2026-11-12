@@ -9,7 +9,7 @@
       "size": 2049416,
       "sha256": "c1d2d2965dea571b9825342f5c6fe4747336664c29f036f9983044e28a170a52",
       "prerelease": true,
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-omega-test3"
+      "url": "https://github.com/voluptuary/dssmm/releases/tag/v8.3.1-omega-test3"
     },
     {
       "tag": "v8.3.1-blue-test2",
@@ -18,7 +18,7 @@
       "size": 3982696,
       "sha256": "ce7b74449b208f466636aa2c090a4621b7f48a08626ccbcc986e256401973710",
       "prerelease": true,
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1-blue-test2"
+      "url": "https://github.com/voluptuary/dssmm/releases/tag/v8.3.1-blue-test2"
     },
     {
       "tag": "v8.3.1",
@@ -27,7 +27,7 @@
       "size": 2024344,
       "sha256": "8fb4cd6054679680d4b774275f114a885e66b00b07ebc9cbe98837726f1c9bf8",
       "prerelease": false,
-      "url": "https://github.com/voluptuary/ezfode-dssmm-kernel/releases/tag/v8.3.1"
+      "url": "https://github.com/voluptuary/dssmm/releases/tag/v8.3.1"
     }
   ]
 }
