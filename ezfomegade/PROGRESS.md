@@ -1,3 +1,8 @@
+## 2026-11-12 15:54 UTC — Owner-requested release-note correction
+
+- Rewrote docs/releases/v8.4.0.md into New features, New fixes, Summary of past features, Summary of past fixes (429words). Folded the directly preceding8.3.2 RAM improvement and audit fixes into condensed cumulative summaries. Retained model exclusions, MiGoomba save-state/hardware limits, actual asset digest, contributors and download guidance.
+- Notes-only change: no DE source/assets/build/test/version/tag/binary edits. Existing published release body will be updated after integrated checks, preserving release flags and asset identities/digests. The earlier publication record remains accurate as dated initial-publication evidence; this entry records the later authorized editorial correction.
+
 ## 2026-11-12 15:24 UTC — v8.4.0 published and downloaded asset verified
 
 - Published https://github.com/voluptuary/dssmm/releases/tag/v8.4.0 from CI-tested source 8e637e3238926fb667d336b99db7ed7c7fcbb9dc. Release is stable/latest by explicit owner choice, with new MiGoomba hardware-testing limits stated. All four hosted release-source CI runs passed, including trunk's three-model matrix. Earlier v8.3.2 notes, flags and asset identities/sizes/timestamps remain unchanged.
