@@ -1,6 +1,6 @@
 # DSSMM on SuperChis Prime v1.0 — porting plan
 
-Status: design proposal, 2026-11-12. Owner has a physical SuperChis Prime v1.0 available for testing. No physical result has been reported yet. Firmware baseline: SuperFW dabbf4909f85e556f7a12972cc8a7b94fc54ac51.
+Status: active implementation, 2026-11-12. Owner reports successful Test1 chain-loading and manual themes on SuperChis Prime v1.0 (SuperFW 0.22); the full DSSMM layout is not yet implemented. See `prime-test1-hardware-observation.json`. Firmware baseline: SuperFW dabbf4909f85e556f7a12972cc8a7b94fc54ac51.
 
 ## Approach
 
@@ -73,3 +73,8 @@ Started 2026-11-12 by owner request. Appended two original DSSMM-oriented Light/
 ## Implementation checkpoint — independent accents
 
 Default plus four manual accents now apply through a hardware-independent palette resolver. The existing settings file persists the selection; missing accent keys retain Default. Overrides preserve text/background roles and propagate through native menu/in-game palette application. Settings uses six rows at 18-pixel spacing. Host regression covers real parsing, serialization/reload and palette roles. Physical contrast/layout and localization remain outstanding. Next implementation slice is the DSSCC format/lookup audit and bounded artwork reader.
+
+
+## First DSSMM browser skin slice
+
+The SD browser now brands the shared tab strip with DSSMM, highlights the complete selected row with the active theme color, and frames the title/box artwork panel. The existing file list, path footer, selection logic, lookup/cache, and launch actions are unchanged. This is the first visible skin pass; typography, iconography, browser composition and other screens still need porting and physical review.

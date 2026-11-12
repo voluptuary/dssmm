@@ -1419,7 +1419,10 @@ void render_browser(volatile uint8_t *frame) {
                          (e->attr & AM_DIR) ? ICON_FOLDER :
                          guessicon(e->fname);
 
-      render_icon(2, (i+1)*16, iconidx);
+      const unsigned row_y = (i + 1) * 16;
+      if (smenu.browser.selector == smenu.browser.seloff + i)
+        dma_memset16(&frame[SCREEN_WIDTH * row_y], dup8(HI_COLOR), list_width / 2);
+      render_icon(2, row_y, iconidx);
 
       if (!artwork_mode && !(e->attr & AM_DIR)) {
         human_size(szstr, sizeof(szstr), e->filesize);
@@ -1436,6 +1439,11 @@ void render_browser(volatile uint8_t *frame) {
 
     for (unsigned i = 0; i < list_width; i += 16)
       render_icon_trans(i, (smenu.browser.selector - smenu.browser.seloff + 1)*16, 63);
+  }
+
+  if (artwork_mode) {
+    // Frame the preview area in the same selection color used by DSSMM panels.
+    draw_box_outline(frame, 116, 240, 32, 128, FG_COLOR);
   }
 
   if (artwork_mode && smenu.browser.dispentries > 0 && smenu.browser.selector >= 0) {
@@ -2117,6 +2125,7 @@ void menu_render(unsigned fcnt) {
       render_icon((i - mintab)*16, 0, i + ICON_RECENT);
     else
       render_icon_trans((i - mintab)*16, 0, i + ICON_RECENT);
+  draw_text_ovf("DSSMM", frame, 100, 4, 48);
 
   // Render the main area
   dma_memset16(&frame[16*SCREEN_WIDTH], dup8(BG_COLOR), SCREEN_WIDTH*(SCREEN_HEIGHT-16) / 2);
