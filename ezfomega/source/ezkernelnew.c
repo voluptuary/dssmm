@@ -312,7 +312,9 @@ u32 Check_file_type(TCHAR *pfilename);
 #include "launcher_splash_lz.h"
 
 
-#include "goomba.h"
+#include "migoomba.h"
+_Static_assert(sizeof(migoomba_gba) <= MAX_pReadCache_size, "MiGoomba must fit the shared loader cache");
+_Static_assert(sizeof(migoomba_gba) % 4 == 0, "MiGoomba ROM append offset must be word-aligned");
 
 #include "accept_raw.h"
 #include "back_raw.h"
@@ -5776,12 +5778,13 @@ u32 IWRAM_CODE LoadEMU2PSRAM(TCHAR *filename,u32 is_EMU)
 	{
 		case 1://gbc
 		case 2://gb
-			if(goomba_gba_size == 0 || goomba_gba_size > PSRAM_CAPACITY_BYTES ||
-				!PSRAM_LoadRangeFits(0, (u32)goomba_gba_size))
+			if(migoomba_gba_size == 0 || migoomba_gba_size > MAX_pReadCache_size ||
+				migoomba_gba_size > PSRAM_CAPACITY_BYTES ||
+				!PSRAM_LoadRangeFits(0, (u32)migoomba_gba_size))
 				goto load_failed;
-			dmaCopy((void*)goomba_gba,pReadCache, goomba_gba_size);
-			dmaCopy((void*)pReadCache,PSRAMBase_S98, goomba_gba_size);
-			rom_start_address = goomba_gba_size;
+			dmaCopy((void*)migoomba_gba,pReadCache, migoomba_gba_size);
+			dmaCopy((void*)pReadCache,PSRAMBase_S98, migoomba_gba_size);
+			rom_start_address = migoomba_gba_size;
 			break;
 		default:
 			res = f_open(&gfile, plugin, FA_READ);
