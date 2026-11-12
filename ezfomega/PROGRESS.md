@@ -1,3 +1,8 @@
+## 2026-11-12 16:11 UTC — All 4 platform release-note bodies published and verified
+
+- Completed owner-requested history-wide formatting for this platform. Every published body matches its canonical docs/releases/v*.md file, has the four requested ordered sections and no repeated build heading. Prior-build changes are condensed into the correct historical summaries; warnings, evidence limits, credits, filenames/digests and historical caveats retained. Original pre-edit bodies are archived at root.
+- All19 repository releases passed remote/local content and metadata checks. This platform's release IDs/titles/tags/draft/prerelease flags/publication dates and asset identities/sizes/digests/timestamps/URLs are unchanged. Every remote tag ref is unchanged; DEv8.4.0 remains latest stable. Proof: root docs/releases/unified-release-notes-2026-11-12.json. Documentation only since the tested release source; no additional kernel tests or hardware claims. Editorial scope complete.
+
 ## 2026-11-12 16:08 UTC — All four Original OMEGA release bodies prepared
 
 - Prepared canonical Test1–Test4 notes with New features, New fixes, Summary of past features, Summary of past fixes and no repeated build headings. Test1 retains partial-port/artwork limitations and its original About-screen development label; Test2/Test3 deltas enter only the appropriate later summaries. Every note retains hardware-untested/model/32MiB/NOR limitations, credits and actual asset details.
