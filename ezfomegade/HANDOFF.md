@@ -1,3 +1,8 @@
+## 2026-11-12 15:58 UTC — Release-note correction published and verified
+
+- Updated https://github.com/voluptuary/dssmm/releases/tag/v8.4.0 body to the requested four ordered categories, with the immediately prior build folded into condensed cumulative summaries (429words). Published body matches docs/releases/v8.4.0.md. Contributors, warnings, limitations, download/hash information retained.
+- Verified existing release ID/title/tag/flags/publication time and asset ID/size/digest/creation/update timestamps/URL are unchanged. No kernel source/build/test/asset changes. All four integrated versioned CI runs passed; BLUE Test4 is now separately published and DE8.4.0 remains latest stable. Root docs/releases/blue-test4-publication.json records this authorized later note edit separately from original publication history. Scope complete.
+
 ## 2026-11-12 15:54 UTC — Owner-requested release-note correction
 
 - Rewrote docs/releases/v8.4.0.md into New features, New fixes, Summary of past features, Summary of past fixes (429words). Folded the directly preceding8.3.2 RAM improvement and audit fixes into condensed cumulative summaries. Retained model exclusions, MiGoomba save-state/hardware limits, actual asset digest, contributors and download guidance.
