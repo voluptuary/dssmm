@@ -1,0 +1,58 @@
+{
+  "tag": "superfw-test1",
+  "source_commit": "8a22da16c2d755de8fc12db7c5482657e6813ecd",
+  "hardware_tested": false,
+  "assets": {
+    "superfw-chis.fw": {
+      "board": "chis",
+      "bytes": 1671680,
+      "sha256": "4d481f8095676027baadc2b4b3556789efbf5d8f8ee42defa49874f7be427509",
+      "id": 740660935,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test1/superfw-chis.fw",
+      "digest": "sha256:4d481f8095676027baadc2b4b3556789efbf5d8f8ee42defa49874f7be427509"
+    },
+    "superfw-sd.fw": {
+      "board": "sd",
+      "bytes": 498688,
+      "sha256": "d1fafd50af6cf9932b2a0358259131adb72a256f2378fb3f5873ca6fade40208",
+      "id": 740660933,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test1/superfw-sd.fw",
+      "digest": "sha256:d1fafd50af6cf9932b2a0358259131adb72a256f2378fb3f5873ca6fade40208"
+    },
+    "superfw-lite.fw": {
+      "board": "lite",
+      "bytes": 465920,
+      "sha256": "1978cc698a0b792b4da81b8af024ad0b215996e50824b2895684fbb77f513c07",
+      "id": 740660930,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test1/superfw-lite.fw",
+      "digest": "sha256:1978cc698a0b792b4da81b8af024ad0b215996e50824b2895684fbb77f513c07"
+    }
+  },
+  "ci": {
+    "dssmm": 43282661424,
+    "superfw": 43282667921,
+    "ezfomegade": 43282666938,
+    "ezfomega": 43282667191,
+    "ezfblue": 43282666475
+  },
+  "local_checks": [
+    "three sequential release builds",
+    "sanitized artwork decoder/adapter/compositor",
+    "theme/artwork settings round trip",
+    "real pinned DSSCC writer interoperability",
+    "project isolation and merge fixtures",
+    "baseline snapshot comparison",
+    "site composition",
+    "GBA header/size/flavour/source identifier/full-image seal"
+  ],
+  "release_id": 443369537,
+  "release_url": "https://github.com/voluptuary/dssmm/releases/tag/superfw-test1",
+  "published_at": "2026-11-12T18:47:02Z",
+  "prerelease": true,
+  "draft": false,
+  "body_sha256": "50289a046919f868bcc07abea1454e69d07992292a04dda45e7508b97ac0c42d",
+  "downloaded_bytes_verified": true,
+  "prior_releases_verified_unchanged": 19,
+  "latest_stable": "v8.4.0",
+  "previous_tags_unchanged": true
+}
