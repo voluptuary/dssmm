@@ -1,3 +1,9 @@
+## 2026-11-12 15:58 UTC — BLUE Test4 published; current release notes corrected
+
+- Published https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-blue-test4 as hardware-untested prerelease from CI-tested 8d854ed8e2117a6a1df8c380dc8a598e964ffffb. All four final versioned CI runs passed, including trunk's all-model matrix. Downloaded ezbluekernel.bin matches the local release byte-for-byte:2124252bytes SHA256 57db5bb4e9fd2cfacdbb1024b6d2d62dd7a83c562964f440d3e5cf02203549a3. DE8.4.0 remains latest stable. Earlier kernel assets/tags/flags remain unchanged.
+- Updated the existing BLUE Test3 body to the owner's four-section format (440words), folding the directly prior Test2 fixes into condensed past-fix summaries. New Test4 notes use the same format (638words), folding Test3 MiGoomba/loader work into past summaries. Credits, model warnings, physical-testing limits, NOR-state restriction and exact digests retained. The report records earlier initial-publication notes as history and these later authorized edits separately.
+- Comparison/import/publication scope complete: independent FrankieT19-informed improvements,106unchanged assets, all software tests and hosted CI pass; no hardware validation is claimed. Details: docs/porting/frankiet19-blue-review.json and docs/porting/FRANKIET19_BLUE_COMPARISON.md. Final evidence/docs only after the tested tag. Next: merge this evidence normally into trunk and sync remote refs; no further source work is required for this request.
+
 ## 2026-11-12 15:53 UTC — BLUE Test4 release and condensed notes authorized
 
 - Owner explicitly requests publication when checks pass and four ordered release-note categories: New features, New fixes, Summary of past features, Summary of past fixes. Condense prior changes and merge the immediately preceding build into those summaries. Correct the three current 8.4.0 release bodies without changing their tags/assets; prepare new v8.4.1-blue-test4 for the reviewed BLUE changes.

@@ -1,4 +1,4 @@
-# Current development — 8.4.1-blue-test4
+# Current release — 8.4.1-blue-test4
 
 The latest source adapts independently implemented improvements informed by
 FrankieT19's BLUE Test 3–5: firmware-free stock-size sealed images, pending-save
@@ -7,7 +7,8 @@ separate Mode B/launcher preferences and BLUE DDR state staging. Persistent NOR
 save-state combinations are blocked until a compatible runtime is validated.
 See [the full comparison, credits and evidence](FRANKIET19_BLUE_COMPARISON.md).
 Neither upstream Test5 nor this build has confirmed physical hardware results.
-The earlier published 8.4.0 BLUE Test3 is unchanged. Older statuses below describe
+The Test4 prerelease is published and download-verified. The earlier Test3
+kernel/tag are unchanged; its release notes were condensed by owner request. Older statuses below describe
 historical layouts and releases and do not override this section.
 
 ## Historical status records
