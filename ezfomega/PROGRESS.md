@@ -1,3 +1,8 @@
+## 2026-11-12 16:08 UTC — All four Original OMEGA release bodies prepared
+
+- Prepared canonical Test1–Test4 notes with New features, New fixes, Summary of past features, Summary of past fixes and no repeated build headings. Test1 retains partial-port/artwork limitations and its original About-screen development label; Test2/Test3 deltas enter only the appropriate later summaries. Every note retains hardware-untested/model/32MiB/NOR limitations, credits and actual asset details.
+- Editorial only: no kernel/tag/asset/flag changes. Exact original published bodies/metadata are archived at root; publish all19 bodies after full review and verify content plus immutable metadata. This does not claim new validation of historical binaries.
+
 ## 2026-11-12 16:00 UTC — Remove redundant release-body build headings
 
 - Owner requests displaying the build/version only in GitHub's release title. Removed the repeated opening build heading from v8.4.0-omega-test4.md; retain the model warning and four ordered changelog sections. Update the corresponding published bodies; no title/tag/asset/flag or kernel input changes.
