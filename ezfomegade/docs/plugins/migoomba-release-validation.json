@@ -51,5 +51,24 @@
     "bytes": 2030600,
     "sha256": "5037473f5992f745e8d29d2df34e12996a76aaac2ccde51786f99b5432827d48"
   },
-  "hardware_validation": "No new physical hardware report; old emulator save states not qualified."
+  "hardware_validation": "No new physical hardware report; old emulator save states not qualified.",
+  "publication": {
+    "target": "ezfomegade",
+    "tag": "v8.4.0",
+    "url": "https://github.com/voluptuary/dssmm/releases/tag/v8.4.0",
+    "release_id": 443130065,
+    "published_at": "2026-11-12T15:22:56Z",
+    "prerelease": false,
+    "source_commit": "8e637e3238926fb667d336b99db7ed7c7fcbb9dc",
+    "asset": {
+      "name": "ezkernelnew.bin",
+      "id": 739978820,
+      "bytes": 2030600,
+      "sha256": "5037473f5992f745e8d29d2df34e12996a76aaac2ccde51786f99b5432827d48",
+      "url": "https://github.com/voluptuary/dssmm/releases/download/v8.4.0/ezkernelnew.bin",
+      "download_matches_local": true
+    },
+    "notes_match_committed_file": true,
+    "previous_release_preserved": "v8.3.2"
+  }
 }

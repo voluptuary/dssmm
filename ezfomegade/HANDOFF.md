@@ -1,3 +1,9 @@
+## 2026-11-12 15:24 UTC — v8.4.0 published and downloaded asset verified
+
+- Published https://github.com/voluptuary/dssmm/releases/tag/v8.4.0 from CI-tested source 8e637e3238926fb667d336b99db7ed7c7fcbb9dc. Release is stable/latest by explicit owner choice, with new MiGoomba hardware-testing limits stated. All four hosted release-source CI runs passed, including trunk's three-model matrix. Earlier v8.3.2 notes, flags and asset identities/sizes/timestamps remain unchanged.
+- Downloaded ezkernelnew.bin matches the local release file byte-for-byte: 2030600 bytes, SHA-256 5037473f5992f745e8d29d2df34e12996a76aaac2ccde51786f99b5432827d48. GitHub digest, release notes, correct model/variant, annotated tag and publication flags verified. Only the installable kernel is attached; GitHub supplies automatic source archives.
+- Full verifier, focused Cppcheck, save/conversion/legacy replay evidence is in docs/plugins/migoomba-release-validation.json. No software regression was found in these checks; no physical hardware or old emulator saved-state qualification is claimed. Back up .esv saves and prefer in-game battery saves when transitioning. No remaining publication task for this release.
+
 ## 2026-11-12 15:17 UTC — 8.4.0 release prepared and software validation complete
 
 - Owner authorizes publication; DE 8.4.0 is stable by explicit request, while Original OMEGA Test 4 and BLUE Test 3 remain hardware-untested prereleases. This lane changes only ezfomegade/. New release notes follow the previous platform release's cumulative style, model warnings, credits and limitations.
