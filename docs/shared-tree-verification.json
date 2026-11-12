@@ -18,6 +18,22 @@
   },
   "kernel_inputs": "All 426 DE, 419 OMEGA and 424 BLUE kernel/build/test inputs match recorded baselines",
   "actual_repository_rehearsal": "Passed all three ordinary lane merges and reverse sparse syncs; docs/shared-tree-merge-rehearsal.json",
-  "common_tree_conversion": "Validated baseline committed; hardware worktrees will fast-forward and focus next",
-  "ancestry_bridge_commit": "430a25115d47c6bc802d823fa268c13ef9627863"
+  "common_tree_conversion": "All four local branches fast-forwarded to c9e4671; hardware worktrees use worktree-local sparse views",
+  "ancestry_bridge_commit": "430a25115d47c6bc802d823fa268c13ef9627863",
+  "verified_utc": "2026-11-12 01:29 UTC",
+  "full_local_verifiers": {
+    "dssmm_full_all_three": "passed, exit0",
+    "ezfomegade_sparse": "passed, exit0",
+    "ezfomega_sparse": "passed, exit0",
+    "ezfblue_sparse": "passed, exit0"
+  },
+  "binary_comparison": "All six outputs byte-identical to fresh published downloads; docs/shared-tree-binary-verification.json",
+  "architecture_tests": "4 policy tests + 3 real-Git merge/sparse tests passed, including inherited trunk changes excluded from hardware PR delta",
+  "readme": "Root README is user-facing hardware/features/downloads/credits overview; developer workflow remains docs/isolation.md",
+  "github_configuration_observed": {
+    "default_branch": "dssmm",
+    "allow_merge_commit": true,
+    "delete_branch_on_merge": false
+  },
+  "hosted_ci": "pending push of validated shared implementation"
 }

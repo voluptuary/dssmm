@@ -1,28 +1,105 @@
-# DS Style Merkin Mix
+# DS Style Merkin Mix (DSSMM)
 
-DSSMM keeps three independent flashcart kernel projects in one repository. Choose the exact hardware before building or installing; kernel files are not interchangeable.
+DSSMM is a Nintendo DS-inspired custom menu kernel for the EZ-FLASH OMEGA family,
+maintained by [Merkin / voluptuary](https://github.com/voluptuary). Merkin Mix
+builds on [FrankieT19's DS Style forks](https://github.com/FrankieT19), with
+foundations from EZ-FLASH and Sterophonick's SimpleLight kernel. On your
+handheld, it provides the cartridge menu for browsing the SD card, launching
+games and managing the card's supported save and NOR features.
 
-| Project | Hardware | Release branch |
-| --- | --- | --- |
-| [ezfomegade](https://github.com/voluptuary/dssmm/blob/dssmm/ezfomegade/README.md) | EZ-FLASH OMEGA Definitive Edition Rev. A/B | `ezfomegade` |
-| [ezfomega](https://github.com/voluptuary/dssmm/blob/dssmm/ezfomega/README.md) | Original EZ-FLASH OMEGA | `ezfomega` |
-| [ezfblue](https://github.com/voluptuary/dssmm/blob/dssmm/ezfblue/README.md) | Newer Definitive Edition B / BLUE | `ezfblue` |
+Merkin Mix's main additions are **artwork transparency and name-matched game
+artwork**. This lets games from supported emulator and plugin systems have their
+own artwork, extending beyond the original kernels' GBA-only artwork lookup.
+It also brings highly optimized menu rendering, more browsing and customization
+options, remembered cheat selections, and improvements to saving and cartridge
+management. Available features depend on the card and its compatible plugins.
 
-Every branch tracks the same combined layout, with three independent projects directly at repository root. Each project owns its source, assets, build tools, tests, configuration and documentation. Root files are universal orchestration, environment and repository records. [projects.json](projects.json) is the common project registry. Hardware branches develop within their own directory; normal merges into `dssmm` integrate those changes.
+## Choose the kernel for your exact card
 
-With devkitARM, libgba, Maxmod, a host C compiler, Python3/Unicorn and Node available:
+**There are three distinct kernels. They are not interchangeable. Check your
+cartridge model before downloading or flashing an update.**
 
-```sh
-make ezfomegade
-make verify-ezfomegade
-make ezfomega
-make verify-ezfomega
-make ezfblue
-make verify-ezfblue
-```
+| Your cartridge | Kernel download | Update file | Status |
+| --- | --- | --- | --- |
+| EZ-FLASH OMEGA **Definitive Edition Rev. A or Rev. B** | [DSSMM 8.3.2](https://github.com/voluptuary/dssmm/releases/tag/v8.3.2) | `ezkernelnew.bin` | Stable release |
+| **Original EZ-FLASH OMEGA** | [DSSMM 8.3.1 — OMEGA Test 3](https://github.com/voluptuary/dssmm/releases/tag/v8.3.1-omega-test3) | `ezkernel.bin` | Experimental; not hardware-verified |
+| Newer EZ-FLASH OMEGA **Definitive Edition B / BLUE** | [DSSMM 8.3.1 — BLUE Test 2](https://github.com/voluptuary/dssmm/releases/tag/v8.3.1-blue-test2) | `ezbluekernel.bin` | Experimental; not hardware-verified |
 
-`make` alone shows help and never selects hardware implicitly. `make build-all` and `make verify-all` select all projects present in the current working view. Each project also builds independently from its directory; hardware working trees can use sparse checkout to show only their matching directory plus universal root infrastructure, while all projects remain tracked. BLUE keeps its vendor linker/resource subproject internally; never install its raw development GBA as an update.
+**The older Definitive Edition Rev. B and the newer Definitive Edition B / BLUE
+are different cards.** The Rev. A/B release is also incompatible with the original
+OMEGA. Use only the kernel and supporting SYSTEM files intended for your model,
+and follow that release's installation instructions.
 
-Changes belong to the appropriate target. Merge hardware branches normally into `dssmm`, then merge `dssmm` back to synchronize the hardware branches. Keep target work and its journals inside the matching directory; make universal root changes through `dssmm`. CI checks hardware PR scope, layout and target identity. See [the shared-tree workflow](docs/isolation.md) for sparse checkout and merge instructions. Same-file changes can still conflict; branch protection controls mandatory checks.
+> [!WARNING]
+> **The Original OMEGA and BLUE ports have not been tested on physical hardware.**
+> Installation, booting, gameplay, saving, plugins, cheats/save states and NOR
+> operations still need hardware verification. BLUE's larger update image has
+> also not been verified with its updater. Software checks do not establish
+> that these builds will work correctly on a cartridge.
+>
+> **Use both experimental builds with caution and only at your own risk.**
+> Back up your SD card and save files before testing. Avoid powering off during
+> kernel updates, save writes or NOR operations.
 
-The hardware-specific READMEs contain features, credits, download/install instructions and remaining validation limits. Original OMEGA and BLUE releases remain hardware-untested. Source archives are supplied automatically by GitHub; no separate source ZIP is maintained.
+## What DSSMM offers
+
+- **Artwork beyond GBA:** name-matched images for supported systems, title or box
+  artwork, mirrored artwork folders and fallback images. Existing GBA artwork
+  lookup remains supported.
+- **Transparent artwork:** compatible marked thumbnails can blend into the menu
+  background. Menu rendering and artwork lookup are highly optimized while
+  retaining transparency compatibility.
+- **Several ways to browse:** list, List + Art, horizontal carousel and vertical
+  carousel views, with favorites, recent games and last-played shortcuts.
+- **A customizable DS-style menu:** Light, Dark and clock-based Auto themes,
+  accent colors, menu sounds, artwork presentation, language and browsing options.
+- **Remembered cheat choices:** optional per-game selections and collapsible
+  cheat groups. In-game cheat and save-state capabilities depend on the card's
+  own engine and the game or plugin being used.
+- **Clearer cartridge management:** themed NOR writing progress, artwork for NOR
+  library entries, and save/settings handling improvements adapted to each card.
+- **More convenient navigation:** configurable startup behavior, wrapping,
+  favorites shortcuts and access to the SYSTEM folder.
+
+Hardware capabilities remain different across the three cards. A feature on one
+card does not add that hardware capability to another, and plugin compatibility
+still depends on the plugin. Flash operations and interrupted save or metadata
+writes retain known limitations, so keep backups even when using a stable build.
+
+For platform-specific features, artwork requirements and known limitations, see
+the [Definitive Edition Rev. A/B guide](ezfomegade/README.md),
+[Original OMEGA guide](ezfomega/README.md) or [BLUE guide](ezfblue/README.md).
+[DS Style Card Companion](https://github.com/voluptuary/dsscc) is the separate
+companion application for finding and preparing artwork.
+
+## Credits
+
+DSSMM builds on the work of the following contributors:
+
+- **Merkin / voluptuary** — Merkin Mix development and maintenance, artwork and
+  transparency support, refreshed splash screens and system icons, rendering
+  optimizations, kernel fixes and the platform ports, with AI assistance.
+- **FrankieT19** — the DS Style foundations, animated carousels and launch
+  presentation, separately authored v8.0 interface and navigation refinements,
+  and the Original OMEGA DS Style adaptation used as that port's foundation.
+- **The EZ-FLASH team**, including **fengflash** and **Windirt Young** — the
+  original kernel sources and hardware foundations, including the BLUE source.
+- **Sterophonick** — SimpleLight, part of the custom-kernel foundation.
+- **exploitz86** — remembered per-game cheat selections, cheat-menu row and
+  collapsed-group handling, and localized setting labels.
+- **SkillerCMP** — the collapsible cheat-group foundation and cheat, save-state
+  and patch-system contributions in the upstream lineage.
+- **aidiadayo** — Thai language support.
+- **Kekun** — the font-header capitalization correction used for compatibility
+  with case-sensitive build systems.
+- **ChaN** — FatFs, the filesystem library used by the kernels.
+- **Copilot** — contributions to interface integration, testing and
+  release documentation. **merkin-agent** and other AI-assisted development work
+  are recorded in the project history.
+
+Thank you also to the upstream component authors, artwork/tool contributors,
+and everyone who has tested builds and reported problems. The platform
+[credit records](CREDITS.md) retain detailed attribution and provenance.
+
+The repository includes the [Apache License 2.0](LICENSE). Individual components
+retain their own licenses and attribution notices.

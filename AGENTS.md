@@ -30,9 +30,11 @@ and merge prohibitions in historical records are superseded by this architecture
 1. Develop/test on the matching hardware branch, confined to its directory.
 2. Merge that branch normally into dssmm (or use a PR). CI checks hardware PR
    changed paths against the merge base and verifies all projects on dssmm.
-3. Merge dssmm back into hardware branches to synchronize the combined tree.
+3. Use merge commits for long-lived hardware PRs (not squash/rebase merging),
+   preserving ancestry for repeated integration. Do not delete hardware lanes.
+4. Merge dssmm back into hardware branches to synchronize the combined tree.
    A fast-forward is preferred when possible; never reset/force-push for syncing.
-4. Make universal root changes on dssmm or a shared feature branch, then sync
+5. Make universal root changes on dssmm or a shared feature branch, then sync
    them outward. Do not mix root changes into a hardware-to-dssmm PR.
 
 Ordinary directory-confined changes no longer add/remove other platforms during
@@ -61,8 +63,9 @@ is read-only; Pages publication remains manual/default-only.
 projects.json is a common live registry, not independent frozen snapshots.
 Its baseline commits record known kernel inputs. `scripts/check-snapshots.py`
 checks those source/assets/build/test baselines (including sparse index inputs),
-not live documentation. For intentional later firmware changes, update baselines
-only after appropriate validation; retain historical verification reports.
+not live documentation. Differences during feature work are expected; this is
+not a merge gate. Refresh root baseline references on trunk at validated release
+checkpoints, never as a root edit in a hardware PR. Retain historical reports.
 
 DE8.3.2 remains stable/latest for Definitive Edition Rev.A/B. Original OMEGA
 Test3 and BLUE Test2 remain hardware-untested prereleases. Builds, mocks and
@@ -75,3 +78,9 @@ Checkpoint before substantial shared changes and after milestones, recording
 actual tests/results and exact continuation steps. Commit/push within the right
 branch; verify remote state. Branch protection enforcement is a repository
 setting, not a guarantee supplied by directory layout or CI.
+
+Root README.md is a user-facing hardware/features/download/credits overview.
+Keep developer commands, sparse/branch/merge procedures and architecture details
+in docs/isolation.md and agent/journal files. Clearly distinguish all three
+cards and retain the OMEGA/BLUE hardware-untested, caution/own-risk notice.
+Keep credits positive and accurate; retain Merkin Mix's DS Style fork lineage.

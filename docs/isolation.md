@@ -45,7 +45,9 @@ rejects hardware PRs that touch another project or root infrastructure. Feature
 PRs into a hardware lane have the same directory restriction; direct hardware
 pushes are checked for their unintegrated changes relative to origin/dssmm. dssmm PRs
 verify all three hardware projects. Merge dssmm back into hardware branches to
-synchronize the integrated tree; those integration syncs are allowed.
+synchronize the integrated tree; those integration syncs are allowed. Use merge
+commits for these long-lived lane PRs rather than squash/rebase merging, so Git
+retains their shared ancestry for later merges. Keep hardware branches after PRs.
 
 Shared root changes belong on dssmm or a shared feature branch. Keep routine
 platform progress in that project's HANDOFF/PROGRESS files, not the root logs.
@@ -75,7 +77,9 @@ The common live projects.json registry records kernel-input baselines rather
 than freezing project documentation. `python3 scripts/check-snapshots.py` compares
 those source/assets/build/test inputs. Live project docs and journals can evolve
 normally without requiring an unrelated registry edit for each hardware change.
-Earlier snapshot/CI/binary reports remain historical evidence; current transition
+Feature changes may differ from those release baselines; the comparison is not
+a merge gate. Update baseline references on trunk at validated release
+checkpoints. Earlier snapshot/CI/binary reports remain historical evidence; current transition
 results are recorded in HANDOFF/PROGRESS and the shared-tree verification report.
 
 Run `python3 tests/test-project-isolation.py` and

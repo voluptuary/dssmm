@@ -88,6 +88,9 @@ class Merges(unittest.TestCase):
         self.assertEqual('BLUE update, hidden in Omega worktree', git(focus, 'show', 'HEAD:ezfblue/PROGRESS.md'))
         self.assertTrue((focus / 'ezfomega/PROGRESS.md').read_text().startswith('Omega work'))
         policy['validate_layout'](focus, expected='ezfomega', branch='ezfomega')
+        own_changes = policy['changed_since_base'](focus, 'dssmm', 'HEAD')
+        self.assertEqual(['ezfomega/PROGRESS.md'], own_changes)
+        policy['validate_pr']('dssmm', 'ezfomega', own_changes)
         with self.assertRaises(ValueError):
             policy['validate_layout'](focus, expected='ezfblue')
         git(self.root, 'merge', '--no-ff', '--no-edit', 'ezfomega')
