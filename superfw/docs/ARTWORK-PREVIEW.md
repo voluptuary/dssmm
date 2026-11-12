@@ -1,5 +1,7 @@
 # Artwork preview prototype
 
+For end-user pack creation and SD-card setup, see [Make and install artwork packs](ARTWORK-SETUP.md).
+
 In the SD browser, press **Start** to cycle List → title artwork → box artwork → List. The footer shows `Start: Art`. To retain the mode across reboot, use the existing UI settings Save button (`artwork=0|1|2` in /.superfw/ui-settings.txt). List remains the default.
 
 Copy DSSCC output into the same /SYSTEM/IMGS and /SYSTEM/IMGS2 layout used by DSSMM. For /Game Boy/Tetris.gbc, title lookup tries /SYSTEM/IMGS/Game Boy/Tetris.bmp and then /SYSTEM/IMGS/CUSTOM/Tetris.bmp. Box mode uses IMGS2. Each candidate must have the selected dimensions (120×80 title or 80×80 box); malformed, short or failed reads are rejected. No separate manifest is required. UTF-8 names pass through to the native filesystem; actual Unicode/case behavior needs hardware qualification.
