@@ -3110,3 +3110,9 @@ Entries below record what was known at each stage. Do not use older branch hashe
 - Added a fourth isolated project based on upstream SuperFW for the SuperCard GBA family. The complete upstream source/assets/licenses/tests are under `superfw/`; local root dispatch supports `make superfw BOARD=sd|lite|chis` and `make verify-superfw`. New `superfw` lane is published on origin.
 - Validation: all three board builds and the upstream coverage-enabled host suite pass in hosted run43263766334; all four projects pass the dssmm matrix in run43263181698. Project identity/branch scope/merge-sparse fixtures, source baselines and site composition pass. Initial CI omission of six upstream emulator assets was corrected, and the baseline is refreshed. Physical SuperCard behavior is not tested here.
 - Remaining: push the final shared validation logs, fast-forward all three existing hardware lanes to trunk and verify all five local/remote heads.
+
+## 2026-11-12 — SuperFW fourth lane delivered
+
+- `superfw/` now holds the pinned upstream SuperFW codebase, bundled build assets, GPL/component notices, project-specific instructions, provenance and journals. The remote `superfw` branch is created. Build and verification commands, shared registry, merge/sparse isolation, CI matrix and user/developer docs are updated.
+- All four upstream variants/projects pass the final hosted matrix: trunk43264263765, SuperFW43264311895, DE43264291574, OMEGA43264297735, BLUE43264305111. Root isolation and real-Git merge fixtures, source-baseline checks and site composition pass. Physical SuperCard behavior remains untested in this repository; no release was made.
+- All five local/remote heads are at970285c03801163273b2c63e2947a8969741a80c. Setup complete.

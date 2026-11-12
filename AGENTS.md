@@ -133,3 +133,5 @@ tests and journals belong under `superfw/`; its development branch is `superfw`.
 Build variants are `sd`, `lite` and `chis`. Do not combine its code or hardware
 protocols with the OMEGA-family kernels. Read `superfw/AGENTS.md` and the project
 current journals before SuperFW work. Local import is not hardware validation.
+
+SuperFW bootstrap is complete: upstream snapshot dabbf4909f85e556f7a12972cc8a7b94fc54ac51 is isolated under `superfw/`, and five-branch CI passed on 2026-11-12. `superfw/docs/bootstrap-validation.json` records builds/tests and the explicit no-hardware-validation limit. The lane has no DSSMM release yet; never imply physical SuperCard qualification from hosted builds/tests.
