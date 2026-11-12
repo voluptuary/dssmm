@@ -1,5 +1,12 @@
 # DS Style Kernel Audit — Standalone Handoff
 
+## 2026-11-12 00:02 UTC — Final workspace orientation
+
+- All four branches have committed/pushed compartmentalization and completion records. Root canonical layout is af9ca04 (structural implementation9cfc7b2), standalone DE927829c, Omega5353bb4, BLUEf5aec2a. Tested product commits and CI evidence remain pinned; completion descendants change only records, not firmware or tooling. Final status checks will be reported after pushes complete.
+- Leave the main Codespace workspace /workspaces/omega-de-ds-style-multisystem-kernel on dssmm so users see the three isolated targets. Release dssmm from its auxiliary /workspaces/dssmm-audit-ezfode checkout by detaching that worktree, switch the clean main workspace from ezfomega to dssmm, then retain standalone Omega at /workspaces/dssmm-standalone-ezfomega. DE and BLUE worktrees remain /workspaces/dssmm-release-ezfomegade and /workspaces/dssmm-audit-ezfblue. Preserve current Omega ELF/GBA in its own worktree; delete only its owned stale root build cache. No branch reset/force push or hardware-code edit is involved.
+- After orientation, verify clean local/remote heads, root help/policy/snapshot checks and final CI/release state. All project directories and hardware branches retain working build environments. Future protection enforcement is still not configured; arbitrary future changes cannot be guaranteed safe by Git/CI alone.
+
+
 ## 2026-11-11 23:59 UTC — Compartmentalization complete; all hosted hardware checks green
 
 - dssmm canonical implementation9cfc7b2 is pushed. Its hosted matrix43123536185 passed all three target jobs. Standalone hosted runs also pass: DE43123265306 at1c57b0e; Omega43122839615 at0f8b39d; BLUE43122841514 at8072874. docs/ci-verification.json stores exact SHAs/jobs/URLs. Earlier ownership/Node18 runs failed honestly and were fixed through scoped checkout trust and target-private ESM declaration; no verification check was removed.
