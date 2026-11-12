@@ -5,10 +5,10 @@ Test 1 supports name-matched artwork made with [DS Style Card Companion (DSSCC)]
 ## Build a pack
 
 1. Download the [latest DSSCC release](https://github.com/voluptuary/dsscc/releases/latest) for Windows and open it. Back up your SD card before changing its contents.
-2. Open **Custom Art → Scan SD Card…** and select the **actual SD-card root**, not a ROM subfolder. This lets the artwork follow the same folders as your games.
+2. Open **Custom Pack → Scan SD Card…** (called Custom Art in some versions) and select the **actual SD-card root**, not a ROM subfolder. This lets the artwork follow the same folders as your games.
 3. Choose the artwork type you prefer and **Wide and square** to prepare both sizes. Enable **Include Game Boy Advance files** if you want GBA artwork too. This prototype needs name-matched output for GBA as well; the separate traditional full-GBA/code pack is not sufficient.
 4. Complete the scan. Check the matched images; use **Set Image…** to supply or replace local artwork where needed. Provider setup and fallback options are explained in [DSSCC’s guide](https://github.com/voluptuary/dsscc#readme).
-5. Choose **Mirrored** under **Output Layout** (described as “Mirror ROM folders” in some versions), then **Build Pack** in Custom Art. Use **For: All** if you want every listed system. The scan offers both sizes: 120×80 title thumbnails go into IMGS and 80×80 box thumbnails into IMGS2.
+5. Choose **Mirrored** under **Output Layout** (described as “Mirror ROM folders” in some versions), then **Build Pack** in Custom Pack. Use **For: All** if you want every listed system. The scan offers both sizes: 120×80 title thumbnails go into IMGS and 80×80 box thumbnails into IMGS2.
 6. Find the completed pack under `DS Style Card Companion Output/Thumbnail Packs/<timestamp>/`, or the output location shown by your DSSCC version.
 
 For a single custom picture, use **Add ROMs…** or **Add Name…**, set an image and choose its size. With **Custom** output, the artwork name must match the ROM filename without its extension: `Tetris (World).gb` needs `Tetris (World).bmp`. Build again for the other size if desired. Keep region tags and punctuation identical. This flat layout cannot distinguish two different games with identical filenames; use Mirrored output for those libraries.
