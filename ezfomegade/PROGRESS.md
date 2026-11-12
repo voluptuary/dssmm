@@ -1,3 +1,8 @@
+## 2026-11-12 16:08 UTC — All eleven DE/fallback release bodies prepared
+
+- Prepared canonical notes for all published DE releases from v7.4.2-fallback through8.4.0, in four ordered sections without repeated build headings. Condensed cumulative histories keep earlier deltas in the correct later summaries; no later features are added to older releases. Fallback's undocumented changes remain explicitly undocumented, and its original description is retained.
+- Preserved the withdrawn/broken7.4.4 warning and historical7.4.6 test link, original hardware/validation caveats and owner-feedback limits, credits, actual filenames/sizes/hashes and source lineage. No kernel/tag/asset/flag changes. Exact original bodies are archived at root before this editorial pass; publish only body text after complete review.
+
 ## 2026-11-12 16:00 UTC — Remove redundant release-body build headings
 
 - Owner requests displaying the build/version only in GitHub's release title. Removed the repeated opening build heading from v8.4.0.md; retain the model warning and four ordered changelog sections. Update the corresponding published bodies; no title/tag/asset/flag or kernel input changes.
