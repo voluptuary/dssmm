@@ -78,6 +78,8 @@ int main(void) {
     game(5,74);
     assert(GetFileListFromNor()==1 && pNorFS[0].rompage==74 && REG_IME==1);
     assert(guarded.before==0x12345678 && guarded.after==0x87654321);
+    reset();game(0,100);game(1,64);game(2,80);
+    assert(GetFileListFromNor()==3 && pNorFS[0].rompage==64 && pNorFS[1].rompage==80 && pNorFS[2].rompage==100);
     puts("BLUE NOR scan: 64 slots, malformed spans/names, overlap, all banks and IRQ restoration passed (ROM simulated).");
 }
 '''

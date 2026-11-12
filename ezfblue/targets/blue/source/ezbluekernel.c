@@ -24,6 +24,7 @@
 #include "RTC.h"
 #include "NORflash_OP.h"
 #include "blue_nor_policy.h"
+#include "blue_settings_policy.h"
 #include "lang.h"
 #include "GBApatch.h"
 #include "showcht.h"
@@ -5186,41 +5187,36 @@ u32 Save_savefile(TCHAR *filename,u32 savesize)
 //---------------------------------------------------------------------------------
 u32 LoadRTSfile(TCHAR *filename)
 {
-	UINT ret;
-	UINT filesize;
-	FIL file;
-	u32 page;
-	FRESULT close_result;
-
-	switch(f_open(&file, filename, FA_READ))
-	{
-		case FR_OK:
-		{
-			filesize = f_size(&file);
-			if(filesize != 0x70000)
-			{
-				f_close(&file);
-				return 0;
-			}
-
-			for(page = 0x40;page<0xB0;page += 0x10)
-			{
-				if(f_read(&file, pReadCache, 64*1024, &ret) != FR_OK || ret != 64*1024)
-				{
-					f_close(&file);
-					SetRampage(0x0);
-					return 0;
-				}
-				SetRampage(page);
-				WriteSram(SRAMSaver, pReadCache , 64*1024 );
-			}
-			close_result = f_close(&file);
-			SetRampage(0x0);
-			return close_result == FR_OK;
+    FIL file;
+    UINT got;
+    u8 signature[16];
+    u32 blank = 1;
+    if(f_open(&file, filename, FA_READ) != FR_OK) return 0;
+    if(f_size(&file) != 0x70000 || f_lseek(&file, 0x62FF0) != FR_OK ||
+       f_read(&file, signature, sizeof(signature), &got) != FR_OK || got != sizeof(signature))
+        goto failed;
+    if(memcmp(signature, "EZ-OmegaRTCFILE.", sizeof(signature))) {
+        /* A newly allocated all-FF state is empty, never a saved CPU image. */
+        if(f_lseek(&file, 0) != FR_OK) goto failed;
+        for(u32 offset = 0; offset < 0x70000; offset += 0x10000) {
+            if(f_read(&file, pReadCache, 0x10000, &got) != FR_OK || got != 0x10000) goto failed;
+            for(u32 i = 0; i < 0x10000; i++) if(pReadCache[i] != 0xFF) blank = 0;
+        }
+        if(!blank) goto failed;
     }
-    default:
-			return false;
-  }
+    if(f_lseek(&file, 0) != FR_OK) goto failed;
+    for(u32 offset = 0; offset < 0x70000; offset += 0x10000) {
+        if(f_read(&file, pReadCache, 0x10000, &got) != FR_OK || got != 0x10000) goto failed;
+        /* BLUE's in-game engine stages RTS in DDR, not the older DE SRAM banks. */
+        SetPSRampage(0x6000);
+        dmaCopy(pReadCache, PSRAMBase_S98 + 0x20000 + offset, 0x10000);
+        SetPSRampage(0);
+    }
+    return f_close(&file) == FR_OK;
+failed:
+    (void)f_close(&file);
+    SetPSRampage(0);
+    return 0;
 }
 //---------------------------------------------------------------------------------
 u32 SavefileWrite(TCHAR *filename,u32 savesize)
@@ -5433,7 +5429,8 @@ void CheckSwitch(void)
 	{
 		u16 modeb_raw = Read_SET_info(assress_ModeB_INIT);
 		gl_ModeB_init = modeb_raw & 0x00FF;
-		gl_boot_mode_pref = (modeb_raw >> 8) & 0x00FF;
+		u16 preference = Read_SET_info(assress_blue_boot_pref);
+		gl_boot_mode_pref = BlueBootPreference(preference, modeb_raw);
 		if( (gl_ModeB_init != 0x0) && (gl_ModeB_init != 0x1)  && (gl_ModeB_init != 0x2))
 		{
 			gl_ModeB_init = 0x2;
@@ -9696,6 +9693,8 @@ u32 Get_savefilesize(BYTE saveMODE)
 //---------------------------------------------------------------------------------
 u8 Process_savefile(u32 is_EMU,TCHAR *pfilename,u32 gamefilesize,BYTE saveMODE)
 {
+	/* Preserve a previous game's FRAM after a failed startup backup. */
+	if(Read_sav_info(0) == 0x11) return 5;
 	u32 res;
 	u32 savefilesize=0;
 	TCHAR savfilename[256];
@@ -10002,7 +10001,8 @@ static void Launcher_SaveSettingsInfo(void)
     SET_info_buffer[assress_show_Thumbnail] = gl_show_Thumbnail;
     SET_info_buffer[assress_ingame_RTC_open_status] = gl_ingame_RTC_open_status;
     SET_info_buffer[assress_auto_save_sel] = (u16)((gl_resume_last_on << 8) | gl_auto_save_sel);
-    SET_info_buffer[assress_ModeB_INIT] = (u16)((gl_boot_mode_pref << 8) | gl_ModeB_init);
+    SET_info_buffer[assress_ModeB_INIT] = gl_ModeB_init;
+    SET_info_buffer[assress_blue_boot_pref] = BLUE_BOOT_PREF_TAG | gl_boot_mode_pref;
     SET_info_buffer[assress_led_open_sel] = gl_led_open_sel;
     SET_info_buffer[assress_Breathing_R] = gl_Breathing_R;
     SET_info_buffer[assress_Breathing_G] = gl_Breathing_G;
@@ -14903,8 +14903,7 @@ int main(void) {
 	SD_Disable();
 	Set_RTC_status(1);
 
-	//check FW
-	Check_FW_update();
+	/* FPGA updates belong to the official BLUE kernel; no firmware payload here. */
 
 
 	Launcher_DrawPackedSplash();
@@ -14987,19 +14986,7 @@ int main(void) {
 	}
 	Launcher_SaveSDState();
 
-	Read_NOR_info();
-	Read_NOR_FAT_info();
-	gl_norOffset = First_game_address;
-	game_total_NOR = GetFileListFromNor();//initialize to prevent direct writes to NOR without page turning
-	if(game_total_NOR==0)
-	{
-		memset(pNorFS,00,sizeof(FM_NOR_FS)*MAX_NOR);
-		memset(NOR_FAT_buffer,0,NOR_FAT_SIZE);
-		Save_NOR_FAT_info();
-		if(!Save_NOR_info_with_art_path((u16*)pNorFS,
-			sizeof(FM_NOR_FS)*MAX_NOR, 0, 0, 1))
-			Show_error_num(3);
-	}
+	Check_NOR_flash(); /* Browsing must not initialise or repair flash. */
 
 refind_file:
 	/* Directory records live in the reserved tail of PSRAM page zero. */
@@ -15068,10 +15055,7 @@ refind_file:
   }  else
   {
 		recents_view_active = 0;
-	Read_NOR_info();
-	Read_NOR_FAT_info();
-		gl_norOffset = First_game_address;
-		game_total_NOR = GetFileListFromNor();
+		Check_NOR_flash();
   }
 
   if(page_num==SD_list)
@@ -16642,6 +16626,13 @@ static void Launcher_ConfirmLaunch(u32 pulse)
 //---------------------------------------------------------------
 void Boot_NOR_game(u32 show_offset,	u32 file_select,u32 key_L)
 {
+	if(show_offset >= game_total_NOR || file_select >= game_total_NOR - show_offset) return;
+	if(Read_sav_info(0) == 0x11) { Show_error_num(5); return; }
+    if(pNorFS[show_offset + file_select].have_patch && pNorFS[show_offset + file_select].have_RTS) {
+        Launcher_ShowLaunchError("NOR save states need a compatible patch.");
+        wait_btn();
+        return;
+    }
 	Launcher_RestoreLaunchMenu(show_offset, file_select);
 	Launcher_ConfirmLaunch(0);
 	UIAudio_StopForSharedBufferUse();
@@ -16705,6 +16696,8 @@ void Boot_NOR_game(u32 show_offset,	u32 file_select,u32 key_L)
 //---------------------------------------------------------------
 u8 FRAM_save_op(u8 OP)
 {
+	if(Read_sav_info(0) == 0x11 || !game_total_NOR ||
+	   pNorFS[0].rompage != First_game_address / 0x20000) return 5;
 	u32 res;
 	u32 savefilesize=0;
 	TCHAR savfilename[100];
@@ -16791,7 +16784,8 @@ u8 FRAM_save_op(u8 OP)
 //---------------------------------------------------------------
 static u32 Launcher_CanDeleteNorTitle(u32 selected_index)
 {
-    return selected_index < game_total_NOR && selected_index < MAX_NOR &&
+    return Blue_NorCatalogMatchesMap() &&
+           selected_index < game_total_NOR && selected_index < MAX_NOR &&
            BlueNorValidSpan(pNorFS[selected_index].rompage, pNorFS[selected_index].filesize);
 }
 
@@ -17624,6 +17618,11 @@ load_file:
 				}
 		break;
 	case 3://WRITE TO NOR ADDON
+        if(gl_rts_on) {
+            Launcher_ShowLaunchError("Turn off save states for NOR add-ons.");
+            wait_btn();
+            return 0;
+        }
 		UIAudio_StopForSharedBufferUse();
 		gl_reset_on = Read_SET_info(assress_v_reset);
 				gl_rts_on = Read_SET_info(assress_v_rts);

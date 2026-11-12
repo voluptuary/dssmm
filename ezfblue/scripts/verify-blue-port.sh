@@ -20,8 +20,8 @@ spec = importlib.util.spec_from_file_location('blue_packer', root / 'scripts/pac
 packer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(packer)
 code = root / 'targets/blue/ezbluekernel-development.gba'
-linked = packer.pack(code.read_bytes(), (root / 'targets/blue/resources/image.bin').read_bytes(), code.with_suffix('.elf'))
-print(f'BLUE resource recipe verified in memory: {len(linked)} bytes; no update distributed.')
+linked = packer.pack(code.read_bytes(), elf=code.with_suffix('.elf'))
+print(f'BLUE firmware-free stock-size image verified in memory: {len(linked)} bytes; no update distributed.')
 
 nm = Path(os.environ['DEVKITARM']) / 'bin/arm-none-eabi-nm'
 symbols = {}

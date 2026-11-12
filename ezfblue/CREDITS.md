@@ -30,3 +30,16 @@ the previous Jagoomba payload in development code. It builds on **Jaga /
 EvilJagaGenius**, **Dwedit** and **FluBBa**. Upstream also credits **Minucce**,
 **Sterophonick**, **EZ-FLASH**, **Nuvie**, **Radimerry**, **Therealteamplayer**
 and **Endrift / mGBA**. [Pinned source, hardware variant and validation](docs/plugins/MIGOOMBA.md).
+
+## FrankieT19 BLUE port comparison and development improvements
+
+**FrankieT19** authored the separate [OMEGA BLUE DS Style port](https://github.com/FrankieT19/omega-blue-ds-style-kernel).
+Review of its Test 3–5 work at commit `08ab566c420641b0f33ffb914e37c35a7e32857a`
+informed our firmware-free stock-size packaging, full-image integrity, pending-save
+protection, NOR allocation/browsing safeguards, BLUE DDR state staging and
+separation of launcher preferences from stock Mode B. These adaptations are
+independently implemented over DSSMM's existing vendor-derived sources; his
+Slot-derived runtime, custom emulator and trampoline were not copied.
+See [the comparison and provenance](docs/porting/FRANKIET19_BLUE_COMPARISON.md).
+Upstream explicitly labels Test 5 physically unverified; no hardware validation
+of DSSMM is implied. EZ-FLASH remains credited for BLUE's hardware foundation.

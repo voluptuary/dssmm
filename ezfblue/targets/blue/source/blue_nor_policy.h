@@ -37,4 +37,18 @@ static inline int BlueNorMark(unsigned char *map, uint32_t page, uint32_t bytes)
     for(uint32_t index = first; index < first + count; index++) map[index] = 0xFF;
     return 1;
 }
+/* Reserve the complete add-on extent, including a patch just before a block end.
+   Inspired by FrankieT19 BLUE Test3's write-plan review; no upstream code copied. */
+static inline int BlueNorAllocation(uint32_t size, int patched, uint32_t trim, uint32_t *bytes)
+{
+    if(!bytes || size < 0xC0 || size > 0x4000000) return 0;
+    uint32_t end = size;
+    if(patched) {
+        if(trim < 0xC0 || trim % 4 || trim > 0x2000000 - 0x2000 ||
+           trim % BLUE_NOR_BLOCK > BLUE_NOR_BLOCK - 0x2000) return 0;
+        if(end < trim + 0x2000) end = trim + 0x2000;
+    }
+    *bytes = (end + 0x3FFFFu) & ~0x3FFFFu;
+    return 1;
+}
 #endif

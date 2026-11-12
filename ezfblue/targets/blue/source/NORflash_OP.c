@@ -300,22 +300,38 @@ u32 Find_NOR_space(u32 needsize)
     return BlueNorFindFree(NOR_FAT_buffer, needsize);
 }
 //-----------------------------------------------------------
+u8 Blue_NorCatalogMatchesMap(void)
+{
+    u8 occupied[NOR_FAT_SIZE / 8] = {0};
+    for(u32 index = 0; index < game_total_NOR; index++) {
+        const FM_NOR_FS *live = &pNorFS[index];
+        if(!BlueNorValidSpan(live->rompage, live->filesize)) return 0;
+        u32 first = live->rompage - First_game_address / 0x20000;
+        for(u32 block = first; block < first + live->filesize / 0x20000; block++) {
+            if(occupied[block / 8] & (1u << (block % 8))) return 0;
+            occupied[block / 8] |= 1u << (block % 8);
+        }
+    }
+    for(u32 block = 0; block < NOR_FAT_SIZE; block++)
+        if(!!NOR_FAT_buffer[block] != !!(occupied[block / 8] & (1u << (block % 8))))
+            return 0;
+    return 1;
+}
+
 void Check_NOR_flash(void)
 {
-	Read_NORgame_info();	    	
-	gl_norOffset = First_game_address;
-	game_total_NOR = GetFileListFromNor();//initialize to prevent direct writes to NOR without page turning
-	if(game_total_NOR==0)
-	{
-		memset(pNorFS,00,sizeof(FM_NOR_FS)*MAX_NOR);
-		Save_NORgame_info((u16*)pNorFS,sizeof(FM_NOR_FS)*MAX_NOR);
-		
-		memset(NOR_FAT_buffer,0x0,NOR_FAT_SIZE);////init
-		Save_NOR_FAT_info();
-	}
-	else{
-		Read_NOR_FAT_info();
-	}	
+    Read_NORgame_info();
+    Read_NOR_FAT_info();
+    /* Only a completely erased catalog AND map prove a factory-empty device.
+       Normalise in RAM; never erase/program metadata while browsing. */
+    u32 erased = 1;
+    for(u32 i = 0; i < sizeof(pNorFS); i++)
+        if(((const u8 *)pNorFS)[i] != 0xFF) erased = 0;
+    for(u32 i = 0; i < NOR_FAT_SIZE; i++)
+        if(NOR_FAT_buffer[i] != 0xFF) erased = 0;
+    if(erased) memset(NOR_FAT_buffer, 0, NOR_FAT_SIZE);
+    gl_norOffset = First_game_address;
+    game_total_NOR = GetFileListFromNor();
 }
 
 //-----------------------------------------------------------
@@ -331,31 +347,22 @@ u32 BlueVendor_Loadfile2NOR(TCHAR *filename, u32 NORaddress, u16 have_patch,
     u32 filesize;
     u32 destination;
     u32 slot;
+    /* Persistent NOR patches must not keep unverified SD state-sector addresses. */
+    if(have_patch && gl_rts_on) return result;
     if(!filename || strlen(filename) >= sizeof(entry.filename)) return result;
     if(Read_S98NOR_ID() != NOR_ID) return NOR_WRITE_RESULT_DEVICE_ERROR;
     if(f_open(&file, filename, FA_READ) != FR_OK) return result;
     FSIZE_t full_size = f_size(&file);
     if(full_size < 0xC0 || full_size > PSRAM_CAPACITY_BYTES) goto done;
     filesize = (u32)full_size;
-    allocation = (filesize + 0x3FFFF) & ~0x3FFFFUL;
-    if(have_patch && iTrimSize >= allocation) {
-        if(iTrimSize > allocation || allocation > NOR_end_address - First_game_address - 0x40000)
-            goto done;
-        allocation += 0x40000;
-    }
+    if(!BlueNorAllocation(filesize, have_patch, iTrimSize, &allocation)) goto done;
     memset(&entry, 0, sizeof(entry));
     if(f_lseek(&file, 0xA0) != FR_OK ||
        f_read(&file, entry.gamename, sizeof(entry.gamename), &received) != FR_OK ||
        received != sizeof(entry.gamename)) goto done;
-    Read_NORgame_info();
-    gl_norOffset = First_game_address;
-    game_total_NOR = GetFileListFromNor();
+    Check_NOR_flash();
     if(game_total_NOR >= MAX_NOR) { result = NOR_WRITE_RESULT_FULL; goto done; }
-    /* Rebuild in RAM from validated catalog spans before choosing a free run. */
-    memset(NOR_FAT_buffer, 0, NOR_FAT_SIZE);
-    for(u32 index = 0; index < game_total_NOR; index++)
-        if(!BlueNorMark(NOR_FAT_buffer, pNorFS[index].rompage, pNorFS[index].filesize))
-            goto done;
+    if(!Blue_NorCatalogMatchesMap()) goto done;
     destination = Find_NOR_space(allocation);
     if(!destination) { result = NOR_WRITE_RESULT_FULL; goto done; }
     slot = game_total_NOR;
@@ -469,6 +476,15 @@ u32 IWRAM_CODE GetFileListFromNor(void)
     SetRompage_MODE(gl_currentpage, SYSTEM_MODE_OS);
     for(u32 slot = count; slot < MAX_NOR; slot++)
         for(u32 index = 0; index < sizeof(FM_NOR_FS); index++) ((u8 *)&pNorFS[slot])[index] = 0;
+    for(u32 i = 1; i < count; i++) {
+        FM_NOR_FS entry = pNorFS[i];
+        u32 j = i;
+        while(j && pNorFS[j - 1].rompage > entry.rompage) {
+            pNorFS[j] = pNorFS[j - 1];
+            j--;
+        }
+        pNorFS[j] = entry;
+    }
     gl_norOffset = First_game_address + used;
     REG_IME = incoming_ime;
     return count;
