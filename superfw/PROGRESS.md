@@ -16,3 +16,7 @@ Added the owner-provided ChisBread Prime introduction to docs/PORTING-PLAN.md. R
 ## 2026-11-12 — Unsupported-feature scope decision
 
 Owner authorizes dropping features unsupported by Prime hardware, including automatic themes. Updated docs/PORTING-PLAN.md: manual Light/Dark/accent controls remain; absent hardware controls are omitted. Existing game software-RTC support is a separate native capability. Documentation only; git diff --check passed.
+
+## 2026-11-12 — DSSCC artwork compatibility target
+
+Owner requests retaining name-matched packs built with voluptuary/dsscc. Added its documented dimensions/layout/BMP format to docs/PORTING-PLAN.md, plus source-format audit and real-pack/physical rendering acceptance gates. Implementation remains pending; no generator or firmware code changed. Documentation whitespace check passed.

@@ -20,7 +20,7 @@ Do not transplant OMEGA drivers, patch payloads, save-state formats or flash lay
 | --- | --- |
 | DS-style panels, icons, typography, Light/Dark themes and accents | High visual fidelity is feasible on the same 240×160 GBA display. Adapt assets/rendering after license, palette, VRAM and firmware-size checks. |
 | List and List + Art | First UI targets; use SuperFW browser and launch actions. |
-| Horizontal/vertical carousels and transparent artwork | Later renderer work; prototype RAM use, image decoding and SD latency before promising parity. Reuse artwork naming conventions where practical. |
+| Horizontal/vertical carousels and transparent artwork | Later renderer work; prototype RAM use, image decoding and SD latency before promising parity. Preserve DSSCC name-matched artwork compatibility as specified below. |
 | Favorites, recents, last-played and startup shortcuts | Carry over behavior; retain native recent/save lifecycle and add versioned settings where needed. |
 | Menu sounds and localization | Feasible, but audit audio/interrupt ownership and preserve SuperFW UTF/font support. |
 | Clock-based Auto theme | Omit on Prime. Keep manual Light/Dark themes and accent selection; do not add a software clock solely to reproduce automatic themes. |
@@ -57,3 +57,11 @@ Prime combines NOR execution with retained SDRAM and fragmented flash allocation
 ## Owner scope decision — omit unsupported hardware features
 
 Automatic clock-based themes are excluded from the Prime port. Retain manual Light/Dark themes and accent colors. Omit controls for absent rumble, hardware RTC and unsupported cartridge modes rather than display disabled placeholders or emulate hardware solely for menu parity. Preserve SuperFW’s existing software RTC game-patching support where applicable; that is independent of menu theme scheduling. Scope the visible interface to target capabilities, including variant-specific builds. Visual consistency means a common design and navigation style, not identical feature counts across cards.
+
+## DSSCC artwork compatibility requirement
+
+Owner requests retaining pack generation with [DSSCC](https://github.com/voluptuary/dsscc). Adopt its existing output as an input compatibility target, rather than require a Prime-only artwork generator. DSSCC documents 120×80 title images under IMGS, 80×80 box images under IMGS2, exact-name files/folders in CUSTOM, and EZ-FLASH-compatible 15-bit BMP output. Its documented CUSTOM index limit is 256 entries per folder; do not silently truncate or assume this is the eventual Prime limit.
+
+Before implementing the artwork milestone, pin/review the generator source and existing DSSMM lookup implementation: filename/extension rules, case handling, mirrored directories, index encoding, transparency markers, fallback precedence and BMP header/pixel details. Preserve existing pack layout and matching behavior where supported; translate pixels in the Prime renderer if necessary. Keep artwork external on SD, load on demand and bound caches to avoid inflating firmware or exhausting RAM. Name matching is independent of which emulator launches the ROM.
+
+Acceptance: build a representative pack with unmodified DSSCC, copy it to the Prime SD card, and verify exact-name title/box artwork for GBA and supported non-GBA entries. Cover duplicate names across directories, Unicode/long names, absent/corrupt files, transparency and navigation latency. NOR entries should retain their source artwork identity where native metadata permits. No compatibility claim until these fixtures and physical rendering pass. This checkpoint adds a design requirement; the current imported firmware has no DSSCC artwork reader yet. Credit DSSCC and its FrankieT19 scraper lineage in implementation documentation.
