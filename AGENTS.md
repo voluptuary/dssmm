@@ -1,14 +1,14 @@
 # DSSMM shared-tree working architecture
 
 Repository: https://github.com/voluptuary/dssmm. Default/integration branch:
-`dssmm`. Hardware branches: `ezfomegade`, `ezfomega`, `ezfblue`. Do not recreate
+`dssmm`. Hardware/project branches: `ezfomegade`, `ezfomega`, `ezfblue`, `superfw`. Do not recreate
 retired `main` or `ezfode` branches.
 
 ## One tracked layout, separate hardware ownership
 
 Every branch tracks the SAME complete tree: universal root infrastructure plus
-`ezfomegade/`, `ezfomega/`, and `ezfblue/`. Hardware branches are development lanes,
-not different repository layouts. GitHub therefore shows all three projects on
+`ezfomegade/`, `ezfomega/`, `ezfblue/`, and `superfw/`. Project branches are development lanes,
+not different repository layouts. GitHub therefore shows all four projects on
 every branch. Optional worktree-local sparse checkout hides unrelated projects
 without deleting them from Git. Never commit their removal to focus a branch.
 
@@ -47,14 +47,14 @@ future merges must use ordinary Git merge behavior.
 ## Working views and builds
 
 A hardware worktree can be focused with:
-`git sparse-checkout set --cone .devcontainer .github docs scripts tests ezfomega`
+`git sparse-checkout set --cone .devcontainer .github docs scripts tests superfw`
 (substitute its target). Root files remain visible automatically. Sparse settings
 are worktree-local; `git sparse-checkout disable` restores the full view. Never
 hand-delete tracked directories. Shared CI uses complete checkouts.
 
-`make` prints help. `make ezfomegade`, `make ezfomega`, `make ezfblue` explicitly
-select hardware. `make build-all`/`make verify-all` select projects materialized
-in the current working view; on full dssmm they select all three. For a hidden
+`make` prints help. `make ezfomegade`, `make ezfomega`, `make ezfblue`, `make superfw` explicitly
+select a project; SuperFW additionally accepts `BOARD=sd|lite|chis`. `make build-all`/`make verify-all` select projects materialized
+in the current working view; on full dssmm they select all four. For a hidden
 project, expand the sparse view first. Outputs remain private to the project.
 Run `make check-isolation`, `python3 tests/test-project-isolation.py` and
 `python3 tests/test-project-merges.py` when changing this architecture. Root CI
@@ -81,8 +81,8 @@ setting, not a guarantee supplied by directory layout or CI.
 
 Root README.md is a user-facing hardware/features/download/credits overview.
 Keep developer commands, sparse/branch/merge procedures and architecture details
-in docs/isolation.md and agent/journal files. Clearly distinguish all three
-cards and retain the OMEGA/BLUE hardware-untested, caution/own-risk notice.
+in docs/isolation.md and agent/journal files. Clearly distinguish the three OMEGA-family cards and the separate SuperCard
+SuperFW project; retain the OMEGA/BLUE hardware-untested, caution/own-risk notice.
 Keep credits positive and accurate; retain Merkin Mix's DS Style fork lineage.
 
 For local VS Code/Docker/Ubuntu setup and session recovery, read
@@ -123,3 +123,13 @@ are archived under docs/history/releases/ before a history-wide editorial pass.
 
 - Owner requests removing end-user-unneeded lines from release bodies, including GitHub's automatic source-archive notice, the packed `.bin` versus raw development `.gba` warning, and SHA-256 lines. Applied to all19 canonical notes and release bodies; removed redundant asset filenames/byte counts as well. Retained model compatibility, hardware-testing limits, save/update cautions, credits and the four ordered changelog sections.
 - Exact remote bodies and metadata before this cleanup are archived at docs/history/releases/before-end-user-cleanup-2026-11-12.json. Update docs/releases/unified-release-notes-2026-11-12.json after publication with new body hashes/word counts; verify all19 remote bodies match canonical files and release metadata/assets remain unchanged. Documentation only; no kernel tests are needed.
+
+## SuperFW project lane
+
+The fourth project is the independent GPL SuperFW source for SuperCard GBA flash
+carts and derivatives, pinned at upstream commit
+`dabbf4909f85e556f7a12972cc8a7b94fc54ac51`. Its source, assets, licenses, tools,
+tests and journals belong under `superfw/`; its development branch is `superfw`.
+Build variants are `sd`, `lite` and `chis`. Do not combine its code or hardware
+protocols with the OMEGA-family kernels. Read `superfw/AGENTS.md` and the project
+current journals before SuperFW work. Local import is not hardware validation.

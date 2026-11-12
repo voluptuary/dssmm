@@ -1983,3 +1983,10 @@ The release was created and subsequently corrected to use the cartridge-required
 
 - Removed the redundant asset/archive/checksum instructions from all19 GitHub release bodies and matching canonical notes. GitHub bodies match the checked local text; the four-section order remains exact. Total body length fell from6343 to6100words. Exact pre-edit notes/metadata are preserved at docs/history/releases/before-end-user-cleanup-2026-11-12.json; post-edit hashes and unchanged metadata/assets are recorded in docs/releases/end-user-cleanup-2026-11-12.json.
 - All release IDs/titles/tags/status/dates/targets and attached asset IDs/names/sizes/digests/timestamps/URLs verified unchanged. No tags or binaries changed. Commit72f5fe293f8a3ec62ddf24852917af0b340e9b4f is pushed to dssmm and all three hardware lanes; remote refs match. Only the pre-existing untracked devcontainer lock remains. Scope complete.
+
+
+## 2026-11-12 — SuperFW fourth project bootstrap checkpoint
+
+- Imported upstream `davidgfnet/superfw` commit `dabbf4909f85e556f7a12972cc8a7b94fc54ac51` under `superfw/`, retaining its 158 tracked files, adding GPL-3.0 `COPYING`, upstream provenance and per-project ownership/journals. Only upstream `.gitignore` has project-local generated-output ignore additions. This is an independent SuperCard project, not an OMEGA kernel.
+- Root registry, dispatcher, CI, project/scope/sparse checks and user/developer docs now include the fourth project. `make check-isolation`, both project policy/merge suites, site composition and input snapshot checks pass. All three upstream board variants build locally; cimpl/util/UTF/cheats/CRC host test groups pass. Full SHA test/coverage suite awaits CI dependencies (`libssl-dev`, `lcov`). One existing upstream unused-variable warning appears in `chis`. No physical hardware qualification is claimed.
+- Next: commit/push shared integration on `dssmm`, collect all-model CI; create/push `superfw` from the integrated tree, run its branch CI; fast-forward/push the other three lanes and verify all five remote heads. Preserve all kernel releases/assets. Existing untracked devcontainer lock is not ours.

@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-DOC_NAMES = {'AGENTS.md', 'HANDOFF.md', 'PROGRESS.md', 'README.md', 'CREDITS.md', 'CHANGELOG.md'}
+DOC_NAMES = {'AGENTS.md', 'HANDOFF.md', 'PROGRESS.md', 'README.md', 'CREDITS.md', 'CHANGELOG.md', 'project.json', 'COPYING'}
 
 
 def kernel_input(name):

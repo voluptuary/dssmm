@@ -3,7 +3,7 @@
 Target: EZ-FLASH OMEGA Definitive Edition Rev. A/B. Repository: voluptuary/dssmm.
 Read root AGENTS.md plus this directory's HANDOFF.md and PROGRESS.md first.
 
-All four branches track the same combined tree. This hardware branch is a
+All five branches (`dssmm`, `ezfomegade`, `ezfomega`, `ezfblue`, `superfw`) track the same combined tree with four isolated project directories. This hardware branch is a
 development lane for ezfomegade/, optionally shown through worktree-local sparse
 checkout. Other project directories remain tracked even when hidden. Never
 commit their removal. Kernel source/assets/tests/protocols stay private here.

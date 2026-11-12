@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-12",
+  "upstream": "https://github.com/davidgfnet/superfw",
+  "upstream_commit": "dabbf4909f85e556f7a12972cc8a7b94fc54ac51",
+  "compiler": "devkitARM 16.1.0",
+  "compression_ratio": 4,
+  "builds": [
+    {
+      "board": "sd",
+      "artifact": "superfw/build/sd/superfw.fw",
+      "size_bytes": 496640,
+      "sha256": "d660aa8e7b241ebe901d9e77239139331c0c27d67df51e2ccd4f829f1d76b653",
+      "build": "passed"
+    },
+    {
+      "board": "lite",
+      "artifact": "superfw/build/lite/superfw.fw",
+      "size_bytes": 464384,
+      "sha256": "02969549eaf1e1c7135fd5b808110c351a5993ac125cc2b958e2c18428f74e6e",
+      "build": "passed"
+    },
+    {
+      "board": "chis",
+      "artifact": "superfw/build/chis/superfw.fw",
+      "size_bytes": 1671680,
+      "sha256": "1d7808b3ed30b86e78ff7b3aab8cdca32bc5d20677484da887a3dc33375bda0f",
+      "build": "passed"
+    }
+  ],
+  "upstream_host_test_groups": {
+    "cimpl": "passed",
+    "util": "passed",
+    "utf_util": "passed",
+    "cheats": "passed",
+    "crc": "passed",
+    "sha256": "not_run_missing_openssl_development_headers"
+  },
+  "coverage": "not_run_missing_lcov",
+  "full_project_verifier": "not_completed_locally; configured CI will install lcov and libssl-dev",
+  "warnings": [
+    "upstream linker emits RWX LOAD-segment warnings",
+    "upstream chis build reports an unused err variable in src/menu.c"
+  ],
+  "hardware_validation": "not_performed"
+}

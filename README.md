@@ -1,7 +1,8 @@
 # DS Style Merkin Mix (DSSMM)
 
-DSSMM is a Nintendo DS-inspired custom menu kernel for the EZ-FLASH OMEGA family,
-maintained by [Merkin](https://github.com/voluptuary). Merkin Mix
+DSSMM is a Nintendo DS-inspired custom menu kernel family for EZ-FLASH OMEGA cards,
+maintained by [Merkin](https://github.com/voluptuary). The repository also includes
+the independent SuperFW project for SuperCard GBA flash carts. Merkin Mix
 builds on [FrankieT19's DS Style forks](https://github.com/FrankieT19), with
 foundations from EZ-FLASH and Sterophonick's SimpleLight kernel. On your
 handheld, it provides the cartridge menu for browsing the SD card, launching
@@ -16,7 +17,7 @@ management. Available features depend on the card and its compatible plugins.
 
 ## Choose the kernel for your exact card
 
-**There are three distinct kernels. They are not interchangeable. Check your
+**The three OMEGA-family kernels below are not interchangeable. Check your
 cartridge model before downloading or flashing an update.**
 
 | Your cartridge | Kernel download | Update file | Status |
@@ -40,6 +41,18 @@ and follow that release's installation instructions.
 > **Use both experimental builds with caution and only at your own risk.**
 > Back up your SD card and save files before testing. Avoid powering off during
 > kernel updates, save writes or NOR operations.
+
+## SuperCard firmware project
+
+The repository also tracks [SuperFW](https://github.com/davidgfnet/superfw), an
+independent GPL-licensed firmware for SuperCard GBA flash carts and derivatives.
+Its `sd`, `lite` and `chis` board variants live in the isolated [`superfw/`](superfw/)
+project and use a separate `superfw` development branch. SuperFW is not an
+OMEGA-family kernel. The `sd`, `lite` and `chis` source builds passed locally, along with five
+upstream host-test groups. The full coverage-enabled suite is pending CI; physical
+SuperCard behavior has not been tested here. There is no DSSMM SuperFW release
+in this repository. Follow the upstream installation
+instructions and use the matching SuperFW variant.
 
 ## GB/GBC emulator update
 
@@ -68,14 +81,15 @@ updating and do not assume old emulator save states are compatible.
 - **More convenient navigation:** configurable startup behavior, wrapping,
   favorites shortcuts and access to the SYSTEM folder.
 
-Hardware capabilities remain different across the three cards. A feature on one
+Hardware capabilities remain different across the three OMEGA-family cards. A feature on one
 card does not add that hardware capability to another, and plugin compatibility
 still depends on the plugin. Flash operations and interrupted save or metadata
 writes retain known limitations, so keep backups even when using a stable build.
 
-For platform-specific features, artwork requirements and known limitations, see
-the [Definitive Edition Rev. A/B guide](ezfomegade/README.md),
+For OMEGA-family features, artwork requirements and known limitations, see the
+[Definitive Edition Rev. A/B guide](ezfomegade/README.md),
 [Original OMEGA guide](ezfomega/README.md) or [BLUE guide](ezfblue/README.md).
+SuperCard development and license details are in [the SuperFW project](superfw/README.md).
 [DS Style Card Companion](https://github.com/voluptuary/dsscc) is the separate
 companion application for finding and preparing artwork.
 
@@ -104,6 +118,8 @@ DSSMM builds on the work of the following contributors:
   **Jaga / EvilJagaGenius**'s Jagoomba Color, **Dwedit**'s Goomba Color and
   **FluBBa**'s Goomba. Its upstream acknowledgments also credit **Minucce**,
   **Nuvie**, **Radimerry**, **Therealteamplayer** and **Endrift / mGBA**.
+- **David Guillen Fandos (davidgfnet)** — author of SuperFW, maintained as a separate
+  upstream project under `superfw/`; its source retains upstream licenses and credits.
 - **Copilot, ChatGPT, and Claude** — contributions to interface integration, testing and
   release documentation. Other AI-assisted development work
   are recorded in the project history.

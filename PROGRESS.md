@@ -3091,3 +3091,10 @@ Entries below record what was known at each stage. Do not use older branch hashe
 - Archived exact prior GitHub bodies/metadata at docs/history/releases/before-end-user-cleanup-2026-11-12.json. Remaining: update all19 GitHub bodies, verify notes and immutable metadata, commit to dssmm, synchronize lanes, and record final body hashes/word counts in release evidence. Documentation only; no kernel regression testing needed.
 
 - Completion: all19 GitHub release bodies now match the streamlined canonical notes. Verification report: docs/releases/end-user-cleanup-2026-11-12.json. Commit72f5fe293f8a3ec62ddf24852917af0b340e9b4f is present on dssmm, ezfomegade, ezfomega and ezfblue locally/remotely. Existing untracked `.devcontainer/devcontainer-lock.json` was left untouched.
+
+
+## 2026-11-12 — SuperFW added as a fourth isolated project
+
+- Imported/pinned upstream SuperFW source and included its own directory, GPL text, provenance, contributors and journals. Project supports upstream `sd`, `lite`, `chis` variants; no OMEGA code is shared. Shared build dispatch, branch scope policy, sparse layout, CI matrix, devcontainer host dependencies and overview docs updated.
+- Validation so far: all three board builds pass locally; five upstream host-test groups pass. `make check-isolation`, five scope/identity fixtures, three real-Git merge/sparse fixtures, four project input baselines and site composition pass. SHA-256 upstream test and coverage reporting are not locally runnable because OpenSSL development headers/lcov are absent; CI config now installs both. No physical SuperCard hardware testing.
+- Next: commit/push trunk setup, confirm hosted all-project CI, create/push `superfw` lane, sync existing lanes and verify remote ref/tree equality.

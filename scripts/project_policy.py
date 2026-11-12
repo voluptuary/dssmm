@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGETS = {'ezfomegade', 'ezfomega', 'ezfblue'}
+TARGETS = {'ezfomegade', 'ezfomega', 'ezfblue', 'superfw'}
 UNIVERSAL = {'.devcontainer', '.editorconfig', '.git-blame-ignore-revs', '.gitattributes',
              '.github', '.gitignore', 'AGENTS.md', 'CREDITS.md', 'HANDOFF.md', 'LICENSE',
              'Makefile', 'PROGRESS.md', 'README.md', 'docs', 'projects.json', 'scripts', 'tests'}
@@ -45,7 +45,13 @@ def validate_project(root, target):
     foreign = {p.name for p in (root / 'targets').iterdir() if p.is_dir()} if (root / 'targets').exists() else set()
     if foreign != ({'blue'} if target == 'ezfblue' else set()):
         raise ValueError('Project contains foreign hardware directories')
-    if target == 'ezfblue':
+    if target == 'superfw':
+        if not all((root / name).is_file() for name in ('README.md', 'Makefile', 'COPYING', 'src/main.c')):
+            raise ValueError('SuperFW project is missing upstream firmware files')
+        metadata = json.loads((root / 'project.json').read_text())
+        if metadata.get('upstream') != 'https://github.com/davidgfnet/superfw' or not metadata.get('upstream_commit'):
+            raise ValueError('SuperFW upstream provenance is missing')
+    elif target == 'ezfblue':
         if (root / 'source').exists() or not (root / 'targets/blue/source/ezbluekernel.c').exists():
             raise ValueError('BLUE must contain only its own firmware source')
     elif not (root / 'source/ezkernelnew.c').exists():
@@ -56,15 +62,17 @@ def validate_project(root, target):
     for name in ('AGENTS.md', 'HANDOFF.md', 'PROGRESS.md', 'Makefile'):
         if not (root / name).is_file():
             raise ValueError('Missing project requirement: ' + name)
-    for name in ('.github', '.devcontainer', '.gitignore', '.gitattributes', 'scripts/project.py', 'scripts/project_policy.py'):
+    for name in ('.devcontainer', '.gitattributes', 'scripts/project.py', 'scripts/project_policy.py'):
         if (root / name).exists():
             raise ValueError('Universal infrastructure duplicated inside project: ' + name)
+    if target != 'superfw' and (root / '.github').exists():
+        raise ValueError('Universal CI duplicated inside project')
 
 
 def validate_layout(root, expected=None, branch=None):
     records = json.loads((root / 'projects.json').read_text())['projects']
     if set(records) != TARGETS:
-        raise ValueError('Every branch must track all three projects in the common registry')
+        raise ValueError('Every branch must track all four projects in the common registry')
     raw = subprocess.check_output(['git', '-C', str(root), 'ls-files', '-t', '-z'])
     entries = {entry[2:].decode(): entry[:1] == b'S' for entry in raw.split(b'\0') if entry}
     misplaced = {Path(name).parts[0] for name in entries} - UNIVERSAL - TARGETS

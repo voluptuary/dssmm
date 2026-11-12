@@ -23,9 +23,20 @@ def fixture(root):
         project = root / target
         project.mkdir()
         (project / 'project.json').write_text(json.dumps({'id': target}))
-        source = project / ('targets/blue/source' if target == 'ezfblue' else 'source')
-        source.mkdir(parents=True)
-        (source / ('ezbluekernel.c' if target == 'ezfblue' else 'ezkernelnew.c')).write_text('')
+        if target == 'superfw':
+            (project / 'README.md').write_text('SuperFW upstream fixture\n')
+            (project / 'Makefile').write_text('')
+            (project / 'COPYING').write_text('GPL fixture\n')
+            (project / 'src').mkdir()
+            (project / 'src/main.c').write_text('')
+            (project / '.github/workflows').mkdir(parents=True)
+            (project / '.github/workflows/build.yml').write_text('')
+            metadata = {'id': target, 'upstream': 'https://github.com/davidgfnet/superfw', 'upstream_commit': 'fixture'}
+            (project / 'project.json').write_text(json.dumps(metadata))
+        else:
+            source = project / ('targets/blue/source' if target == 'ezfblue' else 'source')
+            source.mkdir(parents=True)
+            (source / ('ezbluekernel.c' if target == 'ezfblue' else 'ezkernelnew.c')).write_text('')
         for name in ('AGENTS.md', 'HANDOFF.md', 'PROGRESS.md', 'Makefile'):
             (project / name).write_text('')
 
@@ -84,6 +95,16 @@ class Isolation(unittest.TestCase):
             (project / 'source/external').symlink_to(root / 'ezfomegade/source', target_is_directory=True)
             with self.assertRaises(ValueError):
                 self.validate(root)
+
+    def test_superfw_provenance_and_upstream_workflows_are_project_local(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            fixture(root)
+            self.validate(root, expected='superfw', branch='superfw')
+            project = root / 'superfw'
+            (project / 'project.json').write_text(json.dumps({'id': 'superfw', 'upstream': 'https://example.invalid', 'upstream_commit': 'fixture'}))
+            with self.assertRaises(ValueError):
+                self.validate(root, expected='superfw', branch='superfw')
 
     def test_deleted_directory_is_not_sparse_checkout(self):
         with tempfile.TemporaryDirectory() as folder:

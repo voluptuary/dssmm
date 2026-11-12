@@ -45,13 +45,12 @@ container before this update, select **Dev Containers: Rebuild Container**.
 The Dockerfile pins `devkitpro/devkitarm:20260610`. It supplies devkitARM/libgba
 and GBA rules; the configuration sets DEVKITPRO/DEVKITARM and uses the `vscode`
 user. Host validation tools include GCC, Git/GitHub CLI, Python/Unicorn, Node,
-Cppcheck, CMake and zlib headers. Dev Container features provide Node24 and the
+Cppcheck, CMake, zlib and OpenSSL headers, and lcov for SuperFW host tests. Dev Container features provide Node24 and the
 normal user utilities. First use requires downloading container images/features.
 No package/image cache from Codespaces is required.
 
-The dependency addition was syntax/configuration checked during urgent handoff;
-a fresh local Docker image build still needs verification. Do not report it as
-already tested on the owner's Windows/Ubuntu machine.
+The SuperFW verification dependencies are installed in the container. Rebuild
+an existing container after Dockerfile changes. A fresh image build on the owner's Windows/Ubuntu machine is not implied by this repository-side change.
 
 ## 3. Orient before changing code
 
@@ -76,9 +75,11 @@ make ezfomegade
 make verify-ezfomegade
 # Or: make ezfomega / make verify-ezfomega
 # Or: make ezfblue / make verify-ezfblue
+# SuperCard GBA family: make superfw BOARD=sd|lite|chis
+# Verify all SuperFW variants and upstream host tests: make verify-superfw
 ```
 
-In a full checkout, `make build-all` and `make verify-all` select all three.
+In a full checkout, `make build-all` and `make verify-all` select all four.
 MiGoomba's generated headers are checked in, so normal kernel builds do NOT
 need a MiGoomba checkout, mGBA, commercial games or a network download.
 
@@ -87,7 +88,7 @@ need a MiGoomba checkout, mGBA, commercial games or a network download.
 The simplest local setup is ONE clone and ONE container; switch branches in
 its terminal. You do not need to reproduce the Codespace's four worktree paths.
 All branches track the same combined layout; develop only in the matching
-kernel directory on its hardware lane. Commit or preserve changes before
+project directory on its lane (`superfw` is the SuperCard-family lane). Commit or preserve changes before
 switching; never reset/force-push to obtain a clean tree.
 
 For DE work, for example:
@@ -98,7 +99,9 @@ git sparse-checkout set --cone .devcontainer .github docs scripts tests ezfomega
 make verify-ezfomegade
 ```
 
-Use `ezfomega` or `ezfblue` for the other cards. Sparse checkout hides unrelated
+Use `ezfomega` or `ezfblue` for the other OMEGA-family cards. For SuperCard work,
+switch to `superfw` and include `superfw` in the sparse-checkout set; read its
+project AGENTS/HANDOFF/PROGRESS before editing. Sparse checkout hides unrelated
 projects but does not delete them from Git. To return to full trunk:
 
 ```sh
@@ -117,15 +120,15 @@ HTTPS cloning needs no token. Use your normal Git credentials or `gh auth login`
 inside the container for writes. Never put tokens or authentication files in
 this repository or copy them into documentation.
 
-## 5. Resume the MiGoomba task
+## 5. Existing OMEGA-family build guidance
 
-The three hardware lanes contain a pinned MiGoomba v0.1 replacement and generated
+The three OMEGA-family lanes contain a pinned MiGoomba v0.1 replacement and generated
 payloads: DE uses `ezode`, Original OMEGA uses `ezo`, BLUE uses `generic` to avoid
 unverified DE rumble register writes. Existing .esv paths/64KiB kernel save
 handling remain; back up saves. Old saved-state compatibility is not established.
 
-Earlier successful evidence is in the committed per-target JSON reports. The migration session lost its process handles and `/tmp` logs. Fresh local
-runs on 2026-11-12 completed all three full verifiers, save/conversion/legacy
+Earlier successful evidence is in committed per-target JSON reports. Fresh local
+runs on 2026-11-12 completed the three OMEGA-family verifiers, save/conversion/legacy
 replays and focused Cppcheck. Per-target `migoomba-release-validation.json`
 records the results for 8.4.0. Rerun checks after relevant changes; interrupted
 commands never count as passes.
@@ -143,3 +146,11 @@ historical release-input baseline check may report differences; it is not a
 merge gate. Earlier DE8.3.2 / OMEGA Test3 / BLUE Test2 releases remain unchanged. The owner
 subsequently authorized 8.4.0: DE stable, OMEGA Test4 and BLUE Test3 prereleases;
 see current journals and release notes. Do not overwrite earlier releases.
+
+## 6. SuperFW (SuperCard GBA family)
+
+The `superfw/` directory contains the upstream SuperFW snapshot and its independent
+license/provenance. Read `superfw/AGENTS.md` and `superfw/docs/UPSTREAM.md`. The
+root dispatcher offers `make superfw BOARD=sd|lite|chis` and
+`make verify-superfw`; outputs live under `superfw/build/`. Its source has not
+been physically tested as part of this repository setup.

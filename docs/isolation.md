@@ -1,13 +1,14 @@
 # Shared layout and hardware isolation
 
-All four branches (`dssmm`, `ezfomegade`, `ezfomega`, `ezfblue`) track the same
-combined repository layout. There are three independent projects at root:
+All five branches (`dssmm`, `ezfomegade`, `ezfomega`, `ezfblue`, `superfw`) track the same
+combined repository layout. There are four independent projects at root:
 
 | Directory | Hardware | Project-local verifier |
 | --- | --- | --- |
 | ezfomegade/ | Definitive Edition Rev. A/B | scripts/verify-ezfomegade.sh |
 | ezfomega/ | Original OMEGA | scripts/verify-omega-port.sh |
 | ezfblue/ | Newer Definitive Edition B / BLUE | scripts/verify-blue-port.sh |
+| superfw/ | SuperCard GBA flash carts (upstream SD, Lite and SuperChis variants) | superfw/scripts/verify.sh |
 
 Source, assets, hardware protocols, settings, tools, tests and platform journals
 belong to their own project. Root holds only universal infrastructure and shared
@@ -25,14 +26,14 @@ make ezfomega
 make verify-ezfomega
 ```
 
-Replace ezfomega with the appropriate project. Sparse checkout is local to the
+Replace ezfomega with the appropriate OMEGA project; for SuperCard use `superfw` and `make superfw BOARD=sd|lite|chis`. Sparse checkout is local to the
 worktree and leaves all hidden files tracked. Root files stay visible; common
 CI, environment, scripts, tests and docs are included explicitly. Use
-`git sparse-checkout disable` to restore all three projects. The full dssmm
+`git sparse-checkout disable` to restore all four projects. The full dssmm
 workspace remains unchanged when another worktree is focused.
 
 `make build-all` and `make verify-all` operate on projects present in that working
-view; complete checkouts select all three. Layout checks distinguish real sparse
+view; complete checkouts select all four. Layout checks distinguish real sparse
 index entries from accidentally deleted projects. Builds never borrow another
 project's source or assets. Pages composition requires a complete checkout.
 
@@ -45,10 +46,12 @@ Use the universal root devcontainer or an equivalent devkitPro installation
 with devkitARM, GBA rules, libgba, Maxmod and Make. Verifiers also need a host C
 compiler, Python3/Unicorn and Node. Root make commands dispatch to the private
 project with its correct flags (including Original OMEGA's omega-port target).
+SuperFW is the GPL-licensed upstream project pinned in superfw/docs/UPSTREAM.md;
+use `make superfw BOARD=sd|lite|chis` and `make verify-superfw`.
 Generated theme headers are checked in; when changing theme bitmaps, regenerate
 them using the owning project's Grit tools from that project directory.
 Hardware branch CI verifies its own kernel; trunk and integration-sync PRs
-verify all three. User-facing README files describe hardware and features, not
+verify all four. User-facing README files describe hardware and features, not
 the branch/build workflow.
 
 ## Merging
@@ -59,7 +62,7 @@ changes since the merge base, includes deletions and both sides of renames, and
 rejects hardware PRs that touch another project or root infrastructure. Feature
 PRs into a hardware lane have the same directory restriction; direct hardware
 pushes are checked for their unintegrated changes relative to origin/dssmm. dssmm PRs
-verify all three hardware projects. Merge dssmm back into hardware branches to
+verify all four projects. Merge dssmm back into hardware branches to
 synchronize the integrated tree; those integration syncs are allowed. Use merge
 commits for these long-lived lane PRs rather than squash/rebase merging, so Git
 retains their shared ancestry for later merges. Keep hardware branches after PRs.
@@ -108,3 +111,8 @@ Published releases/tags/assets stay unchanged. DE8.3.2 remains stable/latest;
 Original OMEGA Test3 and BLUE Test2 remain hardware-untested. Existing flash/SD
 atomicity, chip timing, parser and runtime-stack limits are in the private audit
 reports. Repository architecture does not add physical hardware qualification.
+
+SuperFW's imported upstream subtree retains its own GPL-3.0-or-later license,
+component notices, tools and tests. It is not shared with or built through the
+OMEGA-family project sources. Local import or compilation does not establish
+physical SuperCard compatibility; see its project journals for validation status.

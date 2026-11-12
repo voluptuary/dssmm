@@ -7,7 +7,7 @@ import subprocess
 from project_policy import validate_layout
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGETS = ('ezfomegade', 'ezfomega', 'ezfblue')
+TARGETS = ('ezfomegade', 'ezfomega', 'ezfblue', 'superfw')
 
 
 def project_root(target):
@@ -27,18 +27,25 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('build', 'verify'))
     parser.add_argument('target', choices=TARGETS)
+    parser.add_argument('--board', choices=('sd', 'lite', 'chis'), default='sd')
     args = parser.parse_args()
     validate_layout(ROOT, args.target)
     path = project_root(args.target)
     if args.command == 'build':
-        command = ['make']
+        if args.target == 'superfw':
+            command = ['bash', 'scripts/build.sh', args.board]
+        else:
+            command = ['make']
         if args.target == 'ezfomega':
             command += ['BUILD=build-omega', 'TARGET=omega-port']
     else:
-        verifier = {'ezfomegade': 'verify-ezfomegade.sh',
-                    'ezfomega': 'verify-omega-port.sh',
-                    'ezfblue': 'verify-blue-port.sh'}[args.target]
-        command = ['bash', 'scripts/' + verifier]
+        if args.target == 'superfw':
+            command = ['bash', 'scripts/verify.sh']
+        else:
+            verifier = {'ezfomegade': 'verify-ezfomegade.sh',
+                        'ezfomega': 'verify-omega-port.sh',
+                        'ezfblue': 'verify-blue-port.sh'}[args.target]
+            command = ['bash', 'scripts/' + verifier]
     print(args.target + ': ' + str(path) + ' -> ' + ' '.join(command), flush=True)
     subprocess.run(command, cwd=path, check=True)
 

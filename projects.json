@@ -1,5 +1,5 @@
 {
-  "schema": 3,
+  "schema": 4,
   "projects": {
     "ezfomegade": {
       "directory": "ezfomegade",
@@ -18,9 +18,15 @@
       "branch": "ezfblue",
       "baseline_commit": "1406cee33e3df7cddd7d11cb0c186faea44e7906",
       "baseline_directory": "ezfblue"
+    },
+    "superfw": {
+      "directory": "superfw",
+      "branch": "superfw",
+      "baseline_commit": "f00085672b7afb77e8c39e5c95447aa82d4c5850",
+      "baseline_directory": "superfw"
     }
   },
-  "policy": "Normal hardware-to-dssmm merges confined to the matching directory; merge dssmm back for integration sync.",
+  "policy": "Normal hardware-to-dssmm merges confined to the matching project directory; merge dssmm back for integration sync.",
   "relocation_baselines": [
     {
       "target": "ezfomegade",
