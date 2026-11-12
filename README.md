@@ -1,7 +1,7 @@
 # DS Style Merkin Mix (DSSMM)
 
 DSSMM is a Nintendo DS-inspired custom menu kernel for the EZ-FLASH OMEGA family,
-maintained by [Merkin / voluptuary](https://github.com/voluptuary). Merkin Mix
+maintained by [Merkin](https://github.com/voluptuary). Merkin Mix
 builds on [FrankieT19's DS Style forks](https://github.com/FrankieT19), with
 foundations from EZ-FLASH and Sterophonick's SimpleLight kernel. On your
 handheld, it provides the cartridge menu for browsing the SD card, launching
@@ -76,7 +76,7 @@ companion application for finding and preparing artwork.
 
 DSSMM builds on the work of the following contributors:
 
-- **Merkin / voluptuary** — Merkin Mix development and maintenance, artwork and
+- **Merkin** — Merkin Mix development and maintenance, artwork and
   transparency support, refreshed splash screens and system icons, rendering
   optimizations, kernel fixes and the platform ports, with AI assistance.
 - **FrankieT19** — the DS Style foundations, animated carousels and launch
@@ -93,8 +93,8 @@ DSSMM builds on the work of the following contributors:
 - **Kekun** — the font-header capitalization correction used for compatibility
   with case-sensitive build systems.
 - **ChaN** — FatFs, the filesystem library used by the kernels.
-- **Copilot** — contributions to interface integration, testing and
-  release documentation. **merkin-agent** and other AI-assisted development work
+- **Copilot, ChatGPT, and Claude** — contributions to interface integration, testing and
+  release documentation. Other AI-assisted development work
   are recorded in the project history.
 
 Thank you also to the upstream component authors, artwork/tool contributors,
