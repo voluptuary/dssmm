@@ -1,3 +1,8 @@
+## 2026-11-12 16:11 UTC — All 4 platform release-note bodies published and verified
+
+- Completed owner-requested history-wide formatting for this platform. Every published body matches its canonical docs/releases/v*.md file, has the four requested ordered sections and no repeated build heading. Prior-build changes are condensed into the correct historical summaries; warnings, evidence limits, credits, filenames/digests and historical caveats retained. Original pre-edit bodies are archived at root.
+- All19 repository releases passed remote/local content and metadata checks. This platform's release IDs/titles/tags/draft/prerelease flags/publication dates and asset identities/sizes/digests/timestamps/URLs are unchanged. Every remote tag ref is unchanged; DEv8.4.0 remains latest stable. Proof: root docs/releases/unified-release-notes-2026-11-12.json. Documentation only since the tested release source; no additional kernel tests or hardware claims. Editorial scope complete.
+
 ## 2026-11-12 16:07 UTC — All four BLUE release bodies prepared in unified format
 
 - Owner expands formatting to every release. Prepared canonical v8.3.1-blue-test1/Test2, v8.4.0-blue-test3 and v8.4.1-blue-test4 notes without repeated build headings (four BLUE releases). Each uses New features, New fixes, Summary of past features, Summary of past fixes; historical additions stay in the correct version and preceding changes are folded into concise summaries. Retained larger-image vs stock-size warnings, physical-testing limits, original resources/firmware distinctions, credits and actual asset hashes.
