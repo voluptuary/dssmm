@@ -1992,3 +1992,7 @@ The release was created and subsequently corrected to use the cartridge-required
 - The uppercase rename, references, audit script preflight, changelog line and obsolete evidence-folder/archive cleanup are in the worktree. Full audit and forced build have passed; the current candidate is refreshed. No commit, push, PR or release edit has occurred yet.
 - Verified neither evidence directory is used by live build/tests; test `test-upstream-ui-host.sh` uses an in-repository Git baseline. Their key findings are summarized in `files/REVIEW_ARCHIVE.md` and the audit ledgers.
 - Continue with final reference/diff review, source ZIP creation, commit/push to origin, PR to origin/main, and existing v8.3.0 release/tag update. Preserve the current deletion of duplicate `files/AGENTS.md`; root `AGENTS.md` is authoritative. Do not update the separate Merkin Mix fork.
+
+## 2026-11-12 — Release-note asset cleanup published
+
+- All 11 published notes for this platform were updated on GitHub and verified against canonical files. Release identity, flags and assets are unchanged. Proof: root docs/releases/end-user-cleanup-2026-11-12.json. Shared commit72f5fe293f8a3ec62ddf24852917af0b340e9b4f is pushed on all four branches. Editorial task complete; no kernel tests were run because product inputs did not change.
