@@ -94,3 +94,10 @@ see current HANDOFF and per-project migoomba-release-validation.json. All four h
 (DE stable/latest, OMEGA Test4/BLUE Test3 prereleases); downloaded assets match
 the local files. See docs/releases/8.4.0-publication.json. New hardware qualification and old saved-state compatibility are not
 claimed. Preserve user README commit e72b9be and all earlier published releases.
+
+Release notes use four ordered changelog sections: New features, New fixes,
+Summary of past features, Summary of past fixes. Keep cumulative summaries
+concise. Fold the immediately preceding release's new features/fixes into the
+appropriate past summary on the next release; do not leave them in additional
+per-version sections. Preserve accurate model/hardware warnings, credits,
+validation limits and download/hash details around those four sections.
