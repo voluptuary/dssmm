@@ -124,3 +124,11 @@ The first hosted verification of Chis artwork defaults and SYSTEM paths failed b
 ## 2026-11-13 — Workspace cleanup completed
 
 Removed ignored compiler/intermediate products and the superseded local board/release output directory after hosted verification (`make -C superfw clean`; removed `superfw/build/`). No tracked upstream assets, validation records, published tags/assets, or user-created untracked files were removed. Future SuperFW handoffs now include the same build-output cleanup check.
+
+## 2026-11-13 — Test 2 published
+
+Published https://github.com/voluptuary/dssmm/releases/tag/superfw-test2 as prerelease (not draft), tag `superfw-test2` pointing to tested source `c748fea2286721da21aa3394cf8d4ac330b19c8a`. It includes the Chis, SD and Lite firmware builds. Canonical four-section notes: `docs/releases/superfw-test2.md`; exact asset IDs, hashes, URLs, CI runs and validation evidence: `docs/releases/superfw-test2-publication.json`.
+
+All five hosted project checks passed (SuperFW `43436608738`, dssmm `43437592326`, DE `43437613874`, OMEGA `43437617055`, BLUE `43437621334`). Local theme/settings and artwork tests passed; all three board images built sequentially and passed board size, GBA header/size-field and firmware-seal checks. Public downloads byte-match those builds. The full upstream host suite passed in hosted checks; local `make verify` could not run because `lcov` is absent. The Test 1 Prime boot/theme smoke result does not validate Test 2 artwork, settings migration or paths; SD/Lite remain untested. DE `v8.4.0` remains latest stable; Test 1 and all prior releases/assets are preserved.
+
+After public byte verification, removed ignored local compiler products and `superfw/build/`. Keep this cleanup as a handoff step. Next, incorporate the owner's Prime results for default artwork, List/Title/Box persistence, SYSTEM save/state behavior and the broader DSSMM skin; do not claim hardware qualification from builds or mocks.
