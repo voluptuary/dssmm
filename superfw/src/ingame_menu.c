@@ -742,23 +742,23 @@ void draw_states_menu(uint8_t *fb, unsigned framen) {
 
     if (makepers >= 0) {
       copt = copt & 1;
-      draw_text_center(msgs[ingame_menu_lang][IMENU_MAKEPER], fb, SCREEN_WIDTH / 2, 95 + 18*0, HI_COLOR);
-      draw_text_center(msgs[ingame_menu_lang][IMENU_CANCEL],  fb, SCREEN_WIDTH / 2, 95 + 18*1, HI_COLOR);
+      draw_text(msgs[ingame_menu_lang][IMENU_MAKEPER], fb, 24, 95 + 18*0, HI_COLOR);
+      draw_text(msgs[ingame_menu_lang][IMENU_CANCEL],  fb, 24, 95 + 18*1, HI_COLOR);
     } else {
-      draw_text_center(msgs[ingame_menu_lang][IMENU_SSTATEP0_SAVE],  fb, SCREEN_WIDTH / 2, 95 + 18*0, HI_COLOR);
-      draw_text_center(msgs[ingame_menu_lang][IMENU_SSTATEP1_LOAD],  fb, SCREEN_WIDTH / 2, 95 + 18*1,
+      draw_text(msgs[ingame_menu_lang][IMENU_SSTATEP0_SAVE],  fb, 24, 95 + 18*0, HI_COLOR);
+      draw_text(msgs[ingame_menu_lang][IMENU_SSTATEP1_LOAD],  fb, 24, 95 + 18*1,
                        (diskslot_valid[-state_slot - 1] ? HI_COLOR : SH_COLOR));
-      draw_text_center(msgs[ingame_menu_lang][IMENU_SSTATEP2_DEL],   fb, SCREEN_WIDTH / 2, 95 + 18*2,
+      draw_text(msgs[ingame_menu_lang][IMENU_SSTATEP2_DEL],   fb, 24, 95 + 18*2,
                        (diskslot_valid[-state_slot - 1] ? HI_COLOR : SH_COLOR));
     }
   } else {
     npf_snprintf(tmp, sizeof(tmp), msgs[ingame_menu_lang][IMENU_SSTATE_QN], state_slot + 1);
     draw_text_center(tmp,  fb, SCREEN_WIDTH / 2, 34, HI_COLOR);
 
-    draw_text_center(msgs[ingame_menu_lang][IMENU_SSTATEQ0_SAVE],  fb, SCREEN_WIDTH / 2, 95 + 18*0, HI_COLOR);
-    draw_text_center(msgs[ingame_menu_lang][IMENU_SSTATEQ1_LOAD],  fb, SCREEN_WIDTH / 2, 95 + 18*1,
+    draw_text(msgs[ingame_menu_lang][IMENU_SSTATEQ0_SAVE],  fb, 24, 95 + 18*0, HI_COLOR);
+    draw_text(msgs[ingame_menu_lang][IMENU_SSTATEQ1_LOAD],  fb, 24, 95 + 18*1,
                      (memslot_valid[state_slot] ? HI_COLOR : SH_COLOR));
-    draw_text_center(msgs[ingame_menu_lang][IMENU_SSTATEQ2_WRITE], fb, SCREEN_WIDTH / 2, 95 + 18*2,
+    draw_text(msgs[ingame_menu_lang][IMENU_SSTATEQ2_WRITE], fb, 24, 95 + 18*2,
                      (memslot_valid[state_slot] ? HI_COLOR : SH_COLOR));
   }
 
