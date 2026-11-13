@@ -119,7 +119,7 @@ an option for direct-saving (this is the default choice in Auto mode).
 Files and configuration on the SD card
 --------------------------------------
 
-All SuperFW related files are stored under "/.superfw" at the root of the card.
+SuperFW keeps its private configuration and generated data under `/.superfw`.
 The following files are usually created:
 
  - .superfw/settings.txt: User settings, loaded on startup.
@@ -134,6 +134,14 @@ Other noteworthy paths:
  - .superfw/patches/: Patch cache (created by PatchEngine).
  - .superfw/cheats/: Cheat database, contains .cht files.
  - .superfw/emulators/: Emulator ROMs, used to play other device's ROMs.
+
+Game saves and savestates use `/SYSTEM/SAVEGAME/`, `/SYSTEM/SAVES/` and
+`/SYSTEM/SAVESTATE/`; artwork uses `/SYSTEM/IMGS/` and `/SYSTEM/IMGS2/`.
+Existing saves in the old root-level `SAVEGAME`, `SAVES` and `SAVESTATE`
+folders remain usable at their original paths. SuperFW prefers a new SYSTEM
+save when one exists and otherwise continues using the matching legacy save, so
+back up before manually moving old files. The debug log is `/SYSTEM/superfwlog.txt`.
+See `docs/SYSTEM-LAYOUT.md` for the complete layout.
 
 Limits
 ------

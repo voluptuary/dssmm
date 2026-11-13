@@ -55,7 +55,13 @@ static const uint16_t accent_colors[ACCENT_COUNT - 1][2] = {
   { RGB2GBA(0xc0a0e0), RGB2GBA(0x9878b8) },
 };
 uint8_t menu_accent = 0;
+#ifdef SUPERCHIS_IO
+uint8_t artwork_mode = 1;
+#else
 uint8_t artwork_mode = 0;
+#endif
+#define UI_SETTINGS_VERSION 2
+static uint8_t ui_settings_version = 0;
 
 t_theme_colors menu_theme_colors(unsigned theme, unsigned accent) {
   t_theme_colors result = themes[theme < THEME_COUNT ? theme : 0];
@@ -82,20 +88,9 @@ const t_combo_key hotkey_list[] = {
   {"A+B+Start+Sel", 0x03F0},
 };
 
-const char *save_paths[] = {
-  "/SAVEGAME/",
-  "/SAVES/",
-};
-
-const char *savestates_paths[] = {
-  "/SAVESTATE/",
-  "/.superfw/savestate/",
-};
-
-const char *savestates_paths_display[] = {
-  "/SAVESTATE/",
-  ".sfw/savestate",
-};
+const char *save_paths[] = { SAVEGAME_DIR, SAVES_DIR };
+const char *savestates_paths[] = { SAVESTATE_DIR, "/.superfw/savestate/" };
+const char *savestates_paths_display[] = { "/SYSTEM/SAVESTATE/", ".superfw/savestate" };
 
 const uint8_t animspd_lut[] = {
   2,    //  8 pix/second
@@ -156,6 +151,7 @@ bool save_ui_settings() {
   uint16_t lc = lang_getcode();
   char buf[512];
   npf_snprintf(buf, sizeof(buf),
+    "ui_version=%u\n"
     "theme=%u\n"
     "accent=%u\n"
     "artwork=%u\n"
@@ -163,7 +159,8 @@ bool save_ui_settings() {
     "recent_menu=%u\n"
     "anim_speed=%u\n"
     "hide_hidden=%u\n",
-    menu_theme, menu_accent, artwork_mode, (lc & 0xFF), (lc >> 8), recent_menu, anim_speed, hide_hidden);
+    UI_SETTINGS_VERSION, menu_theme, menu_accent, artwork_mode,
+    (lc & 0xFF), (lc >> 8), recent_menu, anim_speed, hide_hidden);
 
   UINT wrbytes;
   FRESULT res = f_write(&fd, buf, strlen(buf), &wrbytes);
@@ -263,7 +260,9 @@ static void parse_settings(void *usr, const char *var, const char *value) {
 }
 
 static void parse_ui_settings(void *usr, const char *var, const char *value) {
-  if (!strcmp(var, "langcode")) {
+  if (!strcmp(var, "ui_version")) {
+    ui_settings_version = parseuint(value);
+  } else if (!strcmp(var, "langcode")) {
     uint16_t code = ((uint8_t)value[0]) | (((uint8_t)value[1]) << 8);
     lang_id = lang_lookup(code);
   } else {
@@ -312,10 +311,18 @@ static void parse_file(char *buf, void(*parse_cb)(void *usr, const char*, const 
   }
 }
 
+static void migrate_ui_settings() {
+#ifdef SUPERCHIS_IO
+  if (ui_settings_version < UI_SETTINGS_VERSION && artwork_mode == 0)
+    artwork_mode = 1;
+#endif
+}
+
 void load_settings() {
   FIL fd;
   UINT rdbytes;
   char buf[512];
+  ui_settings_version = 0;
   if (FR_OK == f_open(&fd, SETTINGS_FILEPATH, FA_READ)) {
     if (FR_OK == f_read(&fd, buf, sizeof(buf) - 1, &rdbytes)) {
       buf[rdbytes] = 0;
@@ -331,27 +338,74 @@ void load_settings() {
     }
     f_close(&fd);
   }
+  migrate_ui_settings();
+}
+
+static bool save_pattern_has_files(const char *pattern) {
+  char path[MAX_FN_LEN];
+  if (npf_snprintf(path, sizeof(path), "%s.sav", pattern) < (int)sizeof(path) && check_file_exists(path))
+    return true;
+  if (npf_snprintf(path, sizeof(path), "%s.tmp.sav", pattern) < (int)sizeof(path) && check_file_exists(path))
+    return true;
+  for (unsigned i = 1; i <= MAX_BACKUP_CNT; ++i)
+    if (npf_snprintf(path, sizeof(path), "%s.%u.sav", pattern, i) < (int)sizeof(path) && check_file_exists(path))
+      return true;
+  return false;
+}
+
+static bool make_file_pattern(char *pattern, unsigned size, const char *path, const char *rom) {
+  int n = npf_snprintf(pattern, size, "%s%s", path, file_basename(rom));
+  if (n < 0 || (unsigned)n >= size)
+    return false;
+  replace_extension(pattern, "");
+  return true;
 }
 
 void sram_filename_calc(const char *rom, char *savefn, unsigned save_path) {
   if (save_path == SaveRomName) {
-    strcpy(savefn, rom);   // Use the full ROM path
+    strbcpy(savefn, rom, MAX_FN_LEN);
+  } else {
+    char pattern[MAX_FN_LEN];
+    if (!make_file_pattern(pattern, sizeof(pattern), save_paths[save_path], rom)) {
+      savefn[0] = 0;
+      return;
+    }
+    /* Keep existing root save sets in place and usable until manually migrated. */
+    if (!save_pattern_has_files(pattern) && save_path < 2) {
+      static const char * const legacy_paths[] = { LEGACY_SAVEGAME_DIR, LEGACY_SAVES_DIR };
+      char legacy[MAX_FN_LEN];
+      if (make_file_pattern(legacy, sizeof(legacy), legacy_paths[save_path], rom) &&
+          save_pattern_has_files(legacy))
+        strbcpy(pattern, legacy, sizeof(pattern));
+    }
+    strbcpy(savefn, pattern, MAX_FN_LEN);
   }
-  else {
-    const char *p = file_basename(rom);
-    const char *path = save_paths[save_path];
-    strcpy(savefn, path);   // Add the base path
-    strcat(savefn, p);      // Append just the basename
-  }
-
-  replace_extension(savefn, ".sav");
+  if (savefn[0])
+    replace_extension(savefn, ".sav");
 }
 
 void savestate_filename_calc(const char *rom, char *statefn) {
-  const char *p = file_basename(rom);
-  strcpy(statefn, savestates_paths[state_path_default]);   // Add the base path
-  strcat(statefn, p);               // Append just the basename
-  replace_extension(statefn, "");
+  char pattern[MAX_FN_LEN];
+  if (!make_file_pattern(pattern, sizeof(pattern), savestates_paths[state_path_default], rom)) {
+    statefn[0] = 0;
+    return;
+  }
+  if (state_path_default == StateSavestateDir) {
+    char path[MAX_FN_LEN];
+    bool current_exists = false, legacy_exists = false;
+    for (unsigned i = 1; i <= DISK_SAVESTATE_SLOTS; ++i)
+      if (npf_snprintf(path, sizeof(path), "%s.%u.state", pattern, i) < (int)sizeof(path))
+        current_exists |= check_file_exists(path);
+    if (!current_exists && make_file_pattern(path, sizeof(path), LEGACY_SAVESTATE_DIR, rom)) {
+      char candidate[MAX_FN_LEN];
+      for (unsigned i = 1; i <= DISK_SAVESTATE_SLOTS; ++i)
+        if (npf_snprintf(candidate, sizeof(candidate), "%s.%u.state", path, i) < (int)sizeof(candidate))
+          legacy_exists |= check_file_exists(candidate);
+      if (legacy_exists)
+        strbcpy(pattern, path, sizeof(pattern));
+    }
+  }
+  strbcpy(statefn, pattern, MAX_FN_LEN);
 }
 
 static void parse_rom_load_settings(void *usr, const char *var, const char *value) {

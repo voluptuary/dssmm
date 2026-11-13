@@ -31,7 +31,9 @@ Do not transplant OMEGA drivers, patch payloads, save-state formats or flash lay
 | MiGoomba and other emulators/plugins | Separate integration project. First preserve bundled upstream emulators. Audit append/load conventions, save paths, return/reset and memory limits before MiGoomba adoption. OMEGA plugin binaries have no blanket compatibility. |
 | OMEGA-specific rumble, cartridge modes and firmware/FPGA update flows | Omit rumble, hardware-clock UI and unsupported OMEGA cartridge modes on Prime. Keep only native SuperFW update and hardware controls supported by the target. |
 
-## Visual target
+## Visual target and top priority
+
+Skinning the browser, recent list, settings, tools/system pages, game details and in-game menus is a top project goal. Apply one DSSMM visual language to panel layout, typography, icons, selection and navigation while keeping hardware-specific options honest.
 
 Aim for a closely recognizable DSSMM main browser: matching overall composition, artwork placement, selection treatment, colors and navigation conventions. Exact pixel parity is a design target only after asset/rendering measurements. SuperFW-specific patch/save controls, tools, updater and hardware information need their own screens using the same visual language. In-game menus can share colors and typography but may need a simpler layout. Do not quote a numerical similarity percentage before a rendered prototype exists.
 
@@ -78,3 +80,8 @@ Default plus four manual accents now apply through a hardware-independent palett
 ## First DSSMM browser skin slice
 
 The SD browser now brands the shared tab strip with DSSMM, highlights the complete selected row with the active theme color, and frames the title/box artwork panel. The existing file list, path footer, selection logic, lookup/cache, and launch actions are unchanged. This is the first visible skin pass; typography, iconography, browser composition and other screens still need porting and physical review.
+
+
+## Owner priority — complete interface skin
+
+Treat consistent DSSMM skinning across browser, settings, system/tools, game information and in-game menus as the top ongoing UI goal. Continue in reviewable screen-by-screen slices; retain SuperFW action/backend code and verify display/memory limits on each board.

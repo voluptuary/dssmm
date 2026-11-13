@@ -62,7 +62,7 @@ uint32_t *get_cheat_table();
 
 #define MAX_SPEED_OPTS      6   // Sync with common.h
 
-#define MAX_DISK_SLOTS      5
+#define MAX_DISK_SLOTS      DISK_SAVESTATE_SLOTS
 #define MAX_MEM_SLOTS      32
 
 #define FG_COLOR    16
@@ -847,6 +847,7 @@ bool action_rtc_menu() {
 void create_paths(const char *fn) {
   char dirp[256];
   file_dirname(fn, dirp);
+  f_mkdir(SYSTEM_DIR);
   f_mkdir(dirp);
 }
 

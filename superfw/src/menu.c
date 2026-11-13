@@ -100,13 +100,14 @@ enum {
 
 enum {
   UiSetTheme = 0,
-  UiSetLang  = 1,
-  UiSetRect  = 2,
-  UiSetASpd  = 3,
-  UiSetHid   = 4,
-  UiSetAccent = 5,
-  UiSetSave  = 6,
-  UiSetMAX   = 6,
+  UiSetArtwork = 1,
+  UiSetLang  = 2,
+  UiSetRect  = 3,
+  UiSetASpd  = 4,
+  UiSetHid   = 5,
+  UiSetAccent = 6,
+  UiSetSave  = 7,
+  UiSetMAX   = 7,
 };
 
 enum {
@@ -1973,34 +1974,41 @@ void render_ui_settings(volatile uint8_t *frame) {
     "White", "Orange", "Blue", "Green", "Purple", "Stock Dark",
     "Light", "Dark"
   };
+  static const char * const artwork_names[] = { "List", "Title", "Box" };
   const unsigned colx = 170;
+  const unsigned row_y[] = { 22, 37, 52, 67, 82, 97, 112 };
   char tmpbuf[64];
   const char *theme_name = menu_theme < THEME_COUNT ? theme_names[menu_theme] : theme_names[0];
+
   npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", theme_name);
-  draw_text_ovf(msgs[lang_id][MSG_UIS_THEME], frame, 8, 22, 224);
-  draw_central_text(tmpbuf, frame, colx, 22 );
+  draw_text_ovf(msgs[lang_id][MSG_UIS_THEME], frame, 8, row_y[UiSetTheme], 224);
+  draw_central_text(tmpbuf, frame, colx, row_y[UiSetTheme]);
+
+  npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", artwork_names[artwork_mode < 3 ? artwork_mode : 0]);
+  draw_text_ovf("Artwork", frame, 8, row_y[UiSetArtwork], 224);
+  draw_central_text(tmpbuf, frame, colx, row_y[UiSetArtwork]);
 
   npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", msgs[lang_id][MSG_LANG_NAME]);
-  draw_text_ovf(msgs[lang_id][MSG_UIS_LANG], frame, 8, 22 + 18, 224);
-  draw_central_text(tmpbuf, frame, colx, 22 + 18 );
+  draw_text_ovf(msgs[lang_id][MSG_UIS_LANG], frame, 8, row_y[UiSetLang], 224);
+  draw_central_text(tmpbuf, frame, colx, row_y[UiSetLang]);
 
-  draw_text_ovf(msgs[lang_id][MSG_UIS_RECNT], frame, 8, 22 + 36, 224);
-  draw_central_text(msgs[lang_id][recent_menu ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, colx, 22 + 36 );
+  draw_text_ovf(msgs[lang_id][MSG_UIS_RECNT], frame, 8, row_y[UiSetRect], 224);
+  draw_central_text(msgs[lang_id][recent_menu ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, colx, row_y[UiSetRect]);
 
   npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", msgs[lang_id][MSG_UIS_SPD0 + anim_speed]);
-  draw_text_ovf(msgs[lang_id][MSG_UIS_ANSPD], frame, 8, 22 + 54, 224);
-  draw_central_text(tmpbuf, frame, colx, 22 + 54 );
+  draw_text_ovf(msgs[lang_id][MSG_UIS_ANSPD], frame, 8, row_y[UiSetASpd], 224);
+  draw_central_text(tmpbuf, frame, colx, row_y[UiSetASpd]);
 
-  draw_text_ovf(msgs[lang_id][MSG_UIS_BHID], frame, 8, 22 + 72, 224);
-  draw_central_text(msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED], frame, colx, 22 + 72 );
+  draw_text_ovf(msgs[lang_id][MSG_UIS_BHID], frame, 8, row_y[UiSetHid], 224);
+  draw_central_text(msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED], frame, colx, row_y[UiSetHid]);
 
-  draw_text_ovf("Accent", frame, 8, 112, 224);
+  draw_text_ovf("Accent", frame, 8, row_y[UiSetAccent], 224);
   npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", accent_names[menu_accent]);
-  draw_central_text(tmpbuf, frame, colx, 112);
+  draw_central_text(tmpbuf, frame, colx, row_y[UiSetAccent]);
 
   if (smenu.uiset.selector != UiSetSave)
     for (unsigned i = 0; i < 240; i += 16)
-      render_icon_trans(i, 22 + smenu.uiset.selector * 18, 63);
+      render_icon_trans(i, row_y[smenu.uiset.selector], 63);
 
   draw_button_box(frame, 20, 220, 132, 152, smenu.uiset.selector == UiSetSave);
   draw_central_text(msgs[lang_id][MSG_UIS_SAVE], frame, 120, 134);
@@ -3136,6 +3144,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
   if (newkeys & KEY_BUTTLEFT) {
     if (smenu.uiset.selector == UiSetTheme)
       menu_theme = menu_theme ? menu_theme - 1 : 0;
+    else if (smenu.uiset.selector == UiSetArtwork)
+      artwork_mode = (artwork_mode + 2) % 3;
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = menu_accent ? menu_accent - 1 : 0;
     else if (smenu.uiset.selector == UiSetASpd)
@@ -3150,6 +3160,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
   if (newkeys & KEY_BUTTRIGHT) {
     if (smenu.uiset.selector == UiSetTheme)
       menu_theme = MIN(THEME_COUNT - 1, menu_theme + 1);
+    else if (smenu.uiset.selector == UiSetArtwork)
+      artwork_mode = (artwork_mode + 1) % 3;
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = MIN(ACCENT_COUNT - 1, menu_accent + 1);
     else if (smenu.uiset.selector == UiSetASpd)
