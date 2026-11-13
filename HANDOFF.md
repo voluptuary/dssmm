@@ -2028,3 +2028,9 @@ Owner clarification: the released Chis build chain-loads on SuperChis Prime v1.0
 Merged the `superfw` lane normally as `66d55df` (merge of lane checkpoint `04cc85c`). Chis now defaults to Title artwork, exposes List/Title/Box in UI settings, and migrates old unversioned List settings. New save/state/log paths are grouped under `/SYSTEM`; `.superfw` remains private, and old root save/state sets remain usable through detection fallback. The project’s top goal now prioritizes consistent DSSMM skinning across browser, settings, system/tools, games and in-game menus.
 
 Focused settings/artwork tests pass. Hosted `superfw` verification passed at run 43435582632 after fixing a missing `config.h` include. Root isolation and real-Git merge fixtures pass. Full dssmm matrix passed at run 43435894669 for DE, Original OMEGA, BLUE and SuperFW. No physical artwork/save validation or release was performed. Next: fast-forward/push all hardware lanes from dssmm, then verify local and remote heads.
+
+## 2026-11-13 — SuperFW Test 2 prerelease published and verified
+
+Owner-authorized Test 2 publishes all three SuperFW board builds as the hardware-validation-pending prerelease `superfw-test2`. Source/tag: `c748fea2286721da21aa3394cf8d4ac330b19c8a`. All five hosted project checks passed; local board builds, focused tests, package seals and public download byte comparisons passed. The new Chis artwork/settings/SYSTEM behavior remains physically untested; prior Test 1 boot/theme smoke evidence is not extended. Exact evidence is `superfw/docs/releases/superfw-test2-publication.json`. DE `v8.4.0` remains latest stable. Generated local SuperFW outputs were cleaned after verifying published assets.
+
+Next SuperFW work continues screen-by-screen DSSMM skinning and incorporates owner hardware feedback on artwork and SYSTEM save/state paths. Keep those changes on the SuperFW lane and preserve existing releases and journals.
