@@ -141,3 +141,7 @@ SuperFW Test1 is published as prerelease superfw-test1, source8a22da16c2d755de8f
 ## 2026-11-13 — SuperFW Test 2 status
 
 SuperFW Test 2 is published as the `superfw-test2` hardware-validation-pending prerelease for Chis, SD and Lite. Tag source is `c748fea2286721da21aa3394cf8d4ac330b19c8a`; all five hosted project checks and local board/package checks passed, and public assets match the verified builds. The new artwork default/settings and SYSTEM save/state behavior have no Test 2 hardware validation. See `superfw/docs/releases/superfw-test2-publication.json`; retain Test 1 and all earlier releases. DE `v8.4.0` remains latest stable. Clean ignored SuperFW build outputs after release verification and keep this in future handoffs.
+
+## 2026-11-13 — SuperFW Test 3 current release
+
+SuperFW Test 3 is the current three-board hardware-validation-pending prerelease, tag source `ad3cdd53ec0eaa5239bf113b858e7b86b75838b9`. SD, Lite and Chis now share DSSMM Light/Title defaults, with prior Test 2 version-2 settings preserved. All five hosted checks and local three-board builds/tests passed; downloaded assets match the built files. No Test 3 hardware validation is claimed. See `superfw/docs/releases/superfw-test3-publication.json`. Test 1/Test 2 assets remain; DE `v8.4.0` is still latest stable. Root README links to Test 3.
