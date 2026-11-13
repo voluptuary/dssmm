@@ -111,7 +111,7 @@ Added a DSSMM wordmark to the tab strip, a full-width active-color selected row,
 
 ## 2026-11-13 — Make Chis artwork discoverable and group system files
 
-Chis now defaults to Title artwork. Added an Artwork row to UI settings with List/Title/Box values, Left/Right controls, Save persistence, and a versioned migration from the old saved List default. The owner elevated consistent skinning of browser, settings, system/tools, game screens and in-game menus to the top project goal; recorded it in `docs/PORTING-PLAN.md` and agent guidance.
+Chis initially defaulted to Title artwork. The cross-variant follow-up below aligns SD and Lite; all board builds expose the Artwork row with List/Title/Box, Left/Right controls and Save persistence. The owner elevated consistent skinning of browser, settings, system/tools, game screens and in-game menus to the top project goal; recorded it in `docs/PORTING-PLAN.md` and agent guidance.
 
 New default save/state/log paths are under `/SYSTEM`: SAVEGAME, SAVES, SAVESTATE and `superfwlog.txt`; artwork remains in IMGS/IMGS2 and private state remains in `/.superfw`. Existing root-level per-game save sets are detected across main/temporary/backup saves and remain the active path when no SYSTEM copy exists; legacy savestates are detected across all disk slots. No old files are deleted or moved. `docs/SYSTEM-LAYOUT.md` explains the layout and safe manual migration.
 
@@ -132,3 +132,15 @@ Published https://github.com/voluptuary/dssmm/releases/tag/superfw-test2 as prer
 All five hosted project checks passed (SuperFW `43436608738`, dssmm `43437592326`, DE `43437613874`, OMEGA `43437617055`, BLUE `43437621334`). Local theme/settings and artwork tests passed; all three board images built sequentially and passed board size, GBA header/size-field and firmware-seal checks. Public downloads byte-match those builds. The full upstream host suite passed in hosted checks; local `make verify` could not run because `lcov` is absent. The Test 1 Prime boot/theme smoke result does not validate Test 2 artwork, settings migration or paths; SD/Lite remain untested. DE `v8.4.0` remains latest stable; Test 1 and all prior releases/assets are preserved.
 
 After public byte verification, removed ignored local compiler products and `superfw/build/`. Keep this cleanup as a handoff step. Next, incorporate the owner's Prime results for default artwork, List/Title/Box persistence, SYSTEM save/state behavior and the broader DSSMM skin; do not claim hardware qualification from builds or mocks.
+
+## 2026-11-13 — Align shared DSSMM presentation across all boards
+
+The prior implementation already compiled the browser branding/selection/artwork renderer, themes/accents, UI settings selector, and SYSTEM paths into SD, Lite and Chis. The defaults were inconsistent: only Chis selected DSSMM Light and Title artwork. Aligned all three boards on those defaults. UI settings format is now version 3; pre-Test-2 unversioned/version-1 native defaults migrate to Light/Title, while Test 2 version-2 settings preserve explicit choices. Chis NOR and other hardware-specific features remain distinct.
+
+Expanded `scripts/test-theme-settings.sh` to compile the actual settings layer with SD, Lite and Chis flags. Settings migration/default tests, artwork tests and sequential local builds for all three variants pass. All three binaries link within their board memory limits; Chis retains the known unused NOR error-variable warning and upstream RWX linker warnings. Physical SD/Lite UI, artwork, storage, save and timing checks remain outstanding. Next: run hosted SuperFW/all-project verification, integrate normally through dssmm, sync every lane and retain these hardware limits in the next release plan.
+
+## 2026-11-13 — Cross-variant defaults and Test 3 checkpoint
+
+The shared DSSMM browser/theme/artwork/SYSTEM implementation already built for SD, Lite and Chis. Aligned new-install defaults across all three: DSSMM Light and Title artwork. Bumped the saved UI format to version 3; legacy unversioned/v1 native defaults migrate to Light/Title, while version 2 settings from Test 2 preserve explicit theme/artwork choices. Board-specific controls remain native (including Chis NOR).
+
+`bash scripts/test-theme-settings.sh` now compiles/runs under SD, Lite and Chis defines and passes migration, persistence, path and palette checks. `bash scripts/test-artwork.sh` passes. Sequential local builds for SD, Lite and Chis passed after the code changes; their pre-integration metadata still reflects the previous commit, so rebuild from the integrated commit for any release. Release-note draft for Test 3 is `docs/releases/superfw-test3.md`; no publication has occurred yet in this checkpoint. Hosted SuperFW and all-project checks are next. Keep physical SD/Lite/Chis behavior marked unvalidated for these changes.

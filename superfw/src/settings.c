@@ -55,12 +55,9 @@ static const uint16_t accent_colors[ACCENT_COUNT - 1][2] = {
   { RGB2GBA(0xc0a0e0), RGB2GBA(0x9878b8) },
 };
 uint8_t menu_accent = 0;
-#ifdef SUPERCHIS_IO
 uint8_t artwork_mode = 1;
-#else
-uint8_t artwork_mode = 0;
-#endif
-#define UI_SETTINGS_VERSION 2
+#define UI_SETTINGS_VERSION 3
+#define UI_SETTINGS_DSSMM_DEFAULTS_VERSION 2
 static uint8_t ui_settings_version = 0;
 
 t_theme_colors menu_theme_colors(unsigned theme, unsigned accent) {
@@ -101,11 +98,7 @@ const uint8_t animspd_lut[] = {
 };
 
 // Menu settings
-#ifdef SUPERCHIS_IO
 uint8_t menu_theme = THEME_DSSMM_LIGHT;
-#else
-uint8_t menu_theme = 0;
-#endif
 uint8_t lang_id = 0;
 uint8_t recent_menu = 1;
 uint8_t hide_hidden = 0;
@@ -312,10 +305,14 @@ static void parse_file(char *buf, void(*parse_cb)(void *usr, const char*, const 
 }
 
 static void migrate_ui_settings() {
-#ifdef SUPERCHIS_IO
-  if (ui_settings_version < UI_SETTINGS_VERSION && artwork_mode == 0)
-    artwork_mode = 1;
-#endif
+  /* Test 1 and earlier settings had no version. Promote their native defaults
+   * on every board while preserving explicit choices saved by Test 2 (v2). */
+  if (ui_settings_version < UI_SETTINGS_DSSMM_DEFAULTS_VERSION) {
+    if (menu_theme == 0)
+      menu_theme = THEME_DSSMM_LIGHT;
+    if (artwork_mode == 0)
+      artwork_mode = 1;
+  }
 }
 
 void load_settings() {
