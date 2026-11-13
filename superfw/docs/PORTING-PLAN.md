@@ -90,3 +90,8 @@ Treat consistent DSSMM skinning across browser, settings, system/tools, game inf
 ## Cross-variant presentation checkpoint — 2026-11-13
 
 The first browser branding, selected-row treatment, artwork panel, theme/accent controls, artwork selector and SYSTEM layout are shared code compiled into all three board builds. Earlier defaults differed: Chis used DSSMM Light and Title artwork while SD/Lite retained upstream defaults. The owner requests keeping variants synchronized wherever hardware allows. Current work aligns those defaults and migrates pre-Test-2 unversioned UI settings on every board, while preserving explicit versioned Test 2 choices. Chis-only NOR support and other genuine hardware capabilities remain variant-specific. Host tests now compile the settings layer with SD, Lite and Chis build defines; physical SD/Lite display, storage, save and timing validation remains outstanding.
+
+
+## 2026-11-13 artwork matching correction
+
+Owner reports no artwork displayed. The filename-only reader did not support the native EZ-FLASH GBA thumbnail key. The official OMEGA kernel reads the four-byte game code at header offset 0xAC and opens `/IMGS/<code[0]>/<code[1]>/<code>.bmp`; with DSSMM's SYSTEM layout the corresponding path is `/SYSTEM/IMGS/<code[0]>/<code[1]>/<code>.bmp`. Keep Title precedence as CUSTOM ROM filename, mirrored ROM filename, then this game-code path. Box remains DSSCC ROM-filename based in IMGS2, CUSTOM first. Existing DSSCC DST1 transparency decoding and tests remain supported. Source read for the native lookup: `ez-flash/omega-kernel/source/ezkernel.c` Load_Thumbnail (offset 0xAC and nested path). Physical rendering and SD performance still need owner validation.
