@@ -106,3 +106,12 @@ SuperChis Prime v1.0 chain-loads the Test1 Chis image and reports SuperFW 0.22 (
 - Added “DSSMM” branding in the existing top tab strip, active-theme selected-row fill in the file browser, and a framed title/box artwork panel. The list data, up/down navigation, artwork lookup/cache and launch path remain the existing SuperFW implementation. No cross-project assets or hardware drivers were imported.
 - Corrected `docs/PORTING-PLAN.md` to reflect the owner-reported Prime boot/theme smoke test and mark porting active. `scripts/test-theme-settings.sh`, `scripts/test-artwork.sh`, and `git diff --check` pass. No hardware screenshot or visual acceptance test yet; local full verifier unavailable without arm-none-eabi-gcc. Hosted matrix pending.
 - Hosted completion: all four kernel jobs passed in run43317208545 on integrated sourcef9f3659, including the SuperFW three-board build/test suite. Only the docs-only result record follows that validated source. Prime visual feedback remains the next hardware-dependent checkpoint.
+
+## 2026-11-13 — Default artwork, visible setting and SYSTEM paths
+
+- Chis default artwork mode is Title. UI settings now has an explicit Artwork selector for List/Title/Box, with Left/Right changes and Save persistence. Old UI settings without a version that recorded `artwork=0` migrate to Title; versioned explicit List remains List. Start in the browser continues to cycle modes.
+- New system save/state/log directories are `/SYSTEM/SAVEGAME/`, `/SYSTEM/SAVES/`, `/SYSTEM/SAVESTATE/` and `/SYSTEM/superfwlog.txt`. `/.superfw` remains unchanged. Root-level legacy save sets (including backups/temp) and savestates remain recognized and in use when there is no matching SYSTEM data; nothing is auto-deleted or moved. Added `docs/SYSTEM-LAYOUT.md` and refreshed setup guidance.
+- The owner made consistent skinning across browser, settings, system/tools, game screens and in-game menus the top goal; the port plan and agent continuation now prioritize screen-by-screen skin work.
+- Theme/settings/path regression tests, artwork tests and whitespace check pass. Local ARM builds unavailable because `arm-none-eabi-gcc` is missing; hosted validation pending. No release or hardware qualification.
+
+- Follow-up to 2026-11-13 SYSTEM path work: hosted run43435382825 exposed a missing `config.h` include in `ingame_menu.c` (undefined SYSTEM_DIR and DISK_SAVESTATE_SLOTS). Added the include. Focused settings/artwork checks are rerun locally; hosted matrix must pass before dssmm integration. No hardware test or release.

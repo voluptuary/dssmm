@@ -3,6 +3,11 @@
 unsigned lang_lookup(uint16_t code) { (void)code; return 0; }
 uint16_t lang_getcode(void) { return 0x6e65; }
 static char saved_settings[512];
+static const char *existing_path;
+FRESULT f_stat(const TCHAR *path, FILINFO *info) {
+  (void)info;
+  return existing_path && !strcmp(path, existing_path) ? FR_OK : FR_NO_FILE;
+}
 FRESULT f_mkdir(const TCHAR *path) { (void)path; return FR_OK; }
 FRESULT f_open(FIL *fp, const TCHAR *path, BYTE mode) {
   (void)fp; (void)path; (void)mode; return FR_OK;
@@ -16,8 +21,10 @@ FRESULT f_write(FIL *fp, const void *data, UINT size, UINT *written) {
 int main(void) {
 #ifdef SUPERCHIS_IO
   assert(menu_theme == THEME_DSSMM_LIGHT);
+  assert(artwork_mode == 1);
 #else
   assert(menu_theme == 0);
+  assert(artwork_mode == 0);
 #endif
   assert(THEME_DSSMM_LIGHT == 6 && THEME_DSSMM_DARK == 7);
   const char *values[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
@@ -49,6 +56,31 @@ int main(void) {
   parse_ui_settings(0, "accent", "5"); assert(menu_accent == 0);
   parse_ui_settings(0, "artwork", "2"); assert(artwork_mode == 2);
   parse_ui_settings(0, "artwork", "3"); assert(artwork_mode == 0);
+  ui_settings_version = 0; artwork_mode = 0; migrate_ui_settings();
+#ifdef SUPERCHIS_IO
+  assert(artwork_mode == 1); /* Old saved default migrates to Title. */
+#else
+  assert(artwork_mode == 0);
+#endif
+  parse_ui_settings(0, "ui_version", "2"); artwork_mode = 0; migrate_ui_settings();
+  assert(artwork_mode == 0); /* New explicit List preference remains selectable. */
+
+  assert(!strcmp(save_paths[0], "/SYSTEM/SAVEGAME/"));
+  assert(!strcmp(save_paths[1], "/SYSTEM/SAVES/"));
+  existing_path = "/SAVEGAME/Game.sav";
+  char path[MAX_FN_LEN];
+  sram_filename_calc("/Games/Game.gba", path, SaveSavegameDir);
+  assert(!strcmp(path, "/SAVEGAME/Game.sav"));
+  existing_path = NULL;
+  sram_filename_calc("/Games/Game.gba", path, SaveSavegameDir);
+  assert(!strcmp(path, "/SYSTEM/SAVEGAME/Game.sav"));
+  existing_path = "/SAVESTATE/Game.2.state";
+  state_path_default = StateSavestateDir;
+  savestate_filename_calc("/Games/Game.gba", path);
+  assert(!strcmp(path, "/SAVESTATE/Game"));
+  existing_path = NULL;
+  savestate_filename_calc("/Games/Game.gba", path);
+  assert(!strcmp(path, "/SYSTEM/SAVESTATE/Game"));
   menu_theme = THEME_DSSMM_DARK; menu_accent = 3; artwork_mode = 2;
   assert(save_ui_settings());
   assert(strstr(saved_settings, "theme=7\naccent=3\n"));

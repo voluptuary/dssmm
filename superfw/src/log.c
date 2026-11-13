@@ -28,7 +28,8 @@ void write_log(const char *fname, int line, const char *format, ...) {
 
   FIL fil;
   UINT written;
-  if (f_open(&fil, "/superfwlog.txt", FA_OPEN_APPEND | FA_WRITE) != FR_OK)
+  f_mkdir(SYSTEM_DIR);
+  if (f_open(&fil, SUPERFW_LOG_FILEPATH, FA_OPEN_APPEND | FA_WRITE) != FR_OK)
     return;
   f_write(&fil, buffer, buf.cur, &written);
   f_close(&fil);

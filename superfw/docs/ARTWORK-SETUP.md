@@ -31,10 +31,10 @@ SD card/
         └── Game Boy/T/Tetris (World).bmp
 ```
 
-For Custom output, place the files at `SYSTEM/IMGS/CUSTOM/Tetris (World).bmp` and `SYSTEM/IMGS2/CUSTOM/Tetris (World).bmp` instead. If both layouts contain artwork for the same game, the mirrored image is used first. Creating these artwork folders does not require moving your existing games or saves.
+For Custom output, place the files at `SYSTEM/IMGS/CUSTOM/Tetris (World).bmp` and `SYSTEM/IMGS2/CUSTOM/Tetris (World).bmp` instead. If both layouts contain artwork for the same game, the mirrored image is used first. Creating these artwork folders does not require moving your existing games or saves. SuperFW stores saves and savestates under `SYSTEM` in newer builds; see [the SD-card folder layout](SYSTEM-LAYOUT.md) for legacy-save compatibility details.
 
 ## Show artwork in SuperFW
 
-Safely eject the SD card and start SuperFW. In the **SD browser**, highlight a game and press **Start** to cycle **List → title artwork → box artwork → List**. To keep the mode after reboot, open **UI settings** and select **Save**. List is the initial default. Recent and NOR views do not show artwork in this prototype.
+Safely eject the SD card and start SuperFW. On the Chis build, title artwork is the default browser mode; if an older saved UI configuration selected List, the first updated build switches that old default to Title. To choose a mode yourself, open **UI settings → Artwork**, press Left/Right to select **List**, **Title** or **Box**, then choose **Save**. In the SD browser, **Start** also cycles those three modes. Recent and NOR views do not show artwork in this prototype.
 
 If the panel is blank, check the selected mode, image size, exact name, folder paths and that you copied the pack inside SYSTEM. Renaming or moving a ROM also requires renaming or moving its matching artwork. Leave and re-enter the folder, or cycle the artwork mode, to retry a cached miss. No extension-wide default artwork is supported yet. Generated transparency is supported, but colors are reduced to fit this early menu renderer. Please report visual or scrolling problems when testing on hardware.

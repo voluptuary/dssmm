@@ -31,6 +31,16 @@
 
 #define MAX_BACKUP_CNT             16
 
+#define SYSTEM_DIR                "/SYSTEM"
+#define SAVEGAME_DIR              "/SYSTEM/SAVEGAME/"
+#define SAVES_DIR                 "/SYSTEM/SAVES/"
+#define SAVESTATE_DIR             "/SYSTEM/SAVESTATE/"
+#define LEGACY_SAVEGAME_DIR       "/SAVEGAME/"
+#define LEGACY_SAVES_DIR          "/SAVES/"
+#define LEGACY_SAVESTATE_DIR      "/SAVESTATE/"
+#define SUPERFW_LOG_FILEPATH      "/SYSTEM/superfwlog.txt"
+#define DISK_SAVESTATE_SLOTS      5
+
 #define SUPERFW_DIR               "/.superfw"
 #define ROMCONFIG_PATH            "/.superfw/config/"
 #define PATCHDB_PATH              "/.superfw/patches/"
