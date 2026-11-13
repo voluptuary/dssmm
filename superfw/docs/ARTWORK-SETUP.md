@@ -1,6 +1,6 @@
 # Make and install SuperFW artwork packs
 
-Test 1 supports name-matched artwork made with [DS Style Card Companion (DSSCC)](https://github.com/voluptuary/dsscc). It supports title images and square box images for files in the SD browser. The first prototype does not support folder artwork or traditional GBA game-code packs.
+Current DSSMM SuperFW builds for Chis, SuperCard SD and SuperCard Lite support name-matched artwork made with [DS Style Card Companion (DSSCC)](https://github.com/voluptuary/dsscc). It supports title images and square box images for files in the SD browser. The first prototype does not support folder artwork or traditional GBA game-code packs.
 
 ## Build a pack
 
@@ -35,6 +35,6 @@ For Custom output, place the files at `SYSTEM/IMGS/CUSTOM/Tetris (World).bmp` an
 
 ## Show artwork in SuperFW
 
-Safely eject the SD card and start SuperFW. On the Chis build, title artwork is the default browser mode; if an older saved UI configuration selected List, the first updated build switches that old default to Title. To choose a mode yourself, open **UI settings → Artwork**, press Left/Right to select **List**, **Title** or **Box**, then choose **Save**. In the SD browser, **Start** also cycles those three modes. Recent and NOR views do not show artwork in this prototype.
+Safely eject the SD card and start any current DSSMM SuperFW build. Title artwork and the DSSMM Light theme are the defaults on Chis, SuperCard SD and SuperCard Lite. An older unversioned UI configuration migrates from the former native defaults; settings saved by Test 2 or newer keep their explicit theme and artwork choices. To choose a mode yourself, open **UI settings → Artwork**, press Left/Right to select **List**, **Title** or **Box**, then choose **Save**. In the SD browser, **Start** also cycles those three modes. Recent and NOR views do not show artwork in this prototype.
 
 If the panel is blank, check the selected mode, image size, exact name, folder paths and that you copied the pack inside SYSTEM. Renaming or moving a ROM also requires renaming or moving its matching artwork. Leave and re-enter the folder, or cycle the artwork mode, to retry a cached miss. No extension-wide default artwork is supported yet. Generated transparency is supported, but colors are reduced to fit this early menu renderer. Please report visual or scrolling problems when testing on hardware.

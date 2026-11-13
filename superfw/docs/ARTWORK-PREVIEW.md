@@ -2,7 +2,7 @@
 
 For end-user pack creation and SD-card setup, see [Make and install artwork packs](ARTWORK-SETUP.md).
 
-In the SD browser, press **Start** to cycle List → title artwork → box artwork → List. The footer shows `Start: Art`. To retain the mode across reboot, use the existing UI settings Save button (`artwork=0|1|2` in /.superfw/ui-settings.txt). On the Chis build, Title is now the default; the other variants retain List by default. Select the mode directly under **UI settings → Artwork** with Left/Right, then choose **Save**. Older Chis UI settings that saved List as the former default migrate to Title once; a new explicit List choice remains saved.
+In the SD browser, press **Start** to cycle List → title artwork → box artwork → List. The footer shows `Start: Art`. To retain the mode across reboot, use the existing UI settings Save button (`artwork=0|1|2` in /.superfw/ui-settings.txt). All three builds (Chis, SuperCard SD and SuperCard Lite) use Title as the default. Select the mode under **UI settings → Artwork** with Left/Right, then choose **Save**. Older unversioned UI settings migrate from the former native defaults; Test 2 settings and newer preserve explicit selections.
 
 Copy DSSCC output into the same /SYSTEM/IMGS and /SYSTEM/IMGS2 layout used by DSSMM. For /Game Boy/Tetris.gbc, title lookup tries /SYSTEM/IMGS/Game Boy/Tetris.bmp and then /SYSTEM/IMGS/CUSTOM/Tetris.bmp. Box mode uses IMGS2. Each candidate must have the selected dimensions (120×80 title or 80×80 box); malformed, short or failed reads are rejected. No separate manifest is required. UTF-8 names pass through to the native filesystem; actual Unicode/case behavior needs hardware qualification.
 
@@ -10,7 +10,7 @@ This first preview supports exact filename stems and mirrored paths for files. F
 
 The preview uses 9600 bytes in the existing cartridge SDRAM state and a small path/cache key in internal RAM. Positive and negative results are cached for the current selection; directory reload, mode change, menu initialization and actions that can reuse RAM invalidate it. No per-frame directory scans or repeated miss probes are performed. The fixed palette is lossy. DST1 transparent pixels retain the panel background; unmarked black stays opaque. Cache and framebuffer writes use halfwords, not byte stores.
 
-Follow-up validation should include physical rendering, selection responsiveness and game/save regression on the owner’s Prime v1.0. No firmware flashing or NOR instructions are implied by this prototype. Preserve the known-good firmware and confirm recovery before installing any future test image.
+Follow-up validation should include physical rendering, selection responsiveness and game/save regression on each supported board. The owner has a Prime v1.0; the SD and Lite variants still need their own hardware checks. No firmware flashing or NOR instructions are implied by this prototype. Preserve the known-good firmware and confirm recovery before installing any future test image.
 
 ## Test 1 downloads and first hardware check
 

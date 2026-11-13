@@ -4,7 +4,7 @@ Status: active implementation, 2026-11-12. Owner reports successful Test1 chain-
 
 ## Approach
 
-Keep SuperFW as the firmware foundation and implement DSSMM presentation and navigation within this project. Prioritize the `chis` board; retain build compatibility for `sd` and `lite` without promising identical feature sets. All implementation stays under superfw/ on its lane. Significant work is expected in the menu, rendering, artwork, configuration and emulator integration; shared repository infrastructure already supports the project.
+Keep SuperFW as the firmware foundation and implement DSSMM presentation and navigation within this project. Keep the shared DSSMM presentation, settings and artwork features aligned across `chis`, `sd` and `lite` wherever the hardware supports them; keep only hardware-specific actions and unavailable capabilities variant-specific. All implementation stays under superfw/ on its lane. Significant work is expected in the menu, rendering, artwork, configuration and emulator integration; shared repository infrastructure already supports the project.
 
 Do not transplant OMEGA drivers, patch payloads, save-state formats or flash layouts. SuperFW already owns SD/filesystem access, WAITCNT/save/IRQ patching, direct saving, game launch, NOR mapping and firmware updates. Keep these paths intact during the first UI milestones. Introduce small interfaces around menu actions and browser metadata so the renderer does not issue hardware operations directly. Existing src/menu.c mixes UI and actions, so extract incrementally rather than rewrite it wholesale.
 
@@ -70,7 +70,7 @@ Acceptance: build a representative pack with unmodified DSSCC, copy it to the Pr
 
 ## Implementation checkpoint — first manual palettes
 
-Started 2026-11-12 by owner request. Appended two original DSSMM-oriented Light/Dark palettes without changing upstream IDs 0–5 or saved numeric settings. New chis configurations default to Light; existing theme settings override it. Other board defaults stay upstream. UI settings identify the new choices as Light/Dark; both use existing theme persistence and rendering, including native in-game palette propagation. This is a palette foundation, not the completed DS-style layout. Independent accents were implemented in the next checkpoint; artwork and browser restructuring remain pending. Existing numeric themes remain available for comparison. Physical contrast/readability needs testing on the owner’s console.
+Started 2026-11-12 by owner request. Appended two original DSSMM-oriented Light/Dark palettes without changing upstream IDs 0–5 or saved numeric settings. The first release defaulted only Chis to Light; the 2026-11-13 cross-variant checkpoint below aligns SD and Lite. Existing versioned theme choices remain saved. UI settings identify the new choices as Light/Dark; both use existing theme persistence and rendering, including native in-game palette propagation. This is a palette foundation, not the completed DS-style layout. Independent accents were implemented in the next checkpoint; artwork and browser restructuring remain pending. Existing numeric themes remain available for comparison. Physical contrast/readability needs testing on the owner’s console.
 
 ## Implementation checkpoint — independent accents
 
@@ -85,3 +85,8 @@ The SD browser now brands the shared tab strip with DSSMM, highlights the comple
 ## Owner priority — complete interface skin
 
 Treat consistent DSSMM skinning across browser, settings, system/tools, game information and in-game menus as the top ongoing UI goal. Continue in reviewable screen-by-screen slices; retain SuperFW action/backend code and verify display/memory limits on each board.
+
+
+## Cross-variant presentation checkpoint — 2026-11-13
+
+The first browser branding, selected-row treatment, artwork panel, theme/accent controls, artwork selector and SYSTEM layout are shared code compiled into all three board builds. Earlier defaults differed: Chis used DSSMM Light and Title artwork while SD/Lite retained upstream defaults. The owner requests keeping variants synchronized wherever hardware allows. Current work aligns those defaults and migrates pre-Test-2 unversioned UI settings on every board, while preserving explicit versioned Test 2 choices. Chis-only NOR support and other genuine hardware capabilities remain variant-specific. Host tests now compile the settings layer with SD, Lite and Chis build defines; physical SD/Lite display, storage, save and timing validation remains outstanding.
