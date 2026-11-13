@@ -115,3 +115,5 @@ SuperChis Prime v1.0 chain-loads the Test1 Chis image and reports SuperFW 0.22 (
 - Theme/settings/path regression tests, artwork tests and whitespace check pass. Local ARM builds unavailable because `arm-none-eabi-gcc` is missing; hosted validation pending. No release or hardware qualification.
 
 - Follow-up to 2026-11-13 SYSTEM path work: hosted run43435382825 exposed a missing `config.h` include in `ingame_menu.c` (undefined SYSTEM_DIR and DISK_SAVESTATE_SLOTS). Added the include. Focused settings/artwork checks are rerun locally; hosted matrix must pass before dssmm integration. No hardware test or release.
+
+- Owner requests a tidy workspace and cleanup of old/superseded builds going forward. After the final hosted matrix, removed ignored SuperFW compiler outputs and `superfw/build/` (including obsolete local Test1 staging builds); added a handoff cleanup rule. Published release assets/evidence and tracked source assets remain intact. The pre-existing untracked devcontainer lock remains untouched.

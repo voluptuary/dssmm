@@ -120,3 +120,7 @@ New default save/state/log paths are under `/SYSTEM`: SAVEGAME, SAVES, SAVESTATE
 ## 2026-11-13 — SYSTEM path build fix
 
 The first hosted verification of Chis artwork defaults and SYSTEM paths failed because `ingame_menu.c` used shared path/slot constants without including `config.h`. Added that include; rerun the focused host tests and hosted project matrix before integrating. The failure was compile-time only, before any firmware artifact was produced. Preserve the untracked `.devcontainer/devcontainer-lock.json`.
+
+## 2026-11-13 — Workspace cleanup completed
+
+Removed ignored compiler/intermediate products and the superseded local board/release output directory after hosted verification (`make -C superfw clean`; removed `superfw/build/`). No tracked upstream assets, validation records, published tags/assets, or user-created untracked files were removed. Future SuperFW handoffs now include the same build-output cleanup check.

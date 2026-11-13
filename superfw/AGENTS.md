@@ -23,3 +23,8 @@ Build identity: the Info page shows the current SuperFW version followed by `(DS
 
 
 SYSTEM storage: new save files use `/SYSTEM/SAVEGAME/` or `/SYSTEM/SAVES/`; disk states use `/SYSTEM/SAVESTATE/`; the debug log uses `/SYSTEM/superfwlog.txt`. Preserve `.superfw`. Legacy `/SAVEGAME`, `/SAVES`, and `/SAVESTATE` data is detected and continues to be used for matching games when no SYSTEM copy exists; never remove these fallback reads without a verified migration and regression coverage. See `docs/SYSTEM-LAYOUT.md`.
+
+
+## Workspace cleanup
+
+Before handoff, remove stale ignored compiler outputs and superseded local board/release builds after validation (`make -C superfw clean`, then remove `superfw/build/`). Preserve tracked upstream assets, journals, validation evidence, published tags and GitHub release assets. Never remove user-created untracked files; check `git status` first.
