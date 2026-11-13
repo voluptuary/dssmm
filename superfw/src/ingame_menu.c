@@ -30,6 +30,7 @@
 #include "supercard_driver.h"
 #include "res/icons-menu.h"
 #include "ingame.h"
+#include "config.h"
 
 #include "directsave.h"
 

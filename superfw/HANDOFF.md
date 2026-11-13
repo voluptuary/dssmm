@@ -116,3 +116,7 @@ Chis now defaults to Title artwork. Added an Artwork row to UI settings with Lis
 New default save/state/log paths are under `/SYSTEM`: SAVEGAME, SAVES, SAVESTATE and `superfwlog.txt`; artwork remains in IMGS/IMGS2 and private state remains in `/.superfw`. Existing root-level per-game save sets are detected across main/temporary/backup saves and remain the active path when no SYSTEM copy exists; legacy savestates are detected across all disk slots. No old files are deleted or moved. `docs/SYSTEM-LAYOUT.md` explains the layout and safe manual migration.
 
 `bash scripts/test-theme-settings.sh` passes for native and Chis defaults, migration, serialization, save/state path selection and legacy fallback. `bash scripts/test-artwork.sh` and `git diff --check` pass. Local ARM build requires unavailable `arm-none-eabi-gcc`; hosted matrix is the next validation. No release/assets changed; pre-existing devcontainer lock untouched.
+
+## 2026-11-13 — SYSTEM path build fix
+
+The first hosted verification of Chis artwork defaults and SYSTEM paths failed because `ingame_menu.c` used shared path/slot constants without including `config.h`. Added that include; rerun the focused host tests and hosted project matrix before integrating. The failure was compile-time only, before any firmware artifact was produced. Preserve the untracked `.devcontainer/devcontainer-lock.json`.
