@@ -133,3 +133,10 @@ Expanded theme/settings host checks to build with SD, Lite and Chis flags. `bash
 ## 2026-11-13 — Three-variant DSSMM defaults and parity work
 
 Aligned the shared UI defaults on SD, Lite and Chis: DSSMM Light plus Title artwork. Version-3 settings migrate only unversioned/version-1 native defaults; explicit version-2 Test 2 theme and artwork selections remain unchanged. Browser styling, settings controls, artwork lookup and SYSTEM paths were already shared across variants. Chis NOR remains Chis-specific. Expanded settings test builds to all board flags; settings/migration, artwork suites and all three sequential board builds pass locally. Release note draft: `docs/releases/superfw-test3.md`. Rebuild from the integrated commit and collect hosted matrix before publishing. No physical behavior is established.
+
+## 2026-11-13 — Synchronized defaults published as Test 3
+
+- Ported DSSMM Light and Title artwork defaults to SD and Lite, matching Chis. Version 3 settings migrate pre-Test-2 unversioned/v1 native defaults; saved version-2 Test 2 preferences are preserved. Browser skin, artwork controls and SYSTEM paths remain common; Chis NOR stays variant-specific.
+- Published `superfw-test3` with all three images at source `ad3cdd53ec0eaa5239bf113b858e7b86b75838b9`, DSSMM Build 524. Five branch CI checks passed; local SD/Lite/Chis settings+migration tests and artwork tests passed, as did all three sequential builds and package checks. Public downloads byte-match builds and GitHub digests. CI host suite passed; local full `verify.sh` could not run because lcov is absent.
+- Release is a prerelease with no Test 3 hardware validation. Previous Prime Test 1 boot/theme smoke is not extended; SD/Lite remain physically untested. Test 2 assets and prior releases remain. DE `v8.4.0` stays latest stable. Publication evidence: `docs/releases/superfw-test3-publication.json`.
+- Removed generated local binaries/staging after byte verification. Root user overview now points to Test 3. Next: owner checks each available variant and report observations; keep styling shared where hardware permits.
