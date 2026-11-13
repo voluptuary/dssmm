@@ -1,0 +1,56 @@
+{
+  "tag": "superfw-test2",
+  "source_commit": "c748fea2286721da21aa3394cf8d4ac330b19c8a",
+  "dssmm_build_number": 517,
+  "new_changes_hardware_tested": false,
+  "previous_hardware_observation": "Test 1 Chis chain-load/theme smoke test on one SuperChis Prime v1.0; does not validate these changes.",
+  "assets": {
+    "superfw-chis.fw": {
+      "board": "chis",
+      "bytes": 1671680,
+      "sha256": "1f784f335c79623822f6fa9d76c97d69bca9574e73f93d63283cb672e29d9ab2",
+      "id": 743841660,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test2/superfw-chis.fw",
+      "digest": "sha256:1f784f335c79623822f6fa9d76c97d69bca9574e73f93d63283cb672e29d9ab2"
+    },
+    "superfw-sd.fw": {
+      "board": "sd",
+      "bytes": 499200,
+      "sha256": "05e2b93b524ddce3332caede955e950d1379bf286ad96abbbfa7a37d480c4a00",
+      "id": 743841659,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test2/superfw-sd.fw",
+      "digest": "sha256:05e2b93b524ddce3332caede955e950d1379bf286ad96abbbfa7a37d480c4a00"
+    },
+    "superfw-lite.fw": {
+      "board": "lite",
+      "bytes": 466944,
+      "sha256": "013c1bc550e441c334eef7e0ff12dbe1885a3aae5e80129431ec397dfc2f50a3",
+      "id": 743841661,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test2/superfw-lite.fw",
+      "digest": "sha256:013c1bc550e441c334eef7e0ff12dbe1885a3aae5e80129431ec397dfc2f50a3"
+    }
+  },
+  "ci": {
+    "superfw": 43436608738,
+    "dssmm": 43437592326,
+    "ezfomegade": 43437613874,
+    "ezfomega": 43437617055,
+    "ezfblue": 43437621334
+  },
+  "local_checks": [
+    "theme/settings and artwork suites passed",
+    "all three board builds passed sequentially",
+    "GBA header checksum and size field, board size limits, and firmware SHA-256 seals verified",
+    "publicly downloaded assets byte-match local builds"
+  ],
+  "hosted_host_suite": "passed as part of all five hosted project checks; local make verify was not run because lcov is unavailable",
+  "release_id": 444290415,
+  "release_url": "https://github.com/voluptuary/dssmm/releases/tag/superfw-test2",
+  "published_at": "2026-11-13T13:55:07Z",
+  "prerelease": true,
+  "draft": false,
+  "body_sha256": "ac1c9baf9cbbde2a83b79d6fc1877faceb868207f7a6b8143849c569a2ecd22f",
+  "notes_sha256": "daa48e88fb59fa975287c27ac9d31b5eb27137a2e8ca3ad38454204312c8a8e2",
+  "previous_release_preserved": "superfw-test1",
+  "latest_stable": "v8.4.0"
+}
