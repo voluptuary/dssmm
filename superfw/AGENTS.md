@@ -28,3 +28,7 @@ SYSTEM storage: new save files use `/SYSTEM/SAVEGAME/` or `/SYSTEM/SAVES/`; disk
 ## Workspace cleanup
 
 Before handoff, remove stale ignored compiler outputs and superseded local board/release builds after validation (`make -C superfw clean`, then remove `superfw/build/`). Preserve tracked upstream assets, journals, validation evidence, published tags and GitHub release assets. Never remove user-created untracked files; check `git status` first.
+
+## Current synchronized release
+
+`superfw-test3` is the current SuperFW prerelease for all three boards. SD, Lite and Chis share DSSMM Light/Title defaults, artwork controls, browser styling and SYSTEM paths; version-2 Test 2 preferences are preserved during migration. Chis NOR remains hardware-specific. Tag source, CI, local builds, asset hashes and explicit no-Test-3-hardware-validation statement are in `docs/releases/superfw-test3-publication.json`. Preserve Test 1/Test 2 releases and DE `v8.4.0` latest stable. Continue workspace cleanup and record physical checks per board.

@@ -1,0 +1,60 @@
+{
+  "tag": "superfw-test3",
+  "source_commit": "ad3cdd53ec0eaa5239bf113b858e7b86b75838b9",
+  "dssmm_build_number": 524,
+  "all_boards_share_dssmm_light_and_title_defaults": true,
+  "legacy_settings_migrated_before_test2_version_2": true,
+  "version_2_explicit_choices_preserved": true,
+  "new_changes_hardware_tested": false,
+  "prior_hardware_observation": "Test 1 Chis boot/theme smoke test on one SuperChis Prime v1.0; does not validate these changes.",
+  "assets": {
+    "superfw-chis.fw": {
+      "board": "chis",
+      "bytes": 1671680,
+      "sha256": "7859572274e8ca7ca4bd10bcdb3889f5f80507dfb8637bd97181fec2b352e467",
+      "id": 744031677,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test3/superfw-chis.fw",
+      "digest": "sha256:7859572274e8ca7ca4bd10bcdb3889f5f80507dfb8637bd97181fec2b352e467"
+    },
+    "superfw-sd.fw": {
+      "board": "sd",
+      "bytes": 499200,
+      "sha256": "ea00de8505a134241b8c25b8b9d4b1b2b6b95c2c384b4c291ea2dfbabe81bbf6",
+      "id": 744031674,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test3/superfw-sd.fw",
+      "digest": "sha256:ea00de8505a134241b8c25b8b9d4b1b2b6b95c2c384b4c291ea2dfbabe81bbf6"
+    },
+    "superfw-lite.fw": {
+      "board": "lite",
+      "bytes": 466944,
+      "sha256": "70a510dd73ea13b77c688c3698754b2f8d7d87637f476bc0577f81bf14834986",
+      "id": 744031682,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test3/superfw-lite.fw",
+      "digest": "sha256:70a510dd73ea13b77c688c3698754b2f8d7d87637f476bc0577f81bf14834986"
+    }
+  },
+  "ci": {
+    "superfw": 43446490080,
+    "dssmm": 43446031170,
+    "ezfomegade": 43446474466,
+    "ezfomega": 43446478860,
+    "ezfblue": 43446484142
+  },
+  "local_checks": [
+    "settings/default/migration suite passed under SD, Lite and Chis defines",
+    "artwork decoder/adapter/compositor tests passed",
+    "all three board builds passed sequentially from tagged source",
+    "board size limits, GBA size field/header checksum, and firmware seal verified",
+    "draft and public downloads byte-match local builds; GitHub asset digests match"
+  ],
+  "hosted_host_suite": "passed in hosted project checks; local full verify was unavailable because lcov is not installed",
+  "release_id": 444355247,
+  "release_url": "https://github.com/voluptuary/dssmm/releases/tag/superfw-test3",
+  "published_at": "2026-11-13T14:52:39Z",
+  "prerelease": true,
+  "draft": false,
+  "body_sha256": "78fa963411b44b7673286d1b9fa005340b900c1e263d08eb6ece2ade4e6701d3",
+  "notes_sha256": "3bd4fa8ac7f16445a3d214ee4dafa8926754f83129693c8390e2dfa5bcd7cc48",
+  "previous_superfw_release_preserved": "superfw-test2",
+  "latest_stable": "v8.4.0"
+}
