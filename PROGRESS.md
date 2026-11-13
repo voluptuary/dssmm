@@ -3131,3 +3131,9 @@ Owner requests an end-user root README, three SuperFW builds in one prerelease, 
 ## 2026-11-12 — SuperChis Prime Test 1 boot report corrected
 
 Owner clarification: the released Chis build chain-loads on SuperChis Prime v1.0 and reports SuperFW 0.22, compared with stock kernel 0.20; manual themes are available. This is an initial boot/theme smoke test only. The menu is still mostly upstream SuperFW; the DSSMM-style layout is not complete. SD/Lite variants, gameplay, saves, artwork rendering, NOR and installation remain unvalidated. Updated root end-user status and canonical prerelease notes; prior remote note body archived at `superfw/docs/history/releases/superfw-test1-before-prime-observation-correction-2026-11-12.md`. Evidence: `superfw/docs/prime-test1-hardware-observation.json`. No firmware or release assets changed.
+
+## 2026-11-13 — SuperFW artwork discoverability and SYSTEM paths integrated
+
+The SuperFW branch change has been merged normally into dssmm. Chis defaults to Title artwork; the UI settings screen has an explicit List/Title/Box selector, and older settings migrate while preserving versioned explicit List selections. New saves/states/logs use `/SYSTEM`; `/.superfw` stays in place and detected legacy root files remain in use rather than being moved or deleted. Consistent DSSMM skinning across all menus/settings/system/game screens is now the SuperFW top port goal.
+
+Validation: local SuperFW settings/artwork scripts, root isolation, and project merge fixtures pass. First SuperFW CI run exposed one missing `config.h` include; the fix passed lane run 43435582632. Integrated all-project CI passed run 43435894669 (all four projects). No physical artwork/save test and no release. Next: fast-forward all lanes from dssmm and verify remote branch equality.
