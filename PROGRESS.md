@@ -3145,3 +3145,10 @@ Published the owner-requested three-board SuperFW Test 2 as prerelease `superfw-
 ## 2026-11-13 — Cross-variant SuperFW port and Test 3 release
 
 Aligned DSSMM Light/Title defaults and older-settings migration across SD, Lite and Chis; kept hardware-specific actions distinct. Updated root user overview and published [SuperFW Test 3](https://github.com/voluptuary/dssmm/releases/tag/superfw-test3) as prerelease with all three board images. Source `ad3cdd53ec0eaa5239bf113b858e7b86b75838b9`; Build 524. Three-variant settings/artwork tests, local sequential builds, package verification, public download comparisons and all five hosted branch checks passed. Hosted upstream tests passed; local `lcov` unavailable. New changes have no physical validation. See publication record. All branches are synchronized at the integration checkpoint; next: owner board testing and continued shared DSSMM skinning. Generated build output was cleaned.
+
+
+## 2026-11-14 — Publish SuperFW Test 4 and prune superseded prereleases
+
+Published SuperFW Test 4 as a prerelease with all three firmware assets at `19429735b3b55f7c57dd3921f0aad61601521e06` (DSSMM Build 531). All five branch CI checks passed; local settings/artwork tests, sequential board builds, size/header/seal checks and downloaded-byte comparisons passed. Local full verification could not run because lcov is missing; hosted upstream host tests passed. Test 4 changes are not physically validated. Publication record: `superfw/docs/releases/superfw-test4-publication.json`.
+
+Owner authorized retaining only the newest prerelease page for each of SuperFW, BLUE and Original OMEGA. Removed their older prerelease release pages/assets after archiving exact metadata and bodies; retained tags. Kept BLUE Test 4, OMEGA Test 4, SuperFW Test 4, and all stable/historical DE releases. Archive: `docs/history/releases/prerelease-retention-2026-11-14.json`. Updated root README and root/project handoffs. Next sync the documentation commits to every lane, confirm release list/tag retention and clean ignored artifacts.

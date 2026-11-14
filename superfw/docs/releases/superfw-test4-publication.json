@@ -1,0 +1,96 @@
+{
+  "tag": "superfw-test4",
+  "source_commit": "19429735b3b55f7c57dd3921f0aad61601521e06",
+  "dssmm_build_number": 531,
+  "title_artwork_uses_gba_game_code_at_header_offset_0xac": true,
+  "title_artwork_precedence": [
+    "CUSTOM ROM filename",
+    "mirrored ROM filename",
+    "native EZ-FLASH game-code path"
+  ],
+  "box_artwork_precedence": [
+    "CUSTOM ROM filename",
+    "mirrored ROM filename"
+  ],
+  "dsscc_dst1_transparency_supported_and_host_tested": true,
+  "artwork_border_removed": true,
+  "decorative_top_bar_text_removed": true,
+  "settings_and_action_menus_left_aligned": true,
+  "font_size_reduced": false,
+  "font_size_note": "Current renderer glyphs are fixed height; no font-size control exists.",
+  "new_changes_hardware_tested": false,
+  "prior_hardware_observation": "Test 1 Chis boot/theme smoke test on one SuperChis Prime v1.0; does not validate artwork or Test 4 UI.",
+  "assets": {
+    "superfw-chis.fw": {
+      "board": "chis",
+      "bytes": 1671680,
+      "sha256": "64c6291dfa3db833a62077de7d9fe3b01a24ee2fbf761dce1ca79e5462876e61",
+      "id": 744162494,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test4/superfw-chis.fw",
+      "digest": "sha256:64c6291dfa3db833a62077de7d9fe3b01a24ee2fbf761dce1ca79e5462876e61"
+    },
+    "superfw-sd.fw": {
+      "board": "sd",
+      "bytes": 499200,
+      "sha256": "389cedc00ad4861e44ca3dde16652ff51cedf4a18b68f294dfb03a4d5a86229f",
+      "id": 744162485,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test4/superfw-sd.fw",
+      "digest": "sha256:389cedc00ad4861e44ca3dde16652ff51cedf4a18b68f294dfb03a4d5a86229f"
+    },
+    "superfw-lite.fw": {
+      "board": "lite",
+      "bytes": 466944,
+      "sha256": "50c690278a30c59d6451cd48bda735d1cfb44f6493c69007e9271cc0ba870ace",
+      "id": 744162495,
+      "url": "https://github.com/voluptuary/dssmm/releases/download/superfw-test4/superfw-lite.fw",
+      "digest": "sha256:50c690278a30c59d6451cd48bda735d1cfb44f6493c69007e9271cc0ba870ace"
+    }
+  },
+  "ci": {
+    "superfw": 43453044083,
+    "dssmm": 43453033523,
+    "ezfomegade": 43453082774,
+    "ezfomega": 43453070676,
+    "ezfblue": 43453055837
+  },
+  "local_checks": [
+    "theme/settings migration tests passed",
+    "artwork decoder/adapter/compositor tests passed, including DST1 transparency and native game-code path",
+    "all three board builds passed sequentially from integrated source",
+    "board size limits, GBA checksum/size field, and firmware seal verified",
+    "all three hosted assets downloaded and byte-match local images and GitHub asset digests"
+  ],
+  "hosted_host_suite": "passed in hosted project checks on all five branches; local full verify unavailable because lcov is not installed",
+  "release_id": 444401776,
+  "release_url": "https://github.com/voluptuary/dssmm/releases/tag/superfw-test4",
+  "published_at": "2026-11-13T15:33:44Z",
+  "prerelease": true,
+  "draft": false,
+  "body_sha256": "b32682996aceb4b52654f1fe0f5bb8f182a092e37cde9b121e3ae1db81bd4a9b",
+  "notes_sha256": "b32682996aceb4b52654f1fe0f5bb8f182a092e37cde9b121e3ae1db81bd4a9b",
+  "superseded_prerelease_pages_removed": {
+    "superfw": [
+      "superfw-test1",
+      "superfw-test2",
+      "superfw-test3"
+    ],
+    "blue": [
+      "v8.4.0-blue-test3",
+      "v8.3.1-blue-test2",
+      "v8.3.1-blue-test1"
+    ],
+    "omega": [
+      "v8.3.1-omega-test3",
+      "v8.3.1-omega-test2",
+      "v8.3.1-omega-test1"
+    ]
+  },
+  "superseded_git_tags_retained": true,
+  "release_body_archive": "docs/history/releases/prerelease-retention-2026-11-14.json",
+  "latest_lane_releases": {
+    "superfw": "superfw-test4",
+    "blue": "v8.4.1-blue-test4",
+    "omega": "v8.4.0-omega-test4",
+    "de_stable": "v8.4.0"
+  }
+}
