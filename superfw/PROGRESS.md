@@ -158,3 +158,10 @@ Next run artwork/settings suites, rebuild all three boards, verify headers/size/
 ## 2026-11-13 — Validate header-code correction
 
 `bash scripts/test-artwork.sh` and `bash scripts/test-theme-settings.sh` pass after adding game-code matching. The artwork suite still verifies DSSCC DST1 transparency (marked zero transparent; unmarked black opaque), exact FatFs reads, CUSTOM/mirrored filename order, Box CUSTOM, and original EZ code path `/SYSTEM/IMGS/B/P/BPRE.bmp`. `git diff --check` passes. Local `make verify-superfw` reaches the coverage-enabled script but cannot run the upstream host suite because `lcov` is absent. The previous Test 3 image does not contain this correction; release remains pending complete hosted CI and final three-board builds.
+
+
+## 2026-11-14 — Test 4 publication and release retention
+
+Published `superfw-test4` at integrated source `19429735b3b55f7c57dd3921f0aad61601521e06` (DSSMM Build 531) with Chis, SD and Lite `.fw` assets. Release notes follow New features, New fixes, Summary of past features, Summary of past fixes. All five lane CI checks passed. Local settings/artwork tests and sequential board builds passed; size/header/seal checks passed; downloads match local bytes and GitHub digests. The full local verify script is blocked only by missing `lcov`; hosted complete host suite passed. Test 4 physical artwork and interface behavior remain unvalidated.
+
+After publication, removed release pages/assets for superseded prereleases: SuperFW Test 1–3, BLUE Test 1–3 and Original OMEGA Test 1–3. Retained git tags and archived exact prior bodies/assets in root `docs/history/releases/prerelease-retention-2026-11-14.json`. Latest SuperFW/BLUE/OMEGA prereleases are Test 4; DE v8.4.0 latest stable and all DE historical releases remain. Public notes omit build headings, checksums, source archive notices and developer cautions. Root README and shared integration logs must be updated through dssmm, then sync all lanes and clean local generated artifacts.

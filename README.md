@@ -44,26 +44,27 @@ and follow that release's installation instructions.
 
 ## SuperCard and SuperChis
 
-[DSSMM SuperFW Test 3](https://github.com/voluptuary/dssmm/releases/tag/superfw-test3)
+[DSSMM SuperFW Test 4](https://github.com/voluptuary/dssmm/releases/tag/superfw-test4)
 is an early menu port for SuperCard-family flashcards, built on
 [David Guillen Fandos’s SuperFW](https://github.com/davidgfnet/superfw). It adds
-shared DSSMM Light/Dark themes, accent colors and name-matched title/box artwork
-to SuperFW’s game browser. All three builds default to the DSSMM Light theme and
-title artwork. The full DS-style layout is still being developed; Chis-only
-hardware features such as its NOR library remain specific to that card.
+shared DSSMM Light/Dark themes, accent colors, DSSCC name-matched title/box art,
+and original EZ-FLASH GBA title art matched by ROM game code. All three builds
+default to the DSSMM Light theme and title artwork. The full DS-style layout is
+still being developed; Chis-only hardware features such as its NOR library remain
+specific to that card.
 
-| Your cartridge | Test 3 download |
+| Your cartridge | Test 4 download |
 | --- | --- |
-| **SuperChis / SuperChis Prime** (including Prime v1.0) | [superfw-chis.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test3/superfw-chis.fw) |
-| **SuperCard SD** | [superfw-sd.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test3/superfw-sd.fw) |
-| **SuperCard Lite** | [superfw-lite.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test3/superfw-lite.fw) |
+| **SuperChis / SuperChis Prime** (including Prime v1.0) | [superfw-chis.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test4/superfw-chis.fw) |
+| **SuperCard SD** | [superfw-sd.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test4/superfw-sd.fw) |
+| **SuperCard Lite** | [superfw-lite.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test4/superfw-lite.fw) |
 
 **Hardware testing:** an earlier Chis build chain-loaded on one SuperChis Prime
 v1.0 and showed SuperFW 0.22 with manual themes. That boot/theme smoke test does
-not validate Test 3. The new defaults, artwork, save/state paths and menu styling
-have not been checked on hardware; SD and Lite also remain untested. These are
-prerelease builds: choose the file for your exact card and back up your SD card,
-saves and current firmware before testing.
+not validate Test 4. Its artwork and menu changes have not been checked on
+hardware; SD and Lite also remain untested. These are prerelease builds: choose
+the file for your exact card and back up your SD card, saves and current firmware
+before testing.
 Follow [SuperFW’s installation and recovery guide](https://superfw.davidgf.net/docs/install/flash/).
 Use only the matching SuperCard-family build; the OMEGA downloads above target
 different hardware. Prime has no hardware RTC or rumble, and this port offers
@@ -78,16 +79,16 @@ upstream versions; MiGoomba is currently an OMEGA-family update.
 2. Check the images, choose **Mirrored** output and select **Build Pack**.
 3. Copy the generated `IMGS` and `IMGS2` contents into `SYSTEM/IMGS` and
    `SYSTEM/IMGS2` on the SD card, preserving all subfolders.
-4. In any Test 3 **SD browser**, title artwork is shown by default. Press
+4. In any Test 4 **SD browser**, title artwork is shown by default. Press
    **Start** to cycle List → title artwork → box artwork. Use
    **UI settings → Save** to remember the mode.
 
 See [the artwork setup guide](superfw/docs/ARTWORK-SETUP.md) for an exact folder
-example, custom images and troubleshooting. Test 1 supports mirrored and CUSTOM
-name-matched files; folder artwork, GBA code-based packs and NOR/recent previews
-are still to come. Artwork colors are reduced in this early renderer. Test 1
-and older unversioned settings migrate to the new common defaults; versioned
-Test 2 choices remain intact.
+example, custom images and troubleshooting. Current builds support mirrored and
+CUSTOM name-matched files, plus EZ-FLASH GBA game-code title art. Folder artwork
+and NOR/recent previews are not supported. Older unversioned settings migrate to
+common defaults; versioned Test 2 choices remain intact. DSSCC DST1 transparency
+is supported, and artwork colors are reduced to fit the menu renderer.
 
 ## GB/GBC emulator update
 

@@ -162,3 +162,12 @@ Implemented the native game-code lookup after the two filename candidates, using
 
 
 Correction from owner: artwork has not displayed at all. The reason the original EZ title image could not match was that I first treated “header artwork” as the 12-byte game title; the EZ kernel uses the four-byte game code and path `<IMGS>/<code0>/<code1>/<code>.bmp`. Code and docs now add this native lookup after CUSTOM and mirrored filename matching. DSSCC DST1 transparent-pixel support already exists in the decoder and host tests; retain it. Verify an exact BPRE-style header fixture plus transparency before integration.
+
+
+## 2026-11-14 — SuperFW Test 4 published and prereleases pruned
+
+Test 4 (`superfw-test4`) is published at `19429735b3b55f7c57dd3921f0aad61601521e06`, displayed build 531, as a prerelease with Chis, SD and Lite firmware. Canonical four-section notes and publication evidence are `docs/releases/superfw-test4.md` and `docs/releases/superfw-test4-publication.json`. The Test 4 source includes native GBA game-code title artwork matching (`0xAC`, `/SYSTEM/IMGS/<code0>/<code1>/<code>.bmp`), filename/CUSTOM Box artwork, existing DSSCC DST1 transparency, simplified left-aligned menu lists, no browser frame and no decorative tab text.
+
+All five hosted workflows passed (SuperFW 43453044083, dssmm 43453033523, DE 43453082774, OMEGA 43453070676, BLUE 43453055837). Local theme/settings and artwork tests passed; SD, Lite and Chis builds passed sequentially at build 531. All board limits, GBA checksums/size fields and firmware seals passed. Public downloads were fetched and byte-compared with local assets; GitHub digests match. `make verify-superfw` could not run the coverage-enabled upstream suite locally because `lcov` is absent; hosted CI passed it. No Test 4 artwork/menu hardware validation is claimed. The earlier Chis Test 1 boot/theme smoke remains the only reported physical test.
+
+Per owner request, deleted prior SuperFW Test 1–3, BLUE Test 1–3 and Original OMEGA Test 1–3 GitHub release pages/assets after Test 4 published. Retained their git tags and all release bodies/asset metadata in root `docs/history/releases/prerelease-retention-2026-11-14.json`. Each lane now shows only its newest prerelease; DE stable v8.4.0 and prior DE releases are untouched. Next: keep workspace tidy, remove ignored build outputs, and wait for the owner’s Chis/other-board artwork observations. Preserve the untracked devcontainer lock.
