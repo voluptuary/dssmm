@@ -88,6 +88,10 @@ Keep credits positive and accurate; retain Merkin Mix's DS Style fork lineage.
 For local VS Code/Docker/Ubuntu setup and session recovery, read
 docs/local-development.md. Codespaces /tmp caches/process handles and ignored
 binaries are not portable; use committed evidence and rerun unfinished checks.
+The standard devcontainer includes mGBA SDL plus Xvfb/xdotool for GBA preview
+testing. Keep any BIOS image outside the repository/releases; document emulator
+version, package, launch-flag or harness changes in docs/local-development.md
+and the root handoff/progress logs.
 
 MiGoomba full local verifiers, replay and focused Cppcheck completed on 2026-11-12;
 see current HANDOFF and per-project migoomba-release-validation.json. All four hosted CI runs passed, and 8.4.0 is published
