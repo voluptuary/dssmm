@@ -74,6 +74,16 @@ shared GBA rendering/artwork modules. If mGBA shows a blank screen, do not count
 that as a successful render test; check emulator version, GBA startup/header,
 BIOS and skip-BIOS configuration first.
 
+For a repeatable headless smoke check that captures a frame and verifies the
+generated Title-art marker, run:
+
+```sh
+bash superfw/scripts/test-browser-preview-mgba.sh
+```
+
+This requires Xvfb, xdotool, devkitARM and the mGBA executable; set `MGBA_BIN`
+if it is installed outside `/usr/games/mgba`.
+
 #### Keeping the standard mGBA setup current
 
 Treat `.devcontainer/Dockerfile`, this section and the root `AGENTS.md` setup

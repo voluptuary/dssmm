@@ -3162,3 +3162,7 @@ Owner authorized retaining only the newest prerelease page for each of SuperFW, 
 ## 2026-11-14 — Packaged mGBA preview correction
 
 The packaged Debian 12 mGBA 0.10.1 binary is `/usr/games/mgba`, outside the default PATH. Executing the generated synthetic preview under Xvfb rendered a horizontal carousel with Title art selected by a fake GBA header in a 240×160 screenshot. Earlier upstream 0.10.5 AppImage attempts showed a blank frame. Updated the setup guide and SuperFW journals with the exact version/path and limits. Box mode, keyboard controls, SD/path integration and full firmware remain unverified. Root Dockerfile/docs were pushed as `9c577cea`; this result correction was pushed as `874a2ee`; devcontainer rebuild from the Dockerfile has not been verified.
+
+## 2026-11-14 — Repeatable mGBA preview smoke check
+
+SuperFW added an Xvfb screenshot smoke script that prints the emulator version and asserts the synthetic Title-art marker in the captured PNG. It passes with Debian mGBA 0.10.1 at `/usr/games/mgba`; five seconds are needed for the preview process to start. A shorter delay produces a white frame and fails. Updated root setup instructions to use this repeatable command. The SuperFW script is still in the project worktree and has not been integrated. Standard devcontainer build from the edited Dockerfile has not been run.
