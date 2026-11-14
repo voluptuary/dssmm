@@ -249,3 +249,7 @@ Build session 42756 ended exit 0 with SD/Lite/Chis firmware. Production source s
 ## 2026-11-14 — Checkpoint and correct focused-card layering
 
 Committed validated carousel/cache milestone as 944ec48. Fixed focused-last painter ordering in the shared layout, added explicit geometry assertions, and passed motion/fixture/cache tests. mGBA vertical Title screenshot passed (6700 BMP pixels) and was visually inspected. All-board evidence currently applies to 944ec48; painter follow-up needs final build/CI. Parity and actual Title-art card behavior remain incomplete.
+
+## 2026-11-14 — Synchronize shared mGBA setup and scroll carousel names
+
+Merged origin/dssmm normally into the lane, carrying root mGBA environment/documentation commits. Selected carousel names now left-align within bounded text regions and rotate to reveal long filenames. Cache and motion/fixture host tests pass. Latest source still needs visual/menu/board validation; CI 43617571436 was live at inspection. No release or parity claim.

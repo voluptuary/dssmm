@@ -28,6 +28,7 @@ preamble=r'''
 #define draw_central_text(...) ((void)0)
 #define draw_central_text_ovf(...) ((void)0)
 #define draw_text_leftovf(...) ((void)0)
+#define draw_text_ovf_rotate(...) ((void)0)
 #define draw_rightj_text(...) ((void)0)
 #define npf_snprintf snprintf
 #define strbcpy(d,s,n) snprintf(d,n,"%s",s)

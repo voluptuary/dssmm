@@ -1566,9 +1566,9 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
     const t_centry *focus = sdr_state->filefilter[focus_index];
 
     if (vertical)
-      draw_central_text_ovf(focus->fname, frame, 164, 85, 140);
+      draw_text_ovf_rotate(focus->fname, frame, 98, 85, 136, &smenu.anim_state);
     else
-      draw_central_text_ovf(focus->fname, frame, 120, 122, 162);
+      draw_text_ovf_rotate(focus->fname, frame, 40, 122, 162, &smenu.anim_state);
   }
 
   draw_text_leftovf(smenu.browser.cpath, frame, 8, 144, SCREEN_WIDTH - 88);
