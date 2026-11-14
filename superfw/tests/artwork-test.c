@@ -85,6 +85,13 @@ int main(void) {
   const unsigned heights[]={1,32,40,56,80,160};
   for(unsigned marked=0;marked<2;++marked) {
     fixture(120,marked);assert(decode(120,ARTWORK_MAX_PIXELS,&info));
+    memset(frame,17,sizeof(frame));
+    assert(artwork_blit_frame(frame+1,(uint16_t *)(output+2),&info,0,0));
+    for(unsigned y=0;y<80;++y) for(unsigned x=0;x<120;++x) {
+      uint8_t expected=output[2+y*120+x];
+      if(!expected) expected=17;
+      assert(((uint8_t *)(frame+1))[y*240+x]==expected);
+    }
     for(unsigned wi=0;wi<sizeof(widths)/sizeof(widths[0]);++wi)
       for(unsigned hi=0;hi<sizeof(heights)/sizeof(heights[0]);++hi) {
         unsigned w=widths[wi],h=heights[hi];

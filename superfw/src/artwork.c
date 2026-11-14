@@ -78,9 +78,12 @@ bool artwork_blit_frame(volatile uint16_t *frame, const uint16_t *pixels,
     }
 #endif
     for (unsigned col = 0; col < info->width / 2; ++col) {
-      uint16_t pair = src[col], bg = dst[col];
-      if (!(pair & 255)) pair |= bg & 255;
-      if (!(pair & 0xff00)) pair |= bg & 0xff00;
+      uint16_t pair = src[col];
+      if (!(pair & 255) || !(pair & 0xff00)) {
+        uint16_t bg = dst[col];
+        if (!(pair & 255)) pair |= bg & 255;
+        if (!(pair & 0xff00)) pair |= bg & 0xff00;
+      }
       dst[col] = pair;
     }
   }

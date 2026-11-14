@@ -297,3 +297,7 @@ Owner requested generic artwork icons in fast mode. Implemented original16x16 la
 ## 2026-11-14 — Visually validate fast Box placeholders
 
 Preview now calls actual placeholder helper and supports AnimationOff layout. Vertical Box screenshot passed and visually shows upright neighbors with native selected image. Recorded fixture timing without claiming hardware speed. Build52898 terminal success but source overlapped latest edits, so548 set remains diagnostic. Next clean committed candidate builds/CI and continued rendering optimization.
+
+## 2026-11-14 — Reduce transparent native-blit reads
+
+Opaque pixel pairs in marked art now avoid background reads. Native pixel-reference and artwork/adapter suites pass. Same vertical Box Off fixture985694cycles versus1051587 before (~6.3% reduction), screenshot unchanged. Still costly; hardware response/artwork unresolved. Commit and hosted board validation next.
