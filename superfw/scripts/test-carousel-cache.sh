@@ -42,22 +42,25 @@ static struct state {
 } state, *sdr_state=&state;
 static bool artwork_cached;
 static unsigned artwork_mode=1;
+static unsigned carousel_animation=1;
 static int browser_motion_offset;
-static unsigned loads, blits, icons;
+static unsigned loads, blits, icons, scales;
 static unsigned browser_entry_icon(const t_centry *entry) { (void)entry; return 0; }
 static void render_icon(int x,int y,unsigned icon) { (void)x;(void)y;(void)icon;++icons; }
 static bool artwork_load(const char *rom,unsigned mode,uint8_t *pixels,size_t capacity,
  uint8_t *bmp,size_t size,artwork_info *info) {
  (void)mode;(void)pixels;(void)capacity;(void)bmp;(void)size;
- ++loads; *info=(artwork_info){120,80,false}; return !strstr(rom,"missing");
+ ++loads; *info=(artwork_info){mode ? 80 : 120,80,false}; return !strstr(rom,"missing");
 }
 bool artwork_blit_frame(volatile uint16_t *frame,const uint16_t *pixels,
  const artwork_info *info,unsigned x,unsigned y) {
- (void)frame;(void)pixels;(void)info;(void)x;(void)y;++blits;return true;
+ (void)frame;(void)pixels;
+ assert(!(x&1) && x+info->width<=240 && y+info->height<=160);
+ ++blits;return true;
 }
 bool artwork_blit_scaled(volatile uint16_t *frame,const uint16_t *pixels,
  const artwork_info *info,unsigned x,unsigned y,unsigned w,unsigned h) {
- (void)w;(void)h;return artwork_blit_frame(frame,pixels,info,x,y);
+ (void)frame;(void)pixels;(void)info;assert(x+w<=240 && y+h<=160);++scales;++blits;return true;
 }
 '''
 tests=r'''
@@ -80,6 +83,23 @@ int main(void) {
  for(unsigned i=0;i<3;++i) assert(!state.carousel_art[i].cached && !state.carousel_art[i].valid);
  assert(state.carousel_art[0].pixels[0]==0x1234);
  render_browser_carousel(frame,false);assert(loads==5);
+ carousel_animation=0;artwork_mode=1;smenu.browser.selector=1;
+ browser_motion_offset=0;browser_invalidate_artwork();
+ unsigned fast_loads=loads;
+ unsigned before_scales=scales;
+ render_browser_carousel(frame,true);
+ render_browser_carousel(frame,false);
+ assert(scales==before_scales); /* Off must never invoke resampling. */
+ assert(loads==fast_loads+1); /* Selected artwork only; no neighbor preloads. */
+ for(unsigned style=1;style<=2;++style) {
+   artwork_mode=style;browser_invalidate_artwork();
+   fast_loads=loads;before_scales=scales;
+   render_browser_carousel(frame,true);
+   render_browser_carousel(frame,false);
+   render_browser_carousel(frame,true);
+   assert(scales==before_scales && loads==fast_loads+1);
+ }
+ carousel_animation=1;
  /* A directory change must never display cache entries from the old path. */
  unsigned before_loads=loads, before_blits=blits, before_icons=icons;
  strcpy(smenu.browser.cpath,"/another/"); browser_motion_offset=128;

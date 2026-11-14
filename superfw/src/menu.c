@@ -1513,7 +1513,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
     /* Populate one missing slot per settled frame, selected entry first. */
     const int candidates[3] = {selected, selected - 1, selected + 1};
     if (artwork_mode && browser_motion_offset == 0) {
-      for (unsigned c = 0; c < 3; ++c) {
+      for (unsigned c = 0; c < (carousel_animation ? 3u : 1u); ++c) {
         int index = candidates[c];
         if (index < 0 || index >= smenu.browser.dispentries) continue;
         const t_centry *entry = sdr_state->filefilter[index];
@@ -1544,30 +1544,43 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       char rom[MAX_FN_LEN];
       int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
       bool drawn = false;
-      if (artwork_mode && !(entry->attr & AM_DIR) && n > 0 && (unsigned)n < sizeof(rom) &&
+      if (artwork_mode && (carousel_animation || item->index == selected) && !(entry->attr & AM_DIR) && n > 0 && (unsigned)n < sizeof(rom) &&
           sdr_state->carousel_art[slot].cached && sdr_state->carousel_art[slot].valid &&
           sdr_state->carousel_art[slot].mode == artwork_mode &&
           !strcmp(sdr_state->carousel_art[slot].rom, rom)) {
         const artwork_info *info = &sdr_state->carousel_art[slot].info;
         unsigned x = item->x, width = item->w, height = item->h;
         if (info->width == 80) { width = height; x += (item->w - width) / 2; }
+        if (!carousel_animation) {
+          width = info->width;
+          height = info->height;
+          x = vertical ? (120 - width)/2 : (240 - width)/2;
+        }
         x &= ~1u;
         width &= ~1u;
         if (width == info->width && height == info->height)
           drawn = artwork_blit_frame((volatile uint16_t *)frame,
-              sdr_state->carousel_art[slot].pixels, info, x, item->y);
+              sdr_state->carousel_art[slot].pixels, info, x,
+              !carousel_animation && vertical ? 48 : item->y);
         else
           drawn = artwork_blit_scaled((volatile uint16_t *)frame,
               sdr_state->carousel_art[slot].pixels, info, x, item->y, width, height);
       }
-      if (!drawn)
-        render_icon(item->x + item->w / 2 - 8, item->y + item->h / 2 - 8,
-                    browser_entry_icon(entry));
+      if (!drawn) {
+        unsigned icon_x = item->x + item->w/2 - 8;
+        unsigned icon_y = item->y + item->h/2 - 8;
+        if (!carousel_animation && vertical) {
+          icon_x = 52;
+          icon_y = item->index < selected ? 24 : item->index > selected ? 128 : 80;
+        }
+        render_icon(icon_x, icon_y, browser_entry_icon(entry));
+      }
     }
     const t_centry *focus = sdr_state->filefilter[focus_index];
 
     if (vertical)
-      draw_text_ovf_rotate(focus->fname, frame, 98, 85, 136, &smenu.anim_state);
+      draw_text_ovf_rotate(focus->fname, frame, carousel_animation ? 98 : 128, 85,
+                           carousel_animation ? 136 : 106, &smenu.anim_state);
     else
       draw_text_ovf_rotate(focus->fname, frame, 40, 122, 162, &smenu.anim_state);
   }

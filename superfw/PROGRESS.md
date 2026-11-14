@@ -281,3 +281,11 @@ Added optional cascaded GBA timer readout. Vertical Title mGBA screenshot passed
 ## 2026-11-14 — Animation On/Off setting
 
 Owner requested immediate versus animated carousel changes. Added persisted format5 carousel_animation, default On, UI toggle, motion reset and gating for both orientations. Settings tests pass for all boards plus cache regression. Prior diagnostic build3360 completed successfully but predates toggle. New source requires clean numbered builds and CI. No physical fix/performance claim.
+
+## 2026-11-14 — Native-size fast carousel path
+
+Animation Off now draws selected artwork at native dimensions, uses neighbor icons, and skips neighbor preloads and all scaling. Production renderer regression verifies valid art, zero scaler calls in both orientations and selected-only load. Passes. Build92051 predates this change; latest board/CI/hardware validation required. Goal remains active.
+
+## 2026-11-14 — Validate no-scaling Off mode
+
+Actual-renderer regression now covers Title/Box and horizontal/vertical native blits with bounds assertions, no scaler calls and no neighbor preload. Navigation/cache/settings checks pass. Prior547 build sequence finished but Lite/Chis recorded dirty source; preserve as diagnostic only. Commit before fresh uniform candidate builds; no release or hardware-speed claim.

@@ -25,3 +25,5 @@ Start with booting and SD browsing, theme/accent selection, then Start’s List/
 Candidate decoder compatibility: 16-bit BI_RGB artwork ignores the unused RGB555 high bit, including when interpreting marked transparent black. Host regressions cover this case. Whether the owner's original Title pack uses that bit is unknown; a physical retest remains necessary.
 
 Under **UI settings → Animation**, choose **On** for sliding carousel transitions or **Off** to switch immediately between entries. Save UI settings to retain the choice after reboot. Existing configurations default to On. This switch affects both horizontal and vertical carousel movement; it does not change the separate text/UI animation speed setting.
+
+Animation Off is the fast carousel path: no transition resampling and no neighbor artwork preloads. It draws selected Title/Box art at native size, with system icons for adjacent entries. Vertical layout reserves a native 120×80 image pane and a separate filename column. Thus Off removes scaling work rather than only suppressing visible motion. Actual card responsiveness still needs measurement.
