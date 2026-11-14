@@ -245,3 +245,7 @@ Expanded production-cache regression for path changes during motion and director
 ## 2026-11-14 — Frozen-source builds pass all boards
 
 Build session 42756 ended exit 0 with SD/Lite/Chis firmware. Production source stayed unchanged throughout this run. Focused host suites pass. Preserve this checkpoint, then fix confirmed vertical painter ordering. Full verifier/hosted CI, visual parity and hardware Title art remain outstanding.
+
+## 2026-11-14 — Checkpoint and correct focused-card layering
+
+Committed validated carousel/cache milestone as 944ec48. Fixed focused-last painter ordering in the shared layout, added explicit geometry assertions, and passed motion/fixture/cache tests. mGBA vertical Title screenshot passed (6700 BMP pixels) and was visually inspected. All-board evidence currently applies to 944ec48; painter follow-up needs final build/CI. Parity and actual Title-art card behavior remain incomplete.

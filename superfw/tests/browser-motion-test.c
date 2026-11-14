@@ -2,6 +2,13 @@
 #include "browser_carousel.h"
 #include "browser_motion.h"
 
+static void index_order(browser_carousel_item items[3]) {
+  assert(items[2].focused); /* Production painter order must put focus last. */
+  for (unsigned i=0;i<3;++i) for(unsigned j=i+1;j<3;++j)
+    if(items[j].index<items[i].index) {
+      browser_carousel_item tmp=items[i];items[i]=items[j];items[j]=tmp;
+    }
+}
 int main(void) {
   int offset = browser_motion_retarget(0, 1);
   assert(offset == 256);
@@ -19,6 +26,7 @@ int main(void) {
 
   browser_carousel_item items[3];
   assert(browser_carousel_layout(false, 2, 5, 0, items) == 3);
+  index_order(items);
   assert(items[0].index == 1 && items[1].index == 2 && items[2].index == 3);
   assert(items[1].focused && items[1].x == 60 && items[1].y == 27 &&
          items[1].w == 120 && items[1].h == 80);
@@ -27,8 +35,9 @@ int main(void) {
   for (unsigned i = 0; i < 3; ++i)
     assert(items[i].x >= 0 && items[i].y >= 18 && items[i].x + items[i].w <= 240 && items[i].y + items[i].h <= 140);
   assert(browser_carousel_layout(false, 2, 5, 256, items) == 3);
-  assert(items[0].focused && items[0].index == 1);
+  assert(items[2].focused && items[2].index == 1);
   assert(browser_carousel_layout(true, 2, 5, 0, items) == 3);
+  index_order(items);
   assert(items[1].focused && items[1].x == 7 && items[1].y == 62 &&
          items[1].w == 84 && items[1].h == 56);
   assert(items[0].x == 25 && items[0].y == 24 && items[0].w == 48 && items[0].h == 32);

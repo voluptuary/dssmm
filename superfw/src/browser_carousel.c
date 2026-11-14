@@ -44,5 +44,13 @@ unsigned browser_carousel_layout(bool vertical, int selected, int count, int off
       index, x, y, w, h, distance, index == focused_item
     };
   }
+  /* Neighbor rectangles can overlap the focused card, especially vertically. */
+  for (unsigned i = 0; i + 1 < total; ++i) {
+    if (!items[i].focused) continue;
+    browser_carousel_item focus = items[i];
+    for (unsigned j = i; j + 1 < total; ++j) items[j] = items[j + 1];
+    items[total - 1] = focus;
+    break;
+  }
   return total;
 }

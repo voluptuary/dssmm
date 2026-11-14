@@ -257,3 +257,7 @@ Visually inspected generated view-1-0.png: vertical next-item artwork overlaps t
 ## 2026-11-14 — Three-board frozen-source checkpoint passed
 
 Session 42756 completed exit 0; logs confirm SD, Lite and Chis firmware built on unchanged production source. Artwork, motion/fixture, three-variant settings and extracted production-cache regressions passed. This is a build/host-test milestone, not full verifier or visual/hardware parity. Checkpoint lane source now before correcting the known focused-card painter order. Official IMGS archive remains inaccessible; full local ASAN verifier remains intermittent, hosted CI still needed after push.
+
+## 2026-11-14 — Focused carousel item painted last
+
+Validated source checkpoint committed as 944ec48 (all three board builds and focused suites passed before this follow-up). Fixed shared layout output to preserve neighbor order while moving the focused item to the final painter slot. Geometry tests now explicitly assert focused-last ordering at rest and during a transition. Motion/fixture and extracted production-cache tests pass; mGBA vertical Title renders 6700 BMP-color pixels and the screenshot was visually inspected. Marked transparent pixels correctly allow underlying artwork/background through. This follow-up still needs latest board/full verifier/CI evidence; previous board binaries predate painter fix. No release. Next push checkpoint, merge shared dssmm environment changes normally, continue real menu render validation and remaining surfaces.
