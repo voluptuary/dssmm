@@ -5,5 +5,6 @@
 /* Candidate 0: mirrored, 1: CUSTOM. Root follows existing DSSMM /SYSTEM layout.
  * Absolute canonical ROM path required. Overlong/unsafe paths are rejected. */
 bool artwork_path(char *out, size_t capacity, const char *rom, unsigned style, unsigned candidate);
-bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capacity, artwork_info *info);
+bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capacity,
+                  uint8_t *bmp_buffer, size_t bmp_capacity, artwork_info *info);
 #endif

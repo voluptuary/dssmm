@@ -56,7 +56,7 @@ static const uint16_t accent_colors[ACCENT_COUNT - 1][2] = {
 };
 uint8_t menu_accent = 0;
 uint8_t artwork_mode = 1;
-#define UI_SETTINGS_VERSION 3
+#define UI_SETTINGS_VERSION 4
 #define UI_SETTINGS_DSSMM_DEFAULTS_VERSION 2
 static uint8_t ui_settings_version = 0;
 
@@ -103,6 +103,7 @@ uint8_t lang_id = 0;
 uint8_t recent_menu = 1;
 uint8_t hide_hidden = 0;
 uint8_t anim_speed = animspd_cnt / 2;
+uint8_t browser_view = 0;
 
 // Default settings
 t_patch_policy patcher_default = PatchAuto;
@@ -148,11 +149,12 @@ bool save_ui_settings() {
     "theme=%u\n"
     "accent=%u\n"
     "artwork=%u\n"
+    "browser_view=%u\n"
     "langcode=%c%c\n"
     "recent_menu=%u\n"
     "anim_speed=%u\n"
     "hide_hidden=%u\n",
-    UI_SETTINGS_VERSION, menu_theme, menu_accent, artwork_mode,
+    UI_SETTINGS_VERSION, menu_theme, menu_accent, artwork_mode, browser_view,
     (lc & 0xFF), (lc >> 8), recent_menu, anim_speed, hide_hidden);
 
   UINT wrbytes;
@@ -267,6 +269,7 @@ static void parse_ui_settings(void *usr, const char *var, const char *value) {
       { "theme",       &menu_theme,  THEME_COUNT },
       { "accent",      &menu_accent, ACCENT_COUNT },
       { "artwork",     &artwork_mode, 3 },
+      { "browser_view",&browser_view, 3 },
       { "recent_menu", &recent_menu, 2 },
       { "hide_hidden", &hide_hidden, 2 },
       { "anim_speed",  &anim_speed,  animspd_cnt },

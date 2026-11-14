@@ -25,6 +25,8 @@
 #include "common.h"
 #include "settings.h"
 #include "artwork_file.h"
+#include "browser_carousel.h"
+#include "browser_motion.h"
 #include "util.h"
 #include "utf_util.h"
 #include "fonts/font_render.h"
@@ -101,13 +103,14 @@ enum {
 enum {
   UiSetTheme = 0,
   UiSetArtwork = 1,
-  UiSetLang  = 2,
-  UiSetRect  = 3,
-  UiSetASpd  = 4,
-  UiSetHid   = 5,
-  UiSetAccent = 6,
-  UiSetSave  = 7,
-  UiSetMAX   = 7,
+  UiSetView  = 2,
+  UiSetLang  = 3,
+  UiSetRect  = 4,
+  UiSetASpd  = 5,
+  UiSetHid   = 6,
+  UiSetAccent = 7,
+  UiSetSave  = 8,
+  UiSetMAX   = 8,
 };
 
 enum {
@@ -283,6 +286,7 @@ static struct {
   // UI settings
   struct {
     int selector;                 // Pointed option
+    int seloff;                   // First visible option
   } uiset;
 
   // Main settings
@@ -391,7 +395,15 @@ typedef struct {
   t_centry fentries[BROWSER_MAXFN_CNT];
   t_rentry rentries[RECENT_MAXFN_CNT];
   t_reg_entry_max nordata;
+  struct {
+    bool cached, valid;
+    unsigned mode;
+    char rom[MAX_FN_LEN];
+    artwork_info info;
+    uint16_t pixels[ARTWORK_MAX_PIXELS / 2];
+  } carousel_art[3];
   uint16_t artwork_pixels[ARTWORK_MAX_PIXELS / 2];
+  uint8_t artwork_bmp_buffer[ARTWORK_BMP_MAX_SIZE] __attribute__((aligned(4)));
 } t_sdram_state;
 
 _Static_assert (sizeof(t_sdram_state) <= 14.5*1024*1024, "scratch SDRAM doesn't exceed 14.5MB");
@@ -1120,9 +1132,19 @@ static bool artwork_cached, artwork_valid;
 static char artwork_rom[MAX_FN_LEN];
 static unsigned artwork_cached_mode;
 static artwork_info preview_info;
+static int browser_motion_offset;
+
+static void browser_invalidate_artwork(void) {
+  artwork_cached = false;
+  for (unsigned i = 0; i < 3; ++i) {
+    sdr_state->carousel_art[i].cached = false;
+    sdr_state->carousel_art[i].valid = false;
+  }
+}
 
 static void browser_reload() {
-  artwork_cached = false;
+  browser_invalidate_artwork();
+  browser_motion_offset = 0;
   smenu.anim_state = 0;
 
   unsigned fcount = 0;
@@ -1401,7 +1423,7 @@ void render_flashbrowser(volatile uint8_t *frame) {
 }
 #endif
 
-void render_browser(volatile uint8_t *frame) {
+static void render_browser_list(volatile uint8_t *frame) {
   unsigned list_width = artwork_mode ? 112 : SCREEN_WIDTH;
   // Render bar below to show path URI
   dma_memset16(&frame[240*144], dup8(FG_COLOR), 240*16/2);
@@ -1451,7 +1473,8 @@ void render_browser(volatile uint8_t *frame) {
         strbcpy(artwork_rom, rom, sizeof(artwork_rom));
         artwork_cached_mode = artwork_mode;
         artwork_valid = artwork_load(rom, artwork_mode - 1,
-          (uint8_t *)sdr_state->artwork_pixels, ARTWORK_MAX_PIXELS, &preview_info);
+          (uint8_t *)sdr_state->artwork_pixels, ARTWORK_MAX_PIXELS,
+          sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer), &preview_info);
         artwork_cached = true;  // Cache misses too; avoid SD probes every frame.
       }
       if (artwork_valid) {
@@ -1469,6 +1492,97 @@ void render_browser(volatile uint8_t *frame) {
   char selinfo[16];
   npf_snprintf(selinfo, sizeof(selinfo), "%u/%d", smenu.browser.selector + 1, smenu.browser.dispentries);
   draw_rightj_text(selinfo, frame, SCREEN_WIDTH - 1, 1);
+}
+
+static unsigned browser_entry_icon(const t_centry *entry) {
+  return ishidden(entry)        ? ((entry->attr & AM_DIR) ? ICON_HFOLDER : ICON_HFILE) :
+         (entry->attr & AM_DIR) ? ICON_FOLDER : guessicon(entry->fname);
+}
+
+static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
+  dma_memset16(&frame[240 * 16], dup8(BG_COLOR), 240 * (144 - 16) / 2);
+
+  if (!smenu.browser.dispentries) {
+    draw_central_text(msgs[lang_id][MSG_BROW_EMPTY], frame, 120, 72);
+  } else {
+    int selected = smenu.browser.selector;
+    browser_carousel_item items[3];
+    unsigned item_count = browser_carousel_layout(vertical, selected,
+        smenu.browser.dispentries, browser_motion_offset, items);
+    /* Populate one missing slot per settled frame, selected entry first. */
+    const int candidates[3] = {selected, selected - 1, selected + 1};
+    if (artwork_mode && browser_motion_offset == 0) {
+      for (unsigned c = 0; c < 3; ++c) {
+        int index = candidates[c];
+        if (index < 0 || index >= smenu.browser.dispentries) continue;
+        const t_centry *entry = sdr_state->filefilter[index];
+        if (entry->attr & AM_DIR) continue;
+        char rom[MAX_FN_LEN];
+        int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
+        if (n <= 0 || (unsigned)n >= sizeof(rom)) continue;
+        unsigned slot = (unsigned)index % 3;
+        if (sdr_state->carousel_art[slot].cached &&
+            sdr_state->carousel_art[slot].mode == artwork_mode &&
+            !strcmp(sdr_state->carousel_art[slot].rom, rom)) continue;
+        strbcpy(sdr_state->carousel_art[slot].rom, rom, MAX_FN_LEN);
+        sdr_state->carousel_art[slot].mode = artwork_mode;
+        sdr_state->carousel_art[slot].valid = artwork_load(rom, artwork_mode - 1,
+            (uint8_t *)sdr_state->carousel_art[slot].pixels, ARTWORK_MAX_PIXELS,
+            sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
+            &sdr_state->carousel_art[slot].info);
+        sdr_state->carousel_art[slot].cached = true;
+        break;
+      }
+    }
+    int focus_index = selected;
+    for (unsigned i = 0; i < item_count; ++i) {
+      const browser_carousel_item *item = &items[i];
+      const t_centry *entry = sdr_state->filefilter[item->index];
+      if (item->focused) focus_index = item->index;
+      unsigned slot = (unsigned)item->index % 3;
+      char rom[MAX_FN_LEN];
+      int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
+      bool drawn = false;
+      if (artwork_mode && !(entry->attr & AM_DIR) && n > 0 && (unsigned)n < sizeof(rom) &&
+          sdr_state->carousel_art[slot].cached && sdr_state->carousel_art[slot].valid &&
+          sdr_state->carousel_art[slot].mode == artwork_mode &&
+          !strcmp(sdr_state->carousel_art[slot].rom, rom)) {
+        const artwork_info *info = &sdr_state->carousel_art[slot].info;
+        unsigned x = item->x, width = item->w, height = item->h;
+        if (info->width == 80) { width = height; x += (item->w - width) / 2; }
+        x &= ~1u;
+        width &= ~1u;
+        if (width == info->width && height == info->height)
+          drawn = artwork_blit_frame((volatile uint16_t *)frame,
+              sdr_state->carousel_art[slot].pixels, info, x, item->y);
+        else
+          drawn = artwork_blit_scaled((volatile uint16_t *)frame,
+              sdr_state->carousel_art[slot].pixels, info, x, item->y, width, height);
+      }
+      if (!drawn)
+        render_icon(item->x + item->w / 2 - 8, item->y + item->h / 2 - 8,
+                    browser_entry_icon(entry));
+    }
+    const t_centry *focus = sdr_state->filefilter[focus_index];
+
+    if (vertical)
+      draw_central_text_ovf(focus->fname, frame, 164, 85, 140);
+    else
+      draw_central_text_ovf(focus->fname, frame, 120, 122, 162);
+  }
+
+  draw_text_leftovf(smenu.browser.cpath, frame, 8, 144, SCREEN_WIDTH - 88);
+  draw_rightj_text("Start: Art", frame, SCREEN_WIDTH - 2, 144);
+  char selinfo[16];
+  npf_snprintf(selinfo, sizeof(selinfo), "%u/%d", smenu.browser.selector + 1, smenu.browser.dispentries);
+  draw_rightj_text(selinfo, frame, SCREEN_WIDTH - 1, 1);
+}
+
+void render_browser(volatile uint8_t *frame) {
+  if (browser_view == 1 || browser_view == 2)
+    render_browser_carousel(frame, browser_view == 2);
+  else
+    render_browser_list(frame);
 }
 
 void render_fw_flash_popup(volatile uint8_t *frame) {
@@ -1557,17 +1671,17 @@ static void render_gbarom_info(volatile uint8_t *frame, const char *dispname,
 }
 
 static const char *render_gbarom_patching(volatile uint8_t *frame, const t_load_gba_info *info, int selector) {
-  draw_central_text(msgs[lang_id][MSG_GBALOAD_MPATCH], frame, SCREEN_WIDTH/2, 23);
-  draw_text_ovf(msgs[lang_id][MSG_DEFS_PATCH], frame, 12, 44, 224);
-  draw_central_text(msgs[lang_id][MSG_PATCH_TYPE0 + info->patch_type], frame, 162, 44);
-  draw_text_ovf(msgs[lang_id][MSG_LOADER_SAVET], frame, 12, 62, 224);
-  draw_central_text(msgs[lang_id][MSG_LOADER_ST0 + (info->use_dsaving ? 0 : 1)], frame, 170, 62);
-  draw_text_ovf(msgs[lang_id][MSG_LOADER_MENU], frame, 12, 80, 224);
-  draw_central_text(msgs[lang_id][info->ingame_menu_enabled ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, 170, 80);
-  draw_text_ovf(msgs[lang_id][MSG_LOADER_RTCE], frame, 12, 98, 224);
-  draw_central_text(msgs[lang_id][info->rtc_patch_enabled ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, 170, 98);
+  draw_text_ovf(msgs[lang_id][MSG_GBALOAD_MPATCH], frame, 12, 23, 216);
+  draw_text_ovf(msgs[lang_id][MSG_DEFS_PATCH], frame, 12, 44, 116);
+  draw_text_ovf(msgs[lang_id][MSG_PATCH_TYPE0 + info->patch_type], frame, 132, 44, 96);
+  draw_text_ovf(msgs[lang_id][MSG_LOADER_SAVET], frame, 12, 62, 116);
+  draw_text_ovf(msgs[lang_id][MSG_LOADER_ST0 + (info->use_dsaving ? 0 : 1)], frame, 132, 62, 96);
+  draw_text_ovf(msgs[lang_id][MSG_LOADER_MENU], frame, 12, 80, 116);
+  draw_text_ovf(msgs[lang_id][info->ingame_menu_enabled ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, 132, 80, 96);
+  draw_text_ovf(msgs[lang_id][MSG_LOADER_RTCE], frame, 12, 98, 116);
+  draw_text_ovf(msgs[lang_id][info->rtc_patch_enabled ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, 132, 98, 96);
 
-  draw_text_ovf(msgs[lang_id][MSG_LOADER_PTCH], frame, 12, 116, 224);
+  draw_text_ovf(msgs[lang_id][MSG_LOADER_PTCH], frame, 12, 116, 116);
   draw_box_outline(frame, 170 - 20, 170 + 20, 115, 133, FG_COLOR);
   draw_central_text("▸", frame, 170, 116);
 
@@ -1580,26 +1694,26 @@ static const char *render_gbarom_patching(volatile uint8_t *frame, const t_load_
 
 static const char *render_gbarom_loading(volatile uint8_t *frame, const t_load_gba_lcfg *data, bool rtc_patching, int selector) {
   char tmp[64];
-  draw_central_text(msgs[lang_id][MSG_GBALOAD_OPTS], frame, SCREEN_WIDTH/2, 23);
-  draw_text_ovf(msgs[lang_id][MSG_LOADER_LOADP], frame, 12, 44, 224);
-  draw_central_text(msgs[lang_id][MSG_LOADER_LOADP0 + data->sram_load_type], frame, 170, 44);
-  draw_text_ovf(msgs[lang_id][MSG_LOADER_SAVEP], frame, 12, 62, 224);
-  draw_central_text(msgs[lang_id][MSG_LOADER_SAVEP0 + data->sram_save_type], frame, 170, 62);
-  draw_text_ovf(msgs[lang_id][MSG_DEF_RTCVAL], frame, 12, 80, 224);
+  draw_text_ovf(msgs[lang_id][MSG_GBALOAD_OPTS], frame, 12, 23, 216);
+  draw_text_ovf(msgs[lang_id][MSG_LOADER_LOADP], frame, 12, 44, 116);
+  draw_text_ovf(msgs[lang_id][MSG_LOADER_LOADP0 + data->sram_load_type], frame, 132, 44, 96);
+  draw_text_ovf(msgs[lang_id][MSG_LOADER_SAVEP], frame, 12, 62, 116);
+  draw_text_ovf(msgs[lang_id][MSG_LOADER_SAVEP0 + data->sram_save_type], frame, 132, 62, 96);
+  draw_text_ovf(msgs[lang_id][MSG_DEF_RTCVAL], frame, 12, 80, 116);
   if (rtc_patching) {
     t_dec_date d;
     timestamp2date(data->rtcval, &d);
     npf_snprintf(tmp, sizeof(tmp), "20%02d/%02d/%02d %02d:%02d",
       d.year, d.month, d.day, d.hour, d.min);
-    draw_central_text(tmp, frame, 170, 80);
+    draw_text_ovf(tmp, frame, 132, 80, 96);
   }
   else
-    draw_central_text("-", frame, 170, 80);
-  draw_text_ovf(msgs[lang_id][MSG_SETT_LDCHT], frame, 12, 98, 224);
-  draw_central_text(msgs[lang_id][data->use_cheats ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, 170, 98);
+    draw_text_ovf("-", frame, 132, 80, 96);
+  draw_text_ovf(msgs[lang_id][MSG_SETT_LDCHT], frame, 12, 98, 116);
+  draw_text_ovf(msgs[lang_id][data->use_cheats ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, 132, 98, 96);
 
   draw_box_outline(frame, 170 - 20, 170 + 20, 115, 133, FG_COLOR);
-  draw_text_ovf(msgs[lang_id][MSG_SETT_REMEMB], frame, 12, 116, 224);
+  draw_text_ovf(msgs[lang_id][MSG_SETT_REMEMB], frame, 12, 116, 116);
   render_icon(170-8, 116, ICON_DISK);
 
   return (selector == GBALdSetLoadP) ? msgs[lang_id][MSG_LOADER_LOADP_I0 + data->sram_load_type] :
@@ -1970,40 +2084,36 @@ void render_ui_settings(volatile uint8_t *frame) {
     "Light", "Dark"
   };
   static const char * const artwork_names[] = { "List", "Title", "Box" };
+  static const char * const view_names[] = { "List", "Horizontal", "Vertical" };
   const unsigned value_x = 128;
-  const unsigned row_y[] = { 22, 37, 52, 67, 82, 97, 112 };
+  const unsigned row_y[] = { 20, 38, 56, 74, 92, 110 };
   char tmpbuf[64];
-  const char *theme_name = menu_theme < THEME_COUNT ? theme_names[menu_theme] : theme_names[0];
-
-  npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", theme_name);
-  draw_text_ovf(msgs[lang_id][MSG_UIS_THEME], frame, 8, row_y[UiSetTheme], 116);
-  draw_text_ovf(tmpbuf, frame, value_x, row_y[UiSetTheme], 104);
-
-  npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", artwork_names[artwork_mode < 3 ? artwork_mode : 0]);
-  draw_text_ovf("Artwork", frame, 8, row_y[UiSetArtwork], 116);
-  draw_text_ovf(tmpbuf, frame, value_x, row_y[UiSetArtwork], 104);
-
-  npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", msgs[lang_id][MSG_LANG_NAME]);
-  draw_text_ovf(msgs[lang_id][MSG_UIS_LANG], frame, 8, row_y[UiSetLang], 116);
-  draw_text_ovf(tmpbuf, frame, value_x, row_y[UiSetLang], 104);
-
-  draw_text_ovf(msgs[lang_id][MSG_UIS_RECNT], frame, 8, row_y[UiSetRect], 116);
-  draw_text_ovf(msgs[lang_id][recent_menu ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, row_y[UiSetRect], 104);
-
-  npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", msgs[lang_id][MSG_UIS_SPD0 + anim_speed]);
-  draw_text_ovf(msgs[lang_id][MSG_UIS_ANSPD], frame, 8, row_y[UiSetASpd], 116);
-  draw_text_ovf(tmpbuf, frame, value_x, row_y[UiSetASpd], 104);
-
-  draw_text_ovf(msgs[lang_id][MSG_UIS_BHID], frame, 8, row_y[UiSetHid], 116);
-  draw_text_ovf(msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED], frame, value_x, row_y[UiSetHid], 104);
-
-  draw_text_ovf("Accent", frame, 8, row_y[UiSetAccent], 116);
-  npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", accent_names[menu_accent]);
-  draw_text_ovf(tmpbuf, frame, value_x, row_y[UiSetAccent], 104);
+  const char * const labels[UiSetSave] = {
+    msgs[lang_id][MSG_UIS_THEME], "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
+    msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent"
+  };
+  for (unsigned row = 0; row < sizeof(row_y) / sizeof(row_y[0]); ++row) {
+    unsigned option = smenu.uiset.seloff + row;
+    if (option >= UiSetSave) break;
+    const char *value = "";
+    switch (option) {
+    case UiSetTheme: value = theme_names[menu_theme < THEME_COUNT ? menu_theme : 0]; break;
+    case UiSetArtwork: value = artwork_names[artwork_mode < 3 ? artwork_mode : 0]; break;
+    case UiSetView: value = view_names[browser_view < 3 ? browser_view : 0]; break;
+    case UiSetLang: value = msgs[lang_id][MSG_LANG_NAME]; break;
+    case UiSetRect: value = msgs[lang_id][recent_menu ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED]; break;
+    case UiSetASpd: value = msgs[lang_id][MSG_UIS_SPD0 + anim_speed]; break;
+    case UiSetHid: value = msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED]; break;
+    case UiSetAccent: value = accent_names[menu_accent < ACCENT_COUNT ? menu_accent : 0]; break;
+    }
+    draw_text_ovf(labels[option], frame, 8, row_y[row], 116);
+    npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", value);
+    draw_text_ovf(tmpbuf, frame, value_x, row_y[row], 104);
+  }
 
   if (smenu.uiset.selector != UiSetSave)
     for (unsigned i = 0; i < 240; i += 16)
-      render_icon_trans(i, row_y[smenu.uiset.selector], 63);
+      render_icon_trans(i, row_y[smenu.uiset.selector - smenu.uiset.seloff], 63);
 
   draw_button_box(frame, 20, 220, 132, 152, smenu.uiset.selector == UiSetSave);
   draw_central_text(msgs[lang_id][MSG_UIS_SAVE], frame, 120, 134);
@@ -2019,14 +2129,15 @@ void render_info(volatile uint8_t *frame) {
 
   switch (smenu.info.selector) {
   case 0:
-    npf_snprintf(tmp, sizeof(tmp), "SuperFW %lu.%lu (DSSMM)", vmaj, vmin);
-    draw_central_text(tmp, frame, 120, 70);
+    npf_snprintf(tmp, sizeof(tmp), "SuperFW %lu.%lu (%08lx)", vmaj, vmin,
+                 (unsigned long)VERSION_SLUG_WORD);
+    draw_text_ovf(tmp, frame, 12, 70, 216);
     npf_snprintf(tmp, sizeof(tmp), "DSSMM Build %lu", (unsigned long)DSSMM_BUILD_NUMBER);
     draw_central_text(tmp, frame, 120, 95);
     draw_central_text(FW_FLAVOUR " variant", frame, 120, 114);
     break;
   case 1:
-    draw_central_text("Flash info", frame, 120, 70);
+    draw_text_ovf("Flash info", frame, 12, 70, 216);
     npf_snprintf(tmp, sizeof(tmp), "Dev ID: %08lx", flashinfo.deviceid);
     draw_central_text(tmp, frame, 120, 95);
     if (flashinfo.size && flashinfo.blksize && flashinfo.blkcount) {
@@ -2034,30 +2145,30 @@ void render_info(volatile uint8_t *frame) {
       npf_snprintf(tmp, sizeof(tmp), "%s [%lu * %lu]", tmp2, flashinfo.blksize, flashinfo.blkcount);
       if (flashinfo.regioncnt != 1)
         strcat(tmp, " !");
-      draw_central_text(tmp, frame, 120, 115);
+      draw_text_ovf(tmp, frame, 12, 115, 216);
     } else {
       npf_snprintf(tmp, sizeof(tmp), "No CFI! (hardwired %dKiB)", FW_MAX_SIZE_KB);
-      draw_central_text(tmp, frame, 120, 115);
+      draw_text_ovf(tmp, frame, 12, 115, 216);
     }
     break;
   case 2:
-    draw_central_text(msgs[lang_id][MSG_DBPINFO], frame, 120, 70);
+    draw_text_ovf(msgs[lang_id][MSG_DBPINFO], frame, 12, 70, 216);
     npf_snprintf(tmp, sizeof(tmp), "%s - %s", pdbinfo.version, pdbinfo.date);
-    draw_central_text(tmp, frame, 120, 90);
+    draw_text_ovf(tmp, frame, 12, 90, 216);
     npf_snprintf(tmp, sizeof(tmp), "Game count: %lu", pdbinfo.patch_count);
-    draw_central_text(tmp, frame, 120, 110);
+    draw_text_ovf(tmp, frame, 12, 110, 216);
     break;
   case 3:
     npf_snprintf(tmp, sizeof(tmp), "SD Card ID: %02x | %04x", sd_info.manufacturer, sd_info.oemid);
-    draw_central_text(tmp, frame, 120, 70);
+    draw_text_ovf(tmp, frame, 12, 70, 216);
     human_size_kb(tmp2, sizeof(tmp2), sd_info.block_cnt / 2);
     npf_snprintf(tmp, sizeof(tmp), "Type: %s  Size: %s", sd_info.sdhc ? "SDHC" : "SDSC", tmp2);
-    draw_central_text(tmp, frame, 120, 90);
+    draw_text_ovf(tmp, frame, 12, 90, 216);
     npf_snprintf(tmp, sizeof(tmp), "Info: %c%c%c%c%c (%d/%d)",
       sd_info.prodname[0] ?: '#', sd_info.prodname[1] ?: '#',
       sd_info.prodname[2] ?: '#', sd_info.prodname[3] ?: '#',
       sd_info.prodname[4] ?: '#', 2000 + sd_info.year, sd_info.month);
-    draw_central_text(tmp, frame, 120, 110);
+    draw_text_ovf(tmp, frame, 12, 110, 216);
     break;
   }
 
@@ -2069,7 +2180,7 @@ void render_info(volatile uint8_t *frame) {
 
 void render_tools(volatile uint8_t *frame) {
   for (unsigned i = 0; i < ToolsMAX; i++)
-    draw_text_ovf(msgs[lang_id][MSG_TOOLS0_SDRAM + i], frame, 22, 26 + 22 * i, 144);
+    draw_text_ovf(msgs[lang_id][MSG_TOOLS0_SDRAM + i], frame, 22, 26 + 22 * i, 206);
 
   smenu.anim_state = (smenu.anim_state + 1) & 255;
   draw_central_text("▸", frame, 11 + (smenu.anim_state >> 6), 26 + 22 * smenu.tools.selector);
@@ -2117,6 +2228,10 @@ static const struct {
 void menu_render(unsigned fcnt) {
   objnum = 0;
   volatile uint8_t *frame = &MEM_VRAM_U8[0xA000*framen];
+  if (smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view)
+    browser_motion_offset = browser_motion_advance(browser_motion_offset, fcnt);
+  else
+    browser_motion_offset = 0;
 
   // Render the tab menu on top (rows 0..15), highlighting the selected option
   dma_memset16(&frame[0], dup8(FG_COLOR), SCREEN_WIDTH*16/2);
@@ -2181,7 +2296,7 @@ void menu_flip() {
 }
 
 void menu_init(int sram_testres) {
-  artwork_cached = false;
+  browser_invalidate_artwork();
   // Reset to ROM browser and SD card root.
   memset(&smenu, 0, sizeof(smenu));
   memset(&spop, 0, sizeof(spop));
@@ -2935,9 +3050,10 @@ static void keypress_menu_recent(unsigned newkeys) {
 }
 
 static void keypress_menu_browse(unsigned newkeys) {
+  int old_selector = smenu.browser.selector;
   if (newkeys & KEY_BUTTSTA) {
     artwork_mode = (artwork_mode + 1) % 3;
-    artwork_cached = false;
+    browser_invalidate_artwork();
   }
   if (smenu.browser.dispentries) {
     // Move menu up and down
@@ -2946,12 +3062,14 @@ static void keypress_menu_browse(unsigned newkeys) {
     if (newkeys & KEY_BUTTDOWN)
       smenu.browser.selector = MIN(smenu.browser.dispentries - 1, smenu.browser.selector + 1);
     if (newkeys & KEY_BUTTLEFT) {
-      smenu.browser.selector = MAX(0, smenu.browser.selector - BROWSER_ROWS);
-      smenu.browser.seloff   = MAX(0, smenu.browser.seloff - BROWSER_ROWS);
+      unsigned step = browser_view ? 1 : BROWSER_ROWS;
+      smenu.browser.selector = MAX(0, smenu.browser.selector - step);
+      smenu.browser.seloff   = MAX(0, smenu.browser.seloff - step);
     }
     if (newkeys & KEY_BUTTRIGHT) {
-      smenu.browser.selector = MIN(smenu.browser.dispentries - 1, smenu.browser.selector + BROWSER_ROWS);
-      smenu.browser.seloff   = MIN(smenu.browser.dispentries - 1, smenu.browser.seloff   + BROWSER_ROWS);
+      unsigned step = browser_view ? 1 : BROWSER_ROWS;
+      smenu.browser.selector = MIN(smenu.browser.dispentries - 1, smenu.browser.selector + step);
+      smenu.browser.seloff   = MIN(smenu.browser.dispentries - 1, smenu.browser.seloff   + step);
     }
     // Move into a new dir and/or open a file
     if (newkeys & KEY_BUTTA) {
@@ -2995,6 +3113,13 @@ static void keypress_menu_browse(unsigned newkeys) {
     smenu.browser.seloff = smenu.browser.selector;
   else if (smenu.browser.selector >= smenu.browser.seloff + BROWSER_ROWS)
     smenu.browser.seloff = smenu.browser.selector - BROWSER_ROWS + 1;
+
+  if (browser_view && smenu.browser.selector != old_selector &&
+      (newkeys & (KEY_BUTTUP | KEY_BUTTDOWN | KEY_BUTTLEFT | KEY_BUTTRIGHT))) {
+    browser_motion_offset = browser_motion_retarget(browser_motion_offset,
+                                                     smenu.browser.selector - old_selector);
+    artwork_cached = false;
+  }
 }
 
 #ifdef SUPPORT_NORGAMES
@@ -3140,6 +3265,11 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       menu_theme = menu_theme ? menu_theme - 1 : 0;
     else if (smenu.uiset.selector == UiSetArtwork)
       artwork_mode = (artwork_mode + 2) % 3;
+    else if (smenu.uiset.selector == UiSetView) {
+      browser_view = (browser_view + 2) % 3;
+      browser_motion_offset = 0;
+      browser_invalidate_artwork();
+    }
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = menu_accent ? menu_accent - 1 : 0;
     else if (smenu.uiset.selector == UiSetASpd)
@@ -3156,6 +3286,11 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       menu_theme = MIN(THEME_COUNT - 1, menu_theme + 1);
     else if (smenu.uiset.selector == UiSetArtwork)
       artwork_mode = (artwork_mode + 1) % 3;
+    else if (smenu.uiset.selector == UiSetView) {
+      browser_view = (browser_view + 1) % 3;
+      browser_motion_offset = 0;
+      browser_invalidate_artwork();
+    }
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = MIN(ACCENT_COUNT - 1, menu_accent + 1);
     else if (smenu.uiset.selector == UiSetASpd)
@@ -3170,11 +3305,19 @@ static void keypress_menu_uisettings(unsigned newkeys) {
 
   if (newkeys & KEY_BUTTA && smenu.uiset.selector == UiSetSave) {
     smenu.uiset.selector = 0;
+    smenu.uiset.seloff = 0;
     if (save_ui_settings())
       spop.alert_msg = msgs[lang_id][MSG_OK_SETSAVE];
     else
       spop.alert_msg = msgs[lang_id][MSG_ERR_SETSAVE];
   }
+
+  if (smenu.uiset.selector == UiSetSave)
+    smenu.uiset.seloff = UiSetSave - 6;
+  else if (smenu.uiset.selector < smenu.uiset.seloff)
+    smenu.uiset.seloff = smenu.uiset.selector;
+  else if (smenu.uiset.selector >= smenu.uiset.seloff + 6)
+    smenu.uiset.seloff = smenu.uiset.selector - 5;
 
   // Apply settings immediately
   reload_theme(menu_theme);
@@ -3274,7 +3417,7 @@ static void keypress_menu_info(unsigned newkeys) {
 void menu_keypress(unsigned newkeys) {
   /* Actions/tools may reuse cartridge RAM; never reuse the preview afterward. */
   if (newkeys & (KEY_BUTTA | KEY_BUTTSEL | KEY_BUTTL | KEY_BUTTR))
-    artwork_cached = false;
+    browser_invalidate_artwork();
   if (spop.alert_msg) {
     // Modal message pop up!
     if (newkeys & (KEY_BUTTA | KEY_BUTTB))

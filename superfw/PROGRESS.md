@@ -165,3 +165,83 @@ Next run artwork/settings suites, rebuild all three boards, verify headers/size/
 Published `superfw-test4` at integrated source `19429735b3b55f7c57dd3921f0aad61601521e06` (DSSMM Build 531) with Chis, SD and Lite `.fw` assets. Release notes follow New features, New fixes, Summary of past features, Summary of past fixes. All five lane CI checks passed. Local settings/artwork tests and sequential board builds passed; size/header/seal checks passed; downloads match local bytes and GitHub digests. The full local verify script is blocked only by missing `lcov`; hosted complete host suite passed. Test 4 physical artwork and interface behavior remain unvalidated.
 
 After publication, removed release pages/assets for superseded prereleases: SuperFW Test 1–3, BLUE Test 1–3 and Original OMEGA Test 1–3. Retained git tags and archived exact prior bodies/assets in root `docs/history/releases/prerelease-retention-2026-11-14.json`. Latest SuperFW/BLUE/OMEGA prereleases are Test 4; DE v8.4.0 latest stable and all DE historical releases remain. Public notes omit build headings, checksums, source archive notices and developer cautions. Root README and shared integration logs must be updated through dssmm, then sync all lanes and clean local generated artifacts.
+
+## 2026-11-14 — Title artwork fallback, Info identity and parity continuation
+
+Owner's Test 4 observation: Box art displays slowly on the SuperChis Prime; original ROM-header Title art still does not show. Updated the artwork decoder to read two image rows per FatFS call (half as many callbacks), support bottom-up and top-down 16-bit BMPs, and tolerate zero BMP file/image sizes when actual data is present. Added flat `/SYSTEM/IMGS/<CODE>.bmp` after the native nested EZ lookup. Tests cover both layouts, BMP orientations/fields, fewer reader calls, DST1, read errors and output bounds. `bash scripts/test-artwork.sh`, `bash scripts/test-theme-settings.sh`, and `git diff --check` pass. Physical title-art resolution remains unconfirmed.
+
+Info now shows the 8-digit upstream hash immediately after SuperFW version, with DSSMM Build on a separate line. Board builds all passed sequentially. Installed `lcov` and `libssl-dev`; standalone `make -C superfw/tests all` passed with 90.8% line coverage. A full `make verify-superfw` completed all three builds but was interrupted at an intermittent upstream ASAN `DEADLYSIGNAL` loop; a focused full host suite passed separately. Do not claim one clean invocation of the integrated verifier.
+
+Owner asks for autonomous menu porting to EZ-FLASH DSSMM visual/interaction parity, especially fluid carousels, and asks about emulator-based testing. Added the continuation plan in `docs/PORTING-PLAN.md`; inspected reference carousel implementation and confirmed it has substantial cache/scaling/motion logic. Debian mGBA 0.10.1 installed; hardware protocol testing remains physical-only. Next: build a small renderer seam and reference-matched list-browser surface before carousel motion; maintain separate SD/Lite/Chis validation and never share drivers across hardware families.
+
+## 2026-11-14 — First browser carousel renderer slice
+
+Added `browser_view` preference to UI settings v4 with List default and Horizontal/Vertical choices. Navigation changes one item per button in carousel modes. `browser_carousel_layout()` and fixed-point motion functions are shared by the firmware and a small GBA preview ROM, with host coverage for selection transitions, edge counts, bounds and centering. The kernel draws three adjacent cards and reuses its current artwork preview at rest. This is only a schematic first slice; icons, text, art scaling/cache, other menu surfaces and fluid DSSMM visual parity remain to implement.
+
+Built/ran the preview ROM in mGBA 0.10.1 without a BIOS and captured F12 screenshots. Full SuperFW firmware still cannot get past SD/Chis/Lite card initialization in mGBA, so mGBA only validates the isolated geometry/render-preview path, not hardware I/O or true card timing. The mGBA harness code is at `tests/browser-preview-rom.c`; build with `scripts/build-browser-preview.sh`.
+
+Host motion, artwork and theme/settings suites pass. SD/Lite/Chis builds pass sequentially after linking `browser_carousel.c`. Full upstream coverage suite previously passed separately after installing `lcov`/`libssl-dev`; the combined verifier had an intermittent ASAN hang. Re-run on integrated checkpoint and require hosted CI. The current Info hash UI and ROM-header flat path fallback are not hardware confirmed. Next: review and improve carousel visuals, reduce Box-art delay further, and continue DSSMM styling across browser/settings/tools/info/game and in-game surfaces.
+
+## 2026-11-14 — Reduce artwork SD transaction count
+
+Replaced per-scanline FatFS access with one read of the full bounded 16-bit BMP into a 4-byte-aligned 19,254-byte staging buffer in external SDRAM; decoder performs its two-row chunks from RAM. This reduces file read calls from about 21 to one per artwork candidate, likely addressing the reported Box slowness. Added a short-buffer regression check. Focused tests pass. Need all three final builds and hosted CI; no physical speed/artwork confirmation.
+
+## 2026-11-14 — Match carousel viewports to EZ-FLASH DSSMM
+
+Inspected the current EZ-FLASH horizontal/vertical layout constants and aligned the SuperFW selected and adjacent preview sizes/positions: horizontal 120×80 plus 60×40 neighbors; vertical 84×56 plus 48×32 neighbors. Implemented bounded nearest-neighbor `artwork_blit_scaled()` for vertical previews, including DST1 transparency and even-width VRAM writes. Removed card outlines, fixed right viewport clipping, and positioned selected filename beneath horizontal art or beside vertical art. No driver, card protocol, or launch action changes.
+
+Validation: artwork, settings, motion, and diff checks pass; preview ROM compiles; clean serial SD/Lite/Chis builds pass after the DMA path and settled-motion read gate. Opaque unscaled framebuffer rows use DMA3; marked transparency and vertical scaling use software. Chis EWRAM is at about 93.0% linked region with existing unused-variable warning; linker regions fit. Local upstream host suite repeated AddressSanitizer `DEADLYSIGNAL` at `cimpl_test` and was stopped; no full local suite pass claimed for this run. Earlier mGBA schematic execution exists, but the fresh GUI screenshot attempt hung and was stopped. No hardware, artwork speed, or parity validation.
+
+Next: cache neighboring artwork so movement avoids synchronous SD reads, then iterate browser background/selected-title styling and port common menu treatment to settings/system surfaces. Keep the temporary scratch file until session end.
+
+## 2026-11-14 — First successful mGBA browser artwork frame
+
+Packaged Debian mGBA 0.10.1 runs as `/usr/games/mgba` (not plain `mgba` on the default PATH). Built the synthetic preview ROM and executed it under Xvfb with dummy audio. A 240×160 screenshot visibly contains the horizontal carousel and generated Title art selected by the fake GBA header code; shared GBA decode/blit code executed. This validates only the isolated preview harness. It does not validate SD/FatFS lookup, the real kernel browser, SuperCard interfaces or hardware timing. Fake ROMs are intentionally non-launchable; no BIOS was needed.
+
+Box artwork and emulator key-driven view changes remain unresolved: one keyboard experiment yielded an unusable frame and is not counted. Earlier mGBA 0.10.5 AppImage attempts showed a blank screen; record exact binary/version because packaged 0.10.1 now renders Title mode. Root standard-container changes/logs are committed separately on dssmm (`9c577cea`, `874a2ee`) and should be merged normally after this lane's source checkpoint. Keep screenshots/fixtures ignored and BIOS out of tracked/public content.
+
+Added and passed `bash scripts/test-browser-preview-mgba.sh`: packaged mGBA 0.10.1 renders a 240×160 frame with the known Title-art marker. The script waits 5 seconds for fresh Xvfb startup, saves F12, and checks screenshot pixels; 3 seconds was insufficient in one run. This is only an isolated renderer smoke test. Box art, key input, filesystem lookup and full firmware behavior remain open.
+
+## 2026-11-14 — Animate production carousel artwork
+
+Selected artwork now follows the layout's moving/scaling rectangle. Cache identity must match ROM path and artwork mode, and failed/missing blits fall back to the focused icon. This removes stale artwork during deferred reads and fixed-position art during transitions. Artwork and motion/fixture host suites and diff checks pass. Three serial board builds are running in session 41036; verify its result and `/tmp/dssmm-carousel-*.log` before recording success. The first launch lacked devkitARM on PATH and was corrected. Full visual parity remains incomplete.
+
+## 2026-11-14 — Reject oversized scaled-artwork rectangles
+
+Added explicit screen dimension limits before unsigned clipping arithmetic in `artwork_blit_scaled`; oversized dimensions previously could underflow the bounds subtraction. New regression cases cover width 242, height 161 and near-UINT32_MAX width. Artwork/adapter tests and diff checks pass. Revalidated build session 41036: SD/Lite succeeded and Chis remains live. These builds overlap the latest guard edit and must be rerun on a settled source checkpoint before release evidence is claimed.
+
+## 2026-11-14 — Double-buffered preview and meaningful BMP assertion
+
+Three-board session 41036 ended successfully; final latest-source board rerun still required. Preview now renders hidden Mode 4 page then flips at VBlank. Added deterministic PREVIEW_VERTICAL/PREVIEW_BOX build options. Replaced incorrect orange-marker assertion (it matched a UI card fill) with counts excluding all four UI colors. mGBA 0.10.1 checks pass for horizontal Title (13,154 decoded-BMP pixels) and vertical Box (4,209). Earlier marker-based passes alone were weak evidence and are superseded. Actual SD/header lookup and hardware Title-art result remain open.
+
+## 2026-11-14 — Four-mode mGBA coverage and RGB555 unused bit
+
+Added PREVIEW_MATRIX=1 smoke mode and confirmed all four initial view/art combinations render decoded BMP colors (13154/8593/6689/4209 pixels). Session 30060 ended exit 0. Fixed decoder rejection of unused RGB555 bit15; it is now masked before palette conversion/transparency. New opaque and DST1 regressions pass with the artwork adapter suite. The edit overlapped matrix compilation; final latest-source board/emulator checks remain required. Physical Title art and full menu parity remain unverified.
+
+## 2026-11-14 — Cache adjacent carousel artwork
+
+Production carousel now uses three SDRAM artwork slots keyed by path/mode, including cached misses. Loads one missing selected/previous/next image per settled frame and draws matching neighbor art during transitions without SD reads. Existing invalidation points clear slots except ordinary carousel movement. Full-size selected art keeps DMA path. Build session 38222 is live; inspect `/tmp/dssmm-cache-*.log`. A tiny DMA-path edit overlapped startup, so final settled-source builds remain necessary. Host checks session 36744 must be inspected. Goal remains active with remaining surfaces and physical title-art confirmation outstanding.
+
+## 2026-11-14 — Repair cache lifetime and align game options
+
+Fixed unconditional cache clearing introduced in the prior edit; key-action invalidation is conditional and now clears metadata flags through a helper rather than zeroing decoded image buffers. Artwork/motion/fixture and three-variant settings suites pass. Left-aligned game patch/loading headings and bounded label/value columns to prevent overlap. Visual popup validation remains pending. Build session 38222 is live but overlaps newer source edits, so final board validation still required.
+
+## 2026-11-14 — Official thumbnail pack identified
+
+Owner supplied the official IMGS.zip URL (https://www.ezflash.cn/zip/IMGS.zip). Curl and web access return Cloudflare HTTP 403; no pack validation occurred. Recorded URL and limitation for subsequent sessions. Actual pack paths/pixel format still need direct inspection when the archive is available.
+
+## 2026-11-14 — Info/Tools layout and final-source build checkpoint
+
+Session 38222 completed all three builds; newer menu/cache edits require fresh evidence. Info text now uses left-aligned bounded lines and Tools labels use available width. Artwork guide now describes neighbor cache instead of claiming it is unsupported. Production source frozen for serial board session 42756 (`/tmp/dssmm-checkpoint-*.log`); focused host suites in session 33143. Inspect terminal results before success claims. Remaining parity/hardware requirements are still open.
+
+## 2026-11-14 — Verify actual carousel cache orchestration
+
+Added/passed host regression compiling extracted production invalidation/render functions with actual layout and mocked storage/draw calls. Asserts single-load settled frames, neighbor/miss caching, no motion reads, mode isolation and flag-only invalidation. Included in scripts/verify.sh. Board session 42756 is still live; production source unchanged during this turn. Full menus/card title-art remain unqualified.
+
+## 2026-11-14 — Cache directory boundaries and visual ordering
+
+Expanded production-cache regression for path changes during motion and directory entries; passes. Visual review of vertical Title screenshot identified next art covering selected art due previous/selected/next painter order. Defer production fix until frozen build 42756 is terminal (SD passed, Lite live), then draw focused card last and test ordering. Pixel-presence smoke checks alone do not prove visual parity.
+
+## 2026-11-14 — Frozen-source builds pass all boards
+
+Build session 42756 ended exit 0 with SD/Lite/Chis firmware. Production source stayed unchanged throughout this run. Focused host suites pass. Preserve this checkpoint, then fix confirmed vertical painter ordering. Full verifier/hosted CI, visual parity and hardware Title art remain outstanding.
