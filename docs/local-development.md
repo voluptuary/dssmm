@@ -91,12 +91,14 @@ Current investigation (2026-11-14): this Debian 12 container has `mgba-sdl`
 0.10.1 installed at `/usr/games/mgba`; the executable is not on the default
 shell `PATH`. The Dockerfile includes the same package, though this container
 has not been rebuilt from the Dockerfile change yet. An upstream 0.10.5 AppImage
-was also tried outside the repository. The generated
-synthetic preview ROM still displayed a blank white frame, with and without
-BIOS/skip-BIOS attempts; therefore no mGBA render/runtime validation has passed.
-The fixtures do validate header codes, checksum and artwork file metadata in
-host tests. Full SuperFW execution still requires cartridge SDRAM and SD
-behavior that mGBA does not emulate.
+was also tried outside the repository and showed a blank frame. The packaged
+0.10.1 executable successfully displayed a generated synthetic preview ROM under
+Xvfb: the 240×160 screenshot showed the horizontal carousel and Title artwork
+decoded using a fake GBA header code. This validates only the isolated GBA
+preview harness. Box-mode display, keyboard-driven navigation/orientation, SD
+path lookup and full SuperFW execution remain unverified; mGBA does not emulate
+cartridge SDRAM or SD behavior. The host fixtures separately validate header
+codes, checksum and artwork file metadata.
 
 Do not add a GBA BIOS image to the container, repository or releases. BIOS files
 supplied for local experiments must stay outside the checkout and remain only
