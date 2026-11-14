@@ -3166,3 +3166,7 @@ The packaged Debian 12 mGBA 0.10.1 binary is `/usr/games/mgba`, outside the defa
 ## 2026-11-14 — Repeatable mGBA preview smoke check
 
 SuperFW added an Xvfb screenshot smoke script that prints the emulator version and asserts the synthetic Title-art marker in the captured PNG. It passes with Debian mGBA 0.10.1 at `/usr/games/mgba`; five seconds are needed for the preview process to start. A shorter delay produces a white frame and fails. Updated root setup instructions to use this repeatable command. The SuperFW script is still in the project worktree and has not been integrated. Standard devcontainer build from the edited Dockerfile has not been run.
+
+## 2026-11-14 — Integrate SuperFW carousel and fast-mode work
+
+Normal merge e3821b4 imports only superfw/ changes; shared isolation and all project-policy/merge fixtures pass. Build553 all-board clean integrity/CI evidence retained privately. Hardware534 failures remain awaiting newer candidate retest; full parity incomplete. Next push/sync lanes, verify hosted checks, then owner-test release preparation under existing notes/retention policy. No release changed at this checkpoint.
