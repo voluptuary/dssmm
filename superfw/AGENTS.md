@@ -31,7 +31,7 @@ Before handoff, remove stale ignored compiler outputs and superseded local board
 
 ## Current synchronized release
 
-`superfw-test3` is the current SuperFW prerelease for all three boards. SD, Lite and Chis share DSSMM Light/Title defaults, artwork controls, browser styling and SYSTEM paths; version-2 Test 2 preferences are preserved during migration. Chis NOR remains hardware-specific. Tag source, CI, local builds, asset hashes and explicit no-Test-3-hardware-validation statement are in `docs/releases/superfw-test3-publication.json`. Preserve Test 1/Test 2 releases and DE `v8.4.0` latest stable. Continue workspace cleanup and record physical checks per board.
+`superfw-test4` is the current SuperFW prerelease for all three boards. SD, Lite and Chis share DSSMM Light/Title defaults, artwork controls, browser styling and SYSTEM paths; version-2 Test 2 preferences are preserved during migration. Chis NOR remains hardware-specific. Tag source, CI, local builds, asset hashes and no-Test-4-hardware-validation statement are in `docs/releases/superfw-test4-publication.json`. Only the newest prerelease page is retained per SuperFW, BLUE and Original OMEGA lane; superseded release bodies/assets are archived at the root and git tags remain. DE `v8.4.0` remains latest stable. Continue workspace cleanup and record physical checks per board.
 
 
 ## Latest artwork/UI follow-up (2026-11-13)
