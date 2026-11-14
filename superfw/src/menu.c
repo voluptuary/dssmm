@@ -3062,12 +3062,12 @@ static void keypress_menu_browse(unsigned newkeys) {
     if (newkeys & KEY_BUTTDOWN)
       smenu.browser.selector = MIN(smenu.browser.dispentries - 1, smenu.browser.selector + 1);
     if (newkeys & KEY_BUTTLEFT) {
-      unsigned step = browser_view ? 1 : BROWSER_ROWS;
+      int step = browser_view ? 1 : BROWSER_ROWS;
       smenu.browser.selector = MAX(0, smenu.browser.selector - step);
       smenu.browser.seloff   = MAX(0, smenu.browser.seloff - step);
     }
     if (newkeys & KEY_BUTTRIGHT) {
-      unsigned step = browser_view ? 1 : BROWSER_ROWS;
+      int step = browser_view ? 1 : BROWSER_ROWS;
       smenu.browser.selector = MIN(smenu.browser.dispentries - 1, smenu.browser.selector + step);
       smenu.browser.seloff   = MIN(smenu.browser.dispentries - 1, smenu.browser.seloff   + step);
     }

@@ -265,3 +265,7 @@ Added fixed-offset and automatic-retarget modes to the mGBA harness; filename fo
 ## 2026-11-14 — Actual Tools text rendered in emulator
 
 Added PREVIEW_SCREEN=1 harness using production Tools function/messages/font helpers. mGBA text check passes; screenshot reviewed with all five common rows fitting. Selection OAM and actions are excluded. Production firmware unchanged. e44bde4 CI passed; newer run live at inspection. Continue menu parity and hardware/title-art work.
+
+## 2026-11-14 — Track hardware candidate and fix edge arithmetic
+
+Recorded owner Build534/hash126ae458 findings in BUILD-TRACKING.md. Commit lacks carousel, proving dirty-source candidate; future builds get board identity manifests including project fingerprint. Fixed unsigned navigation subtraction; actual production-navigation regression fails before and passes after. Missing art/sluggishness remain open. Next board/CI validation and measured renderer/storage investigation.
