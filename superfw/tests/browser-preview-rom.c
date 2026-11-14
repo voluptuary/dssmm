@@ -63,13 +63,18 @@ static void wait_vblank(void) {
   while (REG_VCOUNT < 160) {}
 }
 
+extern void dma_memset16(volatile void *, uint16_t, uint16_t);
 static void fill_rect(volatile uint8_t *frame, int x, int y, int w, int h, uint8_t color) {
   if (x & 1) { --x; ++w; }
   if (w & 1) ++w;
   uint16_t pair = color | ((uint16_t)color << 8);
+  if (x == 0 && w == 240) {
+    dma_memset16(frame + y*240, pair, w*h/2);
+    return;
+  }
   for (int row = y; row < y + h; ++row) {
     volatile uint16_t *out = (volatile uint16_t *)(frame + row * 240 + x);
-    for (int col = 0; col < w / 2; ++col) out[col] = pair;
+    dma_memset16(out, pair, w/2);
   }
 }
 

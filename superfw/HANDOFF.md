@@ -327,3 +327,9 @@ Added test-fast-carousel-pages.sh extracting actual begin/end page policy from m
 ## 2026-11-14 — Reject mixed candidate sets automatically
 
 Added scripts/check-build-set.py: validates three manifests agree on clean source commit/build count/fingerprint, verifies each image hash, GBA checksum, embedded size,512byte alignment and full firmware seal. Current diagnostic set is rejected at Lite dirty-source status, as intended. This is a guard against distributing mixed historical outputs; no complete latest candidate validation claimed. Latest CIca64702/f97b3b8 were confirmed live at start; preceding scaler/icon runs passed. Next build clean same-commit set after checkpoint, collect CI, then real card artwork/performance feedback and remaining parity work. Goal active.
+
+## 2026-11-14 — Uniform Build553 validated and preview corrected
+
+Session66291 completed exit0. All three boards are clean source3ce7d917/Build553 with identical project fingerprint; identity/hash/GBA checksum/embedded size/firmware seal gate passes. Exact manifests retained in docs/build-553-validation.json. Hosted run43619877608 passed. These establish software build/integrity only, not owner artwork/performance qualification or full menu parity.
+
+Ported scratch preview corrections: DMA fills match production's fill method; generated messages header goes into output, so clean checkout preview does not depend on prior firmware build. Scratch without src/messages_data.h passed verticalTitleOff8604BMP pixels. Same verticalBoxOff DMA fill timing433206 versus prior CPU-fill985694cycles, image unchanged5731BMP pixels. Earlier total-cycle reports overstate production fill cost and are superseded for production comparison. Production firmware inputs unchanged by these preview-only edits. Next integrate validated lane normally, prepare owner-test prerelease if release gates met, obtain physical artwork/performance report, and continue remaining skins/fluidity. Goal active.

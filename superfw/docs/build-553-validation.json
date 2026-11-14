@@ -1,0 +1,33 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 553,
+  "boards": [
+    {
+      "source_tree_sha256": "3731cd11478887da16c0d63bc24e10c613eb5d426e848ecaec025ebd0013381c",
+      "board": "sd",
+      "dssmm_build": 553,
+      "source_commit": "3ce7d917585713fb7027b153fdd6e42e0e77fa56",
+      "source_dirty": false,
+      "firmware_sha256": "5269f312fd2500ec3e5abcfb20cbc0216a0fe0eaba162ed31192837e9c5b625f",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "3731cd11478887da16c0d63bc24e10c613eb5d426e848ecaec025ebd0013381c",
+      "board": "lite",
+      "dssmm_build": 553,
+      "source_commit": "3ce7d917585713fb7027b153fdd6e42e0e77fa56",
+      "source_dirty": false,
+      "firmware_sha256": "96ae41a648dbcfd658a9039bddc0a5218f5ecef6285b5dd6d72ec122d42e6bce",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "3731cd11478887da16c0d63bc24e10c613eb5d426e848ecaec025ebd0013381c",
+      "board": "chis",
+      "dssmm_build": 553,
+      "source_commit": "3ce7d917585713fb7027b153fdd6e42e0e77fa56",
+      "source_dirty": false,
+      "firmware_sha256": "9541a39d262a71e38134d412afe26a498e66e747e892786d15a537edc0aeedc3",
+      "validation": "built; runtime and hardware validation not implied"
+    }
+  ]
+}

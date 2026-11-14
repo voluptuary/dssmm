@@ -313,3 +313,7 @@ Production-policy extraction regression passes both page identities, selection/v
 ## 2026-11-14 — Candidate identity/integrity gate
 
 Added three-board identity/firmware validation tool; current mixed diagnostic set correctly rejected as Lite dirty. Documents clean manifests, same source/number/fingerprint, hashes/checksum/size/seals. Does not claim latest boards/hardware pass. Continue clean candidate and runtime/menu parity work.
+
+## 2026-11-14 — Clean Build553 set and honest timing baseline
+
+All three clean553 builds completed; same source/fingerprint and full integrity checks pass. Persisted manifests in docs/build-553-validation.json; CI43619877608 passed. Corrected preview CPU fills to DMA and generated missing messages dependency locally. Scratch clean preview passed; DMA BoxOff433206cycles supersedes985694CPU-fill figure as closer preview baseline. No physical/full parity claim.

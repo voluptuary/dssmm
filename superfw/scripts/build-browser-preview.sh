@@ -3,6 +3,7 @@ set -euo pipefail
 project_root="$(cd "$(dirname "$0")/.." && pwd)"
 out="$project_root/build/mgba"
 mkdir -p "$out"
+python3 "$project_root/res/messages.py" h main > "$out/messages_data.h"
 if [ -n "${DEVKITARM:-}" ] && [ -x "$DEVKITARM/bin/arm-none-eabi-gcc" ]; then
   export PATH="$DEVKITARM/bin:$PATH"
 fi
