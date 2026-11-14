@@ -99,7 +99,8 @@ pixels = Counter(tuple(row[i:i + 3]) for row in rows for i in range(0, stride, 3
 ui_colors = {(24, 57, 49), (255, 255, 255), (255, 165, 123), (173, 173, 173)}
 art_pixels = sum(count for color, count in pixels.items() if color not in ui_colors)
 if os.environ.get("PREVIEW_SCREEN") in ("1", "2"):
-    text_pixels = sum(tuple(row[i:i+3]) == (255,255,255) for row in rows[20:140] for i in range(0,stride,3))
+    background=tuple(rows[80][-3:])
+    text_pixels = sum(tuple(row[i:i+3]) != background for row in rows[20:140] for i in range(0,stride,3))
     if text_pixels < 200: raise SystemExit("Menu text missing")
     print(f"Production menu text rendered: {text_pixels} body text pixels")
     sys.exit(0)

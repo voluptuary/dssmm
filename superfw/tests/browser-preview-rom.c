@@ -105,8 +105,8 @@ static void card(volatile uint8_t *frame, const browser_carousel_item *item,
 
 static void render(volatile uint8_t *frame, int vertical, int selected, int offset, int box_mode) {
   fill_rect(frame, 0, 0, 240, 160, 0);
-  fill_rect(frame, 0, 0, 240, 16, 1);
-  fill_rect(frame, 0, 144, 240, 16, 1);
+  fill_rect(frame, 0, 0, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
+  fill_rect(frame, 0, 144, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
   if (PREVIEW_SCREEN == 2) {
     fill_rect(frame,0,144,240,16,0);
     render_ui_settings(frame); return;
@@ -141,6 +141,12 @@ int main(void) {
   PALETTE[3] = 0x56B5;  /* side card */
   for (unsigned i = 0; i < ARTWORK_PALETTE_SIZE; ++i)
     PALETTE[ARTWORK_PALETTE_BASE + i] = artwork_palette_color(i);
+  if (PREVIEW_THEME >= 0 && PREVIEW_THEME < THEME_COUNT) {
+    const t_theme_colors *colors = &themes[PREVIEW_THEME];
+    PALETTE[0]=colors->bg_color; PALETTE[1]=colors->ft_color;
+    PALETTE[2]=colors->hi_color; PALETTE[3]=colors->fg_color;
+    menu_theme=PREVIEW_THEME;
+  }
   load_fixtures();
   preview_select_ui(PREVIEW_OPTION);
   REG_DISPCNT = 4 | 0x0400; /* Mode 4, BG2 enabled, framebuffer page 0 */

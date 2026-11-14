@@ -345,3 +345,7 @@ Added PREVIEW_SCREEN=2 extraction of actual render_ui_settings, UiSet enum and b
 ## 2026-11-14 — Lower UI-settings/Save screenshot
 
 Added PREVIEW_OPTION to select fixture UI row and extracted actual keypress-menu scroll-offset policy into preview selection setup. Save9 screenshot renders lower6rows (Animation through Accent) and selected Save button; mGBA check passed3157text pixels, screenshot visually fits. Does not execute key input/save writes or selection OAM. Firmware and supplied hardware-test553 unchanged. Next real theme palette/selection-surface parity and remaining system/game surfaces; awaiting owner artwork/performance observation. Goal active.
+
+## 2026-11-14 — Actual DSSMM palette in screen previews
+
+Added PREVIEW_THEME selecting extracted production theme table/type (Light6/Dark7), rather than schematic colors. Light lower-settings Save9 screenshot visually shows proper dark text/pale body/blue selected button. Smoke passes4699foreground pixels; count includes controls and is not a glyph-only assertion. Default-1 preserves prior artwork-test palette; theme-based artwork exclusion checks still need dedicated coverage. Accent/OAM blending not modeled. Firmware and owner553 image unchanged. Next improve actual selected rows/background surface to EZ reference and remaining menus; hardware artwork/performance report outstanding.

@@ -33,10 +33,17 @@ for signature in ("static void draw_box_outline(","static void draw_box_full(","
 a=source.index("  if (smenu.uiset.selector == UiSetSave)",source.index("static void keypress_menu_uisettings("))
 b=source.index("  // Apply settings immediately",a)
 text+="static void preview_select_ui(unsigned option) {\nsmenu.uiset.selector=option>UiSetSave?UiSetSave:option;\n"+source[a:b]+"}\n"
+settings=Path(sys.argv[1]).with_name("settings.c").read_text()
+header=Path(sys.argv[1]).with_name("settings.h").read_text()
+a=header.index("typedef struct {\n  uint16_t fg_color");b=header.index("} t_theme_colors;",a)+len("} t_theme_colors;")
+text+=header[a:b]+"\n#define THEME_DSSMM_LIGHT 6\n#define THEME_DSSMM_DARK 7\n"
+text+="#define RGB2GBA(c) ((((c)&0xF80000)>>19)|(((c)&0x00F800)>>6)|(((c)&0x0000F8)<<7))\n"
+a=settings.index("const t_theme_colors themes[");b=settings.index("\n};",a)+3
+text+=settings[a:b]+"\n"
 Path(sys.argv[2]).write_text(text)
 PY
 arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -mcpu=arm7tdmi -mthumb \
-  -D__GBA__ -DPREVIEW_OPTION="${PREVIEW_OPTION:-0}" -DPREVIEW_ANIMATION="${PREVIEW_ANIMATION:-1}" -DPREVIEW_TIMING="${PREVIEW_TIMING:-0}" -DPREVIEW_SCREEN="${PREVIEW_SCREEN:-0}" -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
+  -D__GBA__ -DPREVIEW_THEME="${PREVIEW_THEME:--1}" -DPREVIEW_OPTION="${PREVIEW_OPTION:-0}" -DPREVIEW_ANIMATION="${PREVIEW_ANIMATION:-1}" -DPREVIEW_TIMING="${PREVIEW_TIMING:-0}" -DPREVIEW_SCREEN="${PREVIEW_SCREEN:-0}" -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
   "$project_root/tests/browser-preview-rom.c" "$project_root/src/browser_carousel.c" \
   "$project_root/src/artwork.c" "$project_root/src/gbahw.c" \
   "$project_root/src/fonts/font_render.c" "$project_root/src/utf_util.c" \

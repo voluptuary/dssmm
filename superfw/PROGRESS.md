@@ -329,3 +329,7 @@ Actual settings renderer/helpers now previewable with PREVIEW_SCREEN=2. mGBA che
 ## 2026-11-14 — Validate settings lower page
 
 PREVIEW_OPTION uses actual settings scroll policy. Save9 lower-row screenshot passes and visibly fits all rows/button. No production firmware change; mGBA input/persistence/OAM not qualified. Continue theme/menu parity while owner tests553.
+
+## 2026-11-14 — Production Light palette checked
+
+Preview extracts actual theme data/type; Light6 settings Save screenshot passes and visually reviewed. Foreground-presence smoke includes controls, documented. Production firmware unchanged; continue skinning/interactive/hardware validation.
