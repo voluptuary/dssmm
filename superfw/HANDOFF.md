@@ -341,3 +341,7 @@ Owner requested a root hardware-test folder then continued work. Copied verified
 ## 2026-11-14 — Production UI-settings preview
 
 Added PREVIEW_SCREEN=2 extraction of actual render_ui_settings, UiSet enum and box/text helpers with fixture preferences. mGBA text check passes3020pixels; initial six rows visually fit including AnimationOff. Corrected generic harness footer to avoid falsely covering Save. Does not validate OAM selection, scrolling/input/save action or physical theme palette. Build553 owner image remains unchanged in hardware-test. Continue actual selection/scroll settings coverage and remaining menu styling while awaiting card report; full parity/title-art hardware result still open.
+
+## 2026-11-14 — Lower UI-settings/Save screenshot
+
+Added PREVIEW_OPTION to select fixture UI row and extracted actual keypress-menu scroll-offset policy into preview selection setup. Save9 screenshot renders lower6rows (Animation through Accent) and selected Save button; mGBA check passed3157text pixels, screenshot visually fits. Does not execute key input/save writes or selection OAM. Firmware and supplied hardware-test553 unchanged. Next real theme palette/selection-surface parity and remaining system/game surfaces; awaiting owner artwork/performance observation. Goal active.

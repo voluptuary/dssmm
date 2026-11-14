@@ -30,10 +30,13 @@ text+=source[a:b]+"\n"
 for signature in ("static void draw_box_outline(","static void draw_box_full(","static void draw_button_box(","void render_ui_settings("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
+a=source.index("  if (smenu.uiset.selector == UiSetSave)",source.index("static void keypress_menu_uisettings("))
+b=source.index("  // Apply settings immediately",a)
+text+="static void preview_select_ui(unsigned option) {\nsmenu.uiset.selector=option>UiSetSave?UiSetSave:option;\n"+source[a:b]+"}\n"
 Path(sys.argv[2]).write_text(text)
 PY
 arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -mcpu=arm7tdmi -mthumb \
-  -D__GBA__ -DPREVIEW_ANIMATION="${PREVIEW_ANIMATION:-1}" -DPREVIEW_TIMING="${PREVIEW_TIMING:-0}" -DPREVIEW_SCREEN="${PREVIEW_SCREEN:-0}" -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
+  -D__GBA__ -DPREVIEW_OPTION="${PREVIEW_OPTION:-0}" -DPREVIEW_ANIMATION="${PREVIEW_ANIMATION:-1}" -DPREVIEW_TIMING="${PREVIEW_TIMING:-0}" -DPREVIEW_SCREEN="${PREVIEW_SCREEN:-0}" -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
   "$project_root/tests/browser-preview-rom.c" "$project_root/src/browser_carousel.c" \
   "$project_root/src/artwork.c" "$project_root/src/gbahw.c" \
   "$project_root/src/fonts/font_render.c" "$project_root/src/utf_util.c" \
