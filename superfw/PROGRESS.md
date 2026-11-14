@@ -301,3 +301,7 @@ Preview now calls actual placeholder helper and supports AnimationOff layout. Ve
 ## 2026-11-14 — Reduce transparent native-blit reads
 
 Opaque pixel pairs in marked art now avoid background reads. Native pixel-reference and artwork/adapter suites pass. Same vertical Box Off fixture985694cycles versus1051587 before (~6.3% reduction), screenshot unchanged. Still costly; hardware response/artwork unresolved. Commit and hosted board validation next.
+
+## 2026-11-14 — Skip unchanged artwork redraw in fast mode
+
+Added per-Mode4-page identity tracking for AnimationOff; stable pages retain body artwork and refresh only text/footer. Menu/modal/artwork invalidation resets both pages. Extracted renderer test verifies no art blits on reuse; passes. Page-lifetime integration, board and physical/runtime performance validation remain required.

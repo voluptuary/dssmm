@@ -44,6 +44,7 @@ static struct state {
  t_centry *filefilter[3];
 } state, *sdr_state=&state;
 static bool artwork_cached;
+static bool browser_fast_reuse, browser_fast_valid[2];
 static unsigned artwork_mode=1;
 static unsigned carousel_animation=1;
 static int browser_motion_offset;
@@ -103,6 +104,10 @@ int main(void) {
  render_browser_carousel(frame,false);
  assert(scales==before_scales); /* Off must never invoke resampling. */
  assert(loads==fast_loads+1); /* Selected artwork only; no neighbor preloads. */
+ unsigned reuse_blits=blits;
+ browser_fast_reuse=true;
+ render_browser_carousel(frame,true);assert(blits==reuse_blits);
+ browser_fast_reuse=false;
  for(unsigned style=1;style<=2;++style) {
    artwork_mode=style;browser_invalidate_artwork();
    fast_loads=loads;before_scales=scales;

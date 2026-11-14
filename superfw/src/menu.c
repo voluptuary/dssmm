@@ -1134,8 +1134,12 @@ static char artwork_rom[MAX_FN_LEN];
 static unsigned artwork_cached_mode;
 static artwork_info preview_info;
 static int browser_motion_offset;
+static bool browser_fast_reuse, browser_fast_valid[2];
+static int browser_fast_selection[2];
+static unsigned browser_fast_view[2], browser_fast_mode[2];
 
 static void browser_invalidate_artwork(void) {
+  browser_fast_valid[0] = browser_fast_valid[1] = false;
   artwork_cached = false;
   for (unsigned i = 0; i < 3; ++i) {
     sdr_state->carousel_art[i].cached = false;
@@ -1535,7 +1539,15 @@ static void render_artwork_placeholder(volatile uint8_t *frame, unsigned x,
 }
 
 static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
-  dma_memset16(&frame[240 * 16], dup8(BG_COLOR), 240 * (144 - 16) / 2);
+  if (!browser_fast_reuse)
+    dma_memset16(&frame[240 * 16], dup8(BG_COLOR), 240 * (144 - 16) / 2);
+  else {
+    unsigned tx = vertical ? 128 : 40, ty = vertical ? 85 : 122;
+    unsigned tw = vertical ? 106 : 162;
+    for (unsigned row = 0; row < 16; ++row)
+      dma_memset16(frame + (ty+row)*240 + tx, dup8(BG_COLOR), tw/2);
+    dma_memset16(frame + 144*240, dup8(BG_COLOR), 240*16/2);
+  }
 
   if (!smenu.browser.dispentries) {
     draw_central_text(msgs[lang_id][MSG_BROW_EMPTY], frame, 120, 72);
@@ -1592,7 +1604,8 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         }
         x &= ~1u;
         width &= ~1u;
-        if (width == info->width && height == info->height)
+        if (browser_fast_reuse) drawn = true;
+        else if (width == info->width && height == info->height)
           drawn = artwork_blit_frame((volatile uint16_t *)frame,
               sdr_state->carousel_art[slot].pixels, info, x,
               !carousel_animation && vertical ? 48 : item->y);
@@ -1607,9 +1620,10 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
           icon_x = 52;
           icon_y = item->index < selected ? 24 : item->index > selected ? 128 : 80;
         }
-        if (!carousel_animation && artwork_mode && item->index != selected)
-          render_artwork_placeholder(frame, icon_x, icon_y, artwork_mode == 2);
-        else
+        if (!carousel_animation && artwork_mode && item->index != selected) {
+          if (!browser_fast_reuse)
+            render_artwork_placeholder(frame, icon_x, icon_y, artwork_mode == 2);
+        } else
           render_icon(icon_x, icon_y, browser_entry_icon(entry));
       }
     }
@@ -2296,7 +2310,15 @@ void menu_render(unsigned fcnt) {
     else
       render_icon_trans((i - mintab)*16, 0, i + ICON_RECENT);
 
-  // Render the main area
+  bool fast_carousel = smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view &&
+      !carousel_animation && !spop.qpop.message && !spop.rtcpop.callback &&
+      !spop.pop_num && !spop.alert_msg;
+  if (!fast_carousel) browser_fast_valid[0] = browser_fast_valid[1] = false;
+  browser_fast_reuse = fast_carousel && browser_fast_valid[framen] &&
+      browser_fast_selection[framen] == smenu.browser.selector &&
+      browser_fast_view[framen] == browser_view && browser_fast_mode[framen] == artwork_mode;
+  // Preserve stable artwork in each Mode 4 page; text is refreshed separately.
+  if (!browser_fast_reuse)
   dma_memset16(&frame[16*SCREEN_WIDTH], dup8(BG_COLOR), SCREEN_WIDTH*(SCREEN_HEIGHT-16) / 2);
 
   if (spop.qpop.message)
@@ -2322,6 +2344,13 @@ void menu_render(unsigned fcnt) {
       renderfns[smenu.menu_tab](frame);
       smenu.anim_state += fcnt * animspd_lut[anim_speed];
     }
+  }
+
+  if (fast_carousel) {
+    browser_fast_valid[framen] = true;
+    browser_fast_selection[framen] = smenu.browser.selector;
+    browser_fast_view[framen] = browser_view;
+    browser_fast_mode[framen] = artwork_mode;
   }
 
   // Render popup window. Use windowing to ensure the pop up is not covered by OBJs.
