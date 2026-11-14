@@ -253,3 +253,7 @@ Committed validated carousel/cache milestone as 944ec48. Fixed focused-last pain
 ## 2026-11-14 — Synchronize shared mGBA setup and scroll carousel names
 
 Merged origin/dssmm normally into the lane, carrying root mGBA environment/documentation commits. Selected carousel names now left-align within bounded text regions and rotate to reveal long filenames. Cache and motion/fixture host tests pass. Latest source still needs visual/menu/board validation; CI 43617571436 was live at inspection. No release or parity claim.
+
+## 2026-11-14 — mGBA preview uses production filename text
+
+Linked real font renderer and extracted production scrolling helper into preview build, including left-aligned selected names. Vertical Title mGBA check passes and screenshot visually inspected. Documented preview-only warning suppression for preexisting Hangul declaration style. CI 43617571436 passed; newer 43617663224 remains live. Complete production menu/hardware behavior remains unverified.

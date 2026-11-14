@@ -4,6 +4,11 @@
 #include "browser_motion.h"
 #include "artwork.h"
 #include "browser_fixture_assets.h"
+#include "fonts/font_render.h"
+#include "browser_preview_text.h"
+static const uint32_t empty_font[2] = {0, 0};
+void *font_base_addr = (void *)empty_font;
+static unsigned text_animation;
 
 #define REG_DISPCNT (*(volatile uint16_t *)0x04000000)
 #define REG_VCOUNT (*(volatile uint16_t *)0x04000006)
@@ -98,7 +103,8 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   browser_carousel_item items[3];
   unsigned n = browser_carousel_layout(vertical, selected, 3, offset, items);
   for (unsigned i = 0; i < n; ++i) card(frame, &items[i], vertical, box_mode);
-  fill_rect(frame, 8, 149, 40, 2, 2);
+  draw_text_ovf_rotate(browser_fixture_names[selected], frame,
+      vertical ? 98 : 40, vertical ? 85 : 122, vertical ? 136 : 162, &text_animation);
 }
 
 int main(void) {
@@ -124,6 +130,7 @@ int main(void) {
     if (pressed & KEY_B) { selected = 1; offset = 0; }
     if (pressed & KEY_L) box_mode = 0;
     if (pressed & KEY_R) box_mode = 1;
+    ++text_animation;
     offset = browser_motion_advance(offset, 1);
     volatile uint8_t *back = VRAM + (back_page ? 0xA000 : 0);
     render(back, vertical, selected, offset, box_mode);
