@@ -45,9 +45,64 @@ container before this update, select **Dev Containers: Rebuild Container**.
 The Dockerfile pins `devkitpro/devkitarm:20260610`. It supplies devkitARM/libgba
 and GBA rules; the configuration sets DEVKITPRO/DEVKITARM and uses the `vscode`
 user. Host validation tools include GCC, Git/GitHub CLI, Python/Unicorn, Node,
-Cppcheck, CMake, zlib and OpenSSL headers, and lcov for SuperFW host tests. Dev Container features provide Node24 and the
-normal user utilities. First use requires downloading container images/features.
-No package/image cache from Codespaces is required.
+Cppcheck, CMake, zlib and OpenSSL headers, lcov for SuperFW host tests, plus
+mGBA SDL and Xvfb/xdotool for automated GBA preview sessions. Dev Container
+features provide Node24 and normal user utilities. First use requires downloading
+container images/features. No package/image cache from Codespaces is required.
+
+### mGBA GBA preview testing
+
+The standard image installs `mgba-sdl`, `xvfb` and `xdotool`. Debian installs the
+SDL executable as `/usr/games/mgba`, which may not be on a non-login shell's
+`PATH`; check the version with `/usr/games/mgba --version`. The tested distro
+package here is 0.10.1. Upstream 0.10.5 has a BIOS-skip fix and can be used
+locally if the distro package cannot boot a preview. Run the SuperFW preview
+builder with devkitARM on `PATH`, then use Xvfb and dummy audio for headless
+sessions:
+
+```sh
+bash superfw/scripts/build-browser-preview.sh
+cd superfw/build/mgba
+SDL_AUDIODRIVER=dummy xvfb-run -a /usr/games/mgba browser-preview.gba
+```
+
+`F12` saves an emulator screenshot; xdotool can send navigation keys. The
+preview and generated ROM/artwork fixtures are disposable build outputs. The
+full SuperFW kernel still needs SuperCard cartridge SDRAM mapping and SD
+protocols that mGBA does not emulate, so the preview harness only validates the
+shared GBA rendering/artwork modules. If mGBA shows a blank screen, do not count
+that as a successful render test; check emulator version, GBA startup/header,
+BIOS and skip-BIOS configuration first.
+
+#### Keeping the standard mGBA setup current
+
+Treat `.devcontainer/Dockerfile`, this section and the root `AGENTS.md` setup
+note as one change set whenever mGBA support changes. Record the tested mGBA
+version, package source, install dependencies, launch flags, harness changes,
+and actual pass/fail result here; add a dated checkpoint to root `HANDOFF.md`
+and `PROGRESS.md` so a later session can distinguish an installed tool from a
+validated test. If the Docker image or package changes, rebuild the devcontainer
+and record that result. Never store a BIOS in the image, repository, release, or
+public artifact; BIOS-dependent testing must use a user-provided local file and
+must document only its external/local status, not publish it. Keep generated
+ROMs, artwork and screenshots disposable and do not call a blank screen a pass.
+
+Current investigation (2026-11-14): this Debian 12 container has `mgba-sdl`
+0.10.1 installed at `/usr/games/mgba`; the executable is not on the default
+shell `PATH`. The Dockerfile includes the same package, though this container
+has not been rebuilt from the Dockerfile change yet. An upstream 0.10.5 AppImage
+was also tried outside the repository. The generated
+synthetic preview ROM still displayed a blank white frame, with and without
+BIOS/skip-BIOS attempts; therefore no mGBA render/runtime validation has passed.
+The fixtures do validate header codes, checksum and artwork file metadata in
+host tests. Full SuperFW execution still requires cartridge SDRAM and SD
+behavior that mGBA does not emulate.
+
+Do not add a GBA BIOS image to the container, repository or releases. BIOS files
+supplied for local experiments must stay outside the checkout and remain only
+until the session ends, then be removed. Record changes to emulator packages,
+versions, launch flags or test harnesses in this guide and the root
+HANDOFF/PROGRESS logs so later sessions can reproduce them.
 
 The SuperFW verification dependencies are installed in the container. Rebuild
 an existing container after Dockerfile changes. A fresh image build on the owner's Windows/Ubuntu machine is not implied by this repository-side change.
