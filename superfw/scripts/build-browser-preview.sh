@@ -17,7 +17,7 @@ end=source.index("\n}",start)+2
 Path(sys.argv[2]).write_text("#define SCREEN_WIDTH 240\n#define FT_COLOR 1\n#define ANIM_INITIAL_WAIT 128\n"+source[start:end]+"\n")
 PY
 arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -mcpu=arm7tdmi -mthumb \
-  -D__GBA__ -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
+  -D__GBA__ -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
   "$project_root/tests/browser-preview-rom.c" "$project_root/src/browser_carousel.c" \
   "$project_root/src/artwork.c" "$project_root/src/gbahw.c" \
   "$project_root/src/fonts/font_render.c" "$project_root/src/utf_util.c" \

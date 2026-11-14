@@ -102,8 +102,12 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   fill_rect(frame, 0, 144, 240, 16, 1);
   browser_carousel_item items[3];
   unsigned n = browser_carousel_layout(vertical, selected, 3, offset, items);
-  for (unsigned i = 0; i < n; ++i) card(frame, &items[i], vertical, box_mode);
-  draw_text_ovf_rotate(browser_fixture_names[selected], frame,
+  int focus = selected;
+  for (unsigned i = 0; i < n; ++i) {
+    card(frame, &items[i], vertical, box_mode);
+    if (items[i].focused) focus = items[i].index;
+  }
+  draw_text_ovf_rotate(browser_fixture_names[focus], frame,
       vertical ? 98 : 40, vertical ? 85 : 122, vertical ? 136 : 162, &text_animation);
 }
 
@@ -117,7 +121,7 @@ int main(void) {
   load_fixtures();
   REG_DISPCNT = 4 | 0x0400; /* Mode 4, BG2 enabled, framebuffer page 0 */
   int selected = 1, offset = 0, vertical = PREVIEW_VERTICAL, box_mode = PREVIEW_BOX;
-  unsigned old_keys = 0, back_page = 1;
+  unsigned old_keys = 0, back_page = 1, demo_frame = 0;
   for (;;) {
     unsigned keys = (unsigned)(~REG_KEYINPUT) & 0x03ff;
     unsigned pressed = keys & ~old_keys;
@@ -131,7 +135,13 @@ int main(void) {
     if (pressed & KEY_L) box_mode = 0;
     if (pressed & KEY_R) box_mode = 1;
     ++text_animation;
-    offset = browser_motion_advance(offset, 1);
+    if (PREVIEW_AUTOMOVE && ++demo_frame % 120 == 0) {
+      int next = selected == 1 ? 0 : 1;
+      offset = browser_motion_retarget(offset, next - selected);
+      selected = next;
+      text_animation = 0;
+    }
+    offset = PREVIEW_OFFSET ? PREVIEW_OFFSET : browser_motion_advance(offset, 1);
     volatile uint8_t *back = VRAM + (back_page ? 0xA000 : 0);
     render(back, vertical, selected, offset, box_mode);
     wait_vblank();

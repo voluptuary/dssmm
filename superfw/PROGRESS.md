@@ -257,3 +257,7 @@ Merged origin/dssmm normally into the lane, carrying root mGBA environment/docum
 ## 2026-11-14 — mGBA preview uses production filename text
 
 Linked real font renderer and extracted production scrolling helper into preview build, including left-aligned selected names. Vertical Title mGBA check passes and screenshot visually inspected. Documented preview-only warning suppression for preexisting Hangul declaration style. CI 43617571436 passed; newer 43617663224 remains live. Complete production menu/hardware behavior remains unverified.
+
+## 2026-11-14 — Transition preview and layout bounds sweep
+
+Added fixed-offset and automatic-retarget modes to the mGBA harness; filename follows visual focus. Vertical midpoint screenshot inspected and smoke passed; automatic-motion smoke passed. Geometry sweep covers both orientations and all selections/counts1..5 over -768..768 offsets, passes bounds and focused-last invariants. CI ae0ca6f passed; newer preview CI live. Whole-menu parity and hardware/title-art remain unverified.

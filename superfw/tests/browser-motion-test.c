@@ -44,5 +44,20 @@ int main(void) {
   assert(items[2].x == 25 && items[2].y == 108 && items[2].w == 48 && items[2].h == 32);
   assert(browser_carousel_layout(false, 0, 1, 0, items) == 1 && items[0].index == 0);
   assert(browser_carousel_layout(true, 4, 5, 0, items) == 2);
+  for (int vertical=0;vertical<2;++vertical)
+    for (int count=1;count<=5;++count)
+      for (int selected=0;selected<count;++selected)
+        for (int offset=-BROWSER_MOTION_LIMIT;offset<=BROWSER_MOTION_LIMIT;offset+=16) {
+          unsigned n=browser_carousel_layout(vertical,selected,count,offset,items);
+          assert(n>=1 && n<=3 && items[n-1].focused);
+          unsigned focuses=0;
+          for(unsigned i=0;i<n;++i) {
+            focuses+=items[i].focused;
+            assert(items[i].index>=0 && items[i].index<count);
+            assert(items[i].x>=0 && items[i].y>=18);
+            assert(items[i].x+items[i].w<=240 && items[i].y+items[i].h<=140);
+          }
+          assert(focuses==1);
+        }
   return 0;
 }
