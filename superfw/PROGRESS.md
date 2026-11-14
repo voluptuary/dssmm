@@ -321,3 +321,7 @@ All three clean553 builds completed; same source/fingerprint and full integrity 
 ## 2026-11-14 — Local Chis553 hardware candidate supplied
 
 Placed validated Chis553 image, manifest and guide in root hardware-test as requested, locally excluded from Git. Confirmed firmware hash matches clean553 evidence. Shared direct path with owner and resumed notes/porting. Test5 note draft follows four ordered cumulative sections and explicitly retains534 failures/unverified fixes/parity limits. No release publication or hardware result yet.
+
+## 2026-11-14 — UI-settings screen in emulator
+
+Actual settings renderer/helpers now previewable with PREVIEW_SCREEN=2. mGBA check passes and initial rows visually inspected. Fixed harness-only footer interference. Fixture state/OAM/input limits documented. Firmware and hardware-test553 unchanged; goal active.

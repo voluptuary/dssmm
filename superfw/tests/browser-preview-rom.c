@@ -107,6 +107,10 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   fill_rect(frame, 0, 0, 240, 160, 0);
   fill_rect(frame, 0, 0, 240, 16, 1);
   fill_rect(frame, 0, 144, 240, 16, 1);
+  if (PREVIEW_SCREEN == 2) {
+    fill_rect(frame,0,144,240,16,0);
+    render_ui_settings(frame); return;
+  }
   if (PREVIEW_SCREEN == 1) { render_tools(frame); return; }
   browser_carousel_item items[3];
   unsigned n = browser_carousel_layout(vertical, selected, 3, offset, items);

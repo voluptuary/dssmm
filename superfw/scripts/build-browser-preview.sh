@@ -19,9 +19,17 @@ text="#define SCREEN_WIDTH 240\n#define FT_COLOR 1\n#define FG_COLOR 3\n#define 
 for signature in ("static void draw_text_ovf(", "static void draw_central_text(", "static void render_artwork_placeholder("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
-text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} tools; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
+text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} tools; struct {unsigned selector,seloff;} uiset; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
 start=source.index("void render_tools(");end=source.index("\n}",start)+2
 text+=source[start:end]+"\n"
+text+="extern void dma_memset16(volatile void *, uint16_t, uint16_t);\n#define dup8(x) ((x)|((x)<<8))\n#define npf_snprintf snprintf\n#define THEME_COUNT 8\n#define ACCENT_COUNT 5\n"
+text+="static uint8_t menu_theme=6,artwork_mode=1,browser_view=1,carousel_animation=0,recent_menu=1,anim_speed=1,hide_hidden=1,menu_accent;\n"
+text+='static const char * const accent_names[5]={"Default","Blue","Green","Orange","Purple"};\n'
+a=source.index("enum {\n  UiSetTheme");b=source.index("\n};",a)+3
+text+=source[a:b]+"\n"
+for signature in ("static void draw_box_outline(","static void draw_box_full(","static void draw_button_box(","void render_ui_settings("):
+ start=source.index(signature);end=source.index("\n}",start)+2
+ text+=source[start:end]+"\n"
 Path(sys.argv[2]).write_text(text)
 PY
 arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -mcpu=arm7tdmi -mthumb \

@@ -337,3 +337,7 @@ Ported scratch preview corrections: DMA fills match production's fill method; ge
 ## 2026-11-14 — Owner hardware-test Chis553 delivered locally
 
 Owner requested a root hardware-test folder then continued work. Copied verified clean Chis553 to /workspaces/dssmm/hardware-test/superfw-chis-build553.fw with build553.json and README.txt. Source3ce7d917; SHA9541a39d262a71e38134d412afe26a498e66e747e892786d15a537edc0aeedc3. Directory is local-only via .git/info/exclude, per owner location request; no root tracked hardware artifacts added. Provided chain-load test focus: first Left edge, Title/Box, AnimationOff responsiveness, return to browser. Await physical result; no resolved-hardware claim. Prepared four-section Test5 canonical draft with immediately prior changes folded into concise summaries; not published. Continue remaining skins/runtime evidence while owner tests; preserve hardware-test folder until superseded with owner knowledge.
+
+## 2026-11-14 — Production UI-settings preview
+
+Added PREVIEW_SCREEN=2 extraction of actual render_ui_settings, UiSet enum and box/text helpers with fixture preferences. mGBA text check passes3020pixels; initial six rows visually fit including AnimationOff. Corrected generic harness footer to avoid falsely covering Save. Does not validate OAM selection, scrolling/input/save action or physical theme palette. Build553 owner image remains unchanged in hardware-test. Continue actual selection/scroll settings coverage and remaining menu styling while awaiting card report; full parity/title-art hardware result still open.
