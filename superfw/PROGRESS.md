@@ -305,3 +305,7 @@ Opaque pixel pairs in marked art now avoid background reads. Native pixel-refere
 ## 2026-11-14 — Skip unchanged artwork redraw in fast mode
 
 Added per-Mode4-page identity tracking for AnimationOff; stable pages retain body artwork and refresh only text/footer. Menu/modal/artwork invalidation resets both pages. Extracted renderer test verifies no art blits on reuse; passes. Page-lifetime integration, board and physical/runtime performance validation remain required.
+
+## 2026-11-14 — Verify page reuse lifetime
+
+Production-policy extraction regression passes both page identities, selection/view/mode changes and all modal/tab/animation invalidation paths. Artwork reset test confirms both pages invalidated. Added to verifier; no firmware change this turn. Full runtime/hardware parity still unproven; newest CI live at inspection.

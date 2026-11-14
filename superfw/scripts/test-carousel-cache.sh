@@ -92,7 +92,9 @@ int main(void) {
  artwork_mode=2;render_browser_carousel(frame,false);assert(loads==3);
  browser_motion_offset=0;render_browser_carousel(frame,false);assert(loads==4);
  state.carousel_art[0].pixels[0]=0x1234;
+ browser_fast_valid[0]=browser_fast_valid[1]=true;
  browser_invalidate_artwork();
+ assert(!browser_fast_valid[0] && !browser_fast_valid[1]);
  for(unsigned i=0;i<3;++i) assert(!state.carousel_art[i].cached && !state.carousel_art[i].valid);
  assert(state.carousel_art[0].pixels[0]==0x1234);
  render_browser_carousel(frame,false);assert(loads==5);
