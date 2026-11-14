@@ -9,6 +9,7 @@
 #define ARTWORK_PALETTE_BASE 20
 #define ARTWORK_PALETTE_SIZE 216
 #define ARTWORK_MAX_PIXELS (120 * 80)
+#define ARTWORK_BMP_MAX_SIZE (54 + 120 * 160)
 typedef bool (*artwork_read_fn)(void *context, uint32_t offset, void *data, size_t size);
 typedef struct {
   uint16_t width, height;
@@ -22,4 +23,8 @@ uint16_t artwork_palette_color(unsigned index);
 /* Composite into a 240x160 indexed frame with halfword-only stores. */
 bool artwork_blit_frame(volatile uint16_t *frame, const uint16_t *pixels,
                        const artwork_info *info, unsigned x, unsigned y);
+/* Nearest-neighbor scale into a bounded, even-width Mode 4 rectangle. */
+bool artwork_blit_scaled(volatile uint16_t *frame, const uint16_t *pixels,
+                         const artwork_info *info, unsigned x, unsigned y,
+                         unsigned width, unsigned height);
 #endif
