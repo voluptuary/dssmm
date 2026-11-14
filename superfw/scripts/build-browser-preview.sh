@@ -14,8 +14,8 @@ import sys
 source=Path(sys.argv[1]).read_text()
 start=source.index("static void draw_text_ovf_rotate(")
 end=source.index("\n}",start)+2
-text="#define SCREEN_WIDTH 240\n#define FT_COLOR 1\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
-for signature in ("static void draw_text_ovf(", "static void draw_central_text("):
+text="#define SCREEN_WIDTH 240\n#define FT_COLOR 1\n#define FG_COLOR 3\n#define HI_COLOR 2\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
+for signature in ("static void draw_text_ovf(", "static void draw_central_text(", "static void render_artwork_placeholder("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
 text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} tools; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
@@ -24,7 +24,7 @@ text+=source[start:end]+"\n"
 Path(sys.argv[2]).write_text(text)
 PY
 arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -mcpu=arm7tdmi -mthumb \
-  -D__GBA__ -DPREVIEW_TIMING="${PREVIEW_TIMING:-0}" -DPREVIEW_SCREEN="${PREVIEW_SCREEN:-0}" -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
+  -D__GBA__ -DPREVIEW_ANIMATION="${PREVIEW_ANIMATION:-1}" -DPREVIEW_TIMING="${PREVIEW_TIMING:-0}" -DPREVIEW_SCREEN="${PREVIEW_SCREEN:-0}" -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
   "$project_root/tests/browser-preview-rom.c" "$project_root/src/browser_carousel.c" \
   "$project_root/src/artwork.c" "$project_root/src/gbahw.c" \
   "$project_root/src/fonts/font_render.c" "$project_root/src/utf_util.c" \

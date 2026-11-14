@@ -289,3 +289,11 @@ Animation Off now draws selected artwork at native dimensions, uses neighbor ico
 ## 2026-11-14 — Validate no-scaling Off mode
 
 Actual-renderer regression now covers Title/Box and horizontal/vertical native blits with bounds assertions, no scaler calls and no neighbor preload. Navigation/cache/settings checks pass. Prior547 build sequence finished but Lite/Chis recorded dirty source; preserve as diagnostic only. Commit before fresh uniform candidate builds; no release or hardware-speed claim.
+
+## 2026-11-14 — Native-size Title/Box neighbor placeholders
+
+Owner requested generic artwork icons in fast mode. Implemented original16x16 landscape screen/upright box patterns, using theme palette and halfword framebuffer writes. Actual helper and cache tests pass distinct shapes/padding/bounds and no-scaling/no-neighbor-read invariants. Build548 predates icon edit; latest source still needs board/visual validation. Goal active.
+
+## 2026-11-14 — Visually validate fast Box placeholders
+
+Preview now calls actual placeholder helper and supports AnimationOff layout. Vertical Box screenshot passed and visually shows upright neighbors with native selected image. Recorded fixture timing without claiming hardware speed. Build52898 terminal success but source overlapped latest edits, so548 set remains diagnostic. Next clean committed candidate builds/CI and continued rendering optimization.

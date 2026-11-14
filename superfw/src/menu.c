@@ -1500,6 +1500,40 @@ static unsigned browser_entry_icon(const t_centry *entry) {
          (entry->attr & AM_DIR) ? ICON_FOLDER : guessicon(entry->fname);
 }
 
+/* Original 16x16 placeholders: landscape title screen and upright game box.
+ * Two-bit cells use existing theme roles, requiring no extra palette or OAM. */
+static void render_artwork_placeholder(volatile uint8_t *frame, unsigned x,
+                                       unsigned y, bool box) {
+  static const char title[16][17] = {
+    "................", "................", "oooooooooooooooo", "obbbbbbbbbbbbbbo",
+    "obssssssssssssbo", "obssssssssssssbo", "obssbbbbbbssssbo", "obssssssssssssbo",
+    "obssssssssssssbo", "obsssbbbbsssssbo", "obssssssssssssbo", "obbbbbbbbbbbbbbo",
+    "oooooooooooooooo", "................", "................", "................"
+  };
+  static const char cover[16][17] = {
+    "..oooooooooooo..", "..obbbbbbbbbbo..", "..obssssssssbo..", "..obbbbbbbbbbo..",
+    "..obssssssssbo..", "..obssssssssbo..", "..obsssbbsssbo..", "..obssbbbbssbo..",
+    "..obsbbbbbbsbo..", "..obssssssssbo..", "..obssssssssbo..", "..obbbbbbbbbbo..",
+    "..obssbbbsssbo..", "..obbbbbbbbbbo..", "..obbbbbbbbbbo..", "..oooooooooooo.."
+  };
+  x &= ~1u;
+  if (x > 224 || y > 144) return;
+  for (unsigned row = 0; row < 16; ++row) {
+    volatile uint16_t *dst = (volatile uint16_t *)frame + (y+row)*120+x/2;
+    for (unsigned col = 0; col < 16; col += 2) {
+      uint16_t pair = dst[col/2];
+      for (unsigned half = 0; half < 2; ++half) {
+        char cell = box ? cover[row][col+half] : title[row][col+half];
+        if (cell == '.') continue;
+        unsigned color = cell == 'o' ? FT_COLOR : cell == 'b' ? FG_COLOR : HI_COLOR;
+        unsigned shift = half*8;
+        pair = (pair & ~(255u << shift)) | (color << shift);
+      }
+      dst[col/2] = pair;
+    }
+  }
+}
+
 static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
   dma_memset16(&frame[240 * 16], dup8(BG_COLOR), 240 * (144 - 16) / 2);
 
@@ -1573,7 +1607,10 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
           icon_x = 52;
           icon_y = item->index < selected ? 24 : item->index > selected ? 128 : 80;
         }
-        render_icon(icon_x, icon_y, browser_entry_icon(entry));
+        if (!carousel_animation && artwork_mode && item->index != selected)
+          render_artwork_placeholder(frame, icon_x, icon_y, artwork_mode == 2);
+        else
+          render_icon(icon_x, icon_y, browser_entry_icon(entry));
       }
     }
     const t_centry *focus = sdr_state->filefilter[focus_index];

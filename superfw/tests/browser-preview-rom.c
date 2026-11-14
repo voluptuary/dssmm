@@ -75,6 +75,7 @@ static void fill_rect(volatile uint8_t *frame, int x, int y, int w, int h, uint8
 
 static void card(volatile uint8_t *frame, const browser_carousel_item *item,
                  int vertical, int box_mode) {
+  (void)vertical;
   uint8_t body = item->focused ? 2 : 3;
   fill_rect(frame, item->x, item->y, item->w, item->h, body);
   int code_index = title_art_index_from_header((unsigned)item->index);
@@ -91,7 +92,7 @@ static void card(volatile uint8_t *frame, const browser_carousel_item *item,
     y += (item->h - height) / 2;
   }
   if (x & 1) --x;
-  if (!vertical && item->focused && width == info->width && height == info->height)
+  if (item->focused && width == info->width && height == info->height)
     (void)artwork_blit_frame((volatile uint16_t *)frame, pixels, info, x, y);
   else
   (void)artwork_blit_scaled((volatile uint16_t *)frame, pixels, info, x, y, width, height);
@@ -106,11 +107,22 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   unsigned n = browser_carousel_layout(vertical, selected, 3, offset, items);
   int focus = selected;
   for (unsigned i = 0; i < n; ++i) {
-    card(frame, &items[i], vertical, box_mode);
+    if (!PREVIEW_ANIMATION && !items[i].focused) {
+      unsigned x = items[i].x + items[i].w/2 - 8;
+      unsigned y = items[i].y + items[i].h/2 - 8;
+      if (vertical) { x=52; y=items[i].index < selected ? 24 : 128; }
+      render_artwork_placeholder(frame,x,y,box_mode);
+    } else if (!PREVIEW_ANIMATION) {
+      browser_carousel_item native=items[i];
+      native.w=box_mode ? 80 : 120; native.h=80;
+      native.x=vertical ? (120-native.w)/2 : (240-native.w)/2;
+      native.y=vertical ? 48 : 27;
+      card(frame,&native,vertical,box_mode);
+    } else card(frame, &items[i], vertical, box_mode);
     if (items[i].focused) focus = items[i].index;
   }
   draw_text_ovf_rotate(browser_fixture_names[focus], frame,
-      vertical ? 98 : 40, vertical ? 85 : 122, vertical ? 136 : 162, &text_animation);
+      vertical ? (PREVIEW_ANIMATION ? 98 : 128) : 40, vertical ? 85 : 122, vertical ? (PREVIEW_ANIMATION ? 136 : 106) : 162, &text_animation);
 }
 
 int main(void) {
@@ -143,7 +155,7 @@ int main(void) {
       selected = next;
       text_animation = 0;
     }
-    offset = PREVIEW_OFFSET ? PREVIEW_OFFSET : browser_motion_advance(offset, 1);
+    offset = !PREVIEW_ANIMATION ? 0 : PREVIEW_OFFSET ? PREVIEW_OFFSET : browser_motion_advance(offset, 1);
     volatile uint8_t *back = VRAM + (back_page ? 0xA000 : 0);
     volatile uint16_t *timers = (volatile uint16_t *)0x04000100;
     if (PREVIEW_TIMING) {

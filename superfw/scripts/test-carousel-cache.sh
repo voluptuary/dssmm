@@ -20,6 +20,9 @@ preamble=r'''
 #define MAX_FN_LEN 256
 #define AM_DIR 16
 #define BG_COLOR 17
+#define FG_COLOR 16
+#define FT_COLOR 18
+#define HI_COLOR 19
 #define SCREEN_WIDTH 240
 #define SCREEN_HEIGHT 160
 #define MSG_BROW_EMPTY 0
@@ -66,6 +69,15 @@ bool artwork_blit_scaled(volatile uint16_t *frame,const uint16_t *pixels,
 tests=r'''
 int main(void) {
  static uint8_t frame[240*160];
+ render_artwork_placeholder(frame,0,0,false);
+ assert(frame[2*240]==FT_COLOR && frame[0]==0 && frame[16]==0);
+ memset(frame,0,sizeof(frame));
+ render_artwork_placeholder(frame,0,0,true);
+ assert(frame[0]==0 && frame[2]==FT_COLOR && frame[15*240+13]==FT_COLOR);
+ memset(frame,0,sizeof(frame));
+ render_artwork_placeholder(frame,239,150,true);
+ for(unsigned i=0;i<sizeof(frame);++i) assert(frame[i]==0);
+
  t_centry entries[3]={{0,"one.gba"},{0,"two.gba"},{0,"missing.gba"}};
  for(unsigned i=0;i<3;++i) state.filefilter[i]=&entries[i];
  strcpy(smenu.browser.cpath,"/"); smenu.browser.selector=1;smenu.browser.dispentries=3;
@@ -116,7 +128,7 @@ int main(void) {
  return 0;
 }
 '''
-Path(sys.argv[2]).write_text(preamble+function('browser_invalidate_artwork')+'\n'+function('render_browser_carousel')+'\n'+tests)
+Path(sys.argv[2]).write_text(preamble+function('render_artwork_placeholder')+'\n'+function('browser_invalidate_artwork')+'\n'+function('render_browser_carousel')+'\n'+tests)
 PY
 gcc -O2 -Wall -Wextra -Wno-unused-variable -I "$root/src" "$tmp/test.c" "$root/src/browser_carousel.c" -o "$tmp/test"
 "$tmp/test"
