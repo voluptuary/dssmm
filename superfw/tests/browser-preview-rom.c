@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 #include "browser_carousel.h"
 #include "browser_motion.h"
 #include "artwork.h"
@@ -144,7 +145,21 @@ int main(void) {
     }
     offset = PREVIEW_OFFSET ? PREVIEW_OFFSET : browser_motion_advance(offset, 1);
     volatile uint8_t *back = VRAM + (back_page ? 0xA000 : 0);
+    volatile uint16_t *timers = (volatile uint16_t *)0x04000100;
+    if (PREVIEW_TIMING) {
+      timers[1] = 0; timers[3] = 0;
+      timers[0] = 0; timers[2] = 0;
+      timers[3] = 0x0084; /* Timer1 cascades Timer0 overflow. */
+      timers[1] = 0x0080; /* CPU-clock ticks. */
+    }
     render(back, vertical, selected, offset, box_mode);
+    if (PREVIEW_TIMING) {
+      timers[1] = 0; timers[3] = 0;
+      uint32_t cycles = timers[0] | ((uint32_t)timers[2] << 16);
+      char timing[48];
+      snprintf(timing, sizeof(timing), "Draw: %lu cycles", (unsigned long)cycles);
+      draw_text_idx8_bus16(timing, (uint8_t *)back + 144*240 + 8, 240, 0);
+    }
     wait_vblank();
     REG_DISPCNT = 4 | 0x0400 | (back_page ? 0x0010 : 0);
     back_page ^= 1;

@@ -94,12 +94,16 @@ bool artwork_blit_scaled(volatile uint16_t *frame, const uint16_t *pixels,
       (x & 1) || !width || (width & 1) || !height || width > 240 || height > 160 ||
       (info->width != 80 && info->width != 120) || info->height != 80 ||
       x > 240U - width || y > 160U - height) return false;
+  /* GBA has no hardware divide. Reuse horizontal samples across all rows. */
+  uint8_t source_x[240];
+  for (unsigned col = 0; col < width; ++col)
+    source_x[col] = col * info->width / width;
   for (unsigned row = 0; row < height; ++row) {
     unsigned sy = row * info->height / height;
     volatile uint16_t *dst = frame + (y + row) * 120 + x / 2;
     for (unsigned col = 0; col < width; col += 2) {
-      unsigned sx0 = col * info->width / width;
-      unsigned sx1 = (col + 1) * info->width / width;
+      unsigned sx0 = source_x[col];
+      unsigned sx1 = source_x[col + 1];
       uint8_t p0 = ((const uint8_t *)pixels)[sy * info->width + sx0];
       uint8_t p1 = ((const uint8_t *)pixels)[sy * info->width + sx1];
       uint16_t pair = p0 | ((uint16_t)p1 << 8);

@@ -80,6 +80,24 @@ int main(void) {
   assert(!artwork_blit_scaled(frame,(uint16_t *)(output+2),&info,0,0,242,80));
   assert(!artwork_blit_scaled(frame,(uint16_t *)(output+2),&info,0,0,120,161));
   assert(!artwork_blit_scaled(frame,(uint16_t *)(output+2),&info,0,0,UINT32_MAX-1,80));
+  /* Compare optimized scaling with the original integer sampling equation. */
+  const unsigned widths[]={2,40,48,56,60,80,84,120,240};
+  const unsigned heights[]={1,32,40,56,80,160};
+  for(unsigned marked=0;marked<2;++marked) {
+    fixture(120,marked);assert(decode(120,ARTWORK_MAX_PIXELS,&info));
+    for(unsigned wi=0;wi<sizeof(widths)/sizeof(widths[0]);++wi)
+      for(unsigned hi=0;hi<sizeof(heights)/sizeof(heights[0]);++hi) {
+        unsigned w=widths[wi],h=heights[hi];
+        memset(frame,17,sizeof(frame));
+        assert(artwork_blit_scaled(frame+1,(uint16_t *)(output+2),&info,0,0,w,h));
+        for(unsigned y=0;y<h;++y) for(unsigned x=0;x<w;++x) {
+          uint8_t expected=output[2+(y*80/h)*120+x*120/w];
+          if(!expected) expected=17;
+          assert(((uint8_t *)(frame+1))[y*240+x]==expected);
+        }
+        assert(frame[0]==0x1111 && frame[240*160/2+1]==0x1111);
+      }
+  }
   assert(artwork_palette_color(0)==0 && artwork_palette_color(215)==0x7fff);
   assert(artwork_palette_color(5)==31 && artwork_palette_color(30)==(31<<5));
   assert(artwork_palette_color(180)==(31<<10));

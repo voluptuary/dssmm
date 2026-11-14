@@ -269,3 +269,15 @@ Added PREVIEW_SCREEN=1 harness using production Tools function/messages/font hel
 ## 2026-11-14 — Track hardware candidate and fix edge arithmetic
 
 Recorded owner Build534/hash126ae458 findings in BUILD-TRACKING.md. Commit lacks carousel, proving dirty-source candidate; future builds get board identity manifests including project fingerprint. Fixed unsigned navigation subtraction; actual production-navigation regression fails before and passes after. Missing art/sluggishness remain open. Next board/CI validation and measured renderer/storage investigation.
+
+## 2026-11-14 — Scaler arithmetic optimization
+
+Precomputed horizontal nearest-neighbor sampling positions instead of dividing twice per pixel pair on every row.120x80 division count falls9680→200; no measured hardware speed claim. Pixel-exact regression sweep9 widths×6 heights×transparent/opaque passes plus adapter/navigation tests. Diagnostic dirty-source board build session3360 live; preserve manifests and freeze source until completion. Commit and clean-build before distributing a candidate. Actual artwork/card-performance findings unresolved.
+
+## 2026-11-14 — Measure preview drawing cost
+
+Added optional cascaded GBA timer readout. Vertical Title mGBA screenshot passed and reported1364130CPUcycles (~4.86frames). Optimized scaler still leaves full redraw too expensive for fluid movement; next cache scaled images/avoid unchanged redraw. Fixture memory differs from real cartridge SDRAM. Edge-fix CI passed; diagnostic board3360 live. No hardware-performance claim.
+
+## 2026-11-14 — Animation On/Off setting
+
+Owner requested immediate versus animated carousel changes. Added persisted format5 carousel_animation, default On, UI toggle, motion reset and gating for both orientations. Settings tests pass for all boards plus cache regression. Prior diagnostic build3360 completed successfully but predates toggle. New source requires clean numbered builds and CI. No physical fix/performance claim.

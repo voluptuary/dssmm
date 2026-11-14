@@ -102,15 +102,16 @@ enum {
 
 enum {
   UiSetTheme = 0,
-  UiSetArtwork = 1,
-  UiSetView  = 2,
-  UiSetLang  = 3,
-  UiSetRect  = 4,
-  UiSetASpd  = 5,
-  UiSetHid   = 6,
-  UiSetAccent = 7,
-  UiSetSave  = 8,
-  UiSetMAX   = 8,
+  UiSetArtwork,
+  UiSetView,
+  UiSetAnimation,
+  UiSetLang,
+  UiSetRect,
+  UiSetASpd,
+  UiSetHid,
+  UiSetAccent,
+  UiSetSave,
+  UiSetMAX = UiSetSave,
 };
 
 enum {
@@ -2089,7 +2090,7 @@ void render_ui_settings(volatile uint8_t *frame) {
   const unsigned row_y[] = { 20, 38, 56, 74, 92, 110 };
   char tmpbuf[64];
   const char * const labels[UiSetSave] = {
-    msgs[lang_id][MSG_UIS_THEME], "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
+    msgs[lang_id][MSG_UIS_THEME], "Artwork", "Browser view", "Animation", msgs[lang_id][MSG_UIS_LANG],
     msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent"
   };
   for (unsigned row = 0; row < sizeof(row_y) / sizeof(row_y[0]); ++row) {
@@ -2100,6 +2101,7 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetTheme: value = theme_names[menu_theme < THEME_COUNT ? menu_theme : 0]; break;
     case UiSetArtwork: value = artwork_names[artwork_mode < 3 ? artwork_mode : 0]; break;
     case UiSetView: value = view_names[browser_view < 3 ? browser_view : 0]; break;
+    case UiSetAnimation: value = carousel_animation ? "On" : "Off"; break;
     case UiSetLang: value = msgs[lang_id][MSG_LANG_NAME]; break;
     case UiSetRect: value = msgs[lang_id][recent_menu ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED]; break;
     case UiSetASpd: value = msgs[lang_id][MSG_UIS_SPD0 + anim_speed]; break;
@@ -2228,7 +2230,7 @@ static const struct {
 void menu_render(unsigned fcnt) {
   objnum = 0;
   volatile uint8_t *frame = &MEM_VRAM_U8[0xA000*framen];
-  if (smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view)
+  if (smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view && carousel_animation)
     browser_motion_offset = browser_motion_advance(browser_motion_offset, fcnt);
   else
     browser_motion_offset = 0;
@@ -3114,7 +3116,7 @@ static void keypress_menu_browse(unsigned newkeys) {
   else if (smenu.browser.selector >= smenu.browser.seloff + BROWSER_ROWS)
     smenu.browser.seloff = smenu.browser.selector - BROWSER_ROWS + 1;
 
-  if (browser_view && smenu.browser.selector != old_selector &&
+  if (browser_view && carousel_animation && smenu.browser.selector != old_selector &&
       (newkeys & (KEY_BUTTUP | KEY_BUTTDOWN | KEY_BUTTLEFT | KEY_BUTTRIGHT))) {
     browser_motion_offset = browser_motion_retarget(browser_motion_offset,
                                                      smenu.browser.selector - old_selector);
@@ -3270,6 +3272,10 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       browser_motion_offset = 0;
       browser_invalidate_artwork();
     }
+    else if (smenu.uiset.selector == UiSetAnimation) {
+      carousel_animation ^= 1;
+      browser_motion_offset = 0;
+    }
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = menu_accent ? menu_accent - 1 : 0;
     else if (smenu.uiset.selector == UiSetASpd)
@@ -3290,6 +3296,10 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       browser_view = (browser_view + 1) % 3;
       browser_motion_offset = 0;
       browser_invalidate_artwork();
+    }
+    else if (smenu.uiset.selector == UiSetAnimation) {
+      carousel_animation ^= 1;
+      browser_motion_offset = 0;
     }
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = MIN(ACCENT_COUNT - 1, menu_accent + 1);
