@@ -261,3 +261,7 @@ Linked real font renderer and extracted production scrolling helper into preview
 ## 2026-11-14 — Transition preview and layout bounds sweep
 
 Added fixed-offset and automatic-retarget modes to the mGBA harness; filename follows visual focus. Vertical midpoint screenshot inspected and smoke passed; automatic-motion smoke passed. Geometry sweep covers both orientations and all selections/counts1..5 over -768..768 offsets, passes bounds and focused-last invariants. CI ae0ca6f passed; newer preview CI live. Whole-menu parity and hardware/title-art remain unverified.
+
+## 2026-11-14 — Actual Tools text rendered in emulator
+
+Added PREVIEW_SCREEN=1 harness using production Tools function/messages/font helpers. mGBA text check passes; screenshot reviewed with all five common rows fitting. Selection OAM and actions are excluded. Production firmware unchanged. e44bde4 CI passed; newer run live at inspection. Continue menu parity and hardware/title-art work.

@@ -33,6 +33,7 @@ SDL_AUDIODRIVER=dummy xvfb-run -a bash -c '
   sleep 1
 ' _ "$out" "$emulator"
 python3 - "$out" <<'PY'
+import os
 from collections import Counter
 from pathlib import Path
 import struct
@@ -97,6 +98,11 @@ pixels = Counter(tuple(row[i:i + 3]) for row in rows for i in range(0, stride, 3
 # Exclude schematic UI colors; other colors originate in decoded BMPs.
 ui_colors = {(24, 57, 49), (255, 255, 255), (255, 165, 123), (173, 173, 173)}
 art_pixels = sum(count for color, count in pixels.items() if color not in ui_colors)
+if os.environ.get("PREVIEW_SCREEN") == "1":
+    text_pixels = sum(tuple(row[i:i+3]) == (255,255,255) for row in rows[20:140] for i in range(0,stride,3))
+    if text_pixels < 200: raise SystemExit("Tools text missing")
+    print(f"Production Tools text rendered: {text_pixels} body text pixels")
+    sys.exit(0)
 if len(pixels) < 8 or art_pixels < 500:
     raise SystemExit(f"Preview lacks decoded BMP pixels: {len(pixels)} colors, {art_pixels} artwork pixels")
 print(f"mGBA preview rendered {width}x{height}; {len(pixels)} colors; decoded BMP pixels: {art_pixels}")
