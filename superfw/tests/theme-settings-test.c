@@ -19,6 +19,9 @@ FRESULT f_write(FIL *fp, const void *data, UINT size, UINT *written) {
   *written = size; return FR_OK;
 }
 int main(void) {
+  assert(carousel_animation == 1);
+  parse_ui_settings(0, "carousel_animation", "0"); assert(carousel_animation == 0);
+  parse_ui_settings(0, "carousel_animation", "1"); assert(carousel_animation == 1);
   assert(menu_theme == THEME_DSSMM_LIGHT);
   assert(artwork_mode == 1);
   assert(THEME_DSSMM_LIGHT == 6 && THEME_DSSMM_DARK == 7);
@@ -51,13 +54,15 @@ int main(void) {
   parse_ui_settings(0, "accent", "5"); assert(menu_accent == 0);
   parse_ui_settings(0, "artwork", "2"); assert(artwork_mode == 2);
   parse_ui_settings(0, "artwork", "3"); assert(artwork_mode == 0);
+  parse_ui_settings(0, "browser_view", "2"); assert(browser_view == 2);
+  parse_ui_settings(0, "browser_view", "3"); assert(browser_view == 0);
   ui_settings_version = 0; menu_theme = 0; artwork_mode = 0; migrate_ui_settings();
   assert(menu_theme == THEME_DSSMM_LIGHT && artwork_mode == 1);
   ui_settings_version = 1; menu_theme = 0; artwork_mode = 0; migrate_ui_settings();
   assert(menu_theme == THEME_DSSMM_LIGHT && artwork_mode == 1);
   parse_ui_settings(0, "ui_version", "2"); menu_theme = 0; artwork_mode = 0; migrate_ui_settings();
   assert(menu_theme == 0 && artwork_mode == 0); /* Test 2 explicit choices survive. */
-  parse_ui_settings(0, "ui_version", "3"); menu_theme = 0; artwork_mode = 0; migrate_ui_settings();
+  parse_ui_settings(0, "ui_version", "4"); menu_theme = 0; artwork_mode = 0; migrate_ui_settings();
   assert(menu_theme == 0 && artwork_mode == 0);
 
   assert(!strcmp(save_paths[0], "/SYSTEM/SAVEGAME/"));
@@ -77,11 +82,17 @@ int main(void) {
   savestate_filename_calc("/Games/Game.gba", path);
   assert(!strcmp(path, "/SYSTEM/SAVESTATE/Game"));
   menu_theme = THEME_DSSMM_DARK; menu_accent = 3; artwork_mode = 2;
+  browser_view = 2;
+  carousel_animation = 0;
   assert(save_ui_settings());
-  assert(strstr(saved_settings, "ui_version=3\n"));
+  assert(strstr(saved_settings, "ui_version=5\n"));
+  assert(strstr(saved_settings, "browser_view=2\n"));
+  assert(strstr(saved_settings, "carousel_animation=0\n"));
   assert(strstr(saved_settings, "theme=7\naccent=3\n"));
-  menu_theme = 0; menu_accent = 0; artwork_mode = 0;
+  menu_theme = 0; menu_accent = 0; artwork_mode = 0; browser_view = 0;
+  carousel_animation = 1;
   parse_file(saved_settings, parse_ui_settings, 0);
-  assert(menu_theme == THEME_DSSMM_DARK && menu_accent == 3 && artwork_mode == 2);
+  assert(menu_theme == THEME_DSSMM_DARK && menu_accent == 3 && artwork_mode == 2 && browser_view == 2);
+  assert(carousel_animation == 0);
   return 0;
 }

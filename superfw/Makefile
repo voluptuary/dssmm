@@ -143,6 +143,7 @@ INFILES=src/gba_ewram_crt0.S \
         src/patcher.c \
         src/patches.S \
         src/menu.c \
+        src/browser_carousel.c \
         src/artwork.c \
         src/artwork_file.c \
         src/recent.c \
