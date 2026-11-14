@@ -9,8 +9,26 @@ case "$board" in
 esac
 compression_ratio="${COMPRESSION_RATIO:-4}"
 cd "$project_root"
+build_number="$(git rev-list --count HEAD)"
 make clean
-make BOARD="$board" COMPRESSION_RATIO="$compression_ratio"
+make DSSMM_BUILD_NUMBER="$build_number" BOARD="$board" COMPRESSION_RATIO="$compression_ratio"
 mkdir -p "build/$board"
 cp superfw.gba "build/$board/superfw.fw"
-printf 'Built %s\n' "$project_root/build/$board/superfw.fw"
+python3 - "$board" "$build_number" <<'PY'
+import hashlib,json,pathlib,subprocess,sys
+board,number=sys.argv[1:]
+def git(*args): return subprocess.check_output(['git',*args],text=True).strip()
+image=pathlib.Path('build')/board/'superfw.fw'
+fingerprint=hashlib.sha256()
+for name in sorted(set(git('ls-files','--cached','--others','--exclude-standard','.').splitlines())):
+    path=pathlib.Path(name)
+    if path.is_file():
+        fingerprint.update(name.encode()+b'\0'+hashlib.sha256(path.read_bytes()).digest())
+record={'source_tree_sha256':fingerprint.hexdigest(),'board':board,'dssmm_build':int(number),'source_commit':git('rev-parse','HEAD'),
+        'source_dirty':bool(git('status','--porcelain','--untracked-files=normal','--','.')),
+        'firmware_sha256':hashlib.sha256(image.read_bytes()).hexdigest(),
+        'validation':'built; runtime and hardware validation not implied'}
+(image.parent/'build-info.json').write_text(json.dumps(record,indent=2)+'\n')
+print(f"DSSMM Build {number} ({board}); source {record['source_commit']}; dirty={record['source_dirty']}")
+PY
+printf 'Built %s\n'  "$project_root/build/$board/superfw.fw"

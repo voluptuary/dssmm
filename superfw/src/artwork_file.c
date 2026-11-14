@@ -45,21 +45,43 @@ static bool artwork_gamecode_path(char *out, size_t capacity, const char gamecod
   memcpy(out + pos, ".bmp", 5);
   return true;
 }
-static bool read_exact(void *context, uint32_t offset, void *data, size_t size) {
-  FIL *file = context;
-  UINT got = 0;
-  return size <= UINT_MAX && f_lseek(file, offset) == FR_OK &&
-         f_read(file, data, (UINT)size, &got) == FR_OK && got == size;
+static bool artwork_gamecode_root_path(char *out, size_t capacity, const char gamecode[4]) {
+  static const char prefix[] = "/SYSTEM/IMGS/";
+  if (!out || !gamecode || capacity < sizeof(prefix) + 8) return false;
+  for (unsigned i = 0; i < 4; ++i) {
+    unsigned char c = (unsigned char)gamecode[i];
+    if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))) return false;
+  }
+  memcpy(out, prefix, sizeof(prefix) - 1);
+  memcpy(out + sizeof(prefix) - 1, gamecode, 4);
+  memcpy(out + sizeof(prefix) + 3, ".bmp", 5);
+  return true;
 }
-bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capacity, artwork_info *info) {
+static bool read_buffer(void *context, uint32_t offset, void *data, size_t size) {
+  const uint8_t *buffer = context;
+  if (offset > ARTWORK_BMP_MAX_SIZE || size > ARTWORK_BMP_MAX_SIZE - offset) return false;
+  memcpy(data, buffer + offset, size);
+  return true;
+}
+static bool artwork_decode_file(FIL *file, uint8_t *bmp, size_t bmp_capacity,
+                                uint8_t *pixels, size_t capacity, artwork_info *info) {
+  FSIZE_t file_size = f_size(file);
+  UINT got = 0;
+  if (!bmp || bmp_capacity > ARTWORK_BMP_MAX_SIZE || file_size > bmp_capacity ||
+      file_size > UINT32_MAX || file_size > UINT_MAX) return false;
+  if (f_tell(file) != 0 && f_lseek(file, 0) != FR_OK) return false;
+  if (f_read(file, bmp, (UINT)file_size, &got) != FR_OK || got != file_size) return false;
+  return artwork_decode(read_buffer, bmp, (uint32_t)file_size, pixels, capacity, info);
+}
+bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capacity,
+                  uint8_t *bmp, size_t bmp_capacity, artwork_info *info) {
   char path[288];
   if (!artwork_path(path, sizeof(path), rom, style, 0)) return false;
   for (int candidate = 1; candidate >= 0; --candidate) {
     if (!artwork_path(path, sizeof(path), rom, style, candidate)) continue;
     FIL file;
     if (f_open(&file, path, FA_READ) != FR_OK) continue;
-    bool ok = f_size(&file) <= UINT32_MAX &&
-      artwork_decode(read_exact, &file, (uint32_t)f_size(&file), pixels, capacity, info);
+    bool ok = artwork_decode_file(&file, bmp, bmp_capacity, pixels, capacity, info);
     FRESULT closed = f_close(&file);
     if (ok && closed == FR_OK && info->width == (style ? 80 : 120)) return true;
   }
@@ -75,10 +97,17 @@ bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capac
                        f_read(&source, gamecode, sizeof(gamecode), &got) == FR_OK && got == sizeof(gamecode);
         (void)f_close(&source);
         if (read_ok) {
-          if (artwork_gamecode_path(path, sizeof(path), gamecode)) {
+          char code_paths[2][288];
+          bool have_paths[2] = {
+            artwork_gamecode_path(code_paths[0], sizeof(code_paths[0]), gamecode),
+            artwork_gamecode_root_path(code_paths[1], sizeof(code_paths[1]), gamecode)
+          };
+          for (unsigned candidate = 0; candidate < 2; ++candidate) {
+            if (!have_paths[candidate]) continue;
+            memcpy(path, code_paths[candidate], strlen(code_paths[candidate]) + 1);
             FIL file;
             if (f_open(&file, path, FA_READ) == FR_OK) {
-              bool ok = f_size(&file) <= UINT32_MAX && artwork_decode(read_exact, &file, (uint32_t)f_size(&file), pixels, capacity, info);
+              bool ok = artwork_decode_file(&file, bmp, bmp_capacity, pixels, capacity, info);
               FRESULT closed = f_close(&file);
               if (ok && closed == FR_OK && info->width == 120) return true;
             }

@@ -50,6 +50,14 @@ Aim for a closely recognizable DSSMM main browser: matching overall composition,
 
 Inventory menu rendering, theme tables, resource sizes and DSSMM asset licenses; define browser/render/action interfaces; produce a list-mode DSSMM skin without changing patch/save/flash code. Before distributing the first hardware candidate, obtain the owner’s installed firmware/recovery details. Keep the pinned baseline available for A/B testing and record every physical observation in a dedicated validation log.
 
+## Autonomous visual-parity continuation (2026-11-14)
+
+Owner asks for autonomous iteration through DSSMM parity, including fluid carousel views. Use the EZ-FLASH DSSMM browser's composition, focus treatment, transitions, iconography, artwork placement and input feel as the reference. Read its source/assets only to measure presentation behavior; retain SuperFW's own SD/Chis/Lite I/O, save, patch, NOR and menu-action backends. Keep shared implementation under `superfw/` and guard only genuinely board-specific behavior.
+
+Work in slices: (1) correct title-art lookup and add a portable rendering path, (2) isolate current SuperFW browser drawing from selection/action state, (3) match list browser geometry, typography, selection, title bar and path/footer, (4) implement responsive horizontal and vertical carousel views with cached adjacent art and smooth selection transitions, (5) style settings, tools, recent, info and game overlays, then in-game menus. Keep fixed-point timing deterministic and never read from SD during each animation frame. Prefer GBA OBJ affine transforms/DMA for repeated sprite movement and bulk VRAM copies where measurements show benefit; GBA has no general-purpose GPU/blitter, so avoid a wholesale video-mode rewrite without a working prototype.
+
+For validation, use host tests for geometry/state transitions and mGBA for GBA CPU/video/debug execution. The installed Debian mGBA 0.10.1 build accepts `--bios FILE`, but most homebrew can be tested without the BIOS. mGBA does not emulate the SuperCard cartridge's SD/NOR/SDRAM interface; use a mockable browser model or test ROM for the menu, and reserve card storage, timing and flash qualification for physical hardware. Capture before/after screenshots at 240×160 and compare key screens against EZ-FLASH DSSMM. Do not mark visual parity complete until all major menu surfaces and both carousel orientations have been reviewed.
+
 ## Designer-thread supplement
 
 Source: [ChisBread’s Prime introduction, January 12, 2026](https://gbatemp.net/threads/superchis-prime-how-i-fixed-the-supercard-sds-flaws-on-a-budget.678808/), reviewed November 12, 2026. These are designer statements, not our hardware results.
