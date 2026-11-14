@@ -309,3 +309,7 @@ Added per-Mode4-page identity tracking for AnimationOff; stable pages retain bod
 ## 2026-11-14 — Verify page reuse lifetime
 
 Production-policy extraction regression passes both page identities, selection/view/mode changes and all modal/tab/animation invalidation paths. Artwork reset test confirms both pages invalidated. Added to verifier; no firmware change this turn. Full runtime/hardware parity still unproven; newest CI live at inspection.
+
+## 2026-11-14 — Candidate identity/integrity gate
+
+Added three-board identity/firmware validation tool; current mixed diagnostic set correctly rejected as Lite dirty. Documents clean manifests, same source/number/fingerprint, hashes/checksum/size/seals. Does not claim latest boards/hardware pass. Continue clean candidate and runtime/menu parity work.

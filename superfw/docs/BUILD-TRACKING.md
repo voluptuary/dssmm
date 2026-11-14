@@ -23,3 +23,11 @@ build number, displayed hash and image hash when available.
   code and passes after signed arithmetic. Hardware retest still required.
 - Missing artwork and slow carousel rendering remain open hardware findings;
   newer cache/renderer changes are not established fixes until retested.
+
+Run `python3 superfw/scripts/check-build-set.py` from the repository root before
+using a three-board set as a candidate. It requires clean matching manifests,
+identical source commit/build number/project fingerprint, matching image hashes,
+valid GBA header checksums, embedded sizes, and full firmware seals. It emits a
+JSON report on success. This is integrity/identity validation; it does not replace
+build logs, tests, or runtime/hardware qualification. It correctly rejects the
+existing diagnostic set because Lite was built with modified source.
