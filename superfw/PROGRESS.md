@@ -317,3 +317,7 @@ Added three-board identity/firmware validation tool; current mixed diagnostic se
 ## 2026-11-14 — Clean Build553 set and honest timing baseline
 
 All three clean553 builds completed; same source/fingerprint and full integrity checks pass. Persisted manifests in docs/build-553-validation.json; CI43619877608 passed. Corrected preview CPU fills to DMA and generated missing messages dependency locally. Scratch clean preview passed; DMA BoxOff433206cycles supersedes985694CPU-fill figure as closer preview baseline. No physical/full parity claim.
+
+## 2026-11-14 — Local Chis553 hardware candidate supplied
+
+Placed validated Chis553 image, manifest and guide in root hardware-test as requested, locally excluded from Git. Confirmed firmware hash matches clean553 evidence. Shared direct path with owner and resumed notes/porting. Test5 note draft follows four ordered cumulative sections and explicitly retains534 failures/unverified fixes/parity limits. No release publication or hardware result yet.
