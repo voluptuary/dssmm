@@ -538,3 +538,18 @@ code uses Os to fit Chis; browser/font/motion retain O2. Static Chis255624 befor
 final title tweak; clean all3 gates next. Storage-only592 was not distributed;
 hosted43721652107 stalled/canceled. Host test Makefile now uses non-PIE sanitizer
 executables to fix recurring startup loops; full standard verifier next.
+
+## 2026-11-15 — Build594 delivered, continue letter-folder pack
+
+Clean source26526437b192b1e26a706379a1ffdf3f9a110b4c Build594 all3
+identities/seals/memory pass. Standard local full verifier passes after non-PIE
+ASAN host fix (90.8/94.5 coverage); hosted43722736343 passes. Exact source pixels,
+ARM VRAM/store discipline, both artwork/cart suites and launcher navigation pass.
+Light/Dark Start/settings mGBA inspected. Evidence build-594-validation.json.
+Chis594 now root hardware-test; own588 superseded after tracked evidence. No
+public release. Full parity unfinished; category children/system/dialogs next.
+Owner confirms588 font works well. New task: transparent closed-folder #/A–Z art
+sets120x80 Title and80x80 Box, global basename matches anywhere. CUSTOM directory
+lookup already matches full basename independent of parent; prepare compatible
+ready-to-copy pack and verify all54 via actual decoder before delivery. Preserve
+CUSTOM override priority if a future embedded fallback is added.

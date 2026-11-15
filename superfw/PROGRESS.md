@@ -494,3 +494,11 @@ Source Chis link fits after size optimization of cold/text-heavy paths. New
 mGBA Start/category renderers use fake recent/art only. Full parity unfinished.
 592 migration-only candidate not distributed due stalled hosted run. Next clean
 combined all3 candidate includes stable non-PIE host sanitizer setup.
+
+## 2026-11-15 — Build594 delivered
+
+All3 clean packages, standard local full verifier and hosted43722736343 pass.
+Evidence build-594-validation.json. Root hardware-test now Chis594 with Start,
+backgrounds/settings hub and SYSTEM migration. Superseded own588 local files;
+owner confirms588 font good. Next transparent #/A–Z folder pack, global basename
+matches, then true category children and remaining DE surfaces. No parity claim.
