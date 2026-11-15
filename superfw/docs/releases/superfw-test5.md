@@ -2,13 +2,13 @@
 
 - Horizontal and vertical carousels with cached neighboring artwork and scrolling filenames.
 - **Animation** switches between sliding transitions and a faster native-size view. Off shows native-size artwork with neighboring images cropped at the edges. Both modes reuse settled artwork frames.
-- Accent selection rows in Light/Dark UI settings and Tools, with more consistent left-aligned game options, Info and Tools text. Info shows the SuperFW source hash alongside the separate DSSMM build number.
+- Accent selection rows in Light/Dark UI settings and Tools, with more consistent left-aligned game options, Info and Tools text. In-game menus share solid selection rows. Info shows the SuperFW source hash alongside the separate DSSMM build number.
 
 ## New fixes
 
 - Moved carousel artwork metadata into GBA RAM so cache flags and filenames no longer use unsupported byte writes to cartridge memory.
 - Fixed an invalid selection caused by pressing Left at the first browser entry.
-- Reduced artwork read calls and scaling work; added support for bottom-up RGB555 thumbnails, optional zero size fields and the unused RGB555 high bit.
+- Reduced artwork read calls, repeated scaling and cartridge reads; added support for bottom-up RGB555 thumbnails, optional zero size fields and the unused RGB555 high bit.
 - Title artwork checks a flat game-code filename after the nested EZ-FLASH path and supports legacy fixed-size EZ records with inconsistent BMP headers. CUSTOM and mirrored filename matches retain priority.
 - Neighbor artwork refreshes when loading finishes; animated previews retain DE positions while clipping safely at screen edges.
 

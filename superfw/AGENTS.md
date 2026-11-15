@@ -64,8 +64,8 @@ delivering the Chis candidate. Keep Build561 hardware-test image unchanged while
 awaiting physical results.
 
 Current continuation: read docs/UI-PARITY.md and latest journals. Filename carousel
-art is physically confirmed on Chis561; Title code-art and571 performance remain
-unconfirmed. Current local hardware-test image is Chis571/hash3d0b1a80. Keep it
+art is physically confirmed on Chis561; Title code-art and582 performance remain
+unconfirmed. Current local hardware-test image is Chis582/hash842bad38. Keep it
 frozen while later UI work proceeds. Owner explicitly requires autonomous
 continuation without a permission/model-switch pause.
 
