@@ -38,10 +38,10 @@ const t_theme_colors themes[THEME_COUNT] = {
   { RGB2GBA(0xad11c8), RGB2GBA(0xe47af6), RGB2GBA(0x000000), RGB2GBA(0xad5dc6), RGB2GBA(0x724095), RGB2GBA(0x72667a) }, // Purple
   { RGB2GBA(0x222222), RGB2GBA(0x444444), RGB2GBA(0xeeeeee), RGB2GBA(0x737573), RGB2GBA(0xaaaaaa), RGB2GBA(0x606060) }, // Dark
   /* DSSMM presentation starts here; native palette roles remain unchanged.
-   * These original palettes require no borrowed graphics or extra RAM buffers.
+   * The native palette roles remain stable alongside credited DE backgrounds.
    * Accents stay readable with the renderer's existing black/white UI masks. */
-  [THEME_DSSMM_LIGHT] = { RGB2GBA(0xd8e0e8), RGB2GBA(0xf8f8f8), RGB2GBA(0x182028), RGB2GBA(0x80b8e8), RGB2GBA(0x90b8d8), RGB2GBA(0x788088) },
-  [THEME_DSSMM_DARK] = { RGB2GBA(0x303840), RGB2GBA(0x182028), RGB2GBA(0xf0f0f0), RGB2GBA(0x5088b8), RGB2GBA(0x406080), RGB2GBA(0x889098) },
+  [THEME_DSSMM_LIGHT] = { RGB2GBA(0xe0e0e0), RGB2GBA(0xffffff), RGB2GBA(0x000000), RGB2GBA(0x80b8e8), RGB2GBA(0x90b8d8), RGB2GBA(0x788088) },
+  [THEME_DSSMM_DARK] = { RGB2GBA(0x181818), RGB2GBA(0x000000), RGB2GBA(0xffffff), RGB2GBA(0x5088b8), RGB2GBA(0x406080), RGB2GBA(0x889098) },
 };
 
 /* Default preserves every upstream palette. Accent changes only selection roles. */

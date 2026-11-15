@@ -27,6 +27,7 @@
 #include "artwork_file.h"
 #include "browser_carousel.h"
 #include "browser_motion.h"
+#include "dssmm_background.h"
 #include "util.h"
 #include "utf_util.h"
 #include "fonts/font_render.h"
@@ -303,6 +304,11 @@ static struct {
   } info;
 } smenu;
 
+/* Start/settings navigation is independent of native tab numbering. */
+static uint8_t launcher_page,launcher_selected=1,launcher_category;
+static bool launcher_valid[2];
+static void launcher_invalidate(void) {launcher_valid[0]=launcher_valid[1]=false;}
+
 // Same but for popups.
 static struct {
   const char *alert_msg;          // Extra pop-up message
@@ -414,6 +420,8 @@ static unsigned framen = 0;
 static unsigned objnum = 0;
 static t_oamobj fobjs[64];
 
+#pragma GCC optimize ("Os")
+
 unsigned lang_lookup(uint16_t code) {
   for (unsigned i = 0; i < LANG_COUNT; i++)
     if (lang_codes[i] == code)
@@ -422,7 +430,7 @@ unsigned lang_lookup(uint16_t code) {
   return 0;  // Fallback to default (english)
 }
 
-inline uint16_t curr_pressed_keys() {
+static inline uint16_t curr_pressed_keys() {
   return REG_KEYINPUT ^ 0x3FF;
 }
 
@@ -430,13 +438,13 @@ uint16_t lang_getcode() {
   return lang_codes[lang_id];
 }
 
-inline bool isascii(char code) {
+static inline bool isascii(char code) {
   // Abuse signed :D
   return code >= 32;
 }
 
 // Uses the FAT attribute and also the unix filename convention.
-inline bool ishidden(const t_centry *e) {
+static inline bool ishidden(const t_centry *e) {
   return (e->attr & AM_HID) || e->fname[0] == '.';
 }
 
@@ -1211,6 +1219,8 @@ static void flashbrowser_reload() {
   #endif
 }
 
+#pragma GCC optimize ("O2")
+
 static inline void render_icon(unsigned x, unsigned y, unsigned iconn) {
   fobjs[objnum++] = (t_oamobj){x, y, 8*iconn };
 }
@@ -1497,7 +1507,7 @@ static void render_browser_list(volatile uint8_t *frame) {
 
   // Draw path, cut left part if necessary.
   draw_text_leftovf(smenu.browser.cpath, frame, 8, 144, SCREEN_WIDTH - 88);
-  draw_rightj_text("Start: Art", frame, SCREEN_WIDTH - 2, 144);
+  draw_rightj_text(menu_theme>=THEME_DSSMM_LIGHT?"Start: Home":"Start: Art", frame, SCREEN_WIDTH - 2, 144);
 
   char selinfo[16];
   npf_snprintf(selinfo, sizeof(selinfo), "%u/%d", smenu.browser.selector + 1, smenu.browser.dispentries);
@@ -1511,11 +1521,13 @@ static unsigned browser_entry_icon(const t_centry *entry) {
 
 static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
   if (!browser_fast_reuse)
-    dma_memset16(&frame[240 * 16], dup8(BG_COLOR), 240 * (144 - 16) / 2);
+    if(menu_theme>=THEME_DSSMM_LIGHT)dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,128);
+    else dma_memset16(&frame[240 * 16], dup8(BG_COLOR),240*(144-16)/2);
   else {
     unsigned tx = vertical ? 98 : 40, ty = vertical ? 85 : 122;
     unsigned tw = vertical ? 136 : 162;
-    for (unsigned row = 0; row < 16; ++row)
+    if(menu_theme>=THEME_DSSMM_LIGHT)dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,tx,ty,tw,16);
+    else for (unsigned row = 0; row < 16; ++row)
       dma_memset16(frame + (ty+row)*240 + tx, dup8(BG_COLOR), tw/2);
     dma_memset16(frame + 144*240, dup8(BG_COLOR), 240*16/2);
   }
@@ -1612,7 +1624,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
   }
 
   draw_text_leftovf(smenu.browser.cpath, frame, 8, 144, SCREEN_WIDTH - 88);
-  draw_rightj_text("Start: Art", frame, SCREEN_WIDTH - 2, 144);
+  draw_rightj_text(menu_theme>=THEME_DSSMM_LIGHT?"Start: Home":"Start: Art", frame, SCREEN_WIDTH - 2, 144);
   char selinfo[16];
   npf_snprintf(selinfo, sizeof(selinfo), "%u/%d", smenu.browser.selector + 1, smenu.browser.dispentries);
   draw_rightj_text(selinfo, frame, SCREEN_WIDTH - 1, 1);
@@ -1624,6 +1636,9 @@ void render_browser(volatile uint8_t *frame) {
   else
     render_browser_list(frame);
 }
+
+/* Text-heavy dialogs favor size; browser/font pixel loops keep O2. */
+#pragma GCC optimize ("Os")
 
 void render_fw_flash_popup(volatile uint8_t *frame) {
   // Render a box to give a pop-up feeling
@@ -2207,6 +2222,7 @@ void render_tools(volatile uint8_t *frame) {
 
 void reload_theme(unsigned thnum) {
   font_set_style(menu_font);
+  launcher_invalidate();
   const t_theme_colors colors = menu_theme_colors(thnum, menu_accent);
   for (unsigned i = 0; i < ARTWORK_PALETTE_SIZE; ++i)
     MEM_PALETTE[ARTWORK_PALETTE_BASE + i] = artwork_palette_color(i);
@@ -2227,6 +2243,72 @@ void reload_theme(unsigned thnum) {
   MEM_PALETTE[256 + SEL_COLOR] = colors.hi_blend;
 }
 
+/* DS Style Start layout matches the DE default geometry. Hardware actions stay
+ * in SuperFW; SD/Lite substitute Recents for the unsupported NOR browser. */
+static void launcher_corners(volatile uint8_t *frame,unsigned x,unsigned y,unsigned w,unsigned h) {
+  for(unsigned row=0;row<h;++row) {
+    unsigned width=(row<2 || row>=h-2)?6:2;
+    if(row<6 || row>=h-6) {
+      dma_memset16(frame+(y+row)*240+x,dup8(HI_COLOR),width/2);
+      dma_memset16(frame+(y+row)*240+x+w-width,dup8(HI_COLOR),width/2);
+    }
+  }
+}
+
+static void render_start(volatile uint8_t *frame) {
+  dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,true);
+  char title_buffer[MAX_FN_LEN];
+  const char *title="No recently played game";
+  if(smenu.recent.maxentries) {
+    const t_rentry *entry=&sdr_state->rentries[0];
+    strbcpy(title_buffer,file_basename(entry->fpath),sizeof(title_buffer));
+    char *extension=strrchr(title_buffer,'.');if(extension)*extension=0;
+    title=title_buffer;
+    if(artwork_mode && !(entry->flags&FLAG_RECENT_NOR)) {
+      if(!artwork_cached || artwork_cached_mode!=artwork_mode || strcmp(artwork_rom,entry->fpath)) {
+        strbcpy(artwork_rom,entry->fpath,sizeof(artwork_rom));artwork_cached_mode=artwork_mode;
+        artwork_valid=artwork_load(entry->fpath,artwork_mode-1,
+          (uint8_t *)sdr_state->artwork_pixels,ARTWORK_MAX_PIXELS,
+          sdr_state->artwork_bmp_buffer,sizeof(sdr_state->artwork_bmp_buffer),&preview_info);
+        artwork_cached=true;
+      }
+      if(artwork_valid)artwork_blit_scaled_cropped((volatile uint16_t *)frame,
+          sdr_state->artwork_pixels,&preview_info,preview_info.width==80?40:30,48,preview_info.width==80?40:60,40);
+      else draw_central_text("GBA",frame,60,60);
+    }
+  }
+  const unsigned lines=menu_font==FONT_STYLE_DSSMM?3:2;
+  for(unsigned row=0;row<lines && *title;++row) {
+    unsigned width,count=font_width_cap_space(title,110,&width);
+    if(!count)count=font_width_cap(title,110);
+    if(!count)break;
+    char line[128];if(count>=sizeof(line))count=sizeof(line)-1;
+    memcpy(line,title,count);line[count]=0;
+    draw_central_text_ovf(line,frame,150,49+row*(lines==3?12:16),110);
+    title+=count;while(*title==' ')++title;
+  }
+  draw_central_text("SD Card",frame,72,106);
+#ifdef SUPPORT_NORGAMES
+  draw_central_text("NOR Flash",frame,168,106);
+#else
+  draw_central_text("Recents",frame,168,106);
+#endif
+  const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{110,144,20,14}};
+  const unsigned *box=boxes[launcher_selected];
+  launcher_corners(frame,box[0],box[1],box[2],box[3]);
+}
+
+static void render_settings_home(volatile uint8_t *frame) {
+  static const char * const labels[]={"Interface","Games","Hardware","System","Help"};
+  for(unsigned i=0;i<5;++i) {
+    unsigned y=35+i*19;
+    if(i==launcher_category)draw_menu_selection(frame,y,24,216);
+    draw_text_ovf(labels[i],frame,32,y,158);
+    draw_text_ovf(">",frame,198,y,12);
+  }
+  draw_central_text("B: Back",frame,120,144);
+}
+
 static const struct {
   const t_mrender_fn render;
   const int max_submenu;
@@ -2243,6 +2325,8 @@ static const struct {
 
 // Renders the menu. Arg0 represents the frame count difference with the
 // previous rendered frame (for animations and similar stuff).
+#pragma GCC optimize ("O2")
+
 void menu_render(unsigned fcnt) {
   objnum = 0;
   volatile uint8_t *frame = &MEM_VRAM_U8[0xA000*framen];
@@ -2251,18 +2335,28 @@ void menu_render(unsigned fcnt) {
   else
     browser_motion_offset = 0;
 
-  // Render the tab menu on top (rows 0..15), highlighting the selected option
-  dma_memset16(&frame[0], dup8(FG_COLOR), SCREEN_WIDTH*16/2);
+  bool ds_style=menu_theme>=THEME_DSSMM_LIGHT;
+  bool launcher=ds_style && launcher_page && !spop.pop_num &&
+      !spop.qpop.message && !spop.rtcpop.callback && !spop.alert_msg;
+  if(ds_style && (launcher || smenu.menu_tab!=MENUTAB_INFO))
+    dssmm_background_palette(MEM_PALETTE,menu_theme==THEME_DSSMM_DARK);
+  if(!(launcher && launcher_page==1 && launcher_valid[framen]))
+    dma_memset16(&frame[0],dup8(FG_COLOR),SCREEN_WIDTH*16/2);
+  if(!ds_style) {
+    int mintab=(recent_menu && smenu.recent.maxentries)?MENUTAB_RECENT:MENUTAB_ROMBROWSE;
+    for(unsigned i=mintab;i<MENUTAB_MAX;++i)
+      if(i==smenu.menu_tab)render_icon((i-mintab)*16,0,i+ICON_RECENT);
+      else render_icon_trans((i-mintab)*16,0,i+ICON_RECENT);
+  } else if(!launcher || launcher_page==2) {
+    static const char * const titles[]={"Recents","SD Card",
+#ifdef SUPPORT_NORGAMES
+      "NOR Flash",
+#endif
+      "Settings","Interface","System","Help"};
+    draw_text_ovf(launcher?"Settings":titles[smenu.menu_tab],frame,8,0,160);
+  }
 
-  // Render icon bar
-  int mintab = (recent_menu && smenu.recent.maxentries) ? MENUTAB_RECENT : MENUTAB_ROMBROWSE;
-  for (unsigned i = mintab; i < MENUTAB_MAX; i++)
-    if (i == smenu.menu_tab)
-      render_icon((i - mintab)*16, 0, i + ICON_RECENT);
-    else
-      render_icon_trans((i - mintab)*16, 0, i + ICON_RECENT);
-
-  bool fast_carousel = smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view &&
+  bool fast_carousel = !launcher && smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view &&
       browser_motion_offset == 0 && !spop.qpop.message && !spop.rtcpop.callback &&
       !spop.pop_num && !spop.alert_msg;
   if (!fast_carousel) browser_fast_valid[0] = browser_fast_valid[1] = false;
@@ -2270,8 +2364,21 @@ void menu_render(unsigned fcnt) {
       browser_fast_selection[framen] == smenu.browser.selector &&
       browser_fast_view[framen] == browser_view && browser_fast_mode[framen] == artwork_mode;
   // Preserve stable artwork in each Mode 4 page; text is refreshed separately.
-  if (!browser_fast_reuse)
-  dma_memset16(&frame[16*SCREEN_WIDTH], dup8(BG_COLOR), SCREEN_WIDTH*(SCREEN_HEIGHT-16) / 2);
+  if (!browser_fast_reuse && !(launcher && launcher_valid[framen])) {
+    if(ds_style && !launcher && smenu.menu_tab!=MENUTAB_INFO)
+      dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,144);
+    else dma_memset16(&frame[16*SCREEN_WIDTH],dup8(BG_COLOR),SCREEN_WIDTH*(SCREEN_HEIGHT-16)/2);
+  }
+  if(launcher) {
+    if(!launcher_valid[framen]) {
+      if(launcher_page==1)render_start(frame);
+      else {dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,144);render_settings_home(frame);}
+      launcher_valid[framen]=true;
+    }
+    REG_WIN0H=REG_WIN0V=0;
+    return;
+  }
+  launcher_invalidate();
 
   if (spop.qpop.message)
     render_popupq(frame, fcnt);
@@ -2346,6 +2453,7 @@ void menu_init(int sram_testres) {
   recent_reload();
 
   reload_theme(menu_theme);
+  launcher_page=menu_theme>=THEME_DSSMM_LIGHT?1:0;launcher_selected=1;
 
   smenu.menu_tab = (recent_menu && smenu.recent.maxentries) ? MENUTAB_RECENT : MENUTAB_ROMBROWSE;
 
@@ -3087,7 +3195,7 @@ static void keypress_menu_recent(unsigned newkeys) {
 
 static void keypress_menu_browse(unsigned newkeys) {
   int old_selector = smenu.browser.selector;
-  if (newkeys & KEY_BUTTSTA) {
+  if (menu_theme<THEME_DSSMM_LIGHT && (newkeys & KEY_BUTTSTA)) {
     artwork_mode = (artwork_mode + 1) % 3;
     browser_invalidate_artwork();
   }
@@ -3514,6 +3622,45 @@ void menu_keypress(unsigned newkeys) {
       keyfns[spop.pop_num](newkeys);
     }
   } else {
+    if(menu_theme>=THEME_DSSMM_LIGHT) {
+      if(newkeys)launcher_invalidate();
+      if((newkeys&KEY_BUTTSTA) && launcher_page!=1) {launcher_page=1;browser_invalidate_artwork();return;}
+      if((newkeys&KEY_BUTTSTA) && launcher_page==1)newkeys=(newkeys&~KEY_BUTTSTA)|KEY_BUTTA;
+      if(launcher_page==1) {
+        if(newkeys&KEY_BUTTDOWN)launcher_selected=launcher_selected==0?1:3;
+        if(newkeys&KEY_BUTTUP)launcher_selected=launcher_selected==3?1:0;
+        if(newkeys&KEY_BUTTLEFT && launcher_selected==2)launcher_selected=1;
+        if(newkeys&KEY_BUTTRIGHT && launcher_selected==1)launcher_selected=2;
+        if(newkeys&KEY_BUTTB) {launcher_page=0;smenu.menu_tab=MENUTAB_ROMBROWSE;}
+        if(newkeys&KEY_BUTTA) {
+          browser_invalidate_artwork();
+          if(launcher_selected==0) {
+            if(smenu.recent.maxentries){smenu.recent.selector=smenu.recent.seloff=0;keypress_menu_recent(KEY_BUTTA);}
+          } else if(launcher_selected==1){launcher_page=0;smenu.menu_tab=MENUTAB_ROMBROWSE;}
+          else if(launcher_selected==2){launcher_page=0;
+#ifdef SUPPORT_NORGAMES
+            smenu.menu_tab=MENUTAB_NORBROWSE;
+#else
+            smenu.menu_tab=MENUTAB_RECENT;
+#endif
+          } else launcher_page=2;
+        }
+        return;
+      }
+      if(launcher_page==2) {
+        if(newkeys&KEY_BUTTUP)launcher_category=launcher_category?launcher_category-1:0;
+        if(newkeys&KEY_BUTTDOWN)launcher_category=MIN(4,launcher_category+1);
+        if(newkeys&KEY_BUTTB)launcher_page=1;
+        if(newkeys&KEY_BUTTA) {
+          static const uint8_t tabs[]={MENUTAB_UILANG,MENUTAB_SETTINGS,MENUTAB_SETTINGS,MENUTAB_TOOLS,MENUTAB_INFO};
+          launcher_page=0;smenu.menu_tab=tabs[launcher_category];
+          if(launcher_category==1)smenu.set.selector=DefsPatchEng;
+          if(launcher_category==2)smenu.set.selector=SettHotkey;
+        }
+        return;
+      }
+      if((newkeys&KEY_BUTTB) && smenu.menu_tab>=MENUTAB_SETTINGS){launcher_page=2;return;}
+    }
     // Menu change via trigger buttons
     int mintab = (recent_menu && smenu.recent.maxentries) ? MENUTAB_RECENT : MENUTAB_ROMBROWSE;
     if (newkeys & KEY_BUTTL)

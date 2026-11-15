@@ -482,3 +482,15 @@ SAVESTATE with legacy save-set detection. Sanitized host migration and all3
 settings fixtures pass; production settings preview pending. Historical
 release notes remain accurate for those older binaries. Continue Start screen,
 DE backgrounds and categorized navigation after numbered validation checkpoint.
+
+## 2026-11-15 — Actual DS Style Start presentation
+
+Imported credited DE Start light/dark bitmap assets with standalone originals,
+lossless3070-byte stream generation, every-pixel host comparison and halfword ARM
+video-bus replay. Start and five-category settings routing share native actions;
+all-board input tests pass. Native themes retain legacy tabs. Generic DSSMM pages
+use exact DE stripes, independent text/art palettes and preserved carousel cache.
+Source Chis link fits after size optimization of cold/text-heavy paths. New
+mGBA Start/category renderers use fake recent/art only. Full parity unfinished.
+592 migration-only candidate not distributed due stalled hosted run. Next clean
+combined all3 candidate includes stable non-PIE host sanitizer setup.

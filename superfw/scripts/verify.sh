@@ -8,6 +8,8 @@ done
 bash "$project_root/scripts/test-theme-settings.sh"
 bash "$project_root/scripts/test-system-layout.sh"
 bash "$project_root/scripts/test-dssmm-font.sh"
+bash "$project_root/scripts/test-dssmm-background.sh"
+bash "$project_root/scripts/test-launcher-navigation.sh"
 bash "$project_root/scripts/test-artwork.sh"
 bash "$project_root/scripts/test-ingame-selection.sh"
 bash "$project_root/scripts/test-browser-motion.sh"

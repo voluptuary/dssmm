@@ -522,3 +522,19 @@ sha256 startup; complete non-PIE sanitizer rerun passes90.8/94.5 coverage. mGBA
 settings renderer inspected/test passes after removing directory controls.
 Hosted43721652107 is still running: do not distribute until it passes. Source
 renderer development may proceed because these clean packages are frozen.
+
+## 2026-11-15 — DS Start/background/settings navigation slice
+
+Added exact credited DE Light/Dark Start assets as3070-byte lossless halfword LZ,
+source pixel fixtures and optional actual ARM video-bus test. Added Start/Last
+Played/SD/board-specific NOR-or-Recents/settings navigation and settings hub.
+Production input extraction passes all3 variants. Generic pages use exact DE
+SD_LIST stripes; carousel text restores texture and retains five-cache/page reuse.
+DSSMM themes use functional headers; native themes keep upstream tabs/Start art.
+Settings children are still native flat pages, not finished parity. mGBA Start
+light/dark and category fixtures render; corrected preview palette role aliasing
+(FT18 vs background0..15). Production roles were already separate. Dialog/cold
+code uses Os to fit Chis; browser/font/motion retain O2. Static Chis255624 before
+final title tweak; clean all3 gates next. Storage-only592 was not distributed;
+hosted43721652107 stalled/canceled. Host test Makefile now uses non-PIE sanitizer
+executables to fix recurring startup loops; full standard verifier next.

@@ -143,7 +143,7 @@ INFILES=src/gba_ewram_crt0.S \
         src/patcher.c \
         src/patches.S \
         src/menu.c \
-        src/browser_carousel.c \
+        src/browser_carousel.c src/dssmm_background.c \
         src/artwork.c \
         src/artwork_file.c \
         src/recent.c \
@@ -236,3 +236,5 @@ clean:
 
 # Optional DSSMM bitmap/renderer metadata are shared by kernel and in-game payload.
 firmware.ewram.gba ingamemenu.payload: src/fonts/dssmm_ascii.h src/fonts/font_render.h
+
+firmware.ewram.gba: src/dssmm_background_data.h src/dssmm_background.h

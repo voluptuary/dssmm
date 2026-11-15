@@ -1,7 +1,9 @@
 
 COV_FLAGS=-ftest-coverage -fprofile-arcs
 MEMCHK_FLAGS=-fsanitize=address -lasan
-CFLAGS = -O0 -ggdb -I../src/ -Wall $(COV_FLAGS)
+# PIE ASAN startup intermittently loops in this Linux container. Keep sanitizers
+# enabled and use stable non-PIE host executables; firmware flags are separate.
+CFLAGS = -fno-pie -no-pie -O0 -ggdb -I../src/ -Wall $(COV_FLAGS)
 
 all:
 	$(CC) $(CFLAGS) $(MEMCHK_FLAGS) -o cimpl_test.bin cimpl_test.c ../src/cimpl.c -DBUILTIN_PREFIX=superfw_

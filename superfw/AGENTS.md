@@ -106,3 +106,13 @@ Unicode fallback. In-game font uses reserved palette word5, not a new payload
 field. Run test-dssmm-font.sh alongside settings/artwork/bus tests. Current folder
 CUSTOM loader is implemented for List+Art and carousels; full basename including
 dots, no header lookup for directories. Both features need physical retesting.
+
+Owner continuation: work continuously without awaiting feedback until stopped or
+DE parity is reached, supplying numbered hardware-test builds at validated
+milestones. Read LAUNCHER-PORT.md and current UI-PARITY map. Start/category hub and
+lossless DE backgrounds are implemented but category children/dialogs remain
+unfinished. Never claim100% parity based on presentation fixtures. All3 variants
+share launcher features; SD/Lite substitute Recents for unsupported NOR. Keep
+palette0..15 backgrounds separate from UI16..19/artwork20..235 and Info logo.
+Host sanitizer executables now disable PIE to avoid recurrent ASAN startup loops;
+sanitizers remain enabled. Firmware optimization flags are separate.
