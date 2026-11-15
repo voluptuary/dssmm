@@ -47,3 +47,12 @@ is inconsistent. Header normalization occurs in internal RAM; the cartridge
 buffer receives no byte writes. Filename artwork retains strict parsing and DST1
 semantics. Original pack download still returns403, so do not call this actual
 pack validation or a confirmed fix for the owner's Title artwork.
+
+Animated geometry now preserves DE's horizontal edge positions (-5/185 for
+60px neighbors) and vertical next position (Y124 for32px height), rather than
+pushing them inward. A clipped scaler samples against the complete original
+rectangle, then writes only visible body pixels (Y16..143). Halfword alignment
+rounds odd X coordinates down one pixel. Selection remains painted last; missing
+art icons are clamped independently. During motion a rectangle may be outside
+the body; clipped blitters reject fully invisible rectangles safely. This is
+presentation only; no card protocols are imported from DE.

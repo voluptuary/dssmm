@@ -31,15 +31,11 @@ unsigned browser_carousel_layout(bool vertical, int selected, int count, int off
     int x, y;
     if (vertical) {
       x = 7 + (distance > BROWSER_MOTION_UNIT ? 18 : distance * 18 / BROWSER_MOTION_UNIT);
-      y = 62 + position * (position < 0 ? 38 : 46) / BROWSER_MOTION_UNIT;
+      y = 62 + position * (position < 0 ? 38 : 62) / BROWSER_MOTION_UNIT;
     } else {
-      x = 60 + position * 125 / BROWSER_MOTION_UNIT;
+      x = 120 + position * 95 / BROWSER_MOTION_UNIT - w/2;
       y = 27 + d * 20 / BROWSER_MOTION_UNIT;
     }
-    if (x < 0) x = 0;
-    if (x + w > 240) x = 240 - w;
-    if (y < 18) y = 18;
-    if (y + h > 140) y = 140 - h;
     items[total++] = (browser_carousel_item){
       index, x, y, w, h, distance, index == focused_item
     };

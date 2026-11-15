@@ -19,6 +19,8 @@ preamble=r'''
 #include "artwork.h"
 #include "browser_carousel.h"
 #define MAX_FN_LEN 256
+#define MAX(a,b) ((a)>(b)?(a):(b))
+#define MIN(a,b) ((a)<(b)?(a):(b))
 #define AM_DIR 16
 #define BG_COLOR 17
 #define FG_COLOR 16
@@ -77,6 +79,11 @@ bool artwork_blit_scaled(volatile uint16_t *frame,const uint16_t *pixels,
  const artwork_info *info,unsigned x,unsigned y,unsigned w,unsigned h) {
  (void)frame;(void)pixels;(void)info;assert(x+w<=240 && y+h<=160);++scales;++blits;return true;
 }
+bool artwork_blit_scaled_cropped(volatile uint16_t *frame,const uint16_t *pixels,
+ const artwork_info *info,int x,int y,unsigned w,unsigned h) {
+ (void)frame;(void)pixels;(void)info;(void)x;(void)y;(void)w;(void)h;++scales;++blits;return true;
+}
+
 '''
 tests=r'''
 int main(void) {

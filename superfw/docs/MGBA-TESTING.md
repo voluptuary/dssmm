@@ -45,3 +45,8 @@ AnimationOff preview now calls production artwork_blit_cropped for all three
 native-sized images, matching the new cropped-neighbor layout. Four initial
 orientation/art combinations pass screenshot checks. These remain fixture-based;
 no SuperCard I/O is emulated. No emulator setup changes.
+
+Animated preview now calls production clipped scaler, preserving DE neighbor
+positions instead of the old fit-to-body clamp. Four settled art/orientation
+screenshots pass and were visually inspected. Cropped-scaler pixel-reference
+checks verify left/right/top/bottom clipping and untouched UI rows/canaries.

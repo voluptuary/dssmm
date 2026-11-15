@@ -82,7 +82,7 @@ static void card(volatile uint8_t *frame, const browser_carousel_item *item,
                  int vertical, int box_mode) {
   (void)vertical;
   uint8_t body = item->focused ? 2 : 3;
-  fill_rect(frame, item->x, item->y, item->w, item->h, body);
+  (void)body; /* The full browser background is already clear. */
   int code_index = title_art_index_from_header((unsigned)item->index);
   if (code_index < 0) return;
   unsigned art_index = (unsigned)code_index;
@@ -90,17 +90,15 @@ static void card(volatile uint8_t *frame, const browser_carousel_item *item,
   const artwork_info *info = box_mode ? &fixture_box_info[art_index] : &fixture_title_info[art_index];
   bool valid = box_mode ? fixture_box_valid[art_index] : fixture_title_valid[art_index];
   if (!valid) return;
-  unsigned x = item->x, y = item->y, width = item->w, height = item->h;
+  int x = item->x, y = item->y;
+  unsigned width = item->w, height = item->h;
   if (box_mode) {
     width = height = item->w < item->h ? item->w : item->h;
     x += (item->w - width) / 2;
     y += (item->h - height) / 2;
   }
   if (x & 1) --x;
-  if (item->focused && width == info->width && height == info->height)
-    (void)artwork_blit_frame((volatile uint16_t *)frame, pixels, info, x, y);
-  else
-  (void)artwork_blit_scaled((volatile uint16_t *)frame, pixels, info, x, y, width, height);
+  (void)artwork_blit_scaled_cropped((volatile uint16_t *)frame,pixels,info,x,y,width,height);
 }
 
 static void render(volatile uint8_t *frame, int vertical, int selected, int offset, int box_mode) {

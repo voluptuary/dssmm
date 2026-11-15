@@ -1566,7 +1566,8 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
           carousel_meta[slot].mode == artwork_mode &&
           !strcmp(carousel_meta[slot].rom, rom)) {
         const artwork_info *info = &carousel_meta[slot].info;
-        unsigned x = item->x, width = item->w, height = item->h;
+        int x = item->x;
+        unsigned width = item->w, height = item->h;
         if (info->width == 80) { width = height; x += (item->w - width) / 2; }
         if (!carousel_animation) {
           int delta = item->index-selected;
@@ -1579,17 +1580,17 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         x &= ~1u;
         width &= ~1u;
         if (browser_fast_reuse) drawn = true;
-        else if (width == info->width && height == info->height)
+        else if (width == info->width && height == info->height && x >= 0 && x+(int)width <= 240 && item->y >= 16 && item->y+(int)height <= 144)
           drawn = artwork_blit_frame((volatile uint16_t *)frame,
               sdr_state->carousel_art[slot].pixels, info, x,
               !carousel_animation && vertical ? 48 : item->y);
         else
-          drawn = artwork_blit_scaled((volatile uint16_t *)frame,
+          drawn = artwork_blit_scaled_cropped((volatile uint16_t *)frame,
               sdr_state->carousel_art[slot].pixels, info, x, item->y, width, height);
       }
       if (!drawn) {
-        unsigned icon_x = item->x + item->w/2 - 8;
-        unsigned icon_y = item->y + item->h/2 - 8;
+        unsigned icon_x = MAX(0, MIN(224, item->x + item->w/2 - 8));
+        unsigned icon_y = MAX(16, MIN(128, item->y + item->h/2 - 8));
         if (!carousel_animation && vertical) {
           icon_x = 52;
           icon_y = item->index < selected ? 24 : item->index > selected ? 128 : 80;

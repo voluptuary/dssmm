@@ -371,3 +371,7 @@ Compared DE game-code reader: fixed54+19200-byte direct-pixel record, unlike our
 ## 2026-11-15 — Build565 ready for card retest
 
 Clean uniform SD/Lite/Chis565 builds, integrity gate and hosted43665489569 pass. Chis image delivered in hardware-test with manifest/guide, replacing superseded561 local artifacts. Owner561 filename success retained;565 native neighbors/performance/legacy Title need physical result. Continue alignment while keeping565 frozen.
+
+## 2026-11-15 — Animated DE geometry preserved with clipping
+
+Corrected horizontal interpolation to move image centers (DE left/right-5/185) and vertical next Y124. Removed fit-to-body geometry shifts; actual clipped scaler keeps source sampling anchored while protecting UI rows. Missing-image icons clamp independently, selection paints last. Added pixel-reference/canary regression for clipped scaling; motion/cache/page/navigation/ARM bus checks pass. All four settled animated mGBA views pass/visually reviewed; Chis source link fits (EWRAM94.13%,IWRAM39.28%). Mid-transition preview pending. No new distributed image; hardware-test565 frozen. Full parity/performance and physical legacy Title result remain open; continue autonomously.

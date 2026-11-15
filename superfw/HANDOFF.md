@@ -389,3 +389,7 @@ Compared DE game-code reader: fixed54+19200-byte direct-pixel record, unlike our
 ## 2026-11-15 — Uniform565 candidate delivered; continue alignment
 
 All three clean565 images source30829054 share fingerprint and pass integrity gate, linked metadata placement and hosted43665489569 full verifier. Four native-cropped Off previews pass; pixel/canary tests pass. Evidence docs/build-565-validation.json. Replaced our superseded561 local image/manifest with hardware-test/superfw-chis-build565.fw plus manifest/guide, retaining tracked561 evidence/owner confirmation. No physical565 performance or header-art result yet; no public release. Continue alignment/performance autonomously. DE reference vertical next y124 versus our108 clamp is a concrete mismatch; preserve footer via clipping instead of shifting the art upward.
+
+## 2026-11-15 — Animated DE geometry preserved with clipping
+
+Corrected horizontal interpolation to move image centers (DE left/right-5/185) and vertical next Y124. Removed fit-to-body geometry shifts; actual clipped scaler keeps source sampling anchored while protecting UI rows. Missing-image icons clamp independently, selection paints last. Added pixel-reference/canary regression for clipped scaling; motion/cache/page/navigation/ARM bus checks pass. All four settled animated mGBA views pass/visually reviewed; Chis source link fits (EWRAM94.13%,IWRAM39.28%). Mid-transition preview pending. No new distributed image; hardware-test565 frozen. Full parity/performance and physical legacy Title result remain open; continue autonomously.

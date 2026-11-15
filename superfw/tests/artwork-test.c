@@ -122,6 +122,22 @@ int main(void) {
       assert(frame[0]==0x1111 && frame[240*160/2+1]==0x1111);
     }
   }
+  for (unsigned marked=0; marked<2; ++marked) {
+    fixture(120,marked); assert(decode(120,ARTWORK_MAX_PIXELS,&info));
+    for (int y=-12;y<=124;y+=68) for(int x=-6;x<=186;x+=96) {
+      memset(frame,17,sizeof(frame));
+      assert(artwork_blit_scaled_cropped(frame+1,(uint16_t *)(output+2),&info,x,y,60,40));
+      for(int fy=0;fy<160;++fy) for(int fx=0;fx<240;++fx) {
+        uint8_t expected=17;
+        if(fy>=16 && fy<144 && fx>=x && fx<x+60 && fy>=y && fy<y+40) {
+          expected=output[2+((fy-y)*80/40)*120+(fx-x)*120/60];
+          if(!expected)expected=17;
+        }
+        assert(((uint8_t *)(frame+1))[fy*240+fx]==expected);
+      }
+      assert(frame[0]==0x1111 && frame[240*160/2+1]==0x1111);
+    }
+  }
   assert(artwork_palette_color(0)==0 && artwork_palette_color(215)==0x7fff);
   assert(artwork_palette_color(5)==31 && artwork_palette_color(30)==(31<<5));
   assert(artwork_palette_color(180)==(31<<10));
