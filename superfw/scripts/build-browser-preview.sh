@@ -21,7 +21,7 @@ text="#define SCREEN_WIDTH 240\n#define FT_COLOR 1\n#define FG_COLOR 3\n#define 
 for signature in ("static void draw_text_ovf(", "static void draw_central_text("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
-text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} tools; struct {unsigned selector;} set; struct {unsigned selector,seloff;} uiset; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
+text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} tools; struct {unsigned selector;} set; struct {int selector,seloff;} uiset; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
 text+="extern void dma_memset16(volatile void *, uint16_t, uint16_t);\n#define dup8(x) ((x)|((x)<<8))\n#define npf_snprintf snprintf\n#define THEME_COUNT 8\n#define ACCENT_COUNT 5\n#define THEME_DSSMM_LIGHT 6\n#define THEME_DSSMM_DARK 7\n"
 text+="static uint8_t menu_theme=6,artwork_mode=1,browser_view=1,carousel_animation=0,recent_menu=1,anim_speed=1,hide_hidden=1,menu_accent;\n"
 text+='static const char * const accent_names[5]={"Default","Blue","Green","Orange","Purple"};\n'
@@ -47,7 +47,7 @@ text+=source[a:b]+"\n"
 text+='#include "settings-preview-fixture.h"\n'
 a=source.index("void render_settings(");b=source.index("\n}",a)+2
 text+=source[a:b]+"\n"
-text+="static struct {unsigned anim;} spop;\nstatic const char *file_basename(const char *path) {const char *p=strrchr(path,'/');return p?p+1:path;}\n"
+text+="static struct {unsigned anim; const char *alert_msg;} spop;\nstatic const char *file_basename(const char *path) {const char *p=strrchr(path,'/');return p?p+1:path;}\n"
 a=source.index("static void render_gbarom_info(");b=source.index("\n}",a)+2
 text+=source[a:b]+"\n"
 a=source.index("enum {\n  GBAInfoCNT");b=source.index("\n};",a)+3
@@ -55,6 +55,14 @@ text+=source[a:b]+"\n"
 for signature in ("static const char *render_gbarom_patching(","static const char *render_gbarom_loading("):
  a=source.index(signature);b=source.index("\n}",a)+2
  text+=source[a:b]+"\n"
+text+="\n#define KEY_BUTTA 1\n#define KEY_BUTTUP 64\n#define KEY_BUTTDOWN 128\n#define KEY_BUTTLEFT 32\n#define KEY_BUTTRIGHT 16\n#define animspd_cnt 5\n#define MAX(a,b) ((a)>(b)?(a):(b))\n#define MIN(a,b) ((a)<(b)?(a):(b))\n"
+text+="static int browser_motion_offset;\nstatic void browser_invalidate_artwork(void) {}\nstatic void browser_reload_filter(void) {}\nstatic bool save_ui_settings(void) {return false;} /* No SD persistence in fixture. */\nstatic void reload_theme(unsigned theme);\n"
+a=source.index("static void keypress_menu_uisettings(");b=source.index("\n}",a)+2
+text+=source[a:b]+"\n"
+a=settings.index("static const uint16_t accent_colors[");b=settings.index("\n};",a)+3
+text+=settings[a:b]+"\n"
+a=settings.index("t_theme_colors menu_theme_colors(");b=settings.index("\n}",a)+2
+text+=settings[a:b]+"\n"
 Path(sys.argv[2]).write_text(text)
 PY
 arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -Wno-unused-parameter -mcpu=arm7tdmi -mthumb \
