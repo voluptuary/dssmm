@@ -1136,6 +1136,11 @@ static struct {
   char rom[MAX_FN_LEN];
   artwork_info info;
 } carousel_meta[3];
+/* Selected artwork is sampled repeatedly during motion. Keep a hot copy in
+ * EWRAM; the linker bounds this NOLOAD allocation on every board. */
+static uint16_t carousel_hot_pixels[ARTWORK_MAX_PIXELS/2] __attribute__((section(".sbss")));
+static bool carousel_hot_valid;
+static int carousel_hot_index;
 static int browser_motion_offset;
 static bool browser_fast_reuse, browser_fast_valid[2];
 static int browser_fast_selection[2];
@@ -1144,6 +1149,7 @@ static unsigned browser_fast_view[2], browser_fast_mode[2];
 static void browser_invalidate_artwork(void) {
   browser_fast_valid[0] = browser_fast_valid[1] = false;
   artwork_cached = false;
+  carousel_hot_valid = false;
   for (unsigned i = 0; i < 3; ++i) {
     carousel_meta[i].cached = false;
     carousel_meta[i].valid = false;
@@ -1547,6 +1553,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
             sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
             &carousel_meta[slot].info);
         carousel_meta[slot].cached = true;
+        carousel_hot_valid = false;
         browser_fast_reuse = false;
         browser_fast_valid[0] = browser_fast_valid[1] = false;
         break;
@@ -1566,6 +1573,15 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
           carousel_meta[slot].mode == artwork_mode &&
           !strcmp(carousel_meta[slot].rom, rom)) {
         const artwork_info *info = &carousel_meta[slot].info;
+        const uint16_t *pixels = sdr_state->carousel_art[slot].pixels;
+        if (item->focused) {
+          if (!carousel_hot_valid || carousel_hot_index != item->index) {
+            dma_memcpy16(carousel_hot_pixels, pixels, info->width*info->height/2);
+            carousel_hot_index = item->index;
+            carousel_hot_valid = true;
+          }
+          pixels = carousel_hot_pixels;
+        }
         int x = item->x;
         unsigned width = item->w, height = item->h;
         if (info->width == 80) { width = height; x += (item->w - width) / 2; }
@@ -1574,7 +1590,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
           int native_x = vertical ? (120-info->width)/2 : (240-info->width)/2 + delta*(int)info->width;
           int native_y = vertical ? 48+delta*80 : 27;
           drawn = browser_fast_reuse || artwork_blit_cropped((volatile uint16_t *)frame,
-              sdr_state->carousel_art[slot].pixels, info, native_x, native_y);
+              pixels, info, native_x, native_y);
           if (drawn) continue;
         }
         x &= ~1u;
@@ -1582,11 +1598,11 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         if (browser_fast_reuse) drawn = true;
         else if (width == info->width && height == info->height && x >= 0 && x+(int)width <= 240 && item->y >= 16 && item->y+(int)height <= 144)
           drawn = artwork_blit_frame((volatile uint16_t *)frame,
-              sdr_state->carousel_art[slot].pixels, info, x,
+              pixels, info, x,
               !carousel_animation && vertical ? 48 : item->y);
         else
           drawn = artwork_blit_scaled_cropped((volatile uint16_t *)frame,
-              sdr_state->carousel_art[slot].pixels, info, x, item->y, width, height);
+              pixels, info, x, item->y, width, height);
       }
       if (!drawn) {
         unsigned icon_x = MAX(0, MIN(224, item->x + item->w/2 - 8));
@@ -1661,26 +1677,28 @@ void render_sav_menu_popup(volatile uint8_t *frame) {
   draw_central_text(msgs[lang_id][MSG_CANCEL], frame, 120, 126);
 }
 
+/* Framebuffer selection leaves text crisp and avoids the native tiled OAM bar. */
+static void draw_menu_selection(volatile uint8_t *frame, unsigned y,
+                                unsigned left, unsigned right) {
+  for (unsigned row = 0; row < 16; ++row)
+    dma_memset16(frame + (y+row)*SCREEN_WIDTH + left, dup8(HI_COLOR), (right-left)/2);
+}
+
 static void render_gbarom_info(volatile uint8_t *frame, const char *dispname,
                                bool issf, const char *gcode, uint8_t ver, int save_type) {
   char tmp[64];
-  draw_central_text(msgs[lang_id][MSG_GBALOAD_MINFO], frame, SCREEN_WIDTH/2, 23);
+  draw_text_ovf(msgs[lang_id][MSG_GBALOAD_MINFO], frame, 24, 23, 192);
 
   const char *romname = file_basename(dispname);
-  unsigned twidth = font_width(romname);
-  if (twidth > SCREEN_WIDTH - 20)
-    draw_text_ovf_rotate(romname, frame, 10, 52,
-                         SCREEN_WIDTH - 20, &spop.anim);
-  else
-    draw_central_text_ovf(romname, frame, SCREEN_WIDTH/2, 52, SCREEN_WIDTH - 20);
+  draw_text_ovf_rotate(romname, frame, 12, 52, SCREEN_WIDTH-24, &spop.anim);
 
   npf_snprintf(tmp, sizeof(tmp), msgs[lang_id][MSG_LOADINFO_GAME], gcode, ver);
-  draw_central_text_ovf(tmp, frame, SCREEN_WIDTH/2, 82, SCREEN_WIDTH - 20);
+  draw_text_ovf(tmp, frame, 12, 82, SCREEN_WIDTH - 24);
 
   if (save_type < 0)
-    draw_central_text_ovf(msgs[lang_id][MSG_LOADINFO_UNKW], frame, SCREEN_WIDTH/2, 102, SCREEN_WIDTH - 20);
+    draw_text_ovf(msgs[lang_id][MSG_LOADINFO_UNKW], frame, 12, 102, SCREEN_WIDTH - 24);
   else if (issf)
-    draw_central_text_ovf("SuperFW firmware", frame, SCREEN_WIDTH/2, 102, SCREEN_WIDTH - 20);
+    draw_text_ovf("SuperFW firmware", frame, 12, 102, SCREEN_WIDTH - 24);
   else {
     const char *stype[] = {
       msgs[lang_id][MSG_SAVETYPE_NONE],       // SaveTypeNone
@@ -1700,14 +1718,16 @@ static void render_gbarom_info(volatile uint8_t *frame, const char *dispname,
     };
 
     npf_snprintf(tmp, sizeof(tmp), msgs[lang_id][MSG_LOADINFO_SAVE], stype[save_type], ssize[save_type]);
-    draw_central_text_ovf(tmp, frame, SCREEN_WIDTH/2, 102, SCREEN_WIDTH - 20);
+    draw_text_ovf(tmp, frame, 12, 102, SCREEN_WIDTH - 24);
   }
 
   draw_box_full(frame, 20, 220, 132, 152, FG_COLOR, HI_COLOR);
 }
 
 static const char *render_gbarom_patching(volatile uint8_t *frame, const t_load_gba_info *info, int selector) {
-  draw_text_ovf(msgs[lang_id][MSG_GBALOAD_MPATCH], frame, 12, 23, 216);
+  if (menu_theme >= THEME_DSSMM_LIGHT)
+    draw_menu_selection(frame, 44 + 18*selector, 8, 232);
+  draw_text_ovf(msgs[lang_id][MSG_GBALOAD_MPATCH], frame, 24, 23, 192);
   draw_text_ovf(msgs[lang_id][MSG_DEFS_PATCH], frame, 12, 44, 116);
   draw_text_ovf(msgs[lang_id][MSG_PATCH_TYPE0 + info->patch_type], frame, 132, 44, 96);
   draw_text_ovf(msgs[lang_id][MSG_LOADER_SAVET], frame, 12, 62, 116);
@@ -1729,8 +1749,10 @@ static const char *render_gbarom_patching(volatile uint8_t *frame, const t_load_
 }
 
 static const char *render_gbarom_loading(volatile uint8_t *frame, const t_load_gba_lcfg *data, bool rtc_patching, int selector) {
+  if (menu_theme >= THEME_DSSMM_LIGHT)
+    draw_menu_selection(frame, 44 + 18*selector, 8, 232);
   char tmp[64];
-  draw_text_ovf(msgs[lang_id][MSG_GBALOAD_OPTS], frame, 12, 23, 216);
+  draw_text_ovf(msgs[lang_id][MSG_GBALOAD_OPTS], frame, 24, 23, 192);
   draw_text_ovf(msgs[lang_id][MSG_LOADER_LOADP], frame, 12, 44, 116);
   draw_text_ovf(msgs[lang_id][MSG_LOADER_LOADP0 + data->sram_load_type], frame, 132, 44, 96);
   draw_text_ovf(msgs[lang_id][MSG_LOADER_SAVEP], frame, 12, 62, 116);
@@ -1739,9 +1761,9 @@ static const char *render_gbarom_loading(volatile uint8_t *frame, const t_load_g
   if (rtc_patching) {
     t_dec_date d;
     timestamp2date(data->rtcval, &d);
-    npf_snprintf(tmp, sizeof(tmp), "20%02d/%02d/%02d %02d:%02d",
+    npf_snprintf(tmp, sizeof(tmp), "%02d/%02d/%02d %02d:%02d",
       d.year, d.month, d.day, d.hour, d.min);
-    draw_text_ovf(tmp, frame, 132, 80, 96);
+    draw_text_ovf(tmp, frame, 112, 80, 120);
   }
   else
     draw_text_ovf("-", frame, 132, 80, 96);
@@ -1792,6 +1814,7 @@ void render_gba_load_popup(volatile uint8_t *frame) {
 
   if (spop.submenu != GbaLoadPopInfo) {
     const unsigned offy = 43;
+    if (menu_theme < THEME_DSSMM_LIGHT)
     for (unsigned i = 8; i < 232; i += 16) {
       render_icon_trans(i, offy + 0 + spop.selector * 18, 63);
       render_icon_trans(i, offy + 2 + spop.selector * 18, 63);
@@ -1847,6 +1870,7 @@ void render_gba_norwrite(volatile uint8_t *frame) {
         draw_central_text_ovf(ht, frame, SCREEN_WIDTH/2, 137, SCREEN_WIDTH - 20);
     }
     const unsigned offy = 43;
+    if (menu_theme < THEME_DSSMM_LIGHT)
     for (unsigned i = 8; i < 232; i += 16) {
       render_icon_trans(i, offy + 0 + spop.selector * 18, 63);
       render_icon_trans(i, offy + 2 + spop.selector * 18, 63);
@@ -1879,6 +1903,7 @@ void render_gba_norload(volatile uint8_t *frame) {
         draw_central_text_ovf(ht, frame, SCREEN_WIDTH/2, 137, SCREEN_WIDTH - 20);
     }
     const unsigned offy = 43;
+    if (menu_theme < THEME_DSSMM_LIGHT)
     for (unsigned i = 8; i < 232; i += 16) {
       render_icon_trans(i, offy + 0 + spop.selector * 18, 63);
       render_icon_trans(i, offy + 2 + spop.selector * 18, 63);
@@ -1931,13 +1956,6 @@ void render_rtcpop(volatile uint8_t *frame) {
   };
   draw_central_text("⯅", frame, cox[spop.rtcpop.selector], 54);
   draw_central_text("⯆", frame, cox[spop.rtcpop.selector], 84);
-}
-
-/* Framebuffer selection leaves text crisp and avoids the native tiled OAM bar. */
-static void draw_menu_selection(volatile uint8_t *frame, unsigned y,
-                                unsigned left, unsigned right) {
-  for (unsigned row = 0; row < 16; ++row)
-    dma_memset16(frame + (y+row)*SCREEN_WIDTH + left, dup8(HI_COLOR), (right-left)/2);
 }
 
 void render_settings(volatile uint8_t *frame) {
@@ -2047,10 +2065,10 @@ void render_settings(volatile uint8_t *frame) {
   if (optnum++ >= baseopt && optcnt < maxrows) {
     t_dec_date d;
     timestamp2date(rtcvalue_default, &d);
-    npf_snprintf(tmp, sizeof(tmp), "20%02d/%02d/%02d %02d:%02d",
+    npf_snprintf(tmp, sizeof(tmp), "%02d/%02d/%02d %02d:%02d",
       d.year, d.month, d.day, d.hour, d.min);
     draw_text_ovf(msgs[lang_id][MSG_DEF_RTCVAL], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(tmp, frame, 112, offy + rowh*optcnt++, 120);
   }
 
   if (optnum++ >= baseopt && optcnt < maxrows) {
@@ -3186,6 +3204,7 @@ static void keypress_menu_browse(unsigned newkeys) {
     browser_motion_offset = browser_motion_retarget(browser_motion_offset,
                                                      smenu.browser.selector - old_selector);
     artwork_cached = false;
+  carousel_hot_valid = false;
   }
 }
 

@@ -59,3 +59,47 @@ checked: Light Chis Fast ROM, Dark SD Savegame-load lower page, and Save. Text
 uses production bounds/scrolling; long value fields can still truncate. This
 executes presentation only, not input/persistence/storage actions. No emulator
 package/version/launch setup changed.
+
+Screens4/5/6 preview the actual ROM-info, patching and loading renderers.
+Option0..5 selects ROM save type (6 exercises a long filename/unknown save),
+or0..4 selects the patch/loading row. Values are synthetic field fixtures,
+not real ROM launch or patch execution. Preview draws popup border/navigation
+arrows to expose title overlap; disk OAM and action handlers are excluded.
+Checked Light info/Flash128K, Dark long name, patch/In-game and loading/RTC.
+
+The build copies messages.h beside its generated messages_data.h, preventing
+an older firmware-generated src/messages_data.h from shadowing fresh preview
+messages through quoted includes. Preview remains independently buildable after
+make clean. No mGBA package, launch flags or BIOS policy changes.
+
+Screens7/8/9 extract production in-game main/reset/save menu renderers and their
+text/selection helpers. PREVIEW_OPTION selects a row. Translation symbols are
+namespaced in generated ingame_preview.h to coexist with launcher messages.
+Synthetic feature flags allow all six main rows; no game, SD, save/reset action,
+register restoration or disk state is exercised. In-game logo and OAM are omitted,
+and launcher bars are removed. Preview maps the real menu's font/selection roles
+to its existing theme palette. Light main/RTC row and Dark reset/save Back rows
+were visually checked. The preview alone suppresses unused-parameter warnings
+because production draw callbacks retain unused frame arguments. Production
+warnings and flags are unchanged; no mGBA package/launch configuration changed.
+
+Screen10 extracts in-game RTC presentation with a synthetic date/speed.
+Option6 checks the solid Update button; numeric controls retain native arrows.
+Dark screenshot passed/was inspected. Cheats/states selection rows use the same
+bounds-tested helper but their full renderers have not been previewed yet.
+
+Screen11 renders two synthetic cheat titles, one enabled and one disabled; no
+cheat opcodes execute. Screen12 uses the production slot renderer and native
+slot icon assets with fake valid/empty flags. PREVIEW_STATE_SLOT selects memory
+(0) or persistent(-1); PREVIEW_MAKEPERS=0 exercises the persistent-copy prompt
+(default-1 is normal). Checked memory option2, persistent option2, and persistent
+copy with initial option2 normalized to0. Production signed slot-count types are
+preserved in fixtures; no warning suppression was added for their comparisons.
+Icon palette128..143 is loaded only for Screen12, protecting artwork palettes
+in other previews. Actual read/write/delete/make-persistent operations and game
+state restoration are never invoked. No mGBA setup change.
+
+Cheat/state fixture output was inspected: memory Save/Load/Make-persistent,
+persistent Save/Load/Delete, persistent-copy Make-persistent/Cancel with option
+normalization, and enabled/disabled cheat rows. All four smoke checks pass.
+The test header initializes fake cheat entries in RAM and does not execute codes.

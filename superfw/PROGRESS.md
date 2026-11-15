@@ -383,3 +383,37 @@ All-board/full CI43665956534 passes DE geometry/clipped scaler; vertical midpoin
 ## 2026-11-15 — Main settings emulator coverage and integration checkpoint
 
 391d7b7 passed hosted43666119527 all-board/full verifier. Added actual main-settings renderer/enum extraction to preview (Screen3), with clearly synthetic settings/date fixture and optional Chis NOR rows. Visually inspected Light Chis Fast-ROM, Dark SD lower save-policy and Save screens; smoke checks pass. Long values remain bounded/truncated; input/persistence are not emulated. Firmware inputs unchanged by this harness slice. Next normal merge into dssmm and combined CI; hardware-test565 remains fixed for performance/header-art result. Continue autonomous parity work; do not claim full parity or physical565 confirmation.
+
+## 2026-11-15 — Selected image hot cache; combined CI passed
+
+Integrationc7872aa passed all four hosted kernel jobs43666315152. All hardware lanes synchronized normally through dssmm: DE2da7584,OMEGA2c2d5cc,BLUE4b9255c; no force/squash or driver changes. Current new SuperFW follow-up adds selected-image DMA copy into9,600-byte EWRAM NOLOAD cache, so repeated sampling avoids cartridge reads. Three SDRAM backing slots remain; identity invalidates on load/path reset and tracks selection. Cache regression verifies no repeated copies when stable; ARM bus checks pass. Actual Chis link places hot pixels in EWRAM and fits97.95% (5268bytes spare), checked by mandatory ELF gate. Hardware speed remains unmeasured, and565 test image is unchanged. Need clean all-board builds/hosted gate of this follow-up before distributing another candidate; continue autonomous work.
+
+## 2026-11-15 — Clean571 all-board hot-cache candidate delivered
+
+All SD/Lite/Chis571 builds at3d0b1a80 are clean, identical source fingerprint, linked metadata/hot-buffer gates and image identities/seals pass. Hosted43666618620 full verifier passes. Evidence docs/build-571-validation.json. Current root hardware-test image is Chis571 (hash3d0b1a80), replacing our565 local image/manifest after retaining evidence. Includes cropped native neighbors, legacy code-art fallback, DE-position clipping and selected EWRAM hot cache. Physical performance/Title result pending. Continue autonomous info/game-menu parity; do not change this frozen candidate. No public release.
+
+## 2026-11-15 — Game information/patch/loading presentation
+
+ROM-info text is bounded/left-aligned with scrolling filename; game action button remains centered. Patch/loading Light/Dark rows use common accent fill; native OAM overlays retained for native themes and NOR driver/action paths unchanged. Headers now leave room for navigation arrows. Compact English Database/Engine/None/Skip BIOS labels and two-digit-year date with wider RTC column fix observed truncation. Screens4/5/6 extract actual renderer functions into mGBA preview with synthetic field fixtures, borders and text navigation arrows; actual launch, storage, NOR and disk OAM are not emulated. Light Flash128K info, Dark long-name/unknown-save, patch In-game and loading RTC previews pass and were inspected. Fixed fresh-preview messages shadowed by stale src/messages_data.h via local wrapper copy. Chis link pending final header adjustment; final hosted all-board tests required. Frozen hardware-test571 remains current; no physical571/art/speed claim.
+
+Final local game-screen result: Chis link passes with252072/257024EWRAM bytes (98.07%) and hot-image/metadata ELF gates pass. Framed patch preview visually confirms arrows/header separation; focused settings/cache/page/ARM bus checks pass. Source checkpoint next, then hosted all-board verification. Candidate571 remains unchanged.
+
+## 2026-11-15 — In-game main/reset/save selection slice
+
+Added solid selection rows to native in-game main/reset/save screens using existing accent palette color, across manual themes. Copied the existing OBJ accent into unused background palette20 (logo uses1..3; text16..19); no palette/header layout, action, save/reset, card protocol or restoration changes. These three screens suppress tiled OAM bar; other in-game screens retain it. Popup-active helper suppresses underlying highlight. Sanitized extracted production helper checks all Ypositions, exact pixels, canaries and popup suppression; added to verifier. Chis in-game payload link fits48904/61440 bytes and combined firmware252184/257024; no physical IGM qualification.
+
+New previews7/8/9 extract actual in-game presentation only with namespaced translations and synthetic flags. Light main/RTC and Dark reset/save Back screenshots pass and were inspected; logo/OAM/actions/storage/register restoration excluded. Current hardware-test571 predates this UI slice and remains frozen. Next hosted full all-board verifier, then integrate latest through dssmm and synchronize lanes. Continue performance/parity; ROM-header art and571 speed still need owner hardware results.
+
+## 2026-11-15 — Hot buffer follows visual transition focus
+
+Refined selected EWRAM cache to follow item->focused, not the new logical selection during the first half of a slide. This keeps the largest visible image in GBA RAM while names/geometry transition; idle/Off focus remains the selected file. Production cache regression asserts the previous image remains hot at the midpoint; ARM bus regression passes. No hardware speed claim. Latest source needs hosted all-board verification before final integration;571 candidate remains fixed and predates this refinement.
+
+## 2026-11-15 — In-game selection consistency and parity map
+
+Extended the shared in-game solid row helper to RTC Update, cheat rows and state actions, keeping numeric arrows/slot icons and all action/storage/restoration code native. State make-persistent selection is normalized before highlighting, as before. Screen10 actual RTC renderer with fake date/speed passes and was inspected; full cheat/state render fixtures remain pending. Bounds/popup helper sanitizer passes. e4c486b hosted43667997240 passed hot visual-focus refinement plus prior IGM slice. Latest extended IGM source still needs hosted all-board verification. Added docs/UI-PARITY.md as the live surface/performance/evidence map; corrected primary reference to ezfomegade per owner. Continue autonomously, with571 hardware image frozen.
+
+## 2026-11-15 — Full in-game renderer fixture coverage
+
+5ae64a7 passed hosted43668232783 full all-board verification, including new selection sanitizer. Added production cheat/state render extraction with native icon assets and synthetic flags/titles; preserved signed slot counts after initial fixture compiler failures exposed incorrect unsigned mocks. Memory slot, persistent slot, make-persistent-normalization and disabled cheat row screenshots pass and were inspected. Palette128..143 loaded only in slot previews to avoid corrupting artwork colors elsewhere. All slot/save/cheat action and restoration paths remain excluded; physical gameplay/state compatibility not qualified. This follow-up changes tests/harness/docs only, not firmware. Integrate the validated firmware milestone normally and keep hardware-test571 frozen.
+
+Final in-game fixture result: all memory/disk/copy/cheat screens pass mGBA0.10.1 smoke checks and visual inspection, using original renderers/icons with synthetic data only. Source firmware5ae64a7 remains the last tested all-board milestone; newer d80ccac+fixture edits are harness/docs only. Continue autonomous interaction coverage and normal integration;571 remains frozen.

@@ -7,6 +7,7 @@
 #include "browser_fixture_assets.h"
 #include "fonts/font_render.h"
 #include "browser_preview_text.h"
+#include "ingame_preview.h"
 static const uint32_t empty_font[2] = {0, 0};
 void *font_base_addr = (void *)empty_font;
 static unsigned text_animation;
@@ -105,6 +106,37 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   fill_rect(frame, 0, 0, 240, 160, 0);
   fill_rect(frame, 0, 0, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
   fill_rect(frame, 0, 144, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
+  if (PREVIEW_SCREEN >= 7 && PREVIEW_SCREEN <= 12) {
+    fill_rect(frame,0,0,240,160,0); /* In-game has no launcher tab/footer bars. */
+    copt=PREVIEW_OPTION < (PREVIEW_SCREEN==7 ? 6u : PREVIEW_SCREEN==10 ? 7u : 4u) ? PREVIEW_OPTION : 0;
+    if(PREVIEW_SCREEN==7)igm_draw_main_menu((uint8_t *)frame,0);
+    if(PREVIEW_SCREEN==8)igm_draw_reset_menu((uint8_t *)frame,0);
+    if(PREVIEW_SCREEN==9)igm_draw_save_menu((uint8_t *)frame,0);
+    if(PREVIEW_SCREEN==10)igm_draw_rtc_menu((uint8_t *)frame,0);
+    if(PREVIEW_SCREEN==11){igm_fake_cheats();copt=PREVIEW_OPTION<2?PREVIEW_OPTION:0;igm_draw_cheats_menu((uint8_t *)frame,0);}
+    if(PREVIEW_SCREEN==12){copt=PREVIEW_OPTION<3?PREVIEW_OPTION:0;igm_draw_states_menu((uint8_t *)frame,0);}
+    return;
+  }
+  if (PREVIEW_SCREEN >= 4 && PREVIEW_SCREEN <= 6) {
+    draw_box_outline(frame,2,238,18,158,FG_COLOR);
+    draw_text_ovf("⯇",frame,10,23,8);
+    draw_text_ovf("⯈",frame,222,23,8);
+  }
+  if (PREVIEW_SCREEN == 5) {
+    const t_load_gba_info info={0,true,true,true};
+    (void)render_gbarom_patching(frame,&info,PREVIEW_OPTION<5 ? PREVIEW_OPTION : 4);
+    return;
+  }
+  if (PREVIEW_SCREEN == 6) {
+    const t_load_gba_lcfg info={0,0,0,true,true};
+    (void)render_gbarom_loading(frame,&info,true,PREVIEW_OPTION<5 ? PREVIEW_OPTION : 4);
+    return;
+  }
+  if (PREVIEW_SCREEN == 4) {
+    render_gbarom_info(frame, PREVIEW_OPTION==6 ? "/Game Boy Advance/P/A very long synthetic title for scrolling checks (USA).gba" : browser_fixture_names[1], false, "FAKE", 0, PREVIEW_OPTION<6 ? PREVIEW_OPTION : -1);
+    draw_central_text(msgs[lang_id][MSG_LOAD_GBA],frame,120,134);
+    return;
+  }
   if (PREVIEW_SCREEN == 3) { render_settings(frame); return; }
   if (PREVIEW_SCREEN == 2) {
     fill_rect(frame,0,144,240,16,0);
@@ -142,6 +174,10 @@ int main(void) {
     PALETTE[0]=colors->bg_color; PALETTE[1]=colors->ft_color;
     PALETTE[2]=colors->hi_color; PALETTE[3]=colors->fg_color;
     menu_theme=PREVIEW_THEME;
+  }
+  if (PREVIEW_SCREEN==12) {
+    for(unsigned i=0;i<16;++i)PALETTE[128+i]=menu_icons_pal[i];
+    PALETTE[128]=PALETTE[0];
   }
   load_fixtures();
   preview_select_ui(PREVIEW_OPTION);

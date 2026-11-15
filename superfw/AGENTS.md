@@ -40,7 +40,8 @@ Owner reported that artwork did not display with GBA games grouped under letter 
 
 ## Active parity goal (2026-11-14)
 
-Owner requests autonomous work until the SuperFW builds reach DSSMM visual/interaction parity with the EZ-FLASH DSSMM kernel, including fluid carousel views. Use `ezfomega` as a visual reference only; port presentation and behavior, not its private card drivers/protocols. Keep all three SuperFW board variants synchronized where hardware allows. Start with standalone rendering/animation seams and preserve native SuperFW actions. mGBA 0.10.1 is installed locally; it can exercise GBA CPU/video and debugger paths but does not emulate SuperCard storage/card protocols. BIOS is optional for many homebrew paths. Do not claim card hardware validation from emulator output.
+Owner requests autonomous work until the SuperFW builds reach DSSMM visual/interaction parity with the EZ-FLASH DSSMM kernel, including fluid carousel views. Use `ezfomegade` as the primary visual reference (the owner calls it EZFODE),
+with `ezfomega` as a supporting reference only; port presentation and behavior, not its private card drivers/protocols. Keep all three SuperFW board variants synchronized where hardware allows. Start with standalone rendering/animation seams and preserve native SuperFW actions. mGBA 0.10.1 is installed locally; it can exercise GBA CPU/video and debugger paths but does not emulate SuperCard storage/card protocols. BIOS is optional for many homebrew paths. Do not claim card hardware validation from emulator output.
 
 Owner Test 4 feedback: Box artwork appears slowly, Title ROM-header art does not. The candidate loads each bounded BMP with one contiguous FatFS read into an aligned 19,254-byte SDRAM buffer, supports top-down/bottom-up 16-bit BMPs with zero size fields, and tries flat game-code `/SYSTEM/IMGS/<CODE>.bmp` after the nested EZ path. Focused artwork/settings/motion suites pass. `lcov` and `libssl-dev` are installed; the upstream host suite passed once standalone but integrated verifier reruns intermittently hang with AddressSanitizer `DEADLYSIGNAL` in `cimpl_test`. Do not suppress or claim a clean full run. UI settings v4 persists List/Horizontal/Vertical browser mode. `browser_carousel.c` is shared by firmware and the mGBA schematic preview ROM. Full menu parity, physical title art, box-art timing and card behavior remain unverified.
 
@@ -61,3 +62,9 @@ art works and edge crash is fixed, but corrected carousel art still requires
 physical retesting. Owner has completed the model switch and authorized continuing the port after
 delivering the Chis candidate. Keep Build561 hardware-test image unchanged while
 awaiting physical results.
+
+Current continuation: read docs/UI-PARITY.md and latest journals. Filename carousel
+art is physically confirmed on Chis561; Title code-art and571 performance remain
+unconfirmed. Current local hardware-test image is Chis571/hash3d0b1a80. Keep it
+frozen while later UI work proceeds. Owner explicitly requires autonomous
+continuation without a permission/model-switch pause.

@@ -3,7 +3,9 @@ set -euo pipefail
 project_root="$(cd "$(dirname "$0")/.." && pwd)"
 out="$project_root/build/mgba"
 mkdir -p "$out"
+python3 "$project_root/scripts/generate-ingame-preview.py" "$out/ingame_preview.h"
 python3 "$project_root/res/messages.py" h main > "$out/messages_data.h"
+cp "$project_root/src/messages.h" "$out/messages.h"
 if [ -n "${DEVKITARM:-}" ] && [ -x "$DEVKITARM/bin/arm-none-eabi-gcc" ]; then
   export PATH="$DEVKITARM/bin:$PATH"
 fi
@@ -45,10 +47,18 @@ text+=source[a:b]+"\n"
 text+='#include "settings-preview-fixture.h"\n'
 a=source.index("void render_settings(");b=source.index("\n}",a)+2
 text+=source[a:b]+"\n"
+text+="static struct {unsigned anim;} spop;\nstatic const char *file_basename(const char *path) {const char *p=strrchr(path,'/');return p?p+1:path;}\n"
+a=source.index("static void render_gbarom_info(");b=source.index("\n}",a)+2
+text+=source[a:b]+"\n"
+a=source.index("enum {\n  GBAInfoCNT");b=source.index("\n};",a)+3
+text+=source[a:b]+"\n"
+for signature in ("static const char *render_gbarom_patching(","static const char *render_gbarom_loading("):
+ a=source.index(signature);b=source.index("\n}",a)+2
+ text+=source[a:b]+"\n"
 Path(sys.argv[2]).write_text(text)
 PY
-arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -mcpu=arm7tdmi -mthumb \
-  -D__GBA__ ${PREVIEW_CHIS:+-DSUPPORT_NORGAMES} -I "$project_root/tests" -DPREVIEW_THEME="${PREVIEW_THEME:--1}" -DPREVIEW_OPTION="${PREVIEW_OPTION:-0}" -DPREVIEW_ANIMATION="${PREVIEW_ANIMATION:-1}" -DPREVIEW_TIMING="${PREVIEW_TIMING:-0}" -DPREVIEW_SCREEN="${PREVIEW_SCREEN:-0}" -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
+arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -Wno-unused-parameter -mcpu=arm7tdmi -mthumb \
+  -D__GBA__ -DPREVIEW_MAKEPERS="${PREVIEW_MAKEPERS:--1}" -DPREVIEW_STATE_SLOT="${PREVIEW_STATE_SLOT:-0}" ${PREVIEW_CHIS:+-DSUPPORT_NORGAMES} -I "$project_root/tests" -DPREVIEW_THEME="${PREVIEW_THEME:--1}" -DPREVIEW_OPTION="${PREVIEW_OPTION:-0}" -DPREVIEW_ANIMATION="${PREVIEW_ANIMATION:-1}" -DPREVIEW_TIMING="${PREVIEW_TIMING:-0}" -DPREVIEW_SCREEN="${PREVIEW_SCREEN:-0}" -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
   "$project_root/tests/browser-preview-rom.c" "$project_root/src/browser_carousel.c" \
   "$project_root/src/artwork.c" "$project_root/src/gbahw.c" \
   "$project_root/src/fonts/font_render.c" "$project_root/src/utf_util.c" \
