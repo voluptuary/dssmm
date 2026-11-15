@@ -4,9 +4,9 @@
 volatile unsigned frame_count;
 int main(void) {
  struct {unsigned left;char text[LAUNCHER_NAME_BYTES];unsigned right;} out={0x12345678,{0},0x89abcdef};
- launcher_name_parse(out.text,"ABCDEFGHIJKLM\r\nignored",22);assert(!strcmp(out.text,"ABCDEFGHIJK"));
+ launcher_name_parse(out.text,"ABCDEFGHIJKLM\r\nignored",22);assert(!strcmp(out.text,"ABCDEFGHIJKL"));
  launcher_name_parse(out.text,"\xef\xbb\xbfOwner\nnext",13);assert(!strcmp(out.text,"Owner"));
- launcher_name_parse(out.text,"\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9",24);assert(strlen(out.text)==22);
+ launcher_name_parse(out.text,"\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9\xc3\xa9",24);assert(strlen(out.text)==24);
  launcher_name_parse(out.text,"A\xe2\x82",3);assert(!strcmp(out.text,"A??"));
  launcher_name_parse(out.text,"\xf0\x9f\x8e\xae",4);assert(strlen(out.text)==4);
  launcher_name_parse(out.text,"\xed\xa0\x80",3);assert(!strcmp(out.text,"???"));

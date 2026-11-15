@@ -6,7 +6,7 @@ trap 'rm -rf "$tmp"' EXIT
 gcc -O2 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-pie -no-pie \
  -I "$root/src" "$root/tests/launcher-profile-test.c" "$root/src/launcher_profile.c" -o "$tmp/test"
 "$tmp/test"
-printf 'Username UTF8/first-line/11-character bounds and GBA-frame clock rollover/unset state passed.\n'
+printf 'Username UTF8/first-line/12-character bounds and GBA-frame clock rollover/unset state passed.\n'
 python3 - "$root/src/menu.c" "$tmp/editor.c" <<'PY'
 from pathlib import Path
 import sys

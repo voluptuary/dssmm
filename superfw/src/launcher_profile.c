@@ -16,7 +16,7 @@ uint32_t launcher_clock_get(void) {
 void launcher_name_parse(char out[LAUNCHER_NAME_BYTES],const char *data,size_t bytes) {
   size_t i=0,pos=0;unsigned chars=0;
   if(bytes>=3 && !memcmp(data,"\xef\xbb\xbf",3))i=3;
-  while(i<bytes && chars<11) {
+  while(i<bytes && chars<12) {
     unsigned c=(uint8_t)data[i],length=c<128?1:c>=0xc2 && c<=0xdf?2:c>=0xe0 && c<=0xef?3:c>=0xf0 && c<=0xf4?4:0;
     if(c<32 || c==127)break;
     /* Validate bounds before copying any continuation. */

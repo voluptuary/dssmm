@@ -611,3 +611,14 @@ standard, extended and missing-tag fallback outputs pass, with no asset writes.
 mGBA time selection/editor/accept and Chis NOR A→B return pass; screenshots
 inspected (header name/time and bold corners). Editor arrows now use actual
 font metrics. Source checkpoint next; freeze source/HEAD for clean all3 candidate.
+
+## 2026-11-15 —598 gates passed; owner12-character follow-up
+
+Clean598/source3508d7328ccdb14f61b7cd9a35ab8d2f36b7d078 all3 packages,
+standard full verifier, flash/RAM/resource gates and hosted43725948594 pass.
+Evidence build-598-validation.json. Not distributed: owner changed displayed
+name limit to12 at this point. Proposed editable name/keyboard was explicitly
+canceled before implementation. Keep NAME.TXT editing manual and only Time
+selectable; wrap cycle remains Last/rememberedSDorNOR/Settings/Time. Updated
+parser/display storage to12 full UTF8 characters (49bytes). New clean candidate
+needed after this tiny follow-up;594 stays current until replacement.

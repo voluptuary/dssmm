@@ -535,3 +535,8 @@ all3 build with flash/resource/RAM gates, CI and new Chis hardware-test image.
 Focused profile/editor/navigation sanitizers and actual ARM external/missing-tag
 replay pass. mGBA time edit/accept and Chis NOR-back fixtures pass and inspected.
 Begin clean same-source all3 packaging/hosted validation before replacing594.
+
+598 all-board/local/hosted43725948594 validation passes; retained tracked evidence
+but not distributed. Owner requests12-character name cap, then cancels name
+editing/keyboard. Apply12-character readonly display only; Time remains the
+selectable header item. Next clean numbered all3 set and hardware-test delivery.
