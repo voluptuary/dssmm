@@ -31,3 +31,12 @@ Timing correction: the old preview fill_rect used CPU loops, while production al
 For lower settings rows, use `PREVIEW_SCREEN=2 PREVIEW_OPTION=9` (Save) or another option index0..9. The preview extracts the actual UI-settings scroll-offset calculation; it does not synthesize input. Save-state screenshot passed3157body-text pixels and was visually checked: Animation/Language/Recent/Text speed/Hidden files/Accent and Save fit. Selection OAM, input and persistence remain separately unverified in mGBA.
 
 `PREVIEW_THEME=6`/`7` selects the actual production Light/Dark palette table extracted from settings.c, mapped to preview background/font/highlight/foreground roles. Default-1 preserves the old schematic palette for earlier artwork checks. Light lower-settings/Save screenshot passed and was visually inspected. Settings smoke now counts non-background foreground pixels (including controls), not exclusively glyph pixels; visual inspection remains required. Accent overrides and OAM palette blending are not modeled yet.
+
+2026-11-15: PREVIEW_OPTION also selects the Tools row (PREVIEW_SCREEN=1),
+clamped to the available rows. Production UI-settings/Tools rendering includes
+DSSMM Light/Dark framebuffer selection fills. Checked Light Animation, Dark
+Accent/lower page and final Tools action. Localized knob labels already containing
+arrows are no longer wrapped again. Fixtures still do not execute native menu
+input, persistence, OAM or actual card I/O. The separate optional ARM/Unicorn
+cartridge-store diagnostic is documented in CAROUSEL-ARTWORK-MEMORY.md; mGBA
+configuration is unchanged.

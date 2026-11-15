@@ -20,14 +20,12 @@ for signature in ("static void draw_text_ovf(", "static void draw_central_text("
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
 text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} tools; struct {unsigned selector,seloff;} uiset; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
-start=source.index("void render_tools(");end=source.index("\n}",start)+2
-text+=source[start:end]+"\n"
-text+="extern void dma_memset16(volatile void *, uint16_t, uint16_t);\n#define dup8(x) ((x)|((x)<<8))\n#define npf_snprintf snprintf\n#define THEME_COUNT 8\n#define ACCENT_COUNT 5\n"
+text+="extern void dma_memset16(volatile void *, uint16_t, uint16_t);\n#define dup8(x) ((x)|((x)<<8))\n#define npf_snprintf snprintf\n#define THEME_COUNT 8\n#define ACCENT_COUNT 5\n#define THEME_DSSMM_LIGHT 6\n#define THEME_DSSMM_DARK 7\n"
 text+="static uint8_t menu_theme=6,artwork_mode=1,browser_view=1,carousel_animation=0,recent_menu=1,anim_speed=1,hide_hidden=1,menu_accent;\n"
 text+='static const char * const accent_names[5]={"Default","Blue","Green","Orange","Purple"};\n'
 a=source.index("enum {\n  UiSetTheme");b=source.index("\n};",a)+3
 text+=source[a:b]+"\n"
-for signature in ("static void draw_box_outline(","static void draw_box_full(","static void draw_button_box(","void render_ui_settings("):
+for signature in ("static void draw_box_outline(","static void draw_box_full(","static void draw_button_box(","static void draw_menu_selection(","void render_ui_settings("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
 a=source.index("  if (smenu.uiset.selector == UiSetSave)",source.index("static void keypress_menu_uisettings("))
@@ -40,6 +38,8 @@ text+=header[a:b]+"\n#define THEME_DSSMM_LIGHT 6\n#define THEME_DSSMM_DARK 7\n"
 text+="#define RGB2GBA(c) ((((c)&0xF80000)>>19)|(((c)&0x00F800)>>6)|(((c)&0x0000F8)<<7))\n"
 a=settings.index("const t_theme_colors themes[");b=settings.index("\n};",a)+3
 text+=settings[a:b]+"\n"
+start=source.index("void render_tools(");end=source.index("\n}",start)+2
+text+=source[start:end]+"\n"
 Path(sys.argv[2]).write_text(text)
 PY
 arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -mcpu=arm7tdmi -mthumb \

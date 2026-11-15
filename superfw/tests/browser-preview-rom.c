@@ -149,6 +149,7 @@ int main(void) {
   }
   load_fixtures();
   preview_select_ui(PREVIEW_OPTION);
+  smenu.tools.selector = PREVIEW_OPTION < ToolsMAX ? PREVIEW_OPTION : ToolsMAX-1;
   REG_DISPCNT = 4 | 0x0400; /* Mode 4, BG2 enabled, framebuffer page 0 */
   int selected = 1, offset = 0, vertical = PREVIEW_VERTICAL, box_mode = PREVIEW_BOX;
   unsigned old_keys = 0, back_page = 1, demo_frame = 0;

@@ -2108,6 +2108,13 @@ void render_settings(volatile uint8_t *frame) {
       render_icon_trans(i, offy + (smenu.set.selector - baseopt) * 20, 63);
 }
 
+/* Framebuffer selection leaves text crisp and avoids the native tiled OAM bar. */
+static void draw_menu_selection(volatile uint8_t *frame, unsigned y,
+                                unsigned left, unsigned right) {
+  for (unsigned row = 0; row < 16; ++row)
+    dma_memset16(frame + (y+row)*SCREEN_WIDTH + left, dup8(HI_COLOR), (right-left)/2);
+}
+
 void render_ui_settings(volatile uint8_t *frame) {
   static const char * const theme_names[THEME_COUNT] = {
     "White", "Orange", "Blue", "Green", "Purple", "Stock Dark",
@@ -2137,12 +2144,15 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetHid: value = msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED]; break;
     case UiSetAccent: value = accent_names[menu_accent < ACCENT_COUNT ? menu_accent : 0]; break;
     }
+    if (menu_theme >= THEME_DSSMM_LIGHT && option == smenu.uiset.selector)
+      draw_menu_selection(frame, row_y[row], 4, 236);
     draw_text_ovf(labels[option], frame, 8, row_y[row], 116);
-    npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", value);
+    /* Localized native knob labels may already include their arrows. */
+    npf_snprintf(tmpbuf, sizeof(tmpbuf), value[0] == '<' ? "%s" : "< %s >", value);
     draw_text_ovf(tmpbuf, frame, value_x, row_y[row], 104);
   }
 
-  if (smenu.uiset.selector != UiSetSave)
+  if (menu_theme < THEME_DSSMM_LIGHT && smenu.uiset.selector != UiSetSave)
     for (unsigned i = 0; i < 240; i += 16)
       render_icon_trans(i, row_y[smenu.uiset.selector - smenu.uiset.seloff], 63);
 
@@ -2210,14 +2220,17 @@ void render_info(volatile uint8_t *frame) {
 }
 
 void render_tools(volatile uint8_t *frame) {
+  if (menu_theme >= THEME_DSSMM_LIGHT)
+    draw_menu_selection(frame, 26 + 22*smenu.tools.selector, 18, 236);
   for (unsigned i = 0; i < ToolsMAX; i++)
     draw_text_ovf(msgs[lang_id][MSG_TOOLS0_SDRAM + i], frame, 22, 26 + 22 * i, 206);
 
   smenu.anim_state = (smenu.anim_state + 1) & 255;
   draw_central_text("▸", frame, 11 + (smenu.anim_state >> 6), 26 + 22 * smenu.tools.selector);
 
-  for (unsigned i = 0; i < 240; i += 16)
-    render_icon_trans(i, 26 + smenu.tools.selector * 22, 63);
+  if (menu_theme < THEME_DSSMM_LIGHT)
+    for (unsigned i = 0; i < 240; i += 16)
+      render_icon_trans(i, 26 + smenu.tools.selector * 22, 63);
 }
 
 void reload_theme(unsigned thnum) {

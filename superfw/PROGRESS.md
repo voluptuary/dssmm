@@ -347,3 +347,7 @@ Owner confirms List Box art works. Carousel metadata was in cartridge SDRAM desp
 Clean SD/Lite/Chis Build561 at76b7a493 share fingerprint and pass image identity/seal checks; each links816-byte metadata to IWRAM0x03000e74. Focused suites, ARM bus regression and all four AnimationOff mGBA Title/Box/orientation previews pass. Hosted full verifier43663344006 passed. Local upstream rerun hung with ASAN DEADLYSIGNAL in crc_test and was terminated; no local full-pass claim. Evidence: docs/build-561-validation.json.
 
 Copied Chis561 to root hardware-test/superfw-chis-build561.fw, SHA ffaf6863e320ec5aeb9c6521a7510167e58403e67508c17e9291f987cf8940ef, with manifest/guide. Removed our superseded553 local image/manifest; historical tracked evidence remains. Owner has switched models and explicitly revoked the requested pause: continue porting after delivery. Physical carousel result remains pending; retain561 unchanged while later menu work proceeds. No public release this turn.
+
+## 2026-11-15 — Solid themed menu selection rows
+
+Continued port after owner revoked pause. UI-settings/Tools for DSSMM Light/Dark use accent fills behind text and avoid native tiled overlays; upstream themes unchanged. mGBA Light/Dark settings/lower row and last Tools action visually fit, cache/page regressions pass, Chis selection-code link fits. Removed duplicate knob arrows seen in preview. Follow-up hosted suite needed; current test image remains561 with metadata fix. Physical artwork and full menu parity remain pending.
