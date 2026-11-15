@@ -1,0 +1,46 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 571,
+  "boards": [
+    {
+      "source_tree_sha256": "4700e0ca52c830fa36800c6241580480caea22817d4e6fb57724788ad10674be",
+      "board": "sd",
+      "dssmm_build": 571,
+      "source_commit": "3d0b1a80fef011676e7f0dd236932ce3e41d8879",
+      "source_dirty": false,
+      "firmware_sha256": "09633f8655062ebb1f340cc7bbe883256049543be36539b712da3840d33f0e79",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "4700e0ca52c830fa36800c6241580480caea22817d4e6fb57724788ad10674be",
+      "board": "lite",
+      "dssmm_build": 571,
+      "source_commit": "3d0b1a80fef011676e7f0dd236932ce3e41d8879",
+      "source_dirty": false,
+      "firmware_sha256": "ea7a8f19e49c313d0ac966ad27c64ff3b2809ab3054ca5d4b1fca39ee56d22e8",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "4700e0ca52c830fa36800c6241580480caea22817d4e6fb57724788ad10674be",
+      "board": "chis",
+      "dssmm_build": 571,
+      "source_commit": "3d0b1a80fef011676e7f0dd236932ce3e41d8879",
+      "source_dirty": false,
+      "firmware_sha256": "995a169fc5363e3ed8a31f5060b6a5309664469ce62c54b249d512d45ba6e12f",
+      "validation": "built; runtime and hardware validation not implied"
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43666618620",
+    "conclusion": "success"
+  },
+  "checks": [
+    "all focused suites and ARM bus regression",
+    "all-board linked metadata/hot-buffer gates",
+    "clean board set identity/seals"
+  ],
+  "limits": [
+    "No physical571 Title/latency/artwork qualification.",
+    "Official pack download403; legacy test is synthetic."
+  ]
+}
