@@ -9,7 +9,7 @@ Unsupported hardware features remain excluded.
 | --- | --- | --- |
 | SD browser | List/horizontal/vertical, filename artwork, CUSTOM priority, Title code fallback, palette, scrolling labels | Header Title still failed on owner561; legacy fallback needs physical result. Full DE chrome/typography and recent/NOR artwork remain incomplete. |
 | Carousel On | DE neighbor positions, clipped scaling, focused-last drawing, no SD reads during motion, settled-page reuse | Physically sluggish on561; later hot-cache/lookup optimizations not measured on card. Fluidity is not established. |
-| Carousel Off | Native-size selected/previous/next, screen/body edge crop, no scaling, idle-page reuse | User-requested behavior implemented after561;571 is ready for hardware testing. |
+| Carousel Off | Native-size selected/previous/next, screen/body edge crop, no scaling, idle-page reuse | User-requested behavior implemented after561;582 is ready for hardware testing. |
 | Artwork storage | Halfword SDRAM pixels; byte metadata in IWRAM; focused image hot copy in EWRAM | 561 filename result confirms metadata fix. Newest focus refinement is newer than571. |
 | Main/UI settings and Tools | Bounded left-aligned rows, solid accent selections on Light/Dark; native themes retained | Actual renderers previewed; production UI-settings input exercised in mGBA for toggles, scrolling and top bound. Storage/filter boundaries are mocked; persistence remains host-tested. Long localized strings may truncate. |
 | ROM info/patch/loading | Bounded left labels, solid Light/Dark selections, navigation-safe headings, compact English labels/date | Actual renderer previews pass; real launch/NOR actions not exercised by previews. |
@@ -22,15 +22,15 @@ Unsupported hardware features remain excluded.
   art absent.
 - Chis561: owner confirms filename art renders; ROM-header Title does not. On
   remains slow, delayed neighbors; Off had no observed gain in that older design.
-- Chis571/hash3d0b1a80: current frozen local `hardware-test` image. Includes native
+- Chis571/hash3d0b1a80: superseded local local `hardware-test` image. Includes native
   cropped neighbors, settled reuse, faster color conversion, selected EWRAM copy,
-  legacy code-art record fallback and aligned clipped scaling. No owner result yet.
-- SD/Lite have no physical qualification. Latest development UI and visual-focus
-  cache refinement are newer than571. See numbered validation JSON and journals.
+  legacy code-art record fallback and aligned clipped scaling. No owner result was reported.
+- SD/Lite have no physical qualification. Chis582/hash842bad38 is the current frozen hardware-test image; it includes all
+  UI/focus-cache refinements plus aligned BMP-tail staging. No owner582 result yet. See numbered validation JSON and journals.
 
 ## Performance constraints and next checks
 
-1. Measure571 on the same card and artwork pack before claiming a speed gain.
+1. Measure582 on the same card and artwork pack before claiming a speed gain.
 2. Storage reads remain synchronous. Large FAT directories/path probes and
    initial three-image loading may stall input even when drawing is fast.
 3. Animated scaling is software; DMA accelerates opaque/native transfers.
@@ -46,7 +46,7 @@ Unsupported hardware features remain excluded.
    record reader with synthetic malformed-metadata fixtures; no actual original
    pack inspection has occurred. Keep filename parsing strict and CUSTOM first.
 
-Keep build571 unchanged until superseded with a clean numbered all-board set.
+Keep build582 unchanged until superseded with a clean numbered all-board set.
 Preserve BIOS and session scratch outside the repository until the whole session
 ends. Keep journals current and remove superseded generated artifacts after
 retaining evidence. No full parity, gameplay or physical timing claim yet.
