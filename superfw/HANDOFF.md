@@ -333,3 +333,71 @@ Added scripts/check-build-set.py: validates three manifests agree on clean sourc
 Session66291 completed exit0. All three boards are clean source3ce7d917/Build553 with identical project fingerprint; identity/hash/GBA checksum/embedded size/firmware seal gate passes. Exact manifests retained in docs/build-553-validation.json. Hosted run43619877608 passed. These establish software build/integrity only, not owner artwork/performance qualification or full menu parity.
 
 Ported scratch preview corrections: DMA fills match production's fill method; generated messages header goes into output, so clean checkout preview does not depend on prior firmware build. Scratch without src/messages_data.h passed verticalTitleOff8604BMP pixels. Same verticalBoxOff DMA fill timing433206 versus prior CPU-fill985694cycles, image unchanged5731BMP pixels. Earlier total-cycle reports overstate production fill cost and are superseded for production comparison. Production firmware inputs unchanged by these preview-only edits. Next integrate validated lane normally, prepare owner-test prerelease if release gates met, obtain physical artwork/performance report, and continue remaining skins/fluidity. Goal active.
+
+## 2026-11-14 — Owner hardware-test Chis553 delivered locally
+
+Owner requested a root hardware-test folder then continued work. Copied verified clean Chis553 to /workspaces/dssmm/hardware-test/superfw-chis-build553.fw with build553.json and README.txt. Source3ce7d917; SHA9541a39d262a71e38134d412afe26a498e66e747e892786d15a537edc0aeedc3. Directory is local-only via .git/info/exclude, per owner location request; no root tracked hardware artifacts added. Provided chain-load test focus: first Left edge, Title/Box, AnimationOff responsiveness, return to browser. Await physical result; no resolved-hardware claim. Prepared four-section Test5 canonical draft with immediately prior changes folded into concise summaries; not published. Continue remaining skins/runtime evidence while owner tests; preserve hardware-test folder until superseded with owner knowledge.
+
+## 2026-11-14 — Production UI-settings preview
+
+Added PREVIEW_SCREEN=2 extraction of actual render_ui_settings, UiSet enum and box/text helpers with fixture preferences. mGBA text check passes3020pixels; initial six rows visually fit including AnimationOff. Corrected generic harness footer to avoid falsely covering Save. Does not validate OAM selection, scrolling/input/save action or physical theme palette. Build553 owner image remains unchanged in hardware-test. Continue actual selection/scroll settings coverage and remaining menu styling while awaiting card report; full parity/title-art hardware result still open.
+
+## 2026-11-14 — Lower UI-settings/Save screenshot
+
+Added PREVIEW_OPTION to select fixture UI row and extracted actual keypress-menu scroll-offset policy into preview selection setup. Save9 screenshot renders lower6rows (Animation through Accent) and selected Save button; mGBA check passed3157text pixels, screenshot visually fits. Does not execute key input/save writes or selection OAM. Firmware and supplied hardware-test553 unchanged. Next real theme palette/selection-surface parity and remaining system/game surfaces; awaiting owner artwork/performance observation. Goal active.
+
+## 2026-11-14 — Actual DSSMM palette in screen previews
+
+Added PREVIEW_THEME selecting extracted production theme table/type (Light6/Dark7), rather than schematic colors. Light lower-settings Save9 screenshot visually shows proper dark text/pale body/blue selected button. Smoke passes4699foreground pixels; count includes controls and is not a glyph-only assertion. Default-1 preserves prior artwork-test palette; theme-based artwork exclusion checks still need dedicated coverage. Accent/OAM blending not modeled. Firmware and owner553 image unchanged. Next improve actual selected rows/background surface to EZ reference and remaining menus; hardware artwork/performance report outstanding.
+
+## 2026-11-14 — Owner553 hardware feedback and placeholder revert
+
+Owner reports wrap/edge crash is gone on tested Chis553; artwork still does not display. This confirms edge-crash fix on that card only, not artwork/performance. Owner requests reverting Box/Title neighbor placeholders: removed original helper and restored normal system OAM icons in Off carousels. Updated preview to schematic icon stand-ins and adjusted actual cache test; cache/navigation regressions pass. Concurrent UI/Tools themed selected-row fill work is in tree and mGBA validation not yet completed (session40265 predates placeholder revert); inspect before claiming pass. Main diagnostic hypothesis to investigate next: contiguous FatFS reads currently target cartridge SDRAM directly, which cannot accept byte writes. Check real FatFS/driver copy paths before choosing a fix; mocks do not model that bus constraint. No artwork cause is yet proved. Hardware-test553 stays unchanged until new validated candidate requested/prepared.
+
+## 2026-11-15 — Carousel artwork root cause isolated
+
+Latest owner clarification: Box art DOES display in List view; carousel artwork does not. Found metadata-only difference: carousel bool flags/path/info lived on cartridge SDRAM and received unsupported byte writes. Moved metadata to GBA RAM (816 bytes IWRAM in initial Chis link), pixels remain halfword SDRAM. Added optional ARM/Unicorn test using actual extracted renderer and declarations: owner Build553 fails at a one-byte cart store; fixed source passes cache assertions and bus gate. Every board build now checks real ELF metadata placement. See docs/CAROUSEL-ARTWORK-MEMORY.md. This establishes a software defect/fix, not a physical result.
+
+Reverted neighbor placeholders as requested. Set aside unfinished unrelated selection styling in session-local /tmp/dssmm-unfinished-selection-style.patch; patch includes other changes, so inspect/select hunks before any future reuse. No root changes. Latest user narrows scope: finish artwork diagnosis, provide clean hardware-test Chis candidate, then PAUSE for model switch; do not continue parity work this turn. Focused checks/builds pending below. Preserve BIOS/session scratch and user devcontainer lock.
+
+## 2026-11-15 — Chis561 delivered; owner authorizes continued port
+
+Clean SD/Lite/Chis Build561 at76b7a493 share fingerprint and pass image identity/seal checks; each links816-byte metadata to IWRAM0x03000e74. Focused suites, ARM bus regression and all four AnimationOff mGBA Title/Box/orientation previews pass. Hosted full verifier43663344006 passed. Local upstream rerun hung with ASAN DEADLYSIGNAL in crc_test and was terminated; no local full-pass claim. Evidence: docs/build-561-validation.json.
+
+Copied Chis561 to root hardware-test/superfw-chis-build561.fw, SHA ffaf6863e320ec5aeb9c6521a7510167e58403e67508c17e9291f987cf8940ef, with manifest/guide. Removed our superseded553 local image/manifest; historical tracked evidence remains. Owner has switched models and explicitly revoked the requested pause: continue porting after delivery. Physical carousel result remains pending; retain561 unchanged while later menu work proceeds. No public release this turn.
+
+## 2026-11-15 — Resume DSSMM settings/Tools selection treatment
+
+After delivering frozen Chis561, resumed owner-authorized port. Light/Dark UI-settings and Tools selections now draw solid accent rows behind text; native themes retain upstream OAM highlights. Preview can select any Tools row. Visually inspected mGBA Light Animation row, Dark Accent/lower-settings page, and last Tools action; all fit. Removed doubled arrows from already-bracketed localized knob labels discovered during review. Native settings actions/persistence unchanged. Cache/page regressions pass; local Chis link of selection treatment passes (before the final arrow text adjustment); hosted full validation of committed follow-up is required. Build561 hardware-test image is unchanged; no physical artwork result yet. Remaining work includes production settings/game/in-game skins, true interactive/runtime coverage, physical carousel confirmation and fluidity; do not claim parity.
+
+## 2026-11-15 — Follow-up menu validation complete
+
+Source fd719d515a65ec7249bb829f2d306f0917e35df8 passed hosted full SuperFW verification43663757321 (three board builds, linked metadata gate and host suites). Final Dark lower-settings screenshot verifies duplicate arrows removed; earlier Light/settings and Tools screenshots inspected. Cleaned generated compiler/host-test/build folders after retaining validation evidence; kept root hardware-test Chis561 and its matching manifest/guide intact. User devcontainer lock, session scratch and private BIOS preserved.
+
+Next: await owner561 physical carousel result, then continue settings/game/in-game menu parity and real interaction/performance coverage. Do not treat isolated mGBA previews as card emulation. The mandatory artwork fix is published to the superfw source branch, not a new public release. Current development source is newer than the intentionally frozen561 test image.
+
+## 2026-11-15 — Owner561 result; native cropped carousel work in progress
+
+Owner confirms filename artwork now renders on hardware; ROM-header Title still fails. AnimationOn remains slow (improved), neighbor loads delayed, alignment differs from DE. Off offers no observed gain. Owner requests native-size previous/current/next with edges cropped, selected fully visible; continue autonomously. Implemented first native cropped blitter and renderer path, enabled neighbor cache population Off and invalidated retained pages when new neighbor arrives (otherwise cached pages hide newly loaded art). These edits are WORK IN PROGRESS, not distributed; update cache tests/builds before commit. Header lookup still unresolved; compare official pack format to strict decoder (DE reads thumbnail bytes directly). Frozen hardware-test561 unchanged. Broader parity goal remains active.
+
+## 2026-11-15 — Native cropped neighbors and settled-frame reuse
+
+Implemented native previous/current/next Off layout with edge/body clipping and selected-last layering, using production cropped blitter in preview. Opaque cropped rows use DMA. Both animation modes reuse settled pages, avoiding idle repeated scaling; motion/modal paths invalidate. New slot loads invalidate both pages so late neighbors become visible. RGB555 quantization uses exact32-entry lookup instead of three divisions per pixel. Pixel-reference cropping tests cover left/right/top/bottom and transparency/canaries; artwork/cache/page and ARM bus tests pass. Four Off mGBA screenshots pass; physical timing remains unconfirmed and synchronous SD reads can still stall.
+
+Compared DE game-code reader: fixed54+19200-byte direct-pixel record, unlike our strict BMP metadata parser. Added exact-length BM-only legacy interpretation after strict decode fails, ONLY for game-code Title fallback; metadata normalized in internal RAM. Adapter regression covers inconsistent desktop metadata and strict filename rejection. Official IMGS archive still403; this is a compatibility hypothesis, not pack/hardware confirmation. Next clean numbered all-board builds/CI and fresh Chis candidate, then continue parity/performance work without pausing. User explicitly requests sustained autonomous continuation.
+
+## 2026-11-15 — Uniform565 candidate delivered; continue alignment
+
+All three clean565 images source30829054 share fingerprint and pass integrity gate, linked metadata placement and hosted43665489569 full verifier. Four native-cropped Off previews pass; pixel/canary tests pass. Evidence docs/build-565-validation.json. Replaced our superseded561 local image/manifest with hardware-test/superfw-chis-build565.fw plus manifest/guide, retaining tracked561 evidence/owner confirmation. No physical565 performance or header-art result yet; no public release. Continue alignment/performance autonomously. DE reference vertical next y124 versus our108 clamp is a concrete mismatch; preserve footer via clipping instead of shifting the art upward.
+
+## 2026-11-15 — Animated DE geometry preserved with clipping
+
+Corrected horizontal interpolation to move image centers (DE left/right-5/185) and vertical next Y124. Removed fit-to-body geometry shifts; actual clipped scaler keeps source sampling anchored while protecting UI rows. Missing-image icons clamp independently, selection paints last. Added pixel-reference/canary regression for clipped scaling; motion/cache/page/navigation/ARM bus checks pass. All four settled animated mGBA views pass/visually reviewed; Chis source link fits (EWRAM94.13%,IWRAM39.28%). Mid-transition preview pending. No new distributed image; hardware-test565 frozen. Full parity/performance and physical legacy Title result remain open; continue autonomously.
+
+## 2026-11-15 — Alignment CI passed; main settings selection unified
+
+Animated alignment sourced7d761e passed hosted43665956534 all-board/full verifier and vertical midpoint mGBA smoke5539BMP pixels. Main settings now uses the same solid accent selection row as UI settings/Tools for themes6/7, retaining native themes' OAM and all actions. Chis link fits94.15%EWRAM; existing Dark UI-setting preview still passes. Main-settings input/visual screen itself has not been emulated; no physical claim. Updated draft Test5 notes to current native-neighbor behavior and owner561 filename confirmation; no public release. Next hosted source validation then normal integration into dssmm, shared-tree checks and combined CI. Continue performance/parity while awaiting owner565 report.
+
+## 2026-11-15 — Main settings emulator coverage and integration checkpoint
+
+391d7b7 passed hosted43666119527 all-board/full verifier. Added actual main-settings renderer/enum extraction to preview (Screen3), with clearly synthetic settings/date fixture and optional Chis NOR rows. Visually inspected Light Chis Fast-ROM, Dark SD lower save-policy and Save screens; smoke checks pass. Long values remain bounded/truncated; input/persistence are not emulated. Firmware inputs unchanged by this harness slice. Next normal merge into dssmm and combined CI; hardware-test565 remains fixed for performance/header-art result. Continue autonomous parity work; do not claim full parity or physical565 confirmation.

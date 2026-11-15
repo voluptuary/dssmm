@@ -1,0 +1,53 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 561,
+  "boards": [
+    {
+      "source_tree_sha256": "04b84b9b144bef512cfc5e203ce40985052c977b9110fbd9b6b37fdf3518b777",
+      "board": "sd",
+      "dssmm_build": 561,
+      "source_commit": "76b7a493be1e348009a9e22a10198e7e866431e5",
+      "source_dirty": false,
+      "firmware_sha256": "c7b6fc4e044d0a9bf990b70c6739cd64eb59f5e477e0e5604c36209b4370ca7b",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "04b84b9b144bef512cfc5e203ce40985052c977b9110fbd9b6b37fdf3518b777",
+      "board": "lite",
+      "dssmm_build": 561,
+      "source_commit": "76b7a493be1e348009a9e22a10198e7e866431e5",
+      "source_dirty": false,
+      "firmware_sha256": "163cf07a485a9d9a857658ea79173378d938d0121007fb9463d2afba93853715",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "04b84b9b144bef512cfc5e203ce40985052c977b9110fbd9b6b37fdf3518b777",
+      "board": "chis",
+      "dssmm_build": 561,
+      "source_commit": "76b7a493be1e348009a9e22a10198e7e866431e5",
+      "source_dirty": false,
+      "firmware_sha256": "ffaf6863e320ec5aeb9c6521a7510167e58403e67508c17e9291f987cf8940ef",
+      "validation": "built; runtime and hardware validation not implied"
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43663344006",
+    "conclusion": "success"
+  },
+  "checks": [
+    "artwork decoder/adapter",
+    "three-board settings",
+    "motion/fixtures",
+    "production cache",
+    "fast-page lifetime",
+    "navigation",
+    "ARM cart-bus: Build553 fails, fixed passes",
+    "mGBA 0.10.1 four Animation Off art/orientation previews",
+    "all-board metadata linked in IWRAM"
+  ],
+  "limits": [
+    "No physical validation of the artwork fix yet.",
+    "Local upstream ASAN rerun hung in crc_test; terminated. Hosted full suite passed.",
+    "mGBA previews do not model SuperCard storage."
+  ]
+}
