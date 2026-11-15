@@ -566,3 +566,19 @@ used/limit/headroom.594 margins SD19968/Lite35840/Chis425472bytes, Chis main EWR
 1368static bytes. User explicitly requires keeping hardware size limits. No
 limit increases. Next integrate evidence/scripts, then true settings categories
 and remaining menu/dialog/DS behavior. Keep594 hardware image frozen during work.
+
+## 2026-11-15 — True Games/Hardware settings category slice
+
+Replaced hub cursor shortcuts with filtered physical-option tables for Games and
+Hardware (board-specific NOR verification only on Chis). Renderer, keyboard
+movement and Save reset share the category mapping; native themes/LR general
+settings retain the full list. Save button recentered. Host production routing,
+category visibility/bounds and movement pass; mGBA actual hub A entry to both
+children and Games scrolling inspected. Chis diagnostic link256144/257024 before
+final helper/reset tweak.594 remains frozen. Next memory work: readonly background
+streams can be appended to native font-resource pack, whose reserved SDRAM area
+is14.5..16MiB (1.5MiB), with font prefixes unchanged. Existing fonts-ext1047800bytes
+leaves ample room for3076-byte appended stream blob. Preserve native byte-safe
+bootloader font unpack/copy, original font header/data_size, current heap/cache
+layout and hardware caps. Need prefix/region tests, actual ARM external-asset
+replay and clean all3 package/memory/CI gates before any candidate replacement.

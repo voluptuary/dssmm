@@ -511,3 +511,12 @@ basenames; no firmware/RAM cost. All54 production decoder sanitizer checks pass.
 Added hard packed-image gates matching native board budgets, boundary tests and
 594 byte margins in evidence. Source remains594 for current hardware image.
 Owner confirms588 font works well. Continue categories and remaining DE parity.
+
+## 2026-11-15 — Independent settings children
+
+Games and Hardware now filter actual options, with shared rendered-row/input
+mapping and bounded cursors. Native themes/general tab retain full settings.
+Save returns to the category's first option and its label is centered. Production
+routing/category/movement tests and mGBA Games/Hardware/scroll fixtures pass.
+Chis RAM remains tight; investigate read-only backgrounds in existing native
+font-resource area before expanding further. No new hardware image yet;594 frozen.

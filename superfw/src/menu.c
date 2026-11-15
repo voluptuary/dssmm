@@ -305,7 +305,7 @@ static struct {
 } smenu;
 
 /* Start/settings navigation is independent of native tab numbering. */
-static uint8_t launcher_page,launcher_selected=1,launcher_category;
+static uint8_t launcher_page,launcher_selected=1,launcher_category,launcher_settings_group;
 static bool launcher_valid[2];
 static void launcher_invalidate(void) {launcher_valid[0]=launcher_valid[1]=false;}
 
@@ -1961,15 +1961,48 @@ void render_rtcpop(volatile uint8_t *frame) {
   draw_central_text("⯆", frame, cox[spop.rtcpop.selector], 84);
 }
 
+/* Filter settings by category while retaining original enum/action identities. */
+static const uint8_t settings_games[]={SettHotkey,SettSaveBkp,SettCheatEn,DefsPatchEng,DefsGamMenu,DefsRTCEnb,DefsRTCVal,DefsRTCSpeed,DefsLoadPol,DefsSavePol,DefsPrefDS,SettSave};
+static const uint8_t settings_hardware[]={SettBootType,SettFastSD,
+#ifdef SUPPORT_NORGAMES
+  SettVerifyNOR,
+#endif
+  SettFastEWRAM,SettSave};
+static unsigned settings_group_total(void) {
+  if(menu_theme<THEME_DSSMM_LIGHT || !launcher_settings_group)return SettMAX;
+  return launcher_settings_group==1?sizeof(settings_games):sizeof(settings_hardware);
+}
+static unsigned settings_option_at(unsigned index) {
+  if(menu_theme<THEME_DSSMM_LIGHT || !launcher_settings_group)return index;
+  return launcher_settings_group==1?settings_games[index]:settings_hardware[index];
+}
+static unsigned settings_position(unsigned option) {
+  for(unsigned i=0;i<settings_group_total();++i)if(settings_option_at(i)==option)return i;
+  return settings_group_total();
+}
+static bool settings_row_visible(unsigned option,unsigned base) {
+  unsigned position=settings_position(option);
+  return position<settings_group_total() && position>=base && position<base+5;
+}
+
+static void settings_move(unsigned newkeys) {
+  unsigned position=settings_position(smenu.set.selector),total=settings_group_total();
+  if(position>=total){position=0;smenu.set.selector=settings_option_at(0);}
+  if (newkeys & KEY_BUTTUP)
+    smenu.set.selector = settings_option_at(position?position-1:0);
+  if (newkeys & KEY_BUTTDOWN)
+    smenu.set.selector = settings_option_at(MIN(total-1,position+1));
+}
+
 void render_settings(volatile uint8_t *frame) {
   char tmp[128];
-  unsigned baseopt = smenu.set.selector <= 2  ? 0 :
-                     smenu.set.selector >= SettMAX - 3 ? SettMAX - 5 :
-                     smenu.set.selector - 2;
+  unsigned position=settings_position(smenu.set.selector),total=settings_group_total();
+  if(position>=total)position=0;
+  unsigned baseopt=total<=5 || position<=2?0:position>=total-3?total-5:position-2;
 
-  if (smenu.set.selector > 2)
+  if (position > 2)
     draw_central_text("⯅", frame, 120, 15);
-  if (smenu.set.selector < SettSave - 2)
+  if (position + 3 < total)
     draw_central_text("⯆", frame, 120, 125);
 
   const unsigned maxrows = 5;
@@ -1978,69 +2011,69 @@ void render_settings(volatile uint8_t *frame) {
   const unsigned offy = 29;
   const unsigned rowh = 20;
   if (menu_theme >= THEME_DSSMM_LIGHT && smenu.set.selector != SettSave)
-    draw_menu_selection(frame, offy + (smenu.set.selector-baseopt)*rowh, 4, 236);
+    draw_menu_selection(frame, offy + (position-baseopt)*rowh, 4, 236);
 
-  if (optnum++ >= baseopt && optcnt < maxrows)
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows)
     draw_text_ovf(msgs[lang_id][MSG_SET_TITL1], frame, 8, offy + rowh*optcnt++, 224);
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     npf_snprintf(tmp, sizeof(tmp), "< %s >", hotkey_list[hotkey_combo].cname);
     draw_text_ovf(msgs[lang_id][MSG_SETT_HOTK], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_SETT_BOOT], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][MSG_BOOT_TYPE0 + boot_bios_splash], frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_SETT_FASTSD], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][use_slowld ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED], frame, value_x, offy + rowh*optcnt++, 104);
   }
 
   #ifdef SUPPORT_NORGAMES
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_SETT_VERNOR], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][use_verify_nor ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt++, 104);
   }
   #endif
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_SETT_FASTEW], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][use_fastew ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     npf_snprintf(tmp, sizeof(tmp), "< %u >", backup_sram_default);
     draw_text_ovf(msgs[lang_id][MSG_SETT_SAVEBK], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_SETT_CHTEN], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][enable_cheats ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows)
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows)
     draw_text_ovf(msgs[lang_id][MSG_SET_TITL2], frame, 8, offy + rowh*optcnt++, 224);
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_DEFS_PATCH], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][MSG_PATCH_TYPE0 + patcher_default], frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_LOADER_MENU], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][MSG_KNOB_DISABLED + ingamemenu_default], frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_LOADER_RTCE], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][MSG_KNOB_DISABLED + rtcpatch_default], frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     t_dec_date d;
     timestamp2date(rtcvalue_default, &d);
     npf_snprintf(tmp, sizeof(tmp), "%02d/%02d/%02d %02d:%02d",
@@ -2049,7 +2082,7 @@ void render_settings(volatile uint8_t *frame) {
     draw_text_ovf(tmp, frame, 112, offy + rowh*optcnt++, 120);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     unsigned spdmsg = rtcspeed_default ? (MSG_UIS_SPD0 + rtcspeed_default - 1) :
                                           MSG_STILLRTC;
     npf_snprintf(tmp, sizeof(tmp), "< %s >", msgs[lang_id][spdmsg]);
@@ -2057,24 +2090,24 @@ void render_settings(volatile uint8_t *frame) {
     draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_LOADER_LOADP], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][MSG_DEF_LOADP0 + (autoload_default ^ 1)], frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_LOADER_SAVEP], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][autosave_default ? MSG_DEF_SAVEP0 : MSG_DEF_SAVEP1], frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_text_ovf(msgs[lang_id][MSG_LOADER_PREFDS], frame, 8, offy + rowh*optcnt, 116);
     draw_text_ovf(msgs[lang_id][autosave_prefer_ds ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt++, 104);
   }
 
-  if (optnum++ >= baseopt && optcnt < maxrows) {
+  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     draw_button_box(frame, 20, 220, 112, 132, smenu.set.selector == SettSave);
-    draw_central_text(msgs[lang_id][MSG_UIS_SAVE], frame, 132, 114);
+    draw_central_text(msgs[lang_id][MSG_UIS_SAVE], frame, 120, 114);
   }
 
   // Render bar below for help messge
@@ -2098,7 +2131,7 @@ void render_settings(volatile uint8_t *frame) {
 
   if (menu_theme < THEME_DSSMM_LIGHT && smenu.set.selector != SettSave)
     for (unsigned i = 0; i < 240; i += 16)
-      render_icon_trans(i, offy + (smenu.set.selector - baseopt) * 20, 63);
+      render_icon_trans(i, offy + (position - baseopt) * 20, 63);
 }
 
 void render_ui_settings(volatile uint8_t *frame) {
@@ -2353,7 +2386,10 @@ void menu_render(unsigned fcnt) {
       "NOR Flash",
 #endif
       "Settings","Interface","System","Help"};
-    draw_text_ovf(launcher?"Settings":titles[smenu.menu_tab],frame,8,0,160);
+    const char *heading=launcher?"Settings":titles[smenu.menu_tab];
+    if(!launcher && smenu.menu_tab==MENUTAB_SETTINGS && launcher_settings_group)
+      heading=launcher_settings_group==1?"Games":"Hardware";
+    draw_text_ovf(heading,frame,8,0,160);
   }
 
   bool fast_carousel = !launcher && smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view &&
@@ -3319,10 +3355,7 @@ static void keypress_menu_norbrowse(unsigned newkeys) {
 #endif
 
 static void keypress_menu_settings(unsigned newkeys) {
-  if (newkeys & KEY_BUTTUP)
-    smenu.set.selector = MAX(0, smenu.set.selector - 1);
-  if (newkeys & KEY_BUTTDOWN)
-    smenu.set.selector = MIN(SettMAX - 1, smenu.set.selector + 1);
+  settings_move(newkeys);
   if (newkeys & KEY_BUTTLEFT) {
     if (smenu.set.selector == SettHotkey)
       hotkey_combo = (hotkey_combo + hotkey_listcnt - 1) % hotkey_listcnt;
@@ -3376,7 +3409,7 @@ static void keypress_menu_settings(unsigned newkeys) {
     spop.rtcpop.callback = accept_rtc;
   }
   if (newkeys & KEY_BUTTA && smenu.set.selector == SettSave) {
-    smenu.set.selector = 0;
+    smenu.set.selector = settings_option_at(0);
     if (save_settings())
       spop.alert_msg = msgs[lang_id][MSG_OK_SETSAVE];
     else
@@ -3654,8 +3687,9 @@ void menu_keypress(unsigned newkeys) {
         if(newkeys&KEY_BUTTA) {
           static const uint8_t tabs[]={MENUTAB_UILANG,MENUTAB_SETTINGS,MENUTAB_SETTINGS,MENUTAB_TOOLS,MENUTAB_INFO};
           launcher_page=0;smenu.menu_tab=tabs[launcher_category];
-          if(launcher_category==1)smenu.set.selector=DefsPatchEng;
-          if(launcher_category==2)smenu.set.selector=SettHotkey;
+          if(launcher_category==1 || launcher_category==2) {
+            launcher_settings_group=launcher_category;smenu.set.selector=settings_option_at(0);
+          }
         }
         return;
       }
@@ -3668,6 +3702,8 @@ void menu_keypress(unsigned newkeys) {
     else if (newkeys & KEY_BUTTR)
       smenu.menu_tab = MIN(smenu.menu_tab + 1, MENUTAB_MAX - 1);
 
+    if((newkeys&(KEY_BUTTL|KEY_BUTTR)) && smenu.menu_tab==MENUTAB_SETTINGS)
+      launcher_settings_group=0;
     if (newkeys & (KEY_BUTTL | KEY_BUTTR | KEY_BUTTUP | KEY_BUTTDOWN))
       smenu.anim_state = 0;
 

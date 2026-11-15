@@ -127,7 +127,7 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
       dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,false);
       if(launcher_page==2){draw_central_text("Settings",frame,120,0);render_settings_home(frame);}
       else if(smenu.menu_tab==MENUTAB_UILANG)render_ui_settings(frame);
-      else if(smenu.menu_tab==MENUTAB_SETTINGS)render_settings(frame);
+      else if(smenu.menu_tab==MENUTAB_SETTINGS){draw_central_text(launcher_settings_group==1?"Games":"Hardware",frame,120,0);render_settings(frame);}
       else if(smenu.menu_tab==MENUTAB_TOOLS)render_tools(frame);
       else draw_central_text("SD Card",frame,120,72);
     }
@@ -223,7 +223,9 @@ int main(void) {
     old_keys = keys;
     if(PREVIEW_SCREEN==13 || PREVIEW_SCREEN==14) {
       unsigned newkeys=pressed;
+      bool child=launcher_page==0 && smenu.menu_tab==MENUTAB_SETTINGS;
       if(newkeys)preview_launcher_keypress(newkeys);
+      if(child && launcher_page==0 && smenu.menu_tab==MENUTAB_SETTINGS)settings_move(newkeys);
     }
     if(PREVIEW_SCREEN==2) {
       if(pressed)keypress_menu_uisettings(pressed);

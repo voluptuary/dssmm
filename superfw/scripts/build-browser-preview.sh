@@ -17,7 +17,7 @@ import sys
 source=Path(sys.argv[1]).read_text()
 start=source.index("static void draw_text_ovf_rotate(")
 end=source.index("\n}",start)+2
-text="#define SCREEN_WIDTH 240\n#define FT_COLOR 18\n#define FG_COLOR 16\n#define HI_COLOR 19\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
+text="#define KEY_BUTTUP 64\n#define KEY_BUTTDOWN 128\n#define MIN(a,b) ((a)<(b)?(a):(b))\n#define SCREEN_WIDTH 240\n#define FT_COLOR 18\n#define FG_COLOR 16\n#define HI_COLOR 19\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
 for signature in ("static void draw_text_ovf(", "static void draw_central_text(", "static void draw_central_text_ovf("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
@@ -43,6 +43,9 @@ text+=settings[a:b]+"\n"
 start=source.index("void render_tools(");end=source.index("\n}",start)+2
 text+=source[start:end]+"\n"
 a=source.index("enum {\n  SettTitle1");b=source.index("\n};",a)+3
+text+=source[a:b]+"\n"
+text+='static uint8_t launcher_settings_group;\n'
+a=source.index('/* Filter settings by category');b=source.index('void render_settings(',a)
 text+=source[a:b]+"\n"
 text+='#include "settings-preview-fixture.h"\n'
 a=source.index("void render_settings(");b=source.index("\n}",a)+2
