@@ -515,3 +515,10 @@ settings tests pass. Cold action/setup code uses Os, renderers keep O2 to fit
 Chis. New storage policy still needs physical testing. Next clean all3 storage
 checkpoint and hardware image, then proceed with actual Start/assets/settings
 work; owner requests continuous autonomous progression until DE parity.
+
+Storage checkpoint packages are clean Build592/source9755f12, all3 matching
+integrity/seal/memory checks pass. Standard local host ASAN again failed at
+sha256 startup; complete non-PIE sanitizer rerun passes90.8/94.5 coverage. mGBA
+settings renderer inspected/test passes after removing directory controls.
+Hosted43721652107 is still running: do not distribute until it passes. Source
+renderer development may proceed because these clean packages are frozen.
