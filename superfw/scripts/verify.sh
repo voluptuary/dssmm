@@ -7,6 +7,7 @@ for tool in arm-none-eabi-gcc arm-none-eabi-g++ gcc g++ lcov; do
 done
 bash "$project_root/scripts/test-theme-settings.sh"
 bash "$project_root/scripts/test-artwork.sh"
+bash "$project_root/scripts/test-ingame-selection.sh"
 bash "$project_root/scripts/test-browser-motion.sh"
 bash "$project_root/scripts/test-carousel-cache.sh"
 bash "$project_root/scripts/test-fast-carousel-pages.sh"

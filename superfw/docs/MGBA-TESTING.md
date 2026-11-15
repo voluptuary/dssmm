@@ -71,3 +71,14 @@ The build copies messages.h beside its generated messages_data.h, preventing
 an older firmware-generated src/messages_data.h from shadowing fresh preview
 messages through quoted includes. Preview remains independently buildable after
 make clean. No mGBA package, launch flags or BIOS policy changes.
+
+Screens7/8/9 extract production in-game main/reset/save menu renderers and their
+text/selection helpers. PREVIEW_OPTION selects a row. Translation symbols are
+namespaced in generated ingame_preview.h to coexist with launcher messages.
+Synthetic feature flags allow all six main rows; no game, SD, save/reset action,
+register restoration or disk state is exercised. In-game logo and OAM are omitted,
+and launcher bars are removed. Preview maps the real menu's font/selection roles
+to its existing theme palette. Light main/RTC row and Dark reset/save Back rows
+were visually checked. The preview alone suppresses unused-parameter warnings
+because production draw callbacks retain unused frame arguments. Production
+warnings and flags are unchanged; no mGBA package/launch configuration changed.
