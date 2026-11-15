@@ -52,6 +52,14 @@ static void load_fixtures(void) {
   }
 }
 
+static bool preview_load_art(const char *path,unsigned mode,uint8_t *pixels,size_t cap,uint8_t *bmp,size_t bcap,artwork_info *info) {
+  (void)path;(void)bmp;(void)bcap;
+  const artwork_info *source=mode?&fixture_box_info[1]:&fixture_title_info[1];
+  if(cap<(size_t)source->width*source->height)return false;
+  memcpy(pixels,mode?fixture_box_pixels[1]:fixture_title_pixels[1],(size_t)source->width*source->height);
+  *info=*source;return true;
+}
+
 static int title_art_index_from_header(unsigned selected) {
   const uint8_t *rom_header = browser_fixtures[selected].rom;
   for (unsigned i = 0; i < 3; ++i)
@@ -107,10 +115,24 @@ static void reload_theme(unsigned theme) {
   const t_theme_colors colors=menu_theme_colors(theme,menu_accent);
   PALETTE[0]=colors.bg_color;PALETTE[1]=colors.ft_color;
   PALETTE[2]=colors.hi_color;PALETTE[3]=colors.fg_color;
+  PALETTE[16]=colors.fg_color;PALETTE[17]=colors.bg_color;PALETTE[18]=colors.ft_color;PALETTE[19]=colors.hi_color;
 }
 
 static void render(volatile uint8_t *frame, int vertical, int selected, int offset, int box_mode) {
   fill_rect(frame, 0, 0, 240, 160, 0);
+  if(PREVIEW_SCREEN==13 || PREVIEW_SCREEN==14) {
+    dssmm_background_palette(PALETTE,menu_theme==THEME_DSSMM_DARK);
+    if(launcher_page==1)render_start(frame);
+    else {
+      dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,false);
+      if(launcher_page==2){draw_central_text("Settings",frame,120,0);render_settings_home(frame);}
+      else if(smenu.menu_tab==MENUTAB_UILANG)render_ui_settings(frame);
+      else if(smenu.menu_tab==MENUTAB_SETTINGS)render_settings(frame);
+      else if(smenu.menu_tab==MENUTAB_TOOLS)render_tools(frame);
+      else draw_central_text("SD Card",frame,120,72);
+    }
+    return;
+  }
   fill_rect(frame, 0, 0, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
   fill_rect(frame, 0, 144, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
   if (PREVIEW_SCREEN >= 7 && PREVIEW_SCREEN <= 12) {
@@ -169,12 +191,14 @@ int main(void) {
   PALETTE[1] = 0x7FFF;  /* light top/footer */
   PALETTE[2] = 0x3E9F;  /* selected blue */
   PALETTE[3] = 0x56B5;  /* side card */
+  PALETTE[16]=PALETTE[3];PALETTE[17]=PALETTE[0];PALETTE[18]=PALETTE[1];PALETTE[19]=PALETTE[2];
   for (unsigned i = 0; i < ARTWORK_PALETTE_SIZE; ++i)
     PALETTE[ARTWORK_PALETTE_BASE + i] = artwork_palette_color(i);
   if (PREVIEW_THEME >= 0 && PREVIEW_THEME < THEME_COUNT) {
     const t_theme_colors *colors = &themes[PREVIEW_THEME];
     PALETTE[0]=colors->bg_color; PALETTE[1]=colors->ft_color;
     PALETTE[2]=colors->hi_color; PALETTE[3]=colors->fg_color;
+    PALETTE[16]=colors->fg_color;PALETTE[17]=colors->bg_color;PALETTE[18]=colors->ft_color;PALETTE[19]=colors->hi_color;
     menu_theme=PREVIEW_THEME;
   }
   if (PREVIEW_SCREEN==12) {
@@ -182,6 +206,11 @@ int main(void) {
     PALETTE[128]=PALETTE[0];
   }
   load_fixtures();
+  launcher_page=PREVIEW_SCREEN==14?2:1;
+  launcher_selected=PREVIEW_OPTION<4?PREVIEW_OPTION:1;
+  launcher_category=PREVIEW_OPTION<5?PREVIEW_OPTION:0;
+  smenu.recent.maxentries=1;
+  strcpy(preview_sdram.rentries[0].fpath,browser_fixture_names[1]);
   preview_select_ui(PREVIEW_OPTION);
   smenu.set.selector = PREVIEW_OPTION < SettMAX ? PREVIEW_OPTION : SettSave;
   smenu.tools.selector = PREVIEW_OPTION < ToolsMAX ? PREVIEW_OPTION : ToolsMAX-1;
@@ -192,6 +221,10 @@ int main(void) {
     unsigned keys = (unsigned)(~REG_KEYINPUT) & 0x03ff;
     unsigned pressed = keys & ~old_keys;
     old_keys = keys;
+    if(PREVIEW_SCREEN==13 || PREVIEW_SCREEN==14) {
+      unsigned newkeys=pressed;
+      if(newkeys)preview_launcher_keypress(newkeys);
+    }
     if(PREVIEW_SCREEN==2) {
       if(pressed)keypress_menu_uisettings(pressed);
     } else {

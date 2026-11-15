@@ -38,10 +38,10 @@ const t_theme_colors themes[THEME_COUNT] = {
   { RGB2GBA(0xad11c8), RGB2GBA(0xe47af6), RGB2GBA(0x000000), RGB2GBA(0xad5dc6), RGB2GBA(0x724095), RGB2GBA(0x72667a) }, // Purple
   { RGB2GBA(0x222222), RGB2GBA(0x444444), RGB2GBA(0xeeeeee), RGB2GBA(0x737573), RGB2GBA(0xaaaaaa), RGB2GBA(0x606060) }, // Dark
   /* DSSMM presentation starts here; native palette roles remain unchanged.
-   * These original palettes require no borrowed graphics or extra RAM buffers.
+   * The native palette roles remain stable alongside credited DE backgrounds.
    * Accents stay readable with the renderer's existing black/white UI masks. */
-  [THEME_DSSMM_LIGHT] = { RGB2GBA(0xd8e0e8), RGB2GBA(0xf8f8f8), RGB2GBA(0x182028), RGB2GBA(0x80b8e8), RGB2GBA(0x90b8d8), RGB2GBA(0x788088) },
-  [THEME_DSSMM_DARK] = { RGB2GBA(0x303840), RGB2GBA(0x182028), RGB2GBA(0xf0f0f0), RGB2GBA(0x5088b8), RGB2GBA(0x406080), RGB2GBA(0x889098) },
+  [THEME_DSSMM_LIGHT] = { RGB2GBA(0xe0e0e0), RGB2GBA(0xffffff), RGB2GBA(0x000000), RGB2GBA(0x80b8e8), RGB2GBA(0x90b8d8), RGB2GBA(0x788088) },
+  [THEME_DSSMM_DARK] = { RGB2GBA(0x181818), RGB2GBA(0x000000), RGB2GBA(0xffffff), RGB2GBA(0x5088b8), RGB2GBA(0x406080), RGB2GBA(0x889098) },
 };
 
 /* Default preserves every upstream palette. Accent changes only selection roles. */
@@ -86,9 +86,7 @@ const t_combo_key hotkey_list[] = {
   {"A+B+Start+Sel", 0x03F0},
 };
 
-const char *save_paths[] = { SAVEGAME_DIR, SAVES_DIR };
-const char *savestates_paths[] = { SAVESTATE_DIR, "/.superfw/savestate/" };
-const char *savestates_paths_display[] = { "/SYSTEM/SAVESTATE/", ".superfw/savestate" };
+
 
 const uint8_t animspd_lut[] = {
   2,    //  8 pix/second
@@ -114,9 +112,6 @@ uint8_t use_slowld = 0;         // Use slow mirrors for ROM loading, check loade
 uint8_t use_fastew = 0;         // Overclock EWRAM while playing.
 uint8_t use_verify_nor = 0;     // Verify flash writes
 
-uint8_t save_path_default = SaveSavegameDir;
-uint8_t save_path_nor_default = SaveSavegameDir;
-uint8_t state_path_default = StateSavestateDir;
 
 uint8_t backup_sram_default = 0;  // Number of older SRAM save to keep as backup
 
@@ -180,9 +175,6 @@ bool save_settings() {
   npf_snprintf(buf, sizeof(buf),
     "hotkey_opt=%u\n"
     "boot_to_bios=%u\n"
-    "save_path_policy=%u\n"
-    "save_path_nor_policy=%u\n"
-    "state_path_policy=%u\n"
     "sram_backup_count=%u\n"
     "enable_cheats=%u\n"
     "enable_slowld=%u\n"
@@ -196,8 +188,7 @@ bool save_settings() {
     "default_savegame=%u\n"
     "prefer_directsave=%u\n"
     "default_rtcts=%lu\n",
-    hotkey_combo, boot_bios_splash, save_path_default, save_path_nor_default,
-    state_path_default, backup_sram_default, enable_cheats, use_slowld, use_fastew,
+    hotkey_combo, boot_bios_splash, backup_sram_default, enable_cheats, use_slowld, use_fastew,
     use_verify_nor, (unsigned int)patcher_default, ingamemenu_default, rtcpatch_default,
     rtcspeed_default, autoload_default, autosave_default, autosave_prefer_ds,
     rtcvalue_default);
@@ -241,9 +232,6 @@ static void parse_settings(void *usr, const char *var, const char *value) {
       const unsigned modval;
     } uintset[] = {
       { "hotkey_opt",           &hotkey_combo,          sizeof(hotkey_list)/sizeof(hotkey_list[0]) },
-      { "save_path_policy",     &save_path_default,     SaveDirCNT },
-      { "save_path_nor_policy", &save_path_nor_default, SaveDirNORCNT },
-      { "state_path_policy",    &state_path_default,    StateDirCNT },
       { "sram_backup_count",    &backup_sram_default,   MAX_BACKUP_CNT + 1 },
       { "default_patcher",      &patcher_default,       PatchTotalCNT },
       { "default_rtctick",      &rtcspeed_default,      RTC_SPEED_CNT },
@@ -364,36 +352,31 @@ static bool make_file_pattern(char *pattern, unsigned size, const char *path, co
   return true;
 }
 
-void sram_filename_calc(const char *rom, char *savefn, unsigned save_path) {
-  if (save_path == SaveRomName) {
-    strbcpy(savefn, rom, MAX_FN_LEN);
-  } else {
-    char pattern[MAX_FN_LEN];
-    if (!make_file_pattern(pattern, sizeof(pattern), save_paths[save_path], rom)) {
-      savefn[0] = 0;
-      return;
+void sram_filename_calc(const char *rom, char *savefn) {
+  char pattern[MAX_FN_LEN];
+  if (!make_file_pattern(pattern,sizeof(pattern),SAVEGAME_DIR,rom)) {savefn[0]=0;return;}
+  if (!save_pattern_has_files(pattern)) {
+    static const char * const legacy_paths[]={LEGACY_SAVEGAME_DIR,SAVES_DIR,LEGACY_SAVES_DIR};
+    for(unsigned i=0;i<3;++i) {
+      char candidate[MAX_FN_LEN];
+      if(make_file_pattern(candidate,sizeof(candidate),legacy_paths[i],rom) && save_pattern_has_files(candidate)) {strbcpy(pattern,candidate,sizeof(pattern));break;}
     }
-    /* Keep existing root save sets in place and usable until manually migrated. */
-    if (!save_pattern_has_files(pattern) && save_path < 2) {
-      static const char * const legacy_paths[] = { LEGACY_SAVEGAME_DIR, LEGACY_SAVES_DIR };
-      char legacy[MAX_FN_LEN];
-      if (make_file_pattern(legacy, sizeof(legacy), legacy_paths[save_path], rom) &&
-          save_pattern_has_files(legacy))
-        strbcpy(pattern, legacy, sizeof(pattern));
+    if(!save_pattern_has_files(pattern)) {
+      char candidate[MAX_FN_LEN];strbcpy(candidate,rom,sizeof(candidate));replace_extension(candidate,"");
+      if(save_pattern_has_files(candidate))strbcpy(pattern,candidate,sizeof(pattern));
     }
-    strbcpy(savefn, pattern, MAX_FN_LEN);
   }
-  if (savefn[0])
-    replace_extension(savefn, ".sav");
+  strbcpy(savefn,pattern,MAX_FN_LEN);
+  replace_extension(savefn,".sav");
 }
 
 void savestate_filename_calc(const char *rom, char *statefn) {
   char pattern[MAX_FN_LEN];
-  if (!make_file_pattern(pattern, sizeof(pattern), savestates_paths[state_path_default], rom)) {
+  if (!make_file_pattern(pattern, sizeof(pattern), SAVESTATE_DIR, rom)) {
     statefn[0] = 0;
     return;
   }
-  if (state_path_default == StateSavestateDir) {
+  {
     char path[MAX_FN_LEN];
     bool current_exists = false, legacy_exists = false;
     for (unsigned i = 1; i <= DISK_SAVESTATE_SLOTS; ++i)

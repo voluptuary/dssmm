@@ -500,3 +500,69 @@ Evidence docs/build-588-validation.json. Root hardware-test now contains Chis588
 and manifest/guide; superseded own585 local artifacts after preserving evidence.
 Folder CUSTOM and optional font need physical observation. Owner585 confirms
 header art and five-cache behavior. Continue broader parity autonomously.
+
+## 2026-11-15 — Fixed SYSTEM storage owner update
+
+Owner explicitly supersedes preserve-.superfw: all resources now use SYSTEM,
+with directory choices removed from UI, persisted output and parsing. Migration
+runs immediately after mount and before pending-SRAM handling: rename absent
+targets, recursively merge existing dirs (depth8/path bounds), never overwrite
+files; conflict/error stops boot. Partial moves resume. Only empty source dirs
+are deleted. Existing root/alternate/next-ROM save sets still auto-detected if
+canonical data absent. Added real host-filesystem adapter tests for resources,
+art preservation, pending-marker conflict, failed move and retry. All-board
+settings tests pass. Cold action/setup code uses Os, renderers keep O2 to fit
+Chis. New storage policy still needs physical testing. Next clean all3 storage
+checkpoint and hardware image, then proceed with actual Start/assets/settings
+work; owner requests continuous autonomous progression until DE parity.
+
+Storage checkpoint packages are clean Build592/source9755f12, all3 matching
+integrity/seal/memory checks pass. Standard local host ASAN again failed at
+sha256 startup; complete non-PIE sanitizer rerun passes90.8/94.5 coverage. mGBA
+settings renderer inspected/test passes after removing directory controls.
+Hosted43721652107 is still running: do not distribute until it passes. Source
+renderer development may proceed because these clean packages are frozen.
+
+## 2026-11-15 — DS Start/background/settings navigation slice
+
+Added exact credited DE Light/Dark Start assets as3070-byte lossless halfword LZ,
+source pixel fixtures and optional actual ARM video-bus test. Added Start/Last
+Played/SD/board-specific NOR-or-Recents/settings navigation and settings hub.
+Production input extraction passes all3 variants. Generic pages use exact DE
+SD_LIST stripes; carousel text restores texture and retains five-cache/page reuse.
+DSSMM themes use functional headers; native themes keep upstream tabs/Start art.
+Settings children are still native flat pages, not finished parity. mGBA Start
+light/dark and category fixtures render; corrected preview palette role aliasing
+(FT18 vs background0..15). Production roles were already separate. Dialog/cold
+code uses Os to fit Chis; browser/font/motion retain O2. Static Chis255624 before
+final title tweak; clean all3 gates next. Storage-only592 was not distributed;
+hosted43721652107 stalled/canceled. Host test Makefile now uses non-PIE sanitizer
+executables to fix recurring startup loops; full standard verifier next.
+
+## 2026-11-15 — Build594 delivered, continue letter-folder pack
+
+Clean source26526437b192b1e26a706379a1ffdf3f9a110b4c Build594 all3
+identities/seals/memory pass. Standard local full verifier passes after non-PIE
+ASAN host fix (90.8/94.5 coverage); hosted43722736343 passes. Exact source pixels,
+ARM VRAM/store discipline, both artwork/cart suites and launcher navigation pass.
+Light/Dark Start/settings mGBA inspected. Evidence build-594-validation.json.
+Chis594 now root hardware-test; own588 superseded after tracked evidence. No
+public release. Full parity unfinished; category children/system/dialogs next.
+Owner confirms588 font works well. New task: transparent closed-folder #/A–Z art
+sets120x80 Title and80x80 Box, global basename matches anywhere. CUSTOM directory
+lookup already matches full basename independent of parent; prepare compatible
+ready-to-copy pack and verify all54 via actual decoder before delivery. Preserve
+CUSTOM override priority if a future embedded fallback is added.
+
+## 2026-11-15 — Letter-folder pack and explicit image budgets
+
+Owner588 confirms font good. Generated54 closed-folder Title120x80/Box80x80 BMPs
+plus alpha PNG copies for #/A–Z, actual credited DE glyphs, DSSCC DST1 transparent
+canvas. Existing CUSTOM folder lookup already matches basenames globally, so pack
+needs no firmware additions. Ready-to-copy ZIP and preview in root hardware-test;
+all54 production decoder sanitizer tests pass. Component licenses included.
+Independent board size gates now reinforce native linker budgets and record
+used/limit/headroom.594 margins SD19968/Lite35840/Chis425472bytes, Chis main EWRAM
+1368static bytes. User explicitly requires keeping hardware size limits. No
+limit increases. Next integrate evidence/scripts, then true settings categories
+and remaining menu/dialog/DS behavior. Keep594 hardware image frozen during work.

@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import struct
 import subprocess
+from firmware_limits import check_size
 
 root = Path(__file__).resolve().parents[1]
 records = []
@@ -12,6 +13,10 @@ for board in ('sd', 'lite', 'chis'):
     folder = root / 'build' / board
     record = json.loads((folder / 'build-info.json').read_text())
     image = (folder / 'superfw.fw').read_bytes()
+    sizes=check_size(board,len(image))
+    for field,value in sizes.items():
+        assert record.get(field,value)==value,f'{board}: incorrect size manifest {field}'
+    record.update(sizes)
     assert record['board'] == board, f'{board}: wrong manifest board'
     assert record['source_dirty'] is False, f'{board}: modified source build'
     assert hashlib.sha256(image).hexdigest() == record['firmware_sha256'], f'{board}: image hash mismatch'

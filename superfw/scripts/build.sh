@@ -18,6 +18,8 @@ cp superfw.gba "build/$board/superfw.fw"
 python3 - "$board" "$build_number" <<'PY'
 import hashlib,json,pathlib,subprocess,sys
 board,number=sys.argv[1:]
+sys.path.insert(0,str(pathlib.Path('scripts').resolve()))
+from firmware_limits import check_size
 def git(*args): return subprocess.check_output(['git',*args],text=True).strip()
 image=pathlib.Path('build')/board/'superfw.fw'
 fingerprint=hashlib.sha256()
@@ -29,6 +31,7 @@ record={'source_tree_sha256':fingerprint.hexdigest(),'board':board,'dssmm_build'
         'source_dirty':bool(git('status','--porcelain','--untracked-files=normal','--','.')),
         'firmware_sha256':hashlib.sha256(image.read_bytes()).hexdigest(),
         'validation':'built; runtime and hardware validation not implied'}
+record.update(check_size(board,image.stat().st_size))
 (image.parent/'build-info.json').write_text(json.dumps(record,indent=2)+'\n')
 print(f"DSSMM Build {number} ({board}); source {record['source_commit']}; dirty={record['source_dirty']}")
 PY

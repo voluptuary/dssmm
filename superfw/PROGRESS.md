@@ -472,3 +472,42 @@ Chis588 in root hardware-test with CUSTOM directory art and optional actual DE
 ASCII font. Updated guide/manifests and removed superseded own585 artifacts.
 No public release or physical588 qualification. Normal integration e7759f3
 pushed; finish evidence integration/sync and retain session BIOS/scratch.
+
+## 2026-11-15 — SYSTEM-only resources and simpler settings
+
+Moved configuration/cache/cheat/emulator/recent/backup/pending resource paths to
+SYSTEM. Added resumable no-overwrite startup migration before pending SRAM;
+conflict/errors stop boot. Removed directory choices; canonical SAVEGAME and
+SAVESTATE with legacy save-set detection. Sanitized host migration and all3
+settings fixtures pass; production settings preview pending. Historical
+release notes remain accurate for those older binaries. Continue Start screen,
+DE backgrounds and categorized navigation after numbered validation checkpoint.
+
+## 2026-11-15 — Actual DS Style Start presentation
+
+Imported credited DE Start light/dark bitmap assets with standalone originals,
+lossless3070-byte stream generation, every-pixel host comparison and halfword ARM
+video-bus replay. Start and five-category settings routing share native actions;
+all-board input tests pass. Native themes retain legacy tabs. Generic DSSMM pages
+use exact DE stripes, independent text/art palettes and preserved carousel cache.
+Source Chis link fits after size optimization of cold/text-heavy paths. New
+mGBA Start/category renderers use fake recent/art only. Full parity unfinished.
+592 migration-only candidate not distributed due stalled hosted run. Next clean
+combined all3 candidate includes stable non-PIE host sanitizer setup.
+
+## 2026-11-15 — Build594 delivered
+
+All3 clean packages, standard local full verifier and hosted43722736343 pass.
+Evidence build-594-validation.json. Root hardware-test now Chis594 with Start,
+backgrounds/settings hub and SYSTEM migration. Superseded own588 local files;
+owner confirms588 font good. Next transparent #/A–Z folder pack, global basename
+matches, then true category children and remaining DE surfaces. No parity claim.
+
+## 2026-11-15 — Global letter folders, size safeguards
+
+Added deterministic transparent #/A–Z closed-folder pack in both exact sizes,
+alpha PNGs, licenses and ready-to-copy SYSTEM ZIP. CUSTOM already matches global
+basenames; no firmware/RAM cost. All54 production decoder sanitizer checks pass.
+Added hard packed-image gates matching native board budgets, boundary tests and
+594 byte margins in evidence. Source remains594 for current hardware image.
+Owner confirms588 font works well. Continue categories and remaining DE parity.

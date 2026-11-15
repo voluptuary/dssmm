@@ -1,0 +1,40 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+#include "dssmm_background.h"
+#include "dssmm_background_data.h"
+void dssmm_background_palette(volatile uint16_t *palette,bool dark) {
+  const uint16_t *source=dark?dssmm_dark_palette:dssmm_light_palette;
+  for(unsigned i=0;i<16;++i)palette[i]=source[i];
+}
+/* Native DE SD_LIST is alternating solid scanlines; no extra framebuffer.
+ * Coordinates must be even in Mode4. Keep all VRAM stores halfword-wide. */
+void dssmm_background_clear(volatile uint8_t *frame,bool dark,unsigned x,unsigned y,unsigned width,unsigned height) {
+  if(x>=240 || y>=160 || (x&1) || (width&1))return;
+  if(width>240-x)width=240-x;
+  if(height>160-y)height=160-y;
+  const uint16_t *palette=dark?dssmm_dark_palette:dssmm_light_palette;
+  unsigned a=0,b=0;
+  /* Exact SD_LIST values: light28/31; dark3/0. */
+  for(unsigned i=0;i<16;++i) {
+    if(palette[i]==(dark?0x0c63:0x739c))a=i;
+    if(palette[i]==(dark?0x0000:0x7fff))b=i;
+  }
+  for(unsigned row=y;row<y+height;++row) {
+    unsigned color=(row&1)?b:a;
+    volatile uint16_t *dest=(volatile uint16_t *)(frame+row*240+x);
+    for(unsigned col=0;col<width/2;++col)dest[col]=color|(color<<8);
+  }
+}
+void dssmm_background_draw(volatile uint8_t *frame,bool dark,bool start) {
+  if(!start){dssmm_background_clear(frame,dark,0,0,240,160);return;}
+  const uint16_t *source=dark?dssmm_dark_start:dssmm_light_start;
+  volatile uint16_t *out=(volatile uint16_t *)frame;
+  unsigned pos=0;
+  while(pos<19200) {
+    unsigned token=*source++;
+    if(token<256)out[pos++]=(token&15)|((token>>4)<<8);
+    else {
+      unsigned length=(token>>11)+3,dist=(token&2047)+1;
+      while(length--){out[pos]=out[pos-dist];++pos;}
+    }
+  }
+}
