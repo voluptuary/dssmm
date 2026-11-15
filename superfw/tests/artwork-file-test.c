@@ -93,6 +93,15 @@ int main(void) {
   assert(artwork_load("/Game Boy Advance/P/Pokemon FireRed.gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
   assert(opens==5 && closes==2 && seeks==1 && image_reads==5 && info.width==120);
   assert(!strcmp(last_path,"/SYSTEM/IMGS/BPRE.bmp"));
+  /* Original EZ fixed-record reader ignores inconsistent desktop metadata.
+   * Exercise this only after CUSTOM/filename misses, with a valid code path. */
+  put32(28,24); put32(22,80); put32(2,28854); put32(34,28800);
+  assert(artwork_load("/Pokemon.gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
+  assert(info.width==120 && info.height==80 && !info.transparent);
+  filename_custom=1;
+  assert(!artwork_load("/Game Boy Advance/P/Game Boy game (USA).gbc",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
+  filename_custom=0;
+  put32(28,16); put32(22,(uint32_t)-80); put32(2,sizeof(bmp)); put32(34,19200);
   gamecode_header=gamecode_flat_art=0;
 
   opens=closes=0; fail_read=1;
