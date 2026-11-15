@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+if [[ -v PREVIEW_ANIMATION || -v PREVIEW_EXPECT_ANIMATION ]]; then
+  echo "The Animation toggle/instant mode was retired; omit PREVIEW_ANIMATION and PREVIEW_EXPECT_ANIMATION." >&2
+  exit 2
+fi
 project_root="$(cd "$(dirname "$0")/.." && pwd)"
 out="$project_root/build/mgba"
 emulator="${MGBA_BIN:-/usr/games/mgba}"
@@ -102,12 +106,6 @@ for _ in range(height):
             raise SystemExit(f"Unsupported PNG filter {method}")
     rows.append(row)
     previous = row
-if "PREVIEW_EXPECT_ANIMATION" in os.environ:
-    if os.environ.get("PREVIEW_SCREEN") != "2": raise SystemExit("Animation input assertion requires UI screen2")
-    expected=(255,255,255) if int(os.environ["PREVIEW_EXPECT_ANIMATION"]) else (0,0,0)
-    actual=tuple(rows[159][:3])
-    if actual!=expected: raise SystemExit(f"Animation state marker {actual}, expected {expected}")
-    print("Production UI input animation state verified.")
 pixels = Counter(tuple(row[i:i + 3]) for row in rows for i in range(0, stride, 3))
 # Exclude schematic UI colors; other colors originate in decoded BMPs.
 ui_colors = {(24, 57, 49), (255, 255, 255), (255, 165, 123), (173, 173, 173)}

@@ -451,3 +451,39 @@ Final BMP-tail checks: sanitizer and ARM adapter replay pass normal/short/close/
 All SD/Lite/Chis582 at842bad386c5c3f5616a4b01eaa4f5e3f8596c5c2 are clean, share fingerprint, and pass image identities/seals plus linked metadata/hot-image placement. Hosted43670448850 full verifier passed. Chis uses252376/257024EWRAM and12872/32768IWRAM; static layout does not qualify stack/timing. Evidence docs/build-582-validation.json. Copied Chis582 to root hardware-test/superfw-chis-build582.fw, SHA5f3e919b878a252056c4bc31d1db869868cfca39ec0f1ade558d4680876350de, with manifest/guide. Superseded our571 local file/manifest after retaining tracked evidence.581 was never distributed. All broader menu/input previews remain applicable because staging fix only changes storage adapter.
 
 Owner has not yet reported582 Title/speed/IGM results. Filename art and edge fix remain physically confirmed only on earlier owner-tested builds. No public release. Next normal merge/sync of final staging fix/evidence, shared checks, collect combined CI, clean generated outputs while preserving hardware image and session BIOS/scratch/user lock. Then continue performance/parity from docs/UI-PARITY.md; do not claim full parity or pause for permission.
+
+## 2026-11-15 12:51 UTC — Build582 feedback; header history and five-image cache
+
+Owner582 confirms only AGS Aging/TCHK header art works, others have No-Intro tags; menu improves but adjacent icons briefly appear. Verified exact DE commit944ac131d0653b2e4a11e04f368fb00220303be5: startup/save-art validator accepted planes0 for owner-supplied19254-byte TCHK. This is distinct from DST1. Native DE browser ignores opaque record headers and reads fixedprefix; SuperFW582 wrongly limited legacy to exact-size BM records. New code-art reader accepts bounded19254-byte prefixes, preserves native DST1 fixed-layout semantics including ignored size fields, keeps filename parser strict. Synthetic TCHK/nested path, planes1, raw prefix/trailer, truncation, marked sizes and No-Intro unchanged-path cases pass; actual original pack remains403/uninspected. See HEADER-ART-COMPATIBILITY.md.
+
+Removed Animation setting, serialization and experimental instant/cropped route; version6 ignores legacy key and preserves other preferences. Normal transitions remain. Expanded SDRAM image cache3→5 (selected±2), metadata remains GBA RAM; visible3 prioritized, outer loads do not invalidate stable pages/hot image. Tests verify forward cache reuse and far-prefetch no redraw/copy. Centered SuperFW version/hash line in Info. Initial Chis link fits IWRAM13416bytes/EWRAM251620bytes before final reader refinement; final all-board link pending. Settings/artwork/cache/page/navigation/motion and both ARM bus suites pass. Four carousel mGBA views pass; new UI view-toggle input preview pending. No new build distributed yet; hardware-test582 remains until replacement. Commit checkpoint, clean same-source all3 build, hosted verifier and new Chis candidate next; continue autonomously.
+
+Follow-up validation before checkpoint: all four normal carousel mGBA screenshots pass; UI-settings View changed Horizontal→Vertical through actual key handler and screenshot passes. Historical Animation preview flags now reject stale commands, and its marker/instant route are removed from the harness. Latest reader marker check mirrors native fixed-layout fields (including ignoring size fields); both ARM bus regressions, sanitized artwork, settings, cache/far-prefetch/page/navigation/motion tests pass. Final all-board memory/link/package gates next; do not edit source/HEAD while serial candidate builds run.
+
+## 2026-11-15 — Build585 validated and delivered
+
+Clean uniform SD/Lite/Chis585 source45e4dbbcc70fcb83d83d55b465e52118eb750ad0 all pass image identities/seals and memory gates; hosted43716700372 full verifier passes. Chis IWRAM13416/EWRAM251732; metadata1360bytes (5slots), focused cache9600EWRAM. Evidence docs/build-585-validation.json. Current root hardware-test/superfw-chis-build585.fw hash45e4dbbc SHA4f1ae0b0e2648b05511a41bfa1217ecc9dcda95fefe24502930405ade00028fa, matching manifest/guide; removed our superseded582 local artifacts after preserving evidence. Hardware compatibility/speed not claimed; original pack unavailable403, synthetic/native-source behavior verified. No public release.
+
+Continue autonomously into directory-open cost: DE history shows header-art ROM reopen scans long-name directories repeatedly. Inspect native SuperFW FatFS R0.15 (LFN2/UTF8, exFAT1, lock/reentrant0) and design independently validated read-only indexed header open with full name/size checks and normal f_open fallback. Do not copy another card's driver. Browser has16384records; current SDRAM state15080036bytes,14.5MiB limit15204352, so a4-byte per-record index(+65536) fits,8bytes(+131072) does not. dir_next leaves dptr unchanged at EOC, so do NOT infer prior SFN offset by subtracting32 after f_readdir. Capture blk_ofs/LFN start (or current dptr for SFN) inside native readdir before advancing, and validate reconstructed name/size when opening. FAT/exFAT real-library RAM-disk tests are needed before retaining any change. Keep585 hardware image frozen through this next work.
+
+## 2026-11-15 — Owner585 confirms artwork/cache; folder art and font goals
+
+Owner reports585 header Title images now display and five cached images solve the reported neighbor problem. Record this as physical Chis585 evidence only. New focus: CUSTOM directory art (`Game Boy Advance.bmp` in both IMGS/CUSTOM and IMGS2/CUSTOM), and optional DE DSSMM font. Added docs/FOCUS-GOALS.md and current agent guidance. Defer indexed filesystem work; only its native source was inspected, no FF/library changes made. Begin folder-art loader/renderer support then font asset/metrics/provenance audit; preserve585 image until a validated replacement. Continue autonomously.
+
+## 2026-11-15 — CUSTOM directory artwork implemented
+
+Added dedicated validated directory-path/loader API: exact complete basename in mode-specific CUSTOM, preserving dots, rejecting parent/traversal names. Strict DSSCC decoding/DST1 and word-safe staging reused; no ROM header/mirrored fallback for directories. List+Art and both carousels dispatch folder entries through this loader, cache positive/negative results and draw valid art instead of folder placeholder. Missing/invalid art retains native icon. Sanitized path/format fixtures cover owner Game Boy Advance paths in Title/Box, dotted names, wrong dimensions, missing images and no ROM opens. Actual carousel dispatch/cache regression and both ARM bus tests pass. Updated end-user artwork guide (post585 development availability). Next optional DE font asset conversion/metrics/persistence/IGM propagation; no new hardware candidate yet,585 remains frozen.
+
+## 2026-11-15 — Optional DSSMM font implementation
+
+Added saved UI Font SuperFW/DSSMM choice (native default), printable DE ASCII
+asset conversion with Apache notice/provenance, and native Unicode fallback.
+All original pixels retained; 12 rows padded within native16-line metrics,
+tilde advances7 for its overhang. Settings7 persists bounded font key. In-game
+handoff uses reserved palette word5 without moving payload fields. Actual glyph
+pixel/odd-even/canary/metrics/scroll/fallback sanitizer and all-board settings
+fixtures pass. Chis development link254956/257024EWRAM; IGM50360/61440.
+mGBA UI screenshot inspected: compact DSSMM glyphs and Font option fit. Folder
+CUSTOM and both bus regressions remain required gates. Next clean committed
+all3 candidate, integrity/memory checks and hardware-test delivery. Physical
+font/folder/IGM qualification pending;585 remains until validated replacement.

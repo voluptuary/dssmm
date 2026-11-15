@@ -103,6 +103,7 @@ static void card(volatile uint8_t *frame, const browser_carousel_item *item,
 }
 
 static void reload_theme(unsigned theme) {
+  font_set_style(menu_font);
   const t_theme_colors colors=menu_theme_colors(theme,menu_accent);
   PALETTE[0]=colors.bg_color;PALETTE[1]=colors.ft_color;
   PALETTE[2]=colors.hi_color;PALETTE[3]=colors.fg_color;
@@ -147,9 +148,6 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   if (PREVIEW_SCREEN == 2) {
     fill_rect(frame,0,144,240,16,0);
     render_ui_settings(frame);
-    /* Test-only state marker, white=On/black=Off; outside visible controls. */
-    unsigned marker=carousel_animation ? 236 : 237;
-    ((volatile uint16_t *)frame)[159*120]=marker|(marker<<8);
     return;
   }
   if (PREVIEW_SCREEN == 1) { render_tools(frame); return; }
@@ -157,22 +155,16 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   unsigned n = browser_carousel_layout(vertical, selected, 3, offset, items);
   int focus = selected;
   for (unsigned i = 0; i < n; ++i) {
-    if (!PREVIEW_ANIMATION) {
-      unsigned index = items[i].index;
-      const artwork_info *info = box_mode ? &fixture_box_info[index] : &fixture_title_info[index];
-      const uint16_t *pixels = box_mode ? fixture_box_pixels[index] : fixture_title_pixels[index];
-      int delta = (int)index-selected;
-      int x = vertical ? (120-info->width)/2 : (240-info->width)/2+delta*(int)info->width;
-      int y = vertical ? 48+delta*80 : 27;
-      artwork_blit_cropped((volatile uint16_t *)frame,pixels,info,x,y);
-    } else card(frame, &items[i], vertical, box_mode);
+    card(frame, &items[i], vertical, box_mode);
     if (items[i].focused) focus = items[i].index;
   }
   draw_text_ovf_rotate(browser_fixture_names[focus], frame,
-      vertical ? (PREVIEW_ANIMATION ? 98 : 128) : 40, vertical ? 85 : 122, vertical ? (PREVIEW_ANIMATION ? 136 : 106) : 162, &text_animation);
+      vertical ? 98 : 40, vertical ? 85 : 122, vertical ? 136 : 162, &text_animation);
 }
 
 int main(void) {
+  menu_font=PREVIEW_FONT;
+  font_set_style(menu_font);
   PALETTE[0] = 0x18E3;  /* DSSMM-like dark blue-gray */
   PALETTE[1] = 0x7FFF;  /* light top/footer */
   PALETTE[2] = 0x3E9F;  /* selected blue */
@@ -189,7 +181,6 @@ int main(void) {
     for(unsigned i=0;i<16;++i)PALETTE[128+i]=menu_icons_pal[i];
     PALETTE[128]=PALETTE[0];
   }
-  PALETTE[236]=0x7fff;PALETTE[237]=0;
   load_fixtures();
   preview_select_ui(PREVIEW_OPTION);
   smenu.set.selector = PREVIEW_OPTION < SettMAX ? PREVIEW_OPTION : SettSave;
@@ -220,7 +211,7 @@ int main(void) {
       selected = next;
       text_animation = 0;
     }
-    offset = !PREVIEW_ANIMATION ? 0 : PREVIEW_OFFSET ? PREVIEW_OFFSET : browser_motion_advance(offset, 1);
+    offset = PREVIEW_OFFSET ? PREVIEW_OFFSET : browser_motion_advance(offset, 1);
     volatile uint8_t *back = VRAM + (back_page ? 0xA000 : 0);
     volatile uint16_t *timers = (volatile uint16_t *)0x04000100;
     if (PREVIEW_TIMING) {

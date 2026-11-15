@@ -19,6 +19,11 @@
 #ifndef _FONT_RENDER_H_
 #define _FONT_RENDER_H_
 
+#include <stdint.h>
+enum { FONT_STYLE_NATIVE=0, FONT_STYLE_DSSMM, FONT_STYLE_COUNT };
+void font_set_style(unsigned style);
+unsigned font_get_style(void);
+
 // Size (in bytes) of the font graphs DB
 unsigned font_block_size();
 

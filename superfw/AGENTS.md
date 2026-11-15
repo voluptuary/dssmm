@@ -64,8 +64,8 @@ delivering the Chis candidate. Keep Build561 hardware-test image unchanged while
 awaiting physical results.
 
 Current continuation: read docs/UI-PARITY.md and latest journals. Filename carousel
-art is physically confirmed on Chis561; Title code-art and582 performance remain
-unconfirmed. Current local hardware-test image is Chis582/hash842bad38. Keep it
+art is physically confirmed on Chis561; Title code-art and585 performance remain
+unconfirmed. Current local hardware-test image is Chis585/hash45e4dbbc. Keep it
 frozen while later UI work proceeds. Owner explicitly requires autonomous
 continuation without a permission/model-switch pause.
 
@@ -73,3 +73,30 @@ BMP staging is a separate cartridge-bus constraint: requests directly into SDRAM
 must use word-aligned buffers/counts. Read the final1..3bytes into GBA RAM and
 copy them with halfword stores; do not restore a whole-file memcpy tail there.
 The optional ARM adapter test reproduces a byte-store fault in the old code.
+
+## Build582 owner follow-up (2026-11-15)
+
+Header Title only renders AGS/TCHK; see docs/HEADER-ART-COMPATIBILITY.md and
+historical fix944ac13 (planes0, not DST1). Match native bounded opaque code-record
+semantics, keep filename parsing strict and retain CUSTOM priority. Owner removes
+the Animation toggle/instant-mode feature: normal carousel transitions remain,
+old config keys are ignored, new settings version6 omits the key. Cache5 images
+(selected±2), prioritizing visible3 and avoiding redraw/hot-copy for outer loads.
+Center the SuperFW version/hash Info line until full DE styling. Produce numbered
+Chis hardware-test builds after all3 variant builds/gates; continue autonomously
+without requiring owner feedback. Owner will identify tested build numbers.
+
+## Owner585 confirmation and new focus goals
+
+Owner physically confirms Chis585's ROM-header images and five-image cache work.
+Prioritize docs/FOCUS-GOALS.md: CUSTOM directory artwork in Title/Box, then an
+optional credited DE DSSMM system font. Native fallback, byte-safe rendering and
+all3 variants remain required. Indexed filesystem work is deferred until these
+priorities are implemented; no such library/source change has been made.
+
+Font continuation: UI Font SuperFW/DSSMM is optional, native default; read
+FONT-PORT.md. Preserve credited Apache asset, reproducible conversion and native
+Unicode fallback. In-game font uses reserved palette word5, not a new payload
+field. Run test-dssmm-font.sh alongside settings/artwork/bus tests. Current folder
+CUSTOM loader is implemented for List+Art and carousels; full basename including
+dots, no header lookup for directories. Both features need physical retesting.
