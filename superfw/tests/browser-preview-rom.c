@@ -116,17 +116,14 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   unsigned n = browser_carousel_layout(vertical, selected, 3, offset, items);
   int focus = selected;
   for (unsigned i = 0; i < n; ++i) {
-    if (!PREVIEW_ANIMATION && !items[i].focused) {
-      unsigned x = items[i].x + items[i].w/2 - 8;
-      unsigned y = items[i].y + items[i].h/2 - 8;
-      if (vertical) { x=52; y=items[i].index < selected ? 24 : 128; }
-      fill_rect(frame,x,y,16,16,3); /* Schematic system-icon stand-in. */
-    } else if (!PREVIEW_ANIMATION) {
-      browser_carousel_item native=items[i];
-      native.w=box_mode ? 80 : 120; native.h=80;
-      native.x=vertical ? (120-native.w)/2 : (240-native.w)/2;
-      native.y=vertical ? 48 : 27;
-      card(frame,&native,vertical,box_mode);
+    if (!PREVIEW_ANIMATION) {
+      unsigned index = items[i].index;
+      const artwork_info *info = box_mode ? &fixture_box_info[index] : &fixture_title_info[index];
+      const uint16_t *pixels = box_mode ? fixture_box_pixels[index] : fixture_title_pixels[index];
+      int delta = (int)index-selected;
+      int x = vertical ? (120-info->width)/2 : (240-info->width)/2+delta*(int)info->width;
+      int y = vertical ? 48+delta*80 : 27;
+      artwork_blit_cropped((volatile uint16_t *)frame,pixels,info,x,y);
     } else card(frame, &items[i], vertical, box_mode);
     if (items[i].focused) focus = items[i].index;
   }

@@ -40,3 +40,8 @@ arrows are no longer wrapped again. Fixtures still do not execute native menu
 input, persistence, OAM or actual card I/O. The separate optional ARM/Unicorn
 cartridge-store diagnostic is documented in CAROUSEL-ARTWORK-MEMORY.md; mGBA
 configuration is unchanged.
+
+AnimationOff preview now calls production artwork_blit_cropped for all three
+native-sized images, matching the new cropped-neighbor layout. Four initial
+orientation/art combinations pass screenshot checks. These remain fixture-based;
+no SuperCard I/O is emulated. No emulator setup changes.

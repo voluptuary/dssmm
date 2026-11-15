@@ -1511,8 +1511,8 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
   if (!browser_fast_reuse)
     dma_memset16(&frame[240 * 16], dup8(BG_COLOR), 240 * (144 - 16) / 2);
   else {
-    unsigned tx = vertical ? 128 : 40, ty = vertical ? 85 : 122;
-    unsigned tw = vertical ? 106 : 162;
+    unsigned tx = vertical ? (carousel_animation ? 98 : 128) : 40, ty = vertical ? 85 : 122;
+    unsigned tw = vertical ? (carousel_animation ? 136 : 106) : 162;
     for (unsigned row = 0; row < 16; ++row)
       dma_memset16(frame + (ty+row)*240 + tx, dup8(BG_COLOR), tw/2);
     dma_memset16(frame + 144*240, dup8(BG_COLOR), 240*16/2);
@@ -1528,7 +1528,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
     /* Populate one missing slot per settled frame, selected entry first. */
     const int candidates[3] = {selected, selected - 1, selected + 1};
     if (artwork_mode && browser_motion_offset == 0) {
-      for (unsigned c = 0; c < (carousel_animation ? 3u : 1u); ++c) {
+      for (unsigned c = 0; c < 3u; ++c) {
         int index = candidates[c];
         if (index < 0 || index >= smenu.browser.dispentries) continue;
         const t_centry *entry = sdr_state->filefilter[index];
@@ -1547,6 +1547,8 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
             sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
             &carousel_meta[slot].info);
         carousel_meta[slot].cached = true;
+        browser_fast_reuse = false;
+        browser_fast_valid[0] = browser_fast_valid[1] = false;
         break;
       }
     }
@@ -1559,7 +1561,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       char rom[MAX_FN_LEN];
       int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
       bool drawn = false;
-      if (artwork_mode && (carousel_animation || item->index == selected) && !(entry->attr & AM_DIR) && n > 0 && (unsigned)n < sizeof(rom) &&
+      if (artwork_mode && !(entry->attr & AM_DIR) && n > 0 && (unsigned)n < sizeof(rom) &&
           carousel_meta[slot].cached && carousel_meta[slot].valid &&
           carousel_meta[slot].mode == artwork_mode &&
           !strcmp(carousel_meta[slot].rom, rom)) {
@@ -1567,9 +1569,12 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         unsigned x = item->x, width = item->w, height = item->h;
         if (info->width == 80) { width = height; x += (item->w - width) / 2; }
         if (!carousel_animation) {
-          width = info->width;
-          height = info->height;
-          x = vertical ? (120 - width)/2 : (240 - width)/2;
+          int delta = item->index-selected;
+          int native_x = vertical ? (120-info->width)/2 : (240-info->width)/2 + delta*(int)info->width;
+          int native_y = vertical ? 48+delta*80 : 27;
+          drawn = browser_fast_reuse || artwork_blit_cropped((volatile uint16_t *)frame,
+              sdr_state->carousel_art[slot].pixels, info, native_x, native_y);
+          if (drawn) continue;
         }
         x &= ~1u;
         width &= ~1u;
@@ -2289,7 +2294,7 @@ void menu_render(unsigned fcnt) {
       render_icon_trans((i - mintab)*16, 0, i + ICON_RECENT);
 
   bool fast_carousel = smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view &&
-      !carousel_animation && !spop.qpop.message && !spop.rtcpop.callback &&
+      browser_motion_offset == 0 && !spop.qpop.message && !spop.rtcpop.callback &&
       !spop.pop_num && !spop.alert_msg;
   if (!fast_carousel) browser_fast_valid[0] = browser_fast_valid[1] = false;
   browser_fast_reuse = fast_carousel && browser_fast_valid[framen] &&

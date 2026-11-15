@@ -69,6 +69,10 @@ bool artwork_blit_frame(volatile uint16_t *frame,const uint16_t *pixels,
  assert(!(x&1) && x+info->width<=240 && y+info->height<=160);
  ++blits;return true;
 }
+bool artwork_blit_cropped(volatile uint16_t *frame,const uint16_t *pixels,
+ const artwork_info *info,int x,int y) {
+ (void)frame;(void)pixels;(void)info;(void)x;(void)y;++blits;return true;
+}
 bool artwork_blit_scaled(volatile uint16_t *frame,const uint16_t *pixels,
  const artwork_info *info,unsigned x,unsigned y,unsigned w,unsigned h) {
  (void)frame;(void)pixels;(void)info;assert(x+w<=240 && y+h<=160);++scales;++blits;return true;
@@ -103,7 +107,8 @@ int main(void) {
  render_browser_carousel(frame,true);
  render_browser_carousel(frame,false);
  assert(scales==before_scales); /* Off must never invoke resampling. */
- assert(loads==fast_loads+1); /* Selected artwork only; no neighbor preloads. */
+ assert(loads==fast_loads+2); /* One native neighbor load per settled frame. */
+ render_browser_carousel(frame,true); /* Finish neighbor population before reuse. */
  unsigned reuse_blits=blits;
  browser_fast_reuse=true;
  render_browser_carousel(frame,true);assert(blits==reuse_blits);
@@ -114,7 +119,7 @@ int main(void) {
    render_browser_carousel(frame,true);
    render_browser_carousel(frame,false);
    render_browser_carousel(frame,true);
-   assert(scales==before_scales && loads==fast_loads+1);
+   assert(scales==before_scales && loads==fast_loads+3);
  }
  carousel_animation=1;
  /* A directory change must never display cache entries from the old path. */

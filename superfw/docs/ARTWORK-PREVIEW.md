@@ -27,3 +27,23 @@ Candidate decoder compatibility: 16-bit BI_RGB artwork ignores the unused RGB555
 Under **UI settings → Animation**, choose **On** for sliding carousel transitions or **Off** to switch immediately between entries. Save UI settings to retain the choice after reboot. Existing configurations default to On. This switch affects both horizontal and vertical carousel movement; it does not change the separate text/UI animation speed setting.
 
 Animation Off is the fast carousel path: no transition resampling and no neighbor artwork preloads. It draws selected Title/Box art at native size, with system icons for adjacent entries. Vertical layout reserves a native 120×80 image pane and a separate filename column. Thus Off removes scaling work rather than only suppressing visible motion. Actual card responsiveness still needs measurement.
+
+## Native carousel and legacy code-art follow-up (2026-11-15)
+
+Animation Off now loads previous/selected/next cache entries and draws native
+120x80 Title or80x80 Box images. Horizontal neighbors extend beyond the left/right
+screen edges; vertical neighbors extend beyond the browser body. Cropping keeps
+the selected image complete and preserves top/footer UI. It performs no scaling.
+New neighbor arrivals invalidate both retained pages. Both animation modes reuse
+settled pages; moving AnimationOn redraws. These software changes need physical
+performance confirmation. Neighbor loads remain synchronous and one per settled
+frame, so slow SD/filesystem operations can still delay input.
+
+The strict DSSCC decoder remains the first choice. For game-code Title fallback
+only, an exact19,254-byte BM record can use native EZ fixed-record interpretation:
+54-byte prefix followed by120x80 top-down GBA RGB555 pixels. This matches the DE
+reader's fixed byte-count/direct-pixel semantics even when legacy BMP metadata
+is inconsistent. Header normalization occurs in internal RAM; the cartridge
+buffer receives no byte writes. Filename artwork retains strict parsing and DST1
+semantics. Original pack download still returns403, so do not call this actual
+pack validation or a confirmed fix for the owner's Title artwork.

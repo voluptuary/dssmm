@@ -23,6 +23,9 @@ uint16_t artwork_palette_color(unsigned index);
 /* Composite into a 240x160 indexed frame with halfword-only stores. */
 bool artwork_blit_frame(volatile uint16_t *frame, const uint16_t *pixels,
                        const artwork_info *info, unsigned x, unsigned y);
+/* Native-size image clipped to the browser body (y=16..143). */
+bool artwork_blit_cropped(volatile uint16_t *frame, const uint16_t *pixels,
+                          const artwork_info *info, int x, int y);
 /* Nearest-neighbor scale into a bounded, even-width Mode 4 rectangle. */
 bool artwork_blit_scaled(volatile uint16_t *frame, const uint16_t *pixels,
                          const artwork_info *info, unsigned x, unsigned y,
