@@ -1170,6 +1170,7 @@ void setup_video_frame() {
   REG_BG2X = 0;
   REG_BG2Y = 0;
 
+  font_set_style(ingame_menu_palette[IGM_FONT_PALETTE_SLOT]);
   // Setup palettes
   init_logo_palette(&MEM_PALETTE[1]);
   MEM_PALETTE[FG_COLOR] = ingame_menu_palette[0];

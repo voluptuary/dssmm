@@ -23,12 +23,15 @@
 #include "compiler.h"
 #include "utf_util.h"
 #include "font_embed.h"
+#include "font_render.h"
+#include "dssmm_ascii.h"
 #include "hangul.h"
 
 extern void *font_base_addr;
 
 // Memory structures that describe character/font data.
 
+#define FLAG_NO_SPACE 0x00000002
 #define FLAG_FW16     0x00000001
 #define FLAG_COMP     0x80000000
 
@@ -57,10 +60,15 @@ typedef struct {
 #define MISSING_CHAR    26   // "?" char, should find a better one though
 #define CHAR_SPACING     1
 
+static unsigned active_font_style;
+void font_set_style(unsigned style) { active_font_style=style==FONT_STYLE_DSSMM ? style : FONT_STYLE_NATIVE; }
+unsigned font_get_style(void) { return active_font_style; }
+
 // Looks up block info for a character code.
 static bool lookup_chptr(uint32_t code, t_char_render_info *chinfo) {
   // Add here any font database pointers as you wish, they are looked up in order.
   const void *font_dblist[] = {
+    active_font_style==FONT_STYLE_DSSMM ? font_dssmm_ascii_embedded : NULL,
     font_ascii_embedded,
     font_base_addr,
   };
@@ -68,6 +76,7 @@ static bool lookup_chptr(uint32_t code, t_char_render_info *chinfo) {
   for (unsigned j = 0; j < sizeof(font_dblist)/sizeof(font_dblist[0]); j++) {
     const t_charblock_header *chdat = (const t_charblock_header*)(font_dblist[j]);
 
+    if (!chdat) continue;
     // Points to the data area (after all the indices)
     const uint8_t *baseptr = (uint8_t*)&chdat->charblks[chdat->block_count];
 
@@ -98,7 +107,7 @@ static bool lookup_chptr(uint32_t code, t_char_render_info *chinfo) {
           const uint16_t *chdata = &chptr[chdat->charblks[i].end_char - chdat->charblks[i].start_char + 1];
 
           chinfo->char_width = (ientry >> 13) + 1;
-          chinfo->spacing_cols = CHAR_SPACING;
+          chinfo->spacing_cols = (chdat->charblks[i].flags & FLAG_NO_SPACE) ? 0 : CHAR_SPACING;
           chinfo->nchars = 1;
           chinfo->data[0] = &chdata[ientry & 0x1FFF];
         }

@@ -19,9 +19,10 @@ FRESULT f_write(FIL *fp, const void *data, UINT size, UINT *written) {
   *written = size; return FR_OK;
 }
 int main(void) {
-  assert(carousel_animation == 1);
-  parse_ui_settings(0, "carousel_animation", "0"); assert(carousel_animation == 0);
-  parse_ui_settings(0, "carousel_animation", "1"); assert(carousel_animation == 1);
+  parse_ui_settings(0,"carousel_animation","0"); /* Retired key is ignored. */
+  assert(menu_font==FONT_STYLE_NATIVE);
+  parse_ui_settings(0,"font","1");assert(menu_font==FONT_STYLE_DSSMM);
+  parse_ui_settings(0,"font","99");assert(menu_font==FONT_STYLE_NATIVE);
   assert(menu_theme == THEME_DSSMM_LIGHT);
   assert(artwork_mode == 1);
   assert(THEME_DSSMM_LIGHT == 6 && THEME_DSSMM_DARK == 7);
@@ -81,18 +82,19 @@ int main(void) {
   existing_path = NULL;
   savestate_filename_calc("/Games/Game.gba", path);
   assert(!strcmp(path, "/SYSTEM/SAVESTATE/Game"));
+  menu_font=FONT_STYLE_DSSMM;
   menu_theme = THEME_DSSMM_DARK; menu_accent = 3; artwork_mode = 2;
   browser_view = 2;
-  carousel_animation = 0;
   assert(save_ui_settings());
-  assert(strstr(saved_settings, "ui_version=5\n"));
+  assert(strstr(saved_settings, "ui_version=7\n"));
+  assert(strstr(saved_settings,"font=1\n"));
+  assert(!strstr(saved_settings,"carousel_animation="));
   assert(strstr(saved_settings, "browser_view=2\n"));
-  assert(strstr(saved_settings, "carousel_animation=0\n"));
-  assert(strstr(saved_settings, "theme=7\naccent=3\n"));
+  assert(strstr(saved_settings, "theme=7\nfont=1\naccent=3\n"));
   menu_theme = 0; menu_accent = 0; artwork_mode = 0; browser_view = 0;
-  carousel_animation = 1;
+  menu_font=FONT_STYLE_NATIVE;
   parse_file(saved_settings, parse_ui_settings, 0);
+  assert(menu_font==FONT_STYLE_DSSMM);
   assert(menu_theme == THEME_DSSMM_DARK && menu_accent == 3 && artwork_mode == 2 && browser_view == 2);
-  assert(carousel_animation == 0);
   return 0;
 }
