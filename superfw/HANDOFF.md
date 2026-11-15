@@ -473,3 +473,17 @@ Owner reports585 header Title images now display and five cached images solve th
 ## 2026-11-15 — CUSTOM directory artwork implemented
 
 Added dedicated validated directory-path/loader API: exact complete basename in mode-specific CUSTOM, preserving dots, rejecting parent/traversal names. Strict DSSCC decoding/DST1 and word-safe staging reused; no ROM header/mirrored fallback for directories. List+Art and both carousels dispatch folder entries through this loader, cache positive/negative results and draw valid art instead of folder placeholder. Missing/invalid art retains native icon. Sanitized path/format fixtures cover owner Game Boy Advance paths in Title/Box, dotted names, wrong dimensions, missing images and no ROM opens. Actual carousel dispatch/cache regression and both ARM bus tests pass. Updated end-user artwork guide (post585 development availability). Next optional DE font asset conversion/metrics/persistence/IGM propagation; no new hardware candidate yet,585 remains frozen.
+
+## 2026-11-15 — Optional DSSMM font implementation
+
+Added saved UI Font SuperFW/DSSMM choice (native default), printable DE ASCII
+asset conversion with Apache notice/provenance, and native Unicode fallback.
+All original pixels retained; 12 rows padded within native16-line metrics,
+tilde advances7 for its overhang. Settings7 persists bounded font key. In-game
+handoff uses reserved palette word5 without moving payload fields. Actual glyph
+pixel/odd-even/canary/metrics/scroll/fallback sanitizer and all-board settings
+fixtures pass. Chis development link254956/257024EWRAM; IGM50360/61440.
+mGBA UI screenshot inspected: compact DSSMM glyphs and Font option fit. Folder
+CUSTOM and both bus regressions remain required gates. Next clean committed
+all3 candidate, integrity/memory checks and hardware-test delivery. Physical
+font/folder/IGM qualification pending;585 remains until validated replacement.

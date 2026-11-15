@@ -103,6 +103,7 @@ static void card(volatile uint8_t *frame, const browser_carousel_item *item,
 }
 
 static void reload_theme(unsigned theme) {
+  font_set_style(menu_font);
   const t_theme_colors colors=menu_theme_colors(theme,menu_accent);
   PALETTE[0]=colors.bg_color;PALETTE[1]=colors.ft_color;
   PALETTE[2]=colors.hi_color;PALETTE[3]=colors.fg_color;
@@ -162,6 +163,8 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
 }
 
 int main(void) {
+  menu_font=PREVIEW_FONT;
+  font_set_style(menu_font);
   PALETTE[0] = 0x18E3;  /* DSSMM-like dark blue-gray */
   PALETTE[1] = 0x7FFF;  /* light top/footer */
   PALETTE[2] = 0x3E9F;  /* selected blue */

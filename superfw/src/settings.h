@@ -23,6 +23,7 @@
 #include <stdbool.h>
 
 #include "common.h"
+#include "fonts/font_render.h"
 
 typedef struct {
   const char * const cname;
@@ -48,6 +49,7 @@ extern const t_theme_colors themes[THEME_COUNT];
 #define ACCENT_COUNT 5
 extern const char * const accent_names[ACCENT_COUNT];
 extern uint8_t menu_accent;
+extern uint8_t menu_font; /* Native or optional DSSMM printable ASCII font. */
 extern uint8_t artwork_mode; /* 0=list, 1=title, 2=box; Start in SD browser */
 extern uint8_t browser_view;  /* 0=list, 1=horizontal carousel, 2=vertical carousel */
 t_theme_colors menu_theme_colors(unsigned theme, unsigned accent);

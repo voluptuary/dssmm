@@ -93,3 +93,10 @@ Prioritize docs/FOCUS-GOALS.md: CUSTOM directory artwork in Title/Box, then an
 optional credited DE DSSMM system font. Native fallback, byte-safe rendering and
 all3 variants remain required. Indexed filesystem work is deferred until these
 priorities are implemented; no such library/source change has been made.
+
+Font continuation: UI Font SuperFW/DSSMM is optional, native default; read
+FONT-PORT.md. Preserve credited Apache asset, reproducible conversion and native
+Unicode fallback. In-game font uses reserved palette word5, not a new payload
+field. Run test-dssmm-font.sh alongside settings/artwork/bus tests. Current folder
+CUSTOM loader is implemented for List+Art and carousels; full basename including
+dots, no header lookup for directories. Both features need physical retesting.

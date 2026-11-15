@@ -95,6 +95,7 @@ enum {
 #define IGM_PAL_HI      242
 #define IGM_PAL_SH      243
 #define IGM_PAL_BL      244
+#define IGM_PAL_FONT    (240+IGM_FONT_PALETTE_SLOT)
 #define SEL_COLOR       255
 
 #define FLASH_UNLOCK_KEYS      (KEY_BUTTDOWN|KEY_BUTTB|KEY_BUTTSTA)
@@ -102,6 +103,7 @@ enum {
 
 enum {
   UiSetTheme = 0,
+  UiSetFont,
   UiSetArtwork,
   UiSetView,
   UiSetLang,
@@ -2137,13 +2139,14 @@ void render_ui_settings(volatile uint8_t *frame) {
     "White", "Orange", "Blue", "Green", "Purple", "Stock Dark",
     "Light", "Dark"
   };
+  static const char * const font_names[] = {"SuperFW", "DSSMM"};
   static const char * const artwork_names[] = { "List", "Title", "Box" };
   static const char * const view_names[] = { "List", "Horizontal", "Vertical" };
   const unsigned value_x = 128;
   const unsigned row_y[] = { 20, 38, 56, 74, 92, 110 };
   char tmpbuf[64];
   const char * const labels[UiSetSave] = {
-    msgs[lang_id][MSG_UIS_THEME], "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
+    msgs[lang_id][MSG_UIS_THEME], "Font", "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
     msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent"
   };
   for (unsigned row = 0; row < sizeof(row_y) / sizeof(row_y[0]); ++row) {
@@ -2152,6 +2155,7 @@ void render_ui_settings(volatile uint8_t *frame) {
     const char *value = "";
     switch (option) {
     case UiSetTheme: value = theme_names[menu_theme < THEME_COUNT ? menu_theme : 0]; break;
+    case UiSetFont: value=font_names[menu_font<FONT_STYLE_COUNT ? menu_font : 0];break;
     case UiSetArtwork: value = artwork_names[artwork_mode < 3 ? artwork_mode : 0]; break;
     case UiSetView: value = view_names[browser_view < 3 ? browser_view : 0]; break;
     case UiSetLang: value = msgs[lang_id][MSG_LANG_NAME]; break;
@@ -2250,6 +2254,7 @@ void render_tools(volatile uint8_t *frame) {
 }
 
 void reload_theme(unsigned thnum) {
+  font_set_style(menu_font);
   const t_theme_colors colors = menu_theme_colors(thnum, menu_accent);
   for (unsigned i = 0; i < ARTWORK_PALETTE_SIZE; ++i)
     MEM_PALETTE[ARTWORK_PALETTE_BASE + i] = artwork_palette_color(i);
@@ -2264,6 +2269,7 @@ void reload_theme(unsigned thnum) {
   MEM_PALETTE[IGM_PAL_HI] = colors.ft_color;
   MEM_PALETTE[IGM_PAL_SH] = colors.sh_color;
   MEM_PALETTE[IGM_PAL_BL] = colors.hi_blend;
+  MEM_PALETTE[IGM_PAL_FONT] = menu_font;
 
   // Palette entries for icons and other objects
   MEM_PALETTE[256 + SEL_COLOR] = colors.hi_blend;
@@ -3339,6 +3345,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
   if (newkeys & KEY_BUTTLEFT) {
     if (smenu.uiset.selector == UiSetTheme)
       menu_theme = menu_theme ? menu_theme - 1 : 0;
+    else if (smenu.uiset.selector == UiSetFont)
+      menu_font ^= 1;
     else if (smenu.uiset.selector == UiSetArtwork)
       artwork_mode = (artwork_mode + 2) % 3;
     else if (smenu.uiset.selector == UiSetView) {
@@ -3361,6 +3369,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
   if (newkeys & KEY_BUTTRIGHT) {
     if (smenu.uiset.selector == UiSetTheme)
       menu_theme = MIN(THEME_COUNT - 1, menu_theme + 1);
+    else if (smenu.uiset.selector == UiSetFont)
+      menu_font ^= 1;
     else if (smenu.uiset.selector == UiSetArtwork)
       artwork_mode = (artwork_mode + 1) % 3;
     else if (smenu.uiset.selector == UiSetView) {

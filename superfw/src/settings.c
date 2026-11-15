@@ -55,8 +55,9 @@ static const uint16_t accent_colors[ACCENT_COUNT - 1][2] = {
   { RGB2GBA(0xc0a0e0), RGB2GBA(0x9878b8) },
 };
 uint8_t menu_accent = 0;
+uint8_t menu_font = FONT_STYLE_NATIVE;
 uint8_t artwork_mode = 1;
-#define UI_SETTINGS_VERSION 6
+#define UI_SETTINGS_VERSION 7
 #define UI_SETTINGS_DSSMM_DEFAULTS_VERSION 2
 static uint8_t ui_settings_version = 0;
 
@@ -147,6 +148,7 @@ bool save_ui_settings() {
   npf_snprintf(buf, sizeof(buf),
     "ui_version=%u\n"
     "theme=%u\n"
+    "font=%u\n"
     "accent=%u\n"
     "artwork=%u\n"
     "browser_view=%u\n"
@@ -154,7 +156,7 @@ bool save_ui_settings() {
     "recent_menu=%u\n"
     "anim_speed=%u\n"
     "hide_hidden=%u\n",
-    UI_SETTINGS_VERSION, menu_theme, menu_accent, artwork_mode, browser_view,
+    UI_SETTINGS_VERSION, menu_theme, menu_font, menu_accent, artwork_mode, browser_view,
     (lc & 0xFF), (lc >> 8), recent_menu, anim_speed, hide_hidden);
 
   UINT wrbytes;
@@ -267,6 +269,7 @@ static void parse_ui_settings(void *usr, const char *var, const char *value) {
       unsigned maxval;
     } uintset[] = {
       { "theme",       &menu_theme,  THEME_COUNT },
+      { "font",&menu_font, FONT_STYLE_COUNT },
       { "accent",      &menu_accent, ACCENT_COUNT },
       { "artwork",     &artwork_mode, 3 },
       { "browser_view",&browser_view, 3 },
