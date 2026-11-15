@@ -379,3 +379,7 @@ Corrected horizontal interpolation to move image centers (DE left/right-5/185) a
 ## 2026-11-15 — Alignments validated, common selection treatment extended
 
 All-board/full CI43665956534 passes DE geometry/clipped scaler; vertical midpoint preview passes. Main settings adopts existing accent row helper for Light/Dark, Chis link fits and shared UI preview passes. Main settings screen visual/input remains unqualified. Draft release notes corrected for current behavior/physical evidence. Integration next; hardware-test565 untouched.
+
+## 2026-11-15 — Main settings emulator coverage and integration checkpoint
+
+391d7b7 passed hosted43666119527 all-board/full verifier. Added actual main-settings renderer/enum extraction to preview (Screen3), with clearly synthetic settings/date fixture and optional Chis NOR rows. Visually inspected Light Chis Fast-ROM, Dark SD lower save-policy and Save screens; smoke checks pass. Long values remain bounded/truncated; input/persistence are not emulated. Firmware inputs unchanged by this harness slice. Next normal merge into dssmm and combined CI; hardware-test565 remains fixed for performance/header-art result. Continue autonomous parity work; do not claim full parity or physical565 confirmation.

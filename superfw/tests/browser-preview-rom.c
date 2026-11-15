@@ -105,6 +105,7 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   fill_rect(frame, 0, 0, 240, 160, 0);
   fill_rect(frame, 0, 0, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
   fill_rect(frame, 0, 144, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
+  if (PREVIEW_SCREEN == 3) { render_settings(frame); return; }
   if (PREVIEW_SCREEN == 2) {
     fill_rect(frame,0,144,240,16,0);
     render_ui_settings(frame); return;
@@ -144,6 +145,7 @@ int main(void) {
   }
   load_fixtures();
   preview_select_ui(PREVIEW_OPTION);
+  smenu.set.selector = PREVIEW_OPTION < SettMAX ? PREVIEW_OPTION : SettSave;
   smenu.tools.selector = PREVIEW_OPTION < ToolsMAX ? PREVIEW_OPTION : ToolsMAX-1;
   REG_DISPCNT = 4 | 0x0400; /* Mode 4, BG2 enabled, framebuffer page 0 */
   int selected = 1, offset = 0, vertical = PREVIEW_VERTICAL, box_mode = PREVIEW_BOX;

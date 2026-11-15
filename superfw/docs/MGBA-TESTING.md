@@ -50,3 +50,12 @@ Animated preview now calls production clipped scaler, preserving DE neighbor
 positions instead of the old fit-to-body clamp. Four settled art/orientation
 screenshots pass and were visually inspected. Cropped-scaler pixel-reference
 checks verify left/right/top/bottom clipping and untouched UI rows/canaries.
+
+PREVIEW_SCREEN=3 extracts the actual main-settings renderer and enum.
+PREVIEW_OPTION selects its row (99 selects Save). PREVIEW_CHIS=1 includes the
+Chis-only NOR settings; omit it for the SD/Lite layout. Values/date/path helpers
+come from tests/settings-preview-fixture.h, explicitly synthetic. Screenshots
+checked: Light Chis Fast ROM, Dark SD Savegame-load lower page, and Save. Text
+uses production bounds/scrolling; long value fields can still truncate. This
+executes presentation only, not input/persistence/storage actions. No emulator
+package/version/launch setup changed.

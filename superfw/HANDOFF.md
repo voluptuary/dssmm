@@ -397,3 +397,7 @@ Corrected horizontal interpolation to move image centers (DE left/right-5/185) a
 ## 2026-11-15 — Alignment CI passed; main settings selection unified
 
 Animated alignment sourced7d761e passed hosted43665956534 all-board/full verifier and vertical midpoint mGBA smoke5539BMP pixels. Main settings now uses the same solid accent selection row as UI settings/Tools for themes6/7, retaining native themes' OAM and all actions. Chis link fits94.15%EWRAM; existing Dark UI-setting preview still passes. Main-settings input/visual screen itself has not been emulated; no physical claim. Updated draft Test5 notes to current native-neighbor behavior and owner561 filename confirmation; no public release. Next hosted source validation then normal integration into dssmm, shared-tree checks and combined CI. Continue performance/parity while awaiting owner565 report.
+
+## 2026-11-15 — Main settings emulator coverage and integration checkpoint
+
+391d7b7 passed hosted43666119527 all-board/full verifier. Added actual main-settings renderer/enum extraction to preview (Screen3), with clearly synthetic settings/date fixture and optional Chis NOR rows. Visually inspected Light Chis Fast-ROM, Dark SD lower save-policy and Save screens; smoke checks pass. Long values remain bounded/truncated; input/persistence are not emulated. Firmware inputs unchanged by this harness slice. Next normal merge into dssmm and combined CI; hardware-test565 remains fixed for performance/header-art result. Continue autonomous parity work; do not claim full parity or physical565 confirmation.
