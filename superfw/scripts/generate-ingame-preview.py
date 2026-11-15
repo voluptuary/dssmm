@@ -13,15 +13,17 @@ text=messages+'''
 /* Synthetic feature flags; no game, SD, save or register-restoration actions. */
 static unsigned copt,selbarpos,num_mem_savestates=2,num_dsk_savestates=2;
 static unsigned has_rtc_support=1,cheat_base_addr=1,ingame_menu_lang;
+static t_dec_date rtc_date={26,11,15,12,0};
+static unsigned rtc_speed=1;
 static const char savefile_pattern[]="preview.sav";
 static struct {const char *msg;} igm_popup;
 #define NOSELBAR 240
 '''
-for name in ('draw_text','draw_menu_selection','draw_main_menu','draw_reset_menu','draw_save_menu'):
+for name in ('draw_text','draw_text_center','draw_menu_selection','draw_main_menu','draw_reset_menu','draw_save_menu','draw_rtc_menu'):
  marker=('static void ' if name=='draw_menu_selection' else 'void ')+name+'('
  a=source.index(marker);b=source.index('\n}',a)+2
  body=source[a:b]
- replacements={'draw_text':'igm_draw_text','draw_menu_selection':'igm_selection',
+ replacements={'draw_text':'igm_draw_text','draw_text_center':'igm_text_center','draw_rtc_menu':'igm_draw_rtc_menu','draw_menu_selection':'igm_selection',
  'draw_main_menu':'igm_draw_main_menu','draw_reset_menu':'igm_draw_reset_menu',
  'draw_save_menu':'igm_draw_save_menu','popup':'igm_popup','msgs':'igm_msgs',
  'HI_COLOR':'FT_COLOR','BL_COLOR':'HI_COLOR','SH_COLOR':'FG_COLOR'}

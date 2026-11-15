@@ -407,3 +407,7 @@ New previews7/8/9 extract actual in-game presentation only with namespaced trans
 ## 2026-11-15 — Hot buffer follows visual transition focus
 
 Refined selected EWRAM cache to follow item->focused, not the new logical selection during the first half of a slide. This keeps the largest visible image in GBA RAM while names/geometry transition; idle/Off focus remains the selected file. Production cache regression asserts the previous image remains hot at the midpoint; ARM bus regression passes. No hardware speed claim. Latest source needs hosted all-board verification before final integration;571 candidate remains fixed and predates this refinement.
+
+## 2026-11-15 — In-game selection consistency and parity map
+
+Extended the shared in-game solid row helper to RTC Update, cheat rows and state actions, keeping numeric arrows/slot icons and all action/storage/restoration code native. State make-persistent selection is normalized before highlighting, as before. Screen10 actual RTC renderer with fake date/speed passes and was inspected; full cheat/state render fixtures remain pending. Bounds/popup helper sanitizer passes. e4c486b hosted43667997240 passed hot visual-focus refinement plus prior IGM slice. Latest extended IGM source still needs hosted all-board verification. Added docs/UI-PARITY.md as the live surface/performance/evidence map; corrected primary reference to ezfomegade per owner. Continue autonomously, with571 hardware image frozen.

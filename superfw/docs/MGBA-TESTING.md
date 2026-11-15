@@ -82,3 +82,8 @@ to its existing theme palette. Light main/RTC row and Dark reset/save Back rows
 were visually checked. The preview alone suppresses unused-parameter warnings
 because production draw callbacks retain unused frame arguments. Production
 warnings and flags are unchanged; no mGBA package/launch configuration changed.
+
+Screen10 extracts in-game RTC presentation with a synthetic date/speed.
+Option6 checks the solid Update button; numeric controls retain native arrows.
+Dark screenshot passed/was inspected. Cheats/states selection rows use the same
+bounds-tested helper but their full renderers have not been previewed yet.

@@ -106,12 +106,13 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   fill_rect(frame, 0, 0, 240, 160, 0);
   fill_rect(frame, 0, 0, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
   fill_rect(frame, 0, 144, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
-  if (PREVIEW_SCREEN >= 7 && PREVIEW_SCREEN <= 9) {
+  if (PREVIEW_SCREEN >= 7 && PREVIEW_SCREEN <= 10) {
     fill_rect(frame,0,0,240,160,0); /* In-game has no launcher tab/footer bars. */
-    copt=PREVIEW_OPTION < (PREVIEW_SCREEN==7 ? 6u : 4u) ? PREVIEW_OPTION : 0;
+    copt=PREVIEW_OPTION < (PREVIEW_SCREEN==7 ? 6u : PREVIEW_SCREEN==10 ? 7u : 4u) ? PREVIEW_OPTION : 0;
     if(PREVIEW_SCREEN==7)igm_draw_main_menu((uint8_t *)frame,0);
     if(PREVIEW_SCREEN==8)igm_draw_reset_menu((uint8_t *)frame,0);
     if(PREVIEW_SCREEN==9)igm_draw_save_menu((uint8_t *)frame,0);
+    if(PREVIEW_SCREEN==10)igm_draw_rtc_menu((uint8_t *)frame,0);
     return;
   }
   if (PREVIEW_SCREEN >= 4 && PREVIEW_SCREEN <= 6) {
