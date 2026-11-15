@@ -1,0 +1,49 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 565,
+  "boards": [
+    {
+      "source_tree_sha256": "f97d5ca0bc62e3b70995552b192b5b9cf40d02d5c5cfa75d403b02495ba840c5",
+      "board": "sd",
+      "dssmm_build": 565,
+      "source_commit": "30829054a3273dd06565085049e9028529fb28c2",
+      "source_dirty": false,
+      "firmware_sha256": "1e7e6d6c02d108fc1ba81027f4cdc4e3cb63a475105eaa6985afbd1a912b1483",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "f97d5ca0bc62e3b70995552b192b5b9cf40d02d5c5cfa75d403b02495ba840c5",
+      "board": "lite",
+      "dssmm_build": 565,
+      "source_commit": "30829054a3273dd06565085049e9028529fb28c2",
+      "source_dirty": false,
+      "firmware_sha256": "d289c0687d6c2492791258ec11b4056fe8d83dc8abf36a9519f23f753436a832",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "f97d5ca0bc62e3b70995552b192b5b9cf40d02d5c5cfa75d403b02495ba840c5",
+      "board": "chis",
+      "dssmm_build": 565,
+      "source_commit": "30829054a3273dd06565085049e9028529fb28c2",
+      "source_dirty": false,
+      "firmware_sha256": "94c0d09f96a433391c91cc989cd1bd40f37fd7dda0592c577251e32f709b25a3",
+      "validation": "built; runtime and hardware validation not implied"
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43665489569",
+    "conclusion": "success"
+  },
+  "checks": [
+    "sanitized decoder/adapter and native-crop pixel-reference tests",
+    "settings allboards",
+    "cache/page/navigation/motion",
+    "ARM cartridge-write regression",
+    "four native-cropped mGBA previews"
+  ],
+  "limits": [
+    "Physical performance and legacy Title compatibility need retesting.",
+    "Official thumbnail archive returns403; synthetic legacy headers used.",
+    "mGBA does not emulate SuperCard I/O."
+  ]
+}

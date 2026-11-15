@@ -25,3 +25,37 @@ The preview now links the production font renderer and extracts the actual draw_
 `PREVIEW_ANIMATION=0` exercises the native-size selected-art preview with extracted production Title/Box placeholders for neighbors. The vertical Box screenshot was visually inspected (5731 BMP-color pixels); timer footer reported1051587cycles for this fixture. This differs from the earlier Title scene and is not a like-for-like performance comparison. Off removes scaling, but framebuffer fill, font and artwork copying/compositing still cost CPU time. Real production-frame/card responsiveness remains unmeasured.
 
 Timing correction: the old preview fill_rect used CPU loops, while production already uses DMA. Preview now uses DMA for background/card fills. Identical vertical Box Off scene changed985694→433206cycles with5731BMP-color pixels unchanged. Prior total-cycle figures must not be presented as production redraw estimates. This still excludes real SD/cartridge memory timing and production per-page reuse. The builder now generates messages_data.h into its output folder, eliminating the previous hidden dependency on an earlier firmware build. Verified in scratch without src/messages_data.h; vertical Title Off passed8604BMP-color pixels.
+
+`PREVIEW_SCREEN=2` renders the extracted production UI-settings function, enum and box/text helpers using fixture preferences (Light, Title, Horizontal, Animation Off). It links the real messages/font path. Initial six rows passed a3020-body-text-pixel check and were visually inspected. The preview clears its generic footer beneath this screen so it does not falsely obscure Save. Supplemental preferences and theme palette remain fixtures; OAM selection, input/scroll/save action and real settings persistence are not exercised by this screenshot.
+
+For lower settings rows, use `PREVIEW_SCREEN=2 PREVIEW_OPTION=9` (Save) or another option index0..9. The preview extracts the actual UI-settings scroll-offset calculation; it does not synthesize input. Save-state screenshot passed3157body-text pixels and was visually checked: Animation/Language/Recent/Text speed/Hidden files/Accent and Save fit. Selection OAM, input and persistence remain separately unverified in mGBA.
+
+`PREVIEW_THEME=6`/`7` selects the actual production Light/Dark palette table extracted from settings.c, mapped to preview background/font/highlight/foreground roles. Default-1 preserves the old schematic palette for earlier artwork checks. Light lower-settings/Save screenshot passed and was visually inspected. Settings smoke now counts non-background foreground pixels (including controls), not exclusively glyph pixels; visual inspection remains required. Accent overrides and OAM palette blending are not modeled yet.
+
+2026-11-15: PREVIEW_OPTION also selects the Tools row (PREVIEW_SCREEN=1),
+clamped to the available rows. Production UI-settings/Tools rendering includes
+DSSMM Light/Dark framebuffer selection fills. Checked Light Animation, Dark
+Accent/lower page and final Tools action. Localized knob labels already containing
+arrows are no longer wrapped again. Fixtures still do not execute native menu
+input, persistence, OAM or actual card I/O. The separate optional ARM/Unicorn
+cartridge-store diagnostic is documented in CAROUSEL-ARTWORK-MEMORY.md; mGBA
+configuration is unchanged.
+
+AnimationOff preview now calls production artwork_blit_cropped for all three
+native-sized images, matching the new cropped-neighbor layout. Four initial
+orientation/art combinations pass screenshot checks. These remain fixture-based;
+no SuperCard I/O is emulated. No emulator setup changes.
+
+Animated preview now calls production clipped scaler, preserving DE neighbor
+positions instead of the old fit-to-body clamp. Four settled art/orientation
+screenshots pass and were visually inspected. Cropped-scaler pixel-reference
+checks verify left/right/top/bottom clipping and untouched UI rows/canaries.
+
+PREVIEW_SCREEN=3 extracts the actual main-settings renderer and enum.
+PREVIEW_OPTION selects its row (99 selects Save). PREVIEW_CHIS=1 includes the
+Chis-only NOR settings; omit it for the SD/Lite layout. Values/date/path helpers
+come from tests/settings-preview-fixture.h, explicitly synthetic. Screenshots
+checked: Light Chis Fast ROM, Dark SD Savegame-load lower page, and Save. Text
+uses production bounds/scrolling; long value fields can still truncate. This
+executes presentation only, not input/persistence/storage actions. No emulator
+package/version/launch setup changed.
