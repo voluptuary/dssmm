@@ -38,5 +38,14 @@ Owner confirms Chis553 no longer crashes at the first entry and Box art works
 in List view; carousel artwork is absent. Build561 (76b7a493) moves byte-written
 carousel metadata from cartridge SDRAM into GBA RAM. Its ARM bus regression
 passes and553 fails. All three clean board builds and hosted CI pass; see
-build-561-validation.json. Chis561 is the current local hardware-test image.
+build-561-validation.json. Chis561 was delivered as a local hardware-test image.
 Physical artwork/performance confirmation is still pending.
+
+## Current local candidate: Build582
+
+Source842bad386c5c3f5616a4b01eaa4f5e3f8596c5c2, displayed hash842bad38.
+All three clean variants share fingerprint and pass integrity/memory gates and
+hosted verification. Chis582 is the current hardware-test image; earlier local
+images were superseded after their evidence was retained. Build581 was not
+distributed after the BMP-tail audit. See build-582-validation.json. Physical
+Header Title matching, speed and in-game save/restore qualification remain open.

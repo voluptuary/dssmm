@@ -40,7 +40,7 @@ with tempfile.TemporaryDirectory() as tmp:
                 if len(row.split()) == 3 and row.split()[2] in ('__assert_func', 'abort', '_exit')}
     violations = []
     def write(uc, access, address, size, value, context):
-        if 0x08000000 <= address < 0x08100000 and (size < 2 or address % 2):
+        if 0x08000000 <= address < 0x08100000 and (size not in (2,4) or address % size):
             violations.append(f'unsupported {size}-byte cartridge store at {address:#x}')
             uc.emu_stop()
     def instruction(uc, address, size, context):

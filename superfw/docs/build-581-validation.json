@@ -1,0 +1,39 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 581,
+  "boards": [
+    {
+      "source_tree_sha256": "2016a481219afa802830856511560587ca066d31e6386a733fd4451561f0dc22",
+      "board": "sd",
+      "dssmm_build": 581,
+      "source_commit": "814ee8e50f62914b22492cc609c99c4f4c0b8cb8",
+      "source_dirty": false,
+      "firmware_sha256": "c5ab6b7a038363f2660b3a321a033d3df51fc12ad0ef0e87b551fd27d214a122",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "2016a481219afa802830856511560587ca066d31e6386a733fd4451561f0dc22",
+      "board": "lite",
+      "dssmm_build": 581,
+      "source_commit": "814ee8e50f62914b22492cc609c99c4f4c0b8cb8",
+      "source_dirty": false,
+      "firmware_sha256": "cf598d77e47e3df7a42fa8171274931c38f2b480f45b08f891a0bccb0217e6dc",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "2016a481219afa802830856511560587ca066d31e6386a733fd4451561f0dc22",
+      "board": "chis",
+      "dssmm_build": 581,
+      "source_commit": "814ee8e50f62914b22492cc609c99c4f4c0b8cb8",
+      "source_dirty": false,
+      "firmware_sha256": "ed29da218d46ccad9c3474cf05c35cc1739886f0c699f2794a9d2f8482642e47",
+      "validation": "built; runtime and hardware validation not implied"
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43669205497",
+    "conclusion": "success",
+    "scope": "all four kernel projects"
+  },
+  "distribution": "not distributed; superseded by the BMP staging-tail bus fix"
+}
