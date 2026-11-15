@@ -56,3 +56,11 @@ rounds odd X coordinates down one pixel. Selection remains painted last; missing
 art icons are clamped independently. During motion a rectangle may be outside
 the body; clipped blitters reject fully invisible rectangles safely. This is
 presentation only; no card protocols are imported from DE.
+
+Selected artwork now has one9,600-byte NOLOAD EWRAM hot buffer. The three-image
+SDRAM cache remains the backing store; selecting an image copies it once with
+DMA, then repeated native/scaled samples read GBA RAM. New cache contents or
+artwork invalidation reset the hot identity. The ELF gate checks both byte-safe
+metadata placement and the hot image's EWRAM address/size on every board. The
+first Chis link uses251,756/257,024EWRAM bytes (97.95%); future code growth is
+linker-limited. This is static layout evidence, not hardware speed/stack proof.
