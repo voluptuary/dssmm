@@ -87,3 +87,14 @@ Screen10 extracts in-game RTC presentation with a synthetic date/speed.
 Option6 checks the solid Update button; numeric controls retain native arrows.
 Dark screenshot passed/was inspected. Cheats/states selection rows use the same
 bounds-tested helper but their full renderers have not been previewed yet.
+
+Screen11 renders two synthetic cheat titles, one enabled and one disabled; no
+cheat opcodes execute. Screen12 uses the production slot renderer and native
+slot icon assets with fake valid/empty flags. PREVIEW_STATE_SLOT selects memory
+(0) or persistent(-1); PREVIEW_MAKEPERS=0 exercises the persistent-copy prompt
+(default-1 is normal). Checked memory option2, persistent option2, and persistent
+copy with initial option2 normalized to0. Production signed slot-count types are
+preserved in fixtures; no warning suppression was added for their comparisons.
+Icon palette128..143 is loaded only for Screen12, protecting artwork palettes
+in other previews. Actual read/write/delete/make-persistent operations and game
+state restoration are never invoked. No mGBA setup change.

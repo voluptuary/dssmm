@@ -106,13 +106,15 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   fill_rect(frame, 0, 0, 240, 160, 0);
   fill_rect(frame, 0, 0, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
   fill_rect(frame, 0, 144, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
-  if (PREVIEW_SCREEN >= 7 && PREVIEW_SCREEN <= 10) {
+  if (PREVIEW_SCREEN >= 7 && PREVIEW_SCREEN <= 12) {
     fill_rect(frame,0,0,240,160,0); /* In-game has no launcher tab/footer bars. */
     copt=PREVIEW_OPTION < (PREVIEW_SCREEN==7 ? 6u : PREVIEW_SCREEN==10 ? 7u : 4u) ? PREVIEW_OPTION : 0;
     if(PREVIEW_SCREEN==7)igm_draw_main_menu((uint8_t *)frame,0);
     if(PREVIEW_SCREEN==8)igm_draw_reset_menu((uint8_t *)frame,0);
     if(PREVIEW_SCREEN==9)igm_draw_save_menu((uint8_t *)frame,0);
     if(PREVIEW_SCREEN==10)igm_draw_rtc_menu((uint8_t *)frame,0);
+    if(PREVIEW_SCREEN==11){igm_fake_cheats();copt=PREVIEW_OPTION<2?PREVIEW_OPTION:0;igm_draw_cheats_menu((uint8_t *)frame,0);}
+    if(PREVIEW_SCREEN==12){copt=PREVIEW_OPTION<3?PREVIEW_OPTION:0;igm_draw_states_menu((uint8_t *)frame,0);}
     return;
   }
   if (PREVIEW_SCREEN >= 4 && PREVIEW_SCREEN <= 6) {
@@ -172,6 +174,10 @@ int main(void) {
     PALETTE[0]=colors->bg_color; PALETTE[1]=colors->ft_color;
     PALETTE[2]=colors->hi_color; PALETTE[3]=colors->fg_color;
     menu_theme=PREVIEW_THEME;
+  }
+  if (PREVIEW_SCREEN==12) {
+    for(unsigned i=0;i<16;++i)PALETTE[128+i]=menu_icons_pal[i];
+    PALETTE[128]=PALETTE[0];
   }
   load_fixtures();
   preview_select_ui(PREVIEW_OPTION);

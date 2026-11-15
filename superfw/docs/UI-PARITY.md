@@ -13,7 +13,7 @@ Unsupported hardware features remain excluded.
 | Artwork storage | Halfword SDRAM pixels; byte metadata in IWRAM; focused image hot copy in EWRAM | 561 filename result confirms metadata fix. Newest focus refinement is newer than571. |
 | Main/UI settings and Tools | Bounded left-aligned rows, solid accent selections on Light/Dark; native themes retained | Actual renderers previewed; real input/persistence only host-tested. Long localized strings may truncate. |
 | ROM info/patch/loading | Bounded left labels, solid Light/Dark selections, navigation-safe headings, compact English labels/date | Actual renderer previews pass; real launch/NOR actions not exercised by previews. |
-| In-game menus | Theme palette inherited; solid selection rows across main/reset/save/RTC update/cheats/states | First four previewed with fake state. Cheats/states action rows need visual fixtures; game-state/save/restore qualification needs real card. Logo, dialogs, typography and slot composition retain native SuperFW elements. |
+| In-game menus | Theme palette inherited; solid selection rows across main/reset/save/RTC update/cheats/states | All six renderers previewed with fake state, including memory/disk/make-persistent views. Game-state/save/restore qualification needs real card. Logo, dialogs, typography and slot composition retain native SuperFW elements. |
 | Confirmation/RTC/file-manager/system dialogs | Native behavior, inherited palette and earlier alignment fixes | Continue visual consistency, wrapping/bounds and interactive coverage. |
 
 ## Hardware evidence

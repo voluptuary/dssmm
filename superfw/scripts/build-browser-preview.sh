@@ -58,7 +58,7 @@ for signature in ("static const char *render_gbarom_patching(","static const cha
 Path(sys.argv[2]).write_text(text)
 PY
 arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -Wno-unused-parameter -mcpu=arm7tdmi -mthumb \
-  -D__GBA__ ${PREVIEW_CHIS:+-DSUPPORT_NORGAMES} -I "$project_root/tests" -DPREVIEW_THEME="${PREVIEW_THEME:--1}" -DPREVIEW_OPTION="${PREVIEW_OPTION:-0}" -DPREVIEW_ANIMATION="${PREVIEW_ANIMATION:-1}" -DPREVIEW_TIMING="${PREVIEW_TIMING:-0}" -DPREVIEW_SCREEN="${PREVIEW_SCREEN:-0}" -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
+  -D__GBA__ -DPREVIEW_MAKEPERS="${PREVIEW_MAKEPERS:--1}" -DPREVIEW_STATE_SLOT="${PREVIEW_STATE_SLOT:-0}" ${PREVIEW_CHIS:+-DSUPPORT_NORGAMES} -I "$project_root/tests" -DPREVIEW_THEME="${PREVIEW_THEME:--1}" -DPREVIEW_OPTION="${PREVIEW_OPTION:-0}" -DPREVIEW_ANIMATION="${PREVIEW_ANIMATION:-1}" -DPREVIEW_TIMING="${PREVIEW_TIMING:-0}" -DPREVIEW_SCREEN="${PREVIEW_SCREEN:-0}" -DPREVIEW_VERTICAL="${PREVIEW_VERTICAL:-0}" -DPREVIEW_BOX="${PREVIEW_BOX:-0}" -DPREVIEW_OFFSET="${PREVIEW_OFFSET:-0}" -DPREVIEW_AUTOMOVE="${PREVIEW_AUTOMOVE:-0}" -I "$project_root/src" -I "$out" -specs=gba.specs \
   "$project_root/tests/browser-preview-rom.c" "$project_root/src/browser_carousel.c" \
   "$project_root/src/artwork.c" "$project_root/src/gbahw.c" \
   "$project_root/src/fonts/font_render.c" "$project_root/src/utf_util.c" \
