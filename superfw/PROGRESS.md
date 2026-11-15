@@ -540,3 +540,12 @@ Begin clean same-source all3 packaging/hosted validation before replacing594.
 but not distributed. Owner requests12-character name cap, then cancels name
 editing/keyboard. Apply12-character readonly display only; Time remains the
 selectable header item. Next clean numbered all3 set and hardware-test delivery.
+
+## 2026-11-15 — Build599 current hardware candidate
+
+All3 clean size/resource/RAM/integrity gates, standard local verifier and
+hosted43726431002 pass. Delivered Chis599 in root hardware-test, retaining art ZIP.
+Name editor canceled;12-character NAME.TXT display only. Time/editor/wrap/NOR-B,
+stronger corners, isolated settings children and readonly resource background
+storage included. Superseded own594 local files, evidence retained. No public
+release or physical599 claim. Continue DE category/body/layout parity autonomously.

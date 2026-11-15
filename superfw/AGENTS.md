@@ -130,7 +130,7 @@ Implementations are in development; see LAUNCHER-PORT.md. The selected time open
 an HH/MM editor; software clock advances only while the menu runs, preserves
 game RTC defaults and uses unset markers until configured. Owner explicitly
 requested this clock after the initial hardware-RTC omission. No Auto themes.
-Username retains11 complete UTF8 characters from first line, optional BOM.
+Username retains12 complete UTF8 characters from first line, optional BOM.
 Background streams now follow unchanged native font prefixes in the existing
 1.5MiB SDRAM resource area; keep prefixes, header data_size and native unpack
 paths intact. Enforce rounded resource budget, packed flash and GBA RAM separately.

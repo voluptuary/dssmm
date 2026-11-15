@@ -622,3 +622,17 @@ canceled before implementation. Keep NAME.TXT editing manual and only Time
 selectable; wrap cycle remains Last/rememberedSDorNOR/Settings/Time. Updated
 parser/display storage to12 full UTF8 characters (49bytes). New clean candidate
 needed after this tiny follow-up;594 stays current until replacement.
+
+## 2026-11-15 — Build599 delivered
+
+Clean all3 Build599/source18a8c56eae41a8a61e5338aac7b87590d3199763
+passes identity/seals, board flash caps, GBA placement and resource budget.
+Standard local full verifier passes; hosted43726431002 passes. Evidence
+build-599-validation.json. Root hardware-test now Chis599/hash18a8c56e plus
+manifest/guide; own594 files superseded after tracked evidence. Letter art ZIP
+and preview retained. Name readonly12-character UTF8 first-line display; user
+canceled name keyboard/editing before implementation. Time remains selectable,
+wrapped Last/SD-or-NOR/Settings/Time, independent software clock and editor.
+No physical599 qualification; owner594 progress recorded. Continue DE settings
+layout/backgrounds, true View options grouping, System/Help/dialog presentation.
+Do not edit599 image while next work proceeds. Integrate/sync this milestone.

@@ -43,7 +43,7 @@ save migration, game launching or in-game restoration.
 ## Name, selectable clock and wrapping
 
 Owner594 feedback adds a solid Start top bar: the first line of
-`SYSTEM/NAME.TXT` appears on the left (up to11 complete UTF8 characters; optional
+`SYSTEM/NAME.TXT` appears on the left (up to12 complete UTF8 characters; optional
 BOM accepted), and a24-hour clock appears on the right. `SYSTEM/NAME` is a
 compatibility fallback. The name is read once during startup, not per frame.
 
