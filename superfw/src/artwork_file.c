@@ -3,6 +3,11 @@
 #include "fatfs/ff.h"
 #include <string.h>
 #include <limits.h>
+#if FF_FS_TINY
+_Static_assert(offsetof(FATFS, win)%4 == 0, "FatFS sector cache must be word aligned");
+#else
+_Static_assert(offsetof(FIL, buf)%4 == 0, "FatFS file cache must be word aligned");
+#endif
 /* No truncated candidate opens, path traversal or directory scans. */
 bool artwork_path(char *out, size_t capacity, const char *rom, unsigned style, unsigned candidate) {
   if (!out || !capacity || !rom || rom[0] != '/' || !rom[1] || style > 1 || candidate > 1) return false;
@@ -84,10 +89,23 @@ static bool artwork_decode_file(FIL *file, uint8_t *bmp, size_t bmp_capacity,
                                 uint8_t *pixels, size_t capacity, artwork_info *info, bool gamecode) {
   FSIZE_t file_size = f_size(file);
   UINT got = 0;
-  if (!bmp || bmp_capacity > ARTWORK_BMP_MAX_SIZE || file_size > bmp_capacity ||
+  if (!bmp || ((uintptr_t)bmp & 3) || bmp_capacity > ARTWORK_BMP_MAX_SIZE ||
+      file_size < 54 || file_size > bmp_capacity || ((file_size+1)&~(FSIZE_t)1) > bmp_capacity ||
       file_size > UINT32_MAX || file_size > UINT_MAX) return false;
   if (f_tell(file) != 0 && f_lseek(file, 0) != FR_OK) return false;
-  if (f_read(file, bmp, (UINT)file_size, &got) != FR_OK || got != file_size) return false;
+  /* FatFS uses memcpy for partial sectors; newlib's 1..3 byte tail stores
+   * are invalid on the cartridge bus. Bulk destination/count stay word-aligned.
+   * Fetch the final bytes into GBA RAM, then emit only halfword stores. The
+   * second read reuses the final sector already cached by the bulk read. */
+  UINT bulk=(UINT)file_size & ~3u;
+  if (f_read(file, bmp, bulk, &got) != FR_OK || got != bulk) return false;
+  UINT remaining=(UINT)file_size-bulk;
+  if (remaining) {
+    _Alignas(4) uint8_t tail[4]={0};
+    if (f_read(file, tail, remaining, &got) != FR_OK || got != remaining) return false;
+    for (unsigned i=0;i<remaining;i+=2)
+      ((volatile uint16_t *)(bmp+bulk))[i/2]=tail[i]|((uint16_t)tail[i+1]<<8);
+  }
   artwork_buffer input = {bmp, false};
   if (artwork_decode(read_buffer, &input, (uint32_t)file_size, pixels, capacity, info)) return true;
   /* Match native EZ fixed-record semantics only for game-code fallbacks.

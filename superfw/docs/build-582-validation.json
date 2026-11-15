@@ -1,0 +1,63 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 582,
+  "boards": [
+    {
+      "source_tree_sha256": "9d22f5e837c9360bc94b921e462e694fd9c3ad4ffe9efd478ea3727c669913ab",
+      "board": "sd",
+      "dssmm_build": 582,
+      "source_commit": "842bad386c5c3f5616a4b01eaa4f5e3f8596c5c2",
+      "source_dirty": false,
+      "firmware_sha256": "39e8d4864f9b20bed70abf6d746c9281a67b34b8092413f42faa54b8b476b6d1",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "9d22f5e837c9360bc94b921e462e694fd9c3ad4ffe9efd478ea3727c669913ab",
+      "board": "lite",
+      "dssmm_build": 582,
+      "source_commit": "842bad386c5c3f5616a4b01eaa4f5e3f8596c5c2",
+      "source_dirty": false,
+      "firmware_sha256": "fa67e39d49308b473bbe6bd0ad03b1cc6080222d2e540caae93690dc33b51a9b",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "9d22f5e837c9360bc94b921e462e694fd9c3ad4ffe9efd478ea3727c669913ab",
+      "board": "chis",
+      "dssmm_build": 582,
+      "source_commit": "842bad386c5c3f5616a4b01eaa4f5e3f8596c5c2",
+      "source_dirty": false,
+      "firmware_sha256": "5f3e919b878a252056c4bc31d1db869868cfca39ec0f1ade558d4680876350de",
+      "validation": "built; runtime and hardware validation not implied"
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43670448850",
+    "conclusion": "success"
+  },
+  "checks": [
+    "clean uniform all-board identity/seal gate",
+    "linked metadata and EWRAM image gates",
+    "sanitized decoder/adapter/crop tests",
+    "both ARM cartridge-bus regressions",
+    "UI settings input replay and all renderer fixtures on preceding presentation source"
+  ],
+  "memory_usage": {
+    "sd": {
+      "iwram_bytes": 13112,
+      "ewram_bytes": 237544
+    },
+    "lite": {
+      "iwram_bytes": 13280,
+      "ewram_bytes": 238104
+    },
+    "chis": {
+      "iwram_bytes": 12872,
+      "ewram_bytes": 252376
+    }
+  },
+  "limits": [
+    "ROM-header Title compatibility and speed still need physical confirmation.",
+    "mGBA previews do not emulate SuperCard storage or game-state restoration.",
+    "Original IMGS archive unavailable with HTTP403; legacy records tested synthetically."
+  ]
+}
