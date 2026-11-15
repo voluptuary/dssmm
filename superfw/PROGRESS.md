@@ -462,3 +462,13 @@ Apache notice and documented conversion/metrics in FONT-PORT.md. Settings and
 pixel/scroll/clipping sanitizer pass; Chis link and mGBA UI fixture pass.
 In-game reserved-word propagation retains existing payload layout. Clean all3
 packaging and new hardware-test image follow; no physical font claims.
+
+## 2026-11-15 — Build588 candidate
+
+All3 clean588 packages pass identities/seals/memory gates; hosted43720266778
+passes. Local full sanitizer suite passes with non-PIE flags after standard
+ASAN startup failure; evidence build-588-validation.json. Delivered numbered
+Chis588 in root hardware-test with CUSTOM directory art and optional actual DE
+ASCII font. Updated guide/manifests and removed superseded own585 artifacts.
+No public release or physical588 qualification. Normal integration e7759f3
+pushed; finish evidence integration/sync and retain session BIOS/scratch.

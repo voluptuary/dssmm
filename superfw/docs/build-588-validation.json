@@ -1,0 +1,59 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 588,
+  "boards": [
+    {
+      "source_tree_sha256": "fce5ba0696d91228e2d99a08738e8ada562f722d1fdea474fcca6fd21f254eb6",
+      "board": "sd",
+      "dssmm_build": 588,
+      "source_commit": "2a150a379d28bac81418ece349a0bf343b963b15",
+      "source_dirty": false,
+      "firmware_sha256": "d463536f16bfef8d8d27693e210145a6bdda459f78850e739b6bd12df635f9f2",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "fce5ba0696d91228e2d99a08738e8ada562f722d1fdea474fcca6fd21f254eb6",
+      "board": "lite",
+      "dssmm_build": 588,
+      "source_commit": "2a150a379d28bac81418ece349a0bf343b963b15",
+      "source_dirty": false,
+      "firmware_sha256": "da6e334d7cfb1b7afecd89742e4889c66f215b3993d31b78e0ce8ed7dbf87aae",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "fce5ba0696d91228e2d99a08738e8ada562f722d1fdea474fcca6fd21f254eb6",
+      "board": "chis",
+      "dssmm_build": 588,
+      "source_commit": "2a150a379d28bac81418ece349a0bf343b963b15",
+      "source_dirty": false,
+      "firmware_sha256": "23b5a2da1387008c28c5237e857173cae701eb4e9c4c2ac777da39356b0560e2",
+      "validation": "built; runtime and hardware validation not implied"
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43720266778",
+    "conclusion": "success"
+  },
+  "checks": [
+    "Sanitized font pixels/metrics/clipping/scrolling/native Unicode fallback",
+    "Settings defaults/migration/font persistence for all three boards",
+    "Artwork loader/decoder including directory CUSTOM and renderer dispatch",
+    "ARM cartridge-bus adapter and cache tests",
+    "Carousel motion/navigation/cache/page tests",
+    "mGBA DSSMM-font UI screenshot inspected",
+    "Clean serial three-board builds and identity/seal/memory gates"
+  ],
+  "local_upstream_host": {
+    "standard": "ASAN startup DEADLYSIGNAL in sha256_test; terminated failing process",
+    "rerun": "all passed with CFLAGS adding -fno-pie -no-pie; sanitizers and coverage retained",
+    "coverage_lines": "90.8%",
+    "coverage_functions": "94.5%"
+  },
+  "memory": {
+    "sd_ewram": 240096,
+    "lite_ewram": 240696,
+    "chis_ewram": 254956,
+    "ewram_limit": 257024
+  },
+  "hardware_limits": "Owner confirms Chis585 header art and cache. New directory CUSTOM/font/IGM propagation not yet physically tested."
+}

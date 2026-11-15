@@ -487,3 +487,16 @@ mGBA UI screenshot inspected: compact DSSMM glyphs and Font option fit. Folder
 CUSTOM and both bus regressions remain required gates. Next clean committed
 all3 candidate, integrity/memory checks and hardware-test delivery. Physical
 font/folder/IGM qualification pending;585 remains until validated replacement.
+
+## 2026-11-15 — Build588 delivered
+
+Clean SD/Lite/Chis588 at2a150a379d28bac81418ece349a0bf343b963b15
+share fingerprint and pass integrity/seals/memory gates; hosted43720266778
+passes. Chis254956/257024EWRAM (2068bytes static headroom; stack/runtime not
+qualified). Local upstream standard ASAN sha256 startup hit known DEADLYSIGNAL;
+terminated that process and complete sanitizer/coverage suite passed with
+CFLAGS adding -fno-pie -no-pie (90.8%lines/94.5%functions). No tests suppressed.
+Evidence docs/build-588-validation.json. Root hardware-test now contains Chis588
+and manifest/guide; superseded own585 local artifacts after preserving evidence.
+Folder CUSTOM and optional font need physical observation. Owner585 confirms
+header art and five-cache behavior. Continue broader parity autonomously.
