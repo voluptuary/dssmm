@@ -375,3 +375,7 @@ Clean uniform SD/Lite/Chis565 builds, integrity gate and hosted43665489569 pass.
 ## 2026-11-15 — Animated DE geometry preserved with clipping
 
 Corrected horizontal interpolation to move image centers (DE left/right-5/185) and vertical next Y124. Removed fit-to-body geometry shifts; actual clipped scaler keeps source sampling anchored while protecting UI rows. Missing-image icons clamp independently, selection paints last. Added pixel-reference/canary regression for clipped scaling; motion/cache/page/navigation/ARM bus checks pass. All four settled animated mGBA views pass/visually reviewed; Chis source link fits (EWRAM94.13%,IWRAM39.28%). Mid-transition preview pending. No new distributed image; hardware-test565 frozen. Full parity/performance and physical legacy Title result remain open; continue autonomously.
+
+## 2026-11-15 — Alignments validated, common selection treatment extended
+
+All-board/full CI43665956534 passes DE geometry/clipped scaler; vertical midpoint preview passes. Main settings adopts existing accent row helper for Light/Dark, Chis link fits and shared UI preview passes. Main settings screen visual/input remains unqualified. Draft release notes corrected for current behavior/physical evidence. Integration next; hardware-test565 untouched.

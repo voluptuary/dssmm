@@ -1933,6 +1933,13 @@ void render_rtcpop(volatile uint8_t *frame) {
   draw_central_text("⯆", frame, cox[spop.rtcpop.selector], 84);
 }
 
+/* Framebuffer selection leaves text crisp and avoids the native tiled OAM bar. */
+static void draw_menu_selection(volatile uint8_t *frame, unsigned y,
+                                unsigned left, unsigned right) {
+  for (unsigned row = 0; row < 16; ++row)
+    dma_memset16(frame + (y+row)*SCREEN_WIDTH + left, dup8(HI_COLOR), (right-left)/2);
+}
+
 void render_settings(volatile uint8_t *frame) {
   char tmp[128];
   unsigned baseopt = smenu.set.selector <= 2  ? 0 :
@@ -1949,6 +1956,8 @@ void render_settings(volatile uint8_t *frame) {
   const unsigned value_x = 128;
   const unsigned offy = 29;
   const unsigned rowh = 20;
+  if (menu_theme >= THEME_DSSMM_LIGHT && smenu.set.selector != SettSave)
+    draw_menu_selection(frame, offy + (smenu.set.selector-baseopt)*rowh, 4, 236);
 
   if (optnum++ >= baseopt && optcnt < maxrows)
     draw_text_ovf(msgs[lang_id][MSG_SET_TITL1], frame, 8, offy + rowh*optcnt++, 224);
@@ -2109,16 +2118,9 @@ void render_settings(volatile uint8_t *frame) {
     draw_text_ovf_rotate(msgs[lang_id][help_msg], frame, 4, SCREEN_HEIGHT - 18, 232, &smenu.anim_state);
   }
 
-  if (smenu.set.selector != SettSave)
+  if (menu_theme < THEME_DSSMM_LIGHT && smenu.set.selector != SettSave)
     for (unsigned i = 0; i < 240; i += 16)
       render_icon_trans(i, offy + (smenu.set.selector - baseopt) * 20, 63);
-}
-
-/* Framebuffer selection leaves text crisp and avoids the native tiled OAM bar. */
-static void draw_menu_selection(volatile uint8_t *frame, unsigned y,
-                                unsigned left, unsigned right) {
-  for (unsigned row = 0; row < 16; ++row)
-    dma_memset16(frame + (y+row)*SCREEN_WIDTH + left, dup8(HI_COLOR), (right-left)/2);
 }
 
 void render_ui_settings(volatile uint8_t *frame) {
