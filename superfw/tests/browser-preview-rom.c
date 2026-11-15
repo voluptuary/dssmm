@@ -82,7 +82,7 @@ static void card(volatile uint8_t *frame, const browser_carousel_item *item,
                  int vertical, int box_mode) {
   (void)vertical;
   uint8_t body = item->focused ? 2 : 3;
-  fill_rect(frame, item->x, item->y, item->w, item->h, body);
+  (void)body; /* The full browser background is already clear. */
   int code_index = title_art_index_from_header((unsigned)item->index);
   if (code_index < 0) return;
   unsigned art_index = (unsigned)code_index;
@@ -90,39 +90,39 @@ static void card(volatile uint8_t *frame, const browser_carousel_item *item,
   const artwork_info *info = box_mode ? &fixture_box_info[art_index] : &fixture_title_info[art_index];
   bool valid = box_mode ? fixture_box_valid[art_index] : fixture_title_valid[art_index];
   if (!valid) return;
-  unsigned x = item->x, y = item->y, width = item->w, height = item->h;
+  int x = item->x, y = item->y;
+  unsigned width = item->w, height = item->h;
   if (box_mode) {
     width = height = item->w < item->h ? item->w : item->h;
     x += (item->w - width) / 2;
     y += (item->h - height) / 2;
   }
   if (x & 1) --x;
-  if (item->focused && width == info->width && height == info->height)
-    (void)artwork_blit_frame((volatile uint16_t *)frame, pixels, info, x, y);
-  else
-  (void)artwork_blit_scaled((volatile uint16_t *)frame, pixels, info, x, y, width, height);
+  (void)artwork_blit_scaled_cropped((volatile uint16_t *)frame,pixels,info,x,y,width,height);
 }
 
 static void render(volatile uint8_t *frame, int vertical, int selected, int offset, int box_mode) {
   fill_rect(frame, 0, 0, 240, 160, 0);
-  fill_rect(frame, 0, 0, 240, 16, 1);
-  fill_rect(frame, 0, 144, 240, 16, 1);
+  fill_rect(frame, 0, 0, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
+  fill_rect(frame, 0, 144, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
+  if (PREVIEW_SCREEN == 3) { render_settings(frame); return; }
+  if (PREVIEW_SCREEN == 2) {
+    fill_rect(frame,0,144,240,16,0);
+    render_ui_settings(frame); return;
+  }
   if (PREVIEW_SCREEN == 1) { render_tools(frame); return; }
   browser_carousel_item items[3];
   unsigned n = browser_carousel_layout(vertical, selected, 3, offset, items);
   int focus = selected;
   for (unsigned i = 0; i < n; ++i) {
-    if (!PREVIEW_ANIMATION && !items[i].focused) {
-      unsigned x = items[i].x + items[i].w/2 - 8;
-      unsigned y = items[i].y + items[i].h/2 - 8;
-      if (vertical) { x=52; y=items[i].index < selected ? 24 : 128; }
-      render_artwork_placeholder(frame,x,y,box_mode);
-    } else if (!PREVIEW_ANIMATION) {
-      browser_carousel_item native=items[i];
-      native.w=box_mode ? 80 : 120; native.h=80;
-      native.x=vertical ? (120-native.w)/2 : (240-native.w)/2;
-      native.y=vertical ? 48 : 27;
-      card(frame,&native,vertical,box_mode);
+    if (!PREVIEW_ANIMATION) {
+      unsigned index = items[i].index;
+      const artwork_info *info = box_mode ? &fixture_box_info[index] : &fixture_title_info[index];
+      const uint16_t *pixels = box_mode ? fixture_box_pixels[index] : fixture_title_pixels[index];
+      int delta = (int)index-selected;
+      int x = vertical ? (120-info->width)/2 : (240-info->width)/2+delta*(int)info->width;
+      int y = vertical ? 48+delta*80 : 27;
+      artwork_blit_cropped((volatile uint16_t *)frame,pixels,info,x,y);
     } else card(frame, &items[i], vertical, box_mode);
     if (items[i].focused) focus = items[i].index;
   }
@@ -137,7 +137,16 @@ int main(void) {
   PALETTE[3] = 0x56B5;  /* side card */
   for (unsigned i = 0; i < ARTWORK_PALETTE_SIZE; ++i)
     PALETTE[ARTWORK_PALETTE_BASE + i] = artwork_palette_color(i);
+  if (PREVIEW_THEME >= 0 && PREVIEW_THEME < THEME_COUNT) {
+    const t_theme_colors *colors = &themes[PREVIEW_THEME];
+    PALETTE[0]=colors->bg_color; PALETTE[1]=colors->ft_color;
+    PALETTE[2]=colors->hi_color; PALETTE[3]=colors->fg_color;
+    menu_theme=PREVIEW_THEME;
+  }
   load_fixtures();
+  preview_select_ui(PREVIEW_OPTION);
+  smenu.set.selector = PREVIEW_OPTION < SettMAX ? PREVIEW_OPTION : SettSave;
+  smenu.tools.selector = PREVIEW_OPTION < ToolsMAX ? PREVIEW_OPTION : ToolsMAX-1;
   REG_DISPCNT = 4 | 0x0400; /* Mode 4, BG2 enabled, framebuffer page 0 */
   int selected = 1, offset = 0, vertical = PREVIEW_VERTICAL, box_mode = PREVIEW_BOX;
   unsigned old_keys = 0, back_page = 1, demo_frame = 0;

@@ -17,9 +17,11 @@ uint16_t artwork_palette_color(unsigned index) {
          (((b * 31 + 2) / 5) << 10);
 }
 static uint8_t pixel_index(uint16_t pixel) {
-  unsigned r = ((pixel & 31) * 5 + 15) / 31;
-  unsigned g = (((pixel >> 5) & 31) * 5 + 15) / 31;
-  unsigned b = (((pixel >> 10) & 31) * 5 + 15) / 31;
+  /* ARM7TDMI has no divide; this exact lookup avoids three divisions per pixel. */
+  static const uint8_t quantize[32] = {0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5};
+  unsigned r = quantize[pixel & 31];
+  unsigned g = quantize[(pixel >> 5) & 31];
+  unsigned b = quantize[(pixel >> 10) & 31];
   return ARTWORK_PALETTE_BASE + r + 6 * g + 36 * b;
 }
 bool artwork_decode(artwork_read_fn read, void *context, uint32_t file_size,
@@ -113,6 +115,69 @@ bool artwork_blit_scaled(volatile uint16_t *frame, const uint16_t *pixels,
       if (!p0) pair = (pair & 0xff00) | (dst[col / 2] & 0x00ff);
       if (!p1) pair = (pair & 0x00ff) | (dst[col / 2] & 0xff00);
       dst[col / 2] = pair;
+    }
+  }
+  return true;
+}
+
+bool artwork_blit_cropped(volatile uint16_t *frame, const uint16_t *pixels,
+                          const artwork_info *info, int x, int y) {
+  if (!frame || !pixels || !info || ((uintptr_t)frame & 1) || ((uintptr_t)pixels & 1) ||
+      x < -120 || x > 240 || y < -80 || y > 160 || (x & 1) ||
+      (info->width != 80 && info->width != 120) || info->height != 80) return false;
+  int left = x < 0 ? -x : 0;
+  int right = x + info->width > 240 ? 240-x : info->width;
+  int top = y < 16 ? 16-y : 0;
+  int bottom = y+80 > 144 ? 144-y : 80;
+  if (left >= right || top >= bottom) return false;
+  for (int row=top; row<bottom; ++row) {
+    volatile uint16_t *dst=frame+(y+row)*120+(x+left)/2;
+    const uint16_t *src=pixels+(row*info->width+left)/2;
+#ifdef __GBA__
+    if (!info->transparent) {
+      dma_memcpy16(dst, src, (right-left)/2);
+      continue;
+    }
+#endif
+    for (int col=left; col<right; col+=2) {
+      uint16_t pair=*src++;
+      if (info->transparent && (!(pair&255) || !(pair&0xff00))) {
+        uint16_t bg=*dst;
+        if (!(pair&255)) pair|=bg&255;
+        if (!(pair&0xff00)) pair|=bg&0xff00;
+      }
+      *dst++=pair;
+    }
+  }
+  return true;
+}
+
+/* Keep source sampling anchored to the complete rectangle when its edges clip. */
+bool artwork_blit_scaled_cropped(volatile uint16_t *frame, const uint16_t *pixels,
+                                 const artwork_info *info, int x, int y,
+                                 unsigned width, unsigned height) {
+  if (!frame || !pixels || !info || ((uintptr_t)frame&1) || ((uintptr_t)pixels&1) ||
+      (x&1) || x < -240 || x > 240 || y < -160 || y > 160 ||
+      !width || width>240 || (width&1) || !height || height>160 ||
+      (info->width!=80 && info->width!=120) || info->height!=80) return false;
+  int left=x<0 ? -x : 0, right=x+(int)width>240 ? 240-x : (int)width;
+  int top=y<16 ? 16-y : 0, bottom=y+(int)height>144 ? 144-y : (int)height;
+  if (left>=right || top>=bottom) return false;
+  uint8_t sample[240];
+  for (int col=left;col<right;++col) sample[col]=col*info->width/width;
+  for (int row=top;row<bottom;++row) {
+    unsigned sy=row*80/height;
+    const uint8_t *src=(const uint8_t *)pixels+sy*info->width;
+    volatile uint16_t *dst=frame+(y+row)*120+(x+left)/2;
+    for (int col=left;col<right;col+=2) {
+      unsigned lo=src[sample[col]], hi=src[sample[col+1]];
+      uint16_t pair=lo|(hi<<8);
+      if (!lo || !hi) {
+        uint16_t bg=*dst;
+        if (!lo) pair|=bg&255;
+        if (!hi) pair|=bg&0xff00;
+      }
+      *dst++=pair;
     }
   }
   return true;

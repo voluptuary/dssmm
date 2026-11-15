@@ -397,10 +397,6 @@ typedef struct {
   t_rentry rentries[RECENT_MAXFN_CNT];
   t_reg_entry_max nordata;
   struct {
-    bool cached, valid;
-    unsigned mode;
-    char rom[MAX_FN_LEN];
-    artwork_info info;
     uint16_t pixels[ARTWORK_MAX_PIXELS / 2];
   } carousel_art[3];
   uint16_t artwork_pixels[ARTWORK_MAX_PIXELS / 2];
@@ -1133,6 +1129,13 @@ static bool artwork_cached, artwork_valid;
 static char artwork_rom[MAX_FN_LEN];
 static unsigned artwork_cached_mode;
 static artwork_info preview_info;
+/* Byte flags and path strings must live in GBA RAM, not the 16-bit cart bus. */
+static struct {
+  bool cached, valid;
+  unsigned mode;
+  char rom[MAX_FN_LEN];
+  artwork_info info;
+} carousel_meta[3];
 static int browser_motion_offset;
 static bool browser_fast_reuse, browser_fast_valid[2];
 static int browser_fast_selection[2];
@@ -1142,8 +1145,8 @@ static void browser_invalidate_artwork(void) {
   browser_fast_valid[0] = browser_fast_valid[1] = false;
   artwork_cached = false;
   for (unsigned i = 0; i < 3; ++i) {
-    sdr_state->carousel_art[i].cached = false;
-    sdr_state->carousel_art[i].valid = false;
+    carousel_meta[i].cached = false;
+    carousel_meta[i].valid = false;
   }
 }
 
@@ -1504,46 +1507,12 @@ static unsigned browser_entry_icon(const t_centry *entry) {
          (entry->attr & AM_DIR) ? ICON_FOLDER : guessicon(entry->fname);
 }
 
-/* Original 16x16 placeholders: landscape title screen and upright game box.
- * Two-bit cells use existing theme roles, requiring no extra palette or OAM. */
-static void render_artwork_placeholder(volatile uint8_t *frame, unsigned x,
-                                       unsigned y, bool box) {
-  static const char title[16][17] = {
-    "................", "................", "oooooooooooooooo", "obbbbbbbbbbbbbbo",
-    "obssssssssssssbo", "obssssssssssssbo", "obssbbbbbbssssbo", "obssssssssssssbo",
-    "obssssssssssssbo", "obsssbbbbsssssbo", "obssssssssssssbo", "obbbbbbbbbbbbbbo",
-    "oooooooooooooooo", "................", "................", "................"
-  };
-  static const char cover[16][17] = {
-    "..oooooooooooo..", "..obbbbbbbbbbo..", "..obssssssssbo..", "..obbbbbbbbbbo..",
-    "..obssssssssbo..", "..obssssssssbo..", "..obsssbbsssbo..", "..obssbbbbssbo..",
-    "..obsbbbbbbsbo..", "..obssssssssbo..", "..obssssssssbo..", "..obbbbbbbbbbo..",
-    "..obssbbbsssbo..", "..obbbbbbbbbbo..", "..obbbbbbbbbbo..", "..oooooooooooo.."
-  };
-  x &= ~1u;
-  if (x > 224 || y > 144) return;
-  for (unsigned row = 0; row < 16; ++row) {
-    volatile uint16_t *dst = (volatile uint16_t *)frame + (y+row)*120+x/2;
-    for (unsigned col = 0; col < 16; col += 2) {
-      uint16_t pair = dst[col/2];
-      for (unsigned half = 0; half < 2; ++half) {
-        char cell = box ? cover[row][col+half] : title[row][col+half];
-        if (cell == '.') continue;
-        unsigned color = cell == 'o' ? FT_COLOR : cell == 'b' ? FG_COLOR : HI_COLOR;
-        unsigned shift = half*8;
-        pair = (pair & ~(255u << shift)) | (color << shift);
-      }
-      dst[col/2] = pair;
-    }
-  }
-}
-
 static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
   if (!browser_fast_reuse)
     dma_memset16(&frame[240 * 16], dup8(BG_COLOR), 240 * (144 - 16) / 2);
   else {
-    unsigned tx = vertical ? 128 : 40, ty = vertical ? 85 : 122;
-    unsigned tw = vertical ? 106 : 162;
+    unsigned tx = vertical ? (carousel_animation ? 98 : 128) : 40, ty = vertical ? 85 : 122;
+    unsigned tw = vertical ? (carousel_animation ? 136 : 106) : 162;
     for (unsigned row = 0; row < 16; ++row)
       dma_memset16(frame + (ty+row)*240 + tx, dup8(BG_COLOR), tw/2);
     dma_memset16(frame + 144*240, dup8(BG_COLOR), 240*16/2);
@@ -1559,7 +1528,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
     /* Populate one missing slot per settled frame, selected entry first. */
     const int candidates[3] = {selected, selected - 1, selected + 1};
     if (artwork_mode && browser_motion_offset == 0) {
-      for (unsigned c = 0; c < (carousel_animation ? 3u : 1u); ++c) {
+      for (unsigned c = 0; c < 3u; ++c) {
         int index = candidates[c];
         if (index < 0 || index >= smenu.browser.dispentries) continue;
         const t_centry *entry = sdr_state->filefilter[index];
@@ -1568,16 +1537,18 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
         if (n <= 0 || (unsigned)n >= sizeof(rom)) continue;
         unsigned slot = (unsigned)index % 3;
-        if (sdr_state->carousel_art[slot].cached &&
-            sdr_state->carousel_art[slot].mode == artwork_mode &&
-            !strcmp(sdr_state->carousel_art[slot].rom, rom)) continue;
-        strbcpy(sdr_state->carousel_art[slot].rom, rom, MAX_FN_LEN);
-        sdr_state->carousel_art[slot].mode = artwork_mode;
-        sdr_state->carousel_art[slot].valid = artwork_load(rom, artwork_mode - 1,
+        if (carousel_meta[slot].cached &&
+            carousel_meta[slot].mode == artwork_mode &&
+            !strcmp(carousel_meta[slot].rom, rom)) continue;
+        strbcpy(carousel_meta[slot].rom, rom, MAX_FN_LEN);
+        carousel_meta[slot].mode = artwork_mode;
+        carousel_meta[slot].valid = artwork_load(rom, artwork_mode - 1,
             (uint8_t *)sdr_state->carousel_art[slot].pixels, ARTWORK_MAX_PIXELS,
             sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
-            &sdr_state->carousel_art[slot].info);
-        sdr_state->carousel_art[slot].cached = true;
+            &carousel_meta[slot].info);
+        carousel_meta[slot].cached = true;
+        browser_fast_reuse = false;
+        browser_fast_valid[0] = browser_fast_valid[1] = false;
         break;
       }
     }
@@ -1590,41 +1561,41 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       char rom[MAX_FN_LEN];
       int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
       bool drawn = false;
-      if (artwork_mode && (carousel_animation || item->index == selected) && !(entry->attr & AM_DIR) && n > 0 && (unsigned)n < sizeof(rom) &&
-          sdr_state->carousel_art[slot].cached && sdr_state->carousel_art[slot].valid &&
-          sdr_state->carousel_art[slot].mode == artwork_mode &&
-          !strcmp(sdr_state->carousel_art[slot].rom, rom)) {
-        const artwork_info *info = &sdr_state->carousel_art[slot].info;
-        unsigned x = item->x, width = item->w, height = item->h;
+      if (artwork_mode && !(entry->attr & AM_DIR) && n > 0 && (unsigned)n < sizeof(rom) &&
+          carousel_meta[slot].cached && carousel_meta[slot].valid &&
+          carousel_meta[slot].mode == artwork_mode &&
+          !strcmp(carousel_meta[slot].rom, rom)) {
+        const artwork_info *info = &carousel_meta[slot].info;
+        int x = item->x;
+        unsigned width = item->w, height = item->h;
         if (info->width == 80) { width = height; x += (item->w - width) / 2; }
         if (!carousel_animation) {
-          width = info->width;
-          height = info->height;
-          x = vertical ? (120 - width)/2 : (240 - width)/2;
+          int delta = item->index-selected;
+          int native_x = vertical ? (120-info->width)/2 : (240-info->width)/2 + delta*(int)info->width;
+          int native_y = vertical ? 48+delta*80 : 27;
+          drawn = browser_fast_reuse || artwork_blit_cropped((volatile uint16_t *)frame,
+              sdr_state->carousel_art[slot].pixels, info, native_x, native_y);
+          if (drawn) continue;
         }
         x &= ~1u;
         width &= ~1u;
         if (browser_fast_reuse) drawn = true;
-        else if (width == info->width && height == info->height)
+        else if (width == info->width && height == info->height && x >= 0 && x+(int)width <= 240 && item->y >= 16 && item->y+(int)height <= 144)
           drawn = artwork_blit_frame((volatile uint16_t *)frame,
               sdr_state->carousel_art[slot].pixels, info, x,
               !carousel_animation && vertical ? 48 : item->y);
         else
-          drawn = artwork_blit_scaled((volatile uint16_t *)frame,
+          drawn = artwork_blit_scaled_cropped((volatile uint16_t *)frame,
               sdr_state->carousel_art[slot].pixels, info, x, item->y, width, height);
       }
       if (!drawn) {
-        unsigned icon_x = item->x + item->w/2 - 8;
-        unsigned icon_y = item->y + item->h/2 - 8;
+        unsigned icon_x = MAX(0, MIN(224, item->x + item->w/2 - 8));
+        unsigned icon_y = MAX(16, MIN(128, item->y + item->h/2 - 8));
         if (!carousel_animation && vertical) {
           icon_x = 52;
           icon_y = item->index < selected ? 24 : item->index > selected ? 128 : 80;
         }
-        if (!carousel_animation && artwork_mode && item->index != selected) {
-          if (!browser_fast_reuse)
-            render_artwork_placeholder(frame, icon_x, icon_y, artwork_mode == 2);
-        } else
-          render_icon(icon_x, icon_y, browser_entry_icon(entry));
+        render_icon(icon_x, icon_y, browser_entry_icon(entry));
       }
     }
     const t_centry *focus = sdr_state->filefilter[focus_index];
@@ -1962,6 +1933,13 @@ void render_rtcpop(volatile uint8_t *frame) {
   draw_central_text("⯆", frame, cox[spop.rtcpop.selector], 84);
 }
 
+/* Framebuffer selection leaves text crisp and avoids the native tiled OAM bar. */
+static void draw_menu_selection(volatile uint8_t *frame, unsigned y,
+                                unsigned left, unsigned right) {
+  for (unsigned row = 0; row < 16; ++row)
+    dma_memset16(frame + (y+row)*SCREEN_WIDTH + left, dup8(HI_COLOR), (right-left)/2);
+}
+
 void render_settings(volatile uint8_t *frame) {
   char tmp[128];
   unsigned baseopt = smenu.set.selector <= 2  ? 0 :
@@ -1978,6 +1956,8 @@ void render_settings(volatile uint8_t *frame) {
   const unsigned value_x = 128;
   const unsigned offy = 29;
   const unsigned rowh = 20;
+  if (menu_theme >= THEME_DSSMM_LIGHT && smenu.set.selector != SettSave)
+    draw_menu_selection(frame, offy + (smenu.set.selector-baseopt)*rowh, 4, 236);
 
   if (optnum++ >= baseopt && optcnt < maxrows)
     draw_text_ovf(msgs[lang_id][MSG_SET_TITL1], frame, 8, offy + rowh*optcnt++, 224);
@@ -2138,7 +2118,7 @@ void render_settings(volatile uint8_t *frame) {
     draw_text_ovf_rotate(msgs[lang_id][help_msg], frame, 4, SCREEN_HEIGHT - 18, 232, &smenu.anim_state);
   }
 
-  if (smenu.set.selector != SettSave)
+  if (menu_theme < THEME_DSSMM_LIGHT && smenu.set.selector != SettSave)
     for (unsigned i = 0; i < 240; i += 16)
       render_icon_trans(i, offy + (smenu.set.selector - baseopt) * 20, 63);
 }
@@ -2172,12 +2152,15 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetHid: value = msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED]; break;
     case UiSetAccent: value = accent_names[menu_accent < ACCENT_COUNT ? menu_accent : 0]; break;
     }
+    if (menu_theme >= THEME_DSSMM_LIGHT && option == smenu.uiset.selector)
+      draw_menu_selection(frame, row_y[row], 4, 236);
     draw_text_ovf(labels[option], frame, 8, row_y[row], 116);
-    npf_snprintf(tmpbuf, sizeof(tmpbuf), "< %s >", value);
+    /* Localized native knob labels may already include their arrows. */
+    npf_snprintf(tmpbuf, sizeof(tmpbuf), value[0] == '<' ? "%s" : "< %s >", value);
     draw_text_ovf(tmpbuf, frame, value_x, row_y[row], 104);
   }
 
-  if (smenu.uiset.selector != UiSetSave)
+  if (menu_theme < THEME_DSSMM_LIGHT && smenu.uiset.selector != UiSetSave)
     for (unsigned i = 0; i < 240; i += 16)
       render_icon_trans(i, row_y[smenu.uiset.selector - smenu.uiset.seloff], 63);
 
@@ -2245,14 +2228,17 @@ void render_info(volatile uint8_t *frame) {
 }
 
 void render_tools(volatile uint8_t *frame) {
+  if (menu_theme >= THEME_DSSMM_LIGHT)
+    draw_menu_selection(frame, 26 + 22*smenu.tools.selector, 18, 236);
   for (unsigned i = 0; i < ToolsMAX; i++)
     draw_text_ovf(msgs[lang_id][MSG_TOOLS0_SDRAM + i], frame, 22, 26 + 22 * i, 206);
 
   smenu.anim_state = (smenu.anim_state + 1) & 255;
   draw_central_text("▸", frame, 11 + (smenu.anim_state >> 6), 26 + 22 * smenu.tools.selector);
 
-  for (unsigned i = 0; i < 240; i += 16)
-    render_icon_trans(i, 26 + smenu.tools.selector * 22, 63);
+  if (menu_theme < THEME_DSSMM_LIGHT)
+    for (unsigned i = 0; i < 240; i += 16)
+      render_icon_trans(i, 26 + smenu.tools.selector * 22, 63);
 }
 
 void reload_theme(unsigned thnum) {
@@ -2311,7 +2297,7 @@ void menu_render(unsigned fcnt) {
       render_icon_trans((i - mintab)*16, 0, i + ICON_RECENT);
 
   bool fast_carousel = smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view &&
-      !carousel_animation && !spop.qpop.message && !spop.rtcpop.callback &&
+      browser_motion_offset == 0 && !spop.qpop.message && !spop.rtcpop.callback &&
       !spop.pop_num && !spop.alert_msg;
   if (!fast_carousel) browser_fast_valid[0] = browser_fast_valid[1] = false;
   browser_fast_reuse = fast_carousel && browser_fast_valid[framen] &&

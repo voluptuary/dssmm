@@ -12,6 +12,7 @@ cd "$project_root"
 build_number="$(git rev-list --count HEAD)"
 make clean
 make DSSMM_BUILD_NUMBER="$build_number" BOARD="$board" COMPRESSION_RATIO="$compression_ratio"
+python3 scripts/check-carousel-memory.py firmware.ewram.elf
 mkdir -p "build/$board"
 cp superfw.gba "build/$board/superfw.fw"
 python3 - "$board" "$build_number" <<'PY'

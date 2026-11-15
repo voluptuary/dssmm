@@ -49,3 +49,15 @@ Latest renderer slice aligns carousel artwork geometry with the EZ-FLASH layout:
 The isolated mGBA preview now renders the generated Title artwork in packaged mGBA 0.10.1 (`/usr/games/mgba`). Run `bash scripts/test-browser-preview-mgba.sh` to rebuild the fake-ROM preview, capture a headless screenshot and assert its known artwork marker. This does not exercise FatFS/card paths or establish full-kernel/hardware behavior. Do not use a plain `mgba` command unless `/usr/games` is on PATH.
 
 Track every candidate using docs/BUILD-TRACKING.md and generated board build-info.json. Commit before producing test images; preserve displayed number/hash plus source fingerprint and image digest in validation evidence. Build 534/hash126ae458 was a dirty-source carousel candidate; its hardware crash/missing-art/sluggishness report is not resolved by synthetic tests.
+
+## Carousel memory rule (2026-11-15)
+
+All carousel cache metadata (flags, path keys and artwork_info) MUST stay in
+internal GBA RAM. Only decoded halfword pixel arrays belong in cartridge SDRAM;
+ordinary byte writes there are invalid. Every board build checks the linked
+metadata address. See docs/CAROUSEL-ARTWORK-MEMORY.md for the ARM regression that
+fails on owner-tested Build553 and passes with the fix. Owner confirms List Box
+art works and edge crash is fixed, but corrected carousel art still requires
+physical retesting. Owner has completed the model switch and authorized continuing the port after
+delivering the Chis candidate. Keep Build561 hardware-test image unchanged while
+awaiting physical results.

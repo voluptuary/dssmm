@@ -57,21 +57,44 @@ static bool artwork_gamecode_root_path(char *out, size_t capacity, const char ga
   memcpy(out + sizeof(prefix) + 3, ".bmp", 5);
   return true;
 }
+typedef struct {
+  const uint8_t *bytes;
+  bool legacy;
+} artwork_buffer;
 static bool read_buffer(void *context, uint32_t offset, void *data, size_t size) {
-  const uint8_t *buffer = context;
+  const artwork_buffer *input = context;
+  const uint8_t *buffer = input->bytes;
   if (offset > ARTWORK_BMP_MAX_SIZE || size > ARTWORK_BMP_MAX_SIZE - offset) return false;
   memcpy(data, buffer + offset, size);
+  /* The original EZ loader ignores header metadata and copies the 54-byte
+   * prefix plus 120x80 GBA pixels. Some legacy packs use desktop BMP metadata
+   * that does not describe that payload. Normalize only that exact code-art
+   * record, in internal RAM; never byte-write the cartridge staging buffer. */
+  if (input->legacy && offset == 0 && size == 54) {
+    static const uint8_t header[54] = {
+      [0]='B',[1]='M',[2]=0x36,[3]=0x4b,[10]=54,[14]=40,
+      [18]=120,[22]=0xb0,[23]=0xff,[24]=0xff,[25]=0xff,
+      [26]=1,[28]=16,[34]=0x00,[35]=0x4b
+    };
+    memcpy(data, header, sizeof(header));
+  }
   return true;
 }
 static bool artwork_decode_file(FIL *file, uint8_t *bmp, size_t bmp_capacity,
-                                uint8_t *pixels, size_t capacity, artwork_info *info) {
+                                uint8_t *pixels, size_t capacity, artwork_info *info, bool gamecode) {
   FSIZE_t file_size = f_size(file);
   UINT got = 0;
   if (!bmp || bmp_capacity > ARTWORK_BMP_MAX_SIZE || file_size > bmp_capacity ||
       file_size > UINT32_MAX || file_size > UINT_MAX) return false;
   if (f_tell(file) != 0 && f_lseek(file, 0) != FR_OK) return false;
   if (f_read(file, bmp, (UINT)file_size, &got) != FR_OK || got != file_size) return false;
-  return artwork_decode(read_buffer, bmp, (uint32_t)file_size, pixels, capacity, info);
+  artwork_buffer input = {bmp, false};
+  if (artwork_decode(read_buffer, &input, (uint32_t)file_size, pixels, capacity, info)) return true;
+  /* Match native EZ fixed-record semantics only for game-code fallbacks.
+   * Filename/DSSCC art keeps strict validation and its own transparency. */
+  if (!gamecode || file_size != 54+120*80*2 || bmp[0] != 'B' || bmp[1] != 'M') return false;
+  input.legacy = true;
+  return artwork_decode(read_buffer, &input, (uint32_t)file_size, pixels, capacity, info);
 }
 bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capacity,
                   uint8_t *bmp, size_t bmp_capacity, artwork_info *info) {
@@ -81,7 +104,7 @@ bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capac
     if (!artwork_path(path, sizeof(path), rom, style, candidate)) continue;
     FIL file;
     if (f_open(&file, path, FA_READ) != FR_OK) continue;
-    bool ok = artwork_decode_file(&file, bmp, bmp_capacity, pixels, capacity, info);
+    bool ok = artwork_decode_file(&file, bmp, bmp_capacity, pixels, capacity, info, false);
     FRESULT closed = f_close(&file);
     if (ok && closed == FR_OK && info->width == (style ? 80 : 120)) return true;
   }
@@ -107,7 +130,7 @@ bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capac
             memcpy(path, code_paths[candidate], strlen(code_paths[candidate]) + 1);
             FIL file;
             if (f_open(&file, path, FA_READ) == FR_OK) {
-              bool ok = artwork_decode_file(&file, bmp, bmp_capacity, pixels, capacity, info);
+              bool ok = artwork_decode_file(&file, bmp, bmp_capacity, pixels, capacity, info, true);
               FRESULT closed = f_close(&file);
               if (ok && closed == FR_OK && info->width == 120) return true;
             }
