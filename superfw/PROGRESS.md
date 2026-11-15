@@ -433,3 +433,42 @@ Final BMP-tail checks: sanitizer and ARM adapter replay pass normal/short/close/
 All SD/Lite/Chis582 at842bad386c5c3f5616a4b01eaa4f5e3f8596c5c2 are clean, share fingerprint, and pass image identities/seals plus linked metadata/hot-image placement. Hosted43670448850 full verifier passed. Chis uses252376/257024EWRAM and12872/32768IWRAM; static layout does not qualify stack/timing. Evidence docs/build-582-validation.json. Copied Chis582 to root hardware-test/superfw-chis-build582.fw, SHA5f3e919b878a252056c4bc31d1db869868cfca39ec0f1ade558d4680876350de, with manifest/guide. Superseded our571 local file/manifest after retaining tracked evidence.581 was never distributed. All broader menu/input previews remain applicable because staging fix only changes storage adapter.
 
 Owner has not yet reported582 Title/speed/IGM results. Filename art and edge fix remain physically confirmed only on earlier owner-tested builds. No public release. Next normal merge/sync of final staging fix/evidence, shared checks, collect combined CI, clean generated outputs while preserving hardware image and session BIOS/scratch/user lock. Then continue performance/parity from docs/UI-PARITY.md; do not claim full parity or pause for permission.
+
+## 2026-11-15 — AGS lead verified and requested simplification
+
+Build582 owner report recorded. Exact DE fix944ac13 accepts AGS planes0; not DST1. Broadened game-code reader to native bounded opaque records, preserving native marker checks; No-Intro paths tested unchanged. Removed Animation option/instant route, migrated settings6, retained standard transitions. Added selected±2 cache with no redraw for far prefetch; centered Info version/hash. All focused suites/ARM bus tests and four mGBA carousel views pass. Original pack inaccessible403, physical fix/speed unconfirmed. Latest changes need clean numbered all-board builds/CI before hardware-test replacement; no feedback/permission pause requested.
+
+Current implementation checks pass for all four carousel previews, actual View input, legacy/native marker and No-Intro adapter fixtures, five-slot/far-prefetch cache, old-setting rejection and ARM bus constraints. Ready for clean numbered three-board packaging and hosted validation.
+
+## 2026-11-15 — Build585 validated and delivered
+
+Clean uniform SD/Lite/Chis585 source45e4dbbcc70fcb83d83d55b465e52118eb750ad0 all pass image identities/seals and memory gates; hosted43716700372 full verifier passes. Chis IWRAM13416/EWRAM251732; metadata1360bytes (5slots), focused cache9600EWRAM. Evidence docs/build-585-validation.json. Current root hardware-test/superfw-chis-build585.fw hash45e4dbbc SHA4f1ae0b0e2648b05511a41bfa1217ecc9dcda95fefe24502930405ade00028fa, matching manifest/guide; removed our superseded582 local artifacts after preserving evidence. Hardware compatibility/speed not claimed; original pack unavailable403, synthetic/native-source behavior verified. No public release.
+
+Continue autonomously into directory-open cost: DE history shows header-art ROM reopen scans long-name directories repeatedly. Inspect native SuperFW FatFS R0.15 (LFN2/UTF8, exFAT1, lock/reentrant0) and design independently validated read-only indexed header open with full name/size checks and normal f_open fallback. Do not copy another card's driver. Browser has16384records; current SDRAM state15080036bytes,14.5MiB limit15204352, so a4-byte per-record index(+65536) fits,8bytes(+131072) does not. dir_next leaves dptr unchanged at EOC, so do NOT infer prior SFN offset by subtracting32 after f_readdir. Capture blk_ofs/LFN start (or current dptr for SFN) inside native readdir before advancing, and validate reconstructed name/size when opening. FAT/exFAT real-library RAM-disk tests are needed before retaining any change. Keep585 hardware image frozen through this next work.
+
+## 2026-11-15 — Owner585 confirms artwork/cache; folder art and font goals
+
+Owner reports585 header Title images now display and five cached images solve the reported neighbor problem. Record this as physical Chis585 evidence only. New focus: CUSTOM directory art (`Game Boy Advance.bmp` in both IMGS/CUSTOM and IMGS2/CUSTOM), and optional DE DSSMM font. Added docs/FOCUS-GOALS.md and current agent guidance. Defer indexed filesystem work; only its native source was inspected, no FF/library changes made. Begin folder-art loader/renderer support then font asset/metrics/provenance audit; preserve585 image until a validated replacement. Continue autonomously.
+
+## 2026-11-15 — CUSTOM directory artwork implemented
+
+Added dedicated validated directory-path/loader API: exact complete basename in mode-specific CUSTOM, preserving dots, rejecting parent/traversal names. Strict DSSCC decoding/DST1 and word-safe staging reused; no ROM header/mirrored fallback for directories. List+Art and both carousels dispatch folder entries through this loader, cache positive/negative results and draw valid art instead of folder placeholder. Missing/invalid art retains native icon. Sanitized path/format fixtures cover owner Game Boy Advance paths in Title/Box, dotted names, wrong dimensions, missing images and no ROM opens. Actual carousel dispatch/cache regression and both ARM bus tests pass. Updated end-user artwork guide (post585 development availability). Next optional DE font asset conversion/metrics/persistence/IGM propagation; no new hardware candidate yet,585 remains frozen.
+
+## 2026-11-15 — Optional DSSMM system font
+
+Implemented Native-default saved Font choice and actual DE printable ASCII
+bitmap in native byte-safe renderer, with native Unicode fallback. Preserved
+Apache notice and documented conversion/metrics in FONT-PORT.md. Settings and
+pixel/scroll/clipping sanitizer pass; Chis link and mGBA UI fixture pass.
+In-game reserved-word propagation retains existing payload layout. Clean all3
+packaging and new hardware-test image follow; no physical font claims.
+
+## 2026-11-15 — Build588 candidate
+
+All3 clean588 packages pass identities/seals/memory gates; hosted43720266778
+passes. Local full sanitizer suite passes with non-PIE flags after standard
+ASAN startup failure; evidence build-588-validation.json. Delivered numbered
+Chis588 in root hardware-test with CUSTOM directory art and optional actual DE
+ASCII font. Updated guide/manifests and removed superseded own585 artifacts.
+No public release or physical588 qualification. Normal integration e7759f3
+pushed; finish evidence integration/sync and retain session BIOS/scratch.

@@ -49,3 +49,12 @@ hosted verification. Chis582 is the current hardware-test image; earlier local
 images were superseded after their evidence was retained. Build581 was not
 distributed after the BMP-tail audit. See build-582-validation.json. Physical
 Header Title matching, speed and in-game save/restore qualification remain open.
+
+## Current local candidate: Build588
+
+Source2a150a379d28bac81418ece349a0bf343b963b15, hash2a150a37.
+All three clean variants pass integrity/memory and hosted gates. Chis588 in
+root hardware-test supersedes585 locally. See build-588-validation.json for
+local ASAN startup limitation and successful full non-PIE sanitizer rerun.
+Owner physically confirms585 header art/cache; new directory CUSTOM and font
+remain unqualified on hardware.
