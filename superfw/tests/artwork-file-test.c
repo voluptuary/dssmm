@@ -4,11 +4,18 @@
 #include "fatfs/ff.h"
 #include "artwork_file.h"
 static unsigned opens, closes, seeks, fail_read, fail_seek, fail_close;
-static unsigned image_reads;
+static unsigned image_reads, fail_tail;
 static int gamecode_header, rom_file, filename_custom, filename_mirror, box_custom, gamecode_art, gamecode_flat_art;
 static char last_path[288];
 static uint8_t bmp[54+120*160];
-static uint8_t bmp_buffer[ARTWORK_BMP_MAX_SIZE];
+static unsigned image_size=sizeof(bmp);
+#ifdef TEST_CART_BUS
+static uint8_t *bmp_buffer=(void *)0x08000000;
+#define BMP_BUFFER_SIZE ARTWORK_BMP_MAX_SIZE
+#else
+_Alignas(4) static uint8_t bmp_buffer[ARTWORK_BMP_MAX_SIZE];
+#define BMP_BUFFER_SIZE sizeof(bmp_buffer)
+#endif
 _Alignas(2) static uint8_t pixels[ARTWORK_MAX_PIXELS];
 static void put32(unsigned off, uint32_t value) {
   for(unsigned i=0;i<4;++i) bmp[off+i]=value>>(8*i);
@@ -28,7 +35,7 @@ FRESULT f_open(FIL *fp, const TCHAR *path, BYTE mode) {
   if(gamecode_flat_art && !strcmp(path,"/SYSTEM/IMGS/BPRE.bmp")) goto image;
   return FR_NO_FILE;
 image:
-  fp->obj.objsize=sizeof(bmp); fp->fptr=0; return FR_OK;
+  fp->obj.objsize=image_size; fp->fptr=0; return FR_OK;
 }
 FRESULT f_lseek(FIL *fp, FSIZE_t offset) {
   ++seeks; fp->fptr=offset; return fail_seek ? FR_DISK_ERR : FR_OK;
@@ -40,9 +47,12 @@ FRESULT f_read(FIL *fp, void *data, UINT size, UINT *got) {
     else { assert(0 && "unexpected ROM header read"); }
     *got=fail_read ? size-1 : size; fp->fptr += *got; return FR_OK;
   }
+  #ifndef TEST_CART_BUS
+  if(data==bmp_buffer) assert(!((uintptr_t)data&3) && !(size&3));
+  #endif
   ++image_reads;
   assert(fp->fptr+size<=sizeof(bmp));
-  *got=fail_read ? size-1 : size;
+  *got=fail_read ? (data==bmp_buffer ? (size-1)&~3u : size-1) : fail_tail && size<4 ? size-1 : size;
   memcpy(data,bmp+fp->fptr,*got); fp->fptr += *got; return FR_OK;
 }
 FRESULT f_close(FIL *fp) { (void)fp; ++closes; return fail_close ? FR_DISK_ERR : FR_OK; }
@@ -64,53 +74,81 @@ int main(void) {
 
   /* CUSTOM filename match wins, with mirrored filename as the next fallback. */
   filename_custom=1;
-  assert(artwork_load("/Game Boy Advance/P/Game Boy game (USA).gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
-  assert(opens==1 && closes==1 && seeks==0 && image_reads==1 && info.width==120);
+  assert(artwork_load("/Game Boy Advance/P/Game Boy game (USA).gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(opens==1 && closes==1 && seeks==0 && image_reads==2 && info.width==120);
   assert(!strcmp(last_path,"/SYSTEM/IMGS/CUSTOM/Game Boy game (USA).bmp"));
   filename_custom=0; filename_mirror=1; opens=closes=seeks=0;
-  assert(artwork_load("/Game Boy Advance/P/Game Boy game (USA).gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
-  assert(opens==2 && closes==1 && seeks==0 && image_reads==2 && info.width==120);
+  assert(artwork_load("/Game Boy Advance/P/Game Boy game (USA).gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(opens==2 && closes==1 && seeks==0 && image_reads==4 && info.width==120);
   assert(!strcmp(last_path,"/SYSTEM/IMGS/Game Boy Advance/P/Game Boy game (USA).bmp"));
 
   /* Box uses IMGS2 and supports a CUSTOM filename fallback. */
   filename_mirror=0; box_custom=1; opens=closes=seeks=0;
   put32(18,80); put32(22,(uint32_t)-80); put32(34,80*160);
-  assert(artwork_load("/Game.gba",1,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
-  assert(opens==1 && closes==1 && seeks==0 && image_reads==3 && info.width==80);
+  assert(artwork_load("/Game.gba",1,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(opens==1 && closes==1 && seeks==0 && image_reads==6 && info.width==80);
   assert(!strcmp(last_path,"/SYSTEM/IMGS2/CUSTOM/Game.bmp"));
   opens=closes=0;
   unsigned reads_before_oversize = image_reads;
-  assert(!artwork_load("/Game.gba",1,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer)-1,&info));
+  assert(!artwork_load("/Game.gba",1,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE-1,&info));
   assert(opens==2 && closes==1 && image_reads==reads_before_oversize);
 
   /* Original EZ-FLASH Title art uses the ROM game code at 0xAC. */
   box_custom=0; gamecode_header=1; gamecode_art=1; opens=closes=seeks=0;
   put32(18,120); put32(22,(uint32_t)-80); put32(34,120*160);
-  assert(artwork_load("/Game Boy Advance/P/Pokemon FireRed.gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
-  assert(opens==4 && closes==2 && seeks==1 && image_reads==4 && info.width==120);
+  assert(artwork_load("/Game Boy Advance/P/Pokemon FireRed.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(opens==4 && closes==2 && seeks==1 && image_reads==8 && info.width==120);
   assert(!strcmp(last_path,"/SYSTEM/IMGS/B/P/BPRE.bmp"));
   gamecode_art=0; gamecode_flat_art=1; opens=closes=seeks=0;
-  assert(artwork_load("/Game Boy Advance/P/Pokemon FireRed.gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
-  assert(opens==5 && closes==2 && seeks==1 && image_reads==5 && info.width==120);
+  assert(artwork_load("/Game Boy Advance/P/Pokemon FireRed.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(opens==5 && closes==2 && seeks==1 && image_reads==10 && info.width==120);
   assert(!strcmp(last_path,"/SYSTEM/IMGS/BPRE.bmp"));
   /* Original EZ fixed-record reader ignores inconsistent desktop metadata.
    * Exercise this only after CUSTOM/filename misses, with a valid code path. */
   put32(28,24); put32(22,80); put32(2,28854); put32(34,28800);
-  assert(artwork_load("/Pokemon.gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
+  assert(artwork_load("/Pokemon.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
   assert(info.width==120 && info.height==80 && !info.transparent);
   filename_custom=1;
-  assert(!artwork_load("/Game Boy Advance/P/Game Boy game (USA).gbc",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
+  assert(!artwork_load("/Game Boy Advance/P/Game Boy game (USA).gbc",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
   filename_custom=0;
   put32(28,16); put32(22,(uint32_t)-80); put32(2,sizeof(bmp)); put32(34,19200);
   gamecode_header=gamecode_flat_art=0;
 
+  /* All tail lengths, including an odd valid BMP offset and padding guard. */
+  box_custom=1;
+  for(unsigned offset=54;offset<=57;++offset) {
+    image_size=offset+80*160;
+    put32(2,image_size);put32(10,offset);put32(18,80);put32(34,80*160);
+    unsigned cap=(image_size+1)&~1u;
+    assert(artwork_load("/Game.gba",1,pixels,sizeof(pixels),bmp_buffer,cap,&info));
+    assert(info.width==80);
+    if(image_size&1) {
+      unsigned before_padding=image_reads;
+      assert(!artwork_load("/Game.gba",1,pixels,sizeof(pixels),bmp_buffer,image_size,&info));
+      assert(image_reads==before_padding);
+    }
+  }
+  box_custom=0;image_size=sizeof(bmp);
+  put32(2,image_size);put32(10,54);put32(18,120);put32(34,120*160);
+  filename_custom=1;
+  unsigned before_alignment=image_reads;
+  assert(!artwork_load("/Game Boy Advance/P/Game Boy game (USA).gba",0,pixels,sizeof(pixels),bmp_buffer+1,BMP_BUFFER_SIZE-1,&info));
+  assert(image_reads==before_alignment);
+  fail_read=1;
+  assert(!artwork_load("/Game Boy Advance/P/Game Boy game (USA).gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  fail_read=0; fail_close=1;
+  assert(!artwork_load("/Game Boy Advance/P/Game Boy game (USA).gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  fail_close=0;
+  filename_custom=1; fail_tail=1;
+  assert(!artwork_load("/Game Boy Advance/P/Game Boy game (USA).gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  fail_tail=0; filename_custom=0;
   opens=closes=0; fail_read=1;
-  assert(!artwork_load("/Game.gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
+  assert(!artwork_load("/Game.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
   fail_read=0; fail_seek=1;
-  assert(!artwork_load("/Game.gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
+  assert(!artwork_load("/Game.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
   fail_seek=0; fail_close=1;
-  assert(!artwork_load("/Game.gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
+  assert(!artwork_load("/Game.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
   fail_close=0; bmp[0]='X';
-  assert(!artwork_load("/Game.gba",0,pixels,sizeof(pixels),bmp_buffer,sizeof(bmp_buffer),&info));
+  assert(!artwork_load("/Game.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
   return 0;
 }

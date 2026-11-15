@@ -64,3 +64,10 @@ artwork invalidation reset the hot identity. The ELF gate checks both byte-safe
 metadata placement and the hot image's EWRAM address/size on every board. The
 first Chis link uses251,756/257,024EWRAM bytes (97.95%); future code growth is
 linker-limited. This is static layout evidence, not hardware speed/stack proof.
+
+BMP staging now reads a word-aligned bulk prefix and an internal-RAM tail,
+then halfword-copies the tail to cartridge memory. This prevents newlib memcpy
+from emitting invalid cart byte stores at EOF, while preserving contiguous
+bulk-sector reads. The tail uses the already-cached final sector. Staging must
+be4-byte aligned; odd-length input requires an extra writable padding byte.
+See CAROUSEL-ARTWORK-MEMORY.md for the before/after ARM bus reproduction.
