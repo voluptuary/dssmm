@@ -56,3 +56,27 @@ pack that also fails in List may have a separate lookup/format issue; this fix
 does not claim to resolve unobserved pack formats. Physical timing and the
 owner's full SD contents cannot be reproduced locally. Owner subsequently completed the model switch and authorized resuming styling
 after candidate delivery. Build561 is frozen in hardware-test for that retest.
+
+## Separate BMP-tail byte-store audit
+
+After the metadata correction, audited the actual Build581 ARM memcpy and FatFS
+partial-sector path. Newlib emits STRB for a1..3byte remainder; FatFS copies the
+last310bytes of a19,254byte file via memcpy, including two byte stores. Optional
+`scripts/test-artwork-cart-bus.py` runs the production adapter/decoder plus a
+FatFS mock using real ARM memcpy. The pre-fix adapter fails at0x08004b34, the
+final two BMP bytes. Fixed code passes all positive and read/close-fault cases
+without cartridge byte stores. This affects end-of-image pixels; absence of
+ROM-header Title artwork remains separately unconfirmed.
+
+Staging now requires4-byte alignment. The bulk read count is rounded down to a
+word, and the final1..3bytes go into aligned internal RAM then halfword stores.
+Even writable capacity is checked before an odd tail can be padded. The second
+f_read consumes the sector the first read already cached; it is not a return to
+per-row reads. Static assertions check the native FatFS sector-cache offset is
+word-aligned. The mandatory adapter mock rejects non-word cartridge read
+requests, exercises tail-short-read failure and misalignment rejection. The ARM
+mock's short bulk fault transfers whole words, matching the bus contract; no
+real SD/card timing is emulated. Reproduce the old adapter via
+`ARTWORK_FILE_SOURCE=/path/to/pre-fix/artwork_file.c` on the ARM test command.
+Build581 was validated as a package snapshot but not distributed after this
+audit; preserve its report as history, and build a new numbered candidate.
