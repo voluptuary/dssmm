@@ -582,3 +582,32 @@ leaves ample room for3076-byte appended stream blob. Preserve native byte-safe
 bootloader font unpack/copy, original font header/data_size, current heap/cache
 layout and hardware caps. Need prefix/region tests, actual ARM external-asset
 replay and clean all3 package/memory/CI gates before any candidate replacement.
+
+## 2026-11-15 — Owner594 Start refinement and read-only resource work
+
+Owner reports good594 progress. Implemented NAME.TXT/NAME first-line cache,
+UTF8/BOM/11-character bounds, right software time bar, A/Start HH/MM editor,
+stronger corners, NOR B→Start and wrapping0/remembered1or2/3/4. Clock runs only
+in menu using280896/16777216 frame duration, persists UI starting time (settings8),
+unknown until set; no off/game wall time or hardware RTC claim and no game-RTC
+changes. Native date modal field bounds reused with time-only presentation.
+Pure profile/clock tests pass; production editor callback/bounds/cancel/save
+checks and mGBA clock/NOR return fixtures in progress. Profile source Chis
+link254760EWRAM/13464IWRAM before final text refinements.
+
+Background streams appended as3076-byte DBG1 blob to original normal/extended
+font assets in native1.5MiB resource region; original prefixes/header sizes
+unchanged. Existing copy/apunpack algorithms/addresses retained. Build generates
+both packs; rounded ext copy still has516096bytes free. Actual ARM embedded,
+standard and extended background pixels pass and no read-only resource writes
+occur. Main RAM recovered~2.6KiB before new profile. Missing-tag fallback replay
+added; final tests/clean all3/hosted checks next.594 remains frozen. Preserve art
+ZIP/preview and session BIOS/scratch. Continue autonomously after next candidate.
+
+Final focused checks: username/clock parser and actual clock editor field bounds,
+cancel/accept/save/game-RTC isolation pass with sanitizers. All3 production
+launcher cycles, remembered SD/NOR row and NOR B-return pass. Actual ARM embedded,
+standard, extended and missing-tag fallback outputs pass, with no asset writes.
+mGBA time selection/editor/accept and Chis NOR A→B return pass; screenshots
+inspected (header name/time and bold corners). Editor arrows now use actual
+font metrics. Source checkpoint next; freeze source/HEAD for clean all3 candidate.

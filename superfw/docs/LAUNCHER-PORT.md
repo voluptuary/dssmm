@@ -39,3 +39,42 @@ runs the actual ARM renderer and rejects byte/unaligned video writes. mGBA scree
 ROM/artwork and no card/game actions. Preview palettes use the production roles
 so backgrounds cannot overwrite text colors. None qualifies real card timing,
 save migration, game launching or in-game restoration.
+
+## Name, selectable clock and wrapping
+
+Owner594 feedback adds a solid Start top bar: the first line of
+`SYSTEM/NAME.TXT` appears on the left (up to11 complete UTF8 characters; optional
+BOM accepted), and a24-hour clock appears on the right. `SYSTEM/NAME` is a
+compatibility fallback. The name is read once during startup, not per frame.
+
+Up/Down wraps Last Played → SD/NOR → Settings → Time → Last Played. The middle
+row remembers SD or NOR. Left/Right switches those two panels. A/Start on Time
+opens an hours/minutes editor; Left/Right chooses the field, Up/Down changes it,
+A accepts/saves UI preferences, B cancels. NOR B returns to Start when no modal
+is open. Corners are longer/thicker for better visibility.
+
+These cards have no hardware-backed menu RTC. The independent software clock
+uses actual GBA frame duration while the menu runs; it does not advance while
+powered off or run across games. Before it is set, the bar shows `--:--:--`.
+Setting it saves a new starting time, not a claim of battery-backed wall time.
+Game RTC defaults and emulation remain separate. No automatic theme scheduling
+has been introduced. This explicitly requested software clock supersedes the
+initial plan to omit all clock UI on this hardware.
+
+## Read-only background storage
+
+The3076-byte tagged background stream blob now follows the untouched native
+font database in the existing14.5..16MiB cartridge SDRAM resource partition.
+The native font header/data_size and every original font byte remain identical;
+in-game font consumers therefore copy their original data only. Bootloader font
+copy/decompression paths retain their native algorithms and addresses, loading
+the complete enlarged resource. Build rules generate both normal and extended
+packs and check rounded copy sizes against the1.5MiB resource budget. Background
+pixels use existing VRAM; no extra framebuffer or image cache was added.
+
+Firmware reads streams with halfword accesses; only native boot copy/unpack
+writes the resource area. A missing tag falls back to the striped texture.
+Host pixel comparisons and actual ARM embedded/normal/extended resource tests
+verify output and reject writes into the read-only font partition. Main Chis
+RAM recovers about2.6KiB before the new profile/clock code. Keep packed flash
+and GBA RAM gates independent; do not raise hardware limits to fit future UI.

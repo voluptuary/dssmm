@@ -700,11 +700,11 @@ patches_end:
 
 font_start:
   #if defined(COMPRESS_FONTS)
-    .incbin "res/fonts.pack.comp"
+    .incbin "res/fonts-dssmm.pack.comp"
   #elif defined(FONTS_EXT)
-    .incbin "res/fonts-ext.pack"
+    .incbin "res/fonts-ext-dssmm.pack"
   #else
-    .incbin "res/fonts.pack"
+    .incbin "res/fonts-dssmm.pack"
   #endif
   .balign 4
 font_end:

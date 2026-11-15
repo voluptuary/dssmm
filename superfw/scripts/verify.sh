@@ -12,6 +12,7 @@ bash "$project_root/scripts/test-letter-folder-pack.sh"
 bash "$project_root/scripts/test-dssmm-font.sh"
 bash "$project_root/scripts/test-dssmm-background.sh"
 bash "$project_root/scripts/test-launcher-navigation.sh"
+bash "$project_root/scripts/test-launcher-profile.sh"
 bash "$project_root/scripts/test-artwork.sh"
 bash "$project_root/scripts/test-ingame-selection.sh"
 bash "$project_root/scripts/test-browser-motion.sh"
@@ -21,5 +22,6 @@ bash "$project_root/scripts/test-browser-navigation.sh"
 for board in sd lite chis; do
   bash "$project_root/scripts/build.sh" "$board"
 done
+python3 "$project_root/tools/pack-dssmm-resources.py" --check
 make -C "$project_root/tests" clean
 make -C "$project_root/tests" all

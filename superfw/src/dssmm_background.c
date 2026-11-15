@@ -1,6 +1,10 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "dssmm_background.h"
 #include "dssmm_background_data.h"
+#ifdef DSSMM_EXTERNAL_BACKGROUNDS
+#include "dssmm_background_offsets.h"
+extern void *font_base_addr;
+#endif
 void dssmm_background_palette(volatile uint16_t *palette,bool dark) {
   const uint16_t *source=dark?dssmm_dark_palette:dssmm_light_palette;
   for(unsigned i=0;i<16;++i)palette[i]=source[i];
@@ -26,7 +30,20 @@ void dssmm_background_clear(volatile uint8_t *frame,bool dark,unsigned x,unsigne
 }
 void dssmm_background_draw(volatile uint8_t *frame,bool dark,bool start) {
   if(!start){dssmm_background_clear(frame,dark,0,0,240,160);return;}
+#ifdef DSSMM_EXTERNAL_BACKGROUNDS
+#ifdef FONTS_EXT
+  const unsigned base=DSSMM_BG_BASE_EXTENDED;
+#else
+  const unsigned base=DSSMM_BG_BASE_STANDARD;
+#endif
+  const uint8_t *asset=(const uint8_t *)font_base_addr+base;
+  if(*(const uint32_t *)asset!=0x31474244u) {
+    dssmm_background_clear(frame,dark,0,0,240,160);return;
+  }
+  const uint16_t *source=(const uint16_t *)(asset+(dark?DSSMM_BG_DARK_OFFSET:4));
+#else
   const uint16_t *source=dark?dssmm_dark_start:dssmm_light_start;
+#endif
   volatile uint16_t *out=(volatile uint16_t *)frame;
   unsigned pos=0;
   while(pos<19200) {

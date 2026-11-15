@@ -520,3 +520,18 @@ Save returns to the category's first option and its label is centered. Productio
 routing/category/movement tests and mGBA Games/Hardware/scroll fixtures pass.
 Chis RAM remains tight; investigate read-only backgrounds in existing native
 font-resource area before expanding further. No new hardware image yet;594 frozen.
+
+## 2026-11-15 — Profile/time/navigation and background memory budget
+
+Added cached NAME.TXT UTF8 first line and independent software menu clock with
+selectable editor; stronger corners, NOR B→Start, wrapped navigation preserves
+SD/NOR choice. Game RTC unaffected; no powered-off wall time. Owner594 confirms
+progress, not new-source hardware validation. Background streams now use native
+reserved font-resource partition with unchanged original prefix/data_size and
+native loader algorithms. ARM source pixels/halfword discipline and readonly
+region checks pass, recovering GBA RAM for menu work. Next full same-source
+all3 build with flash/resource/RAM gates, CI and new Chis hardware-test image.
+
+Focused profile/editor/navigation sanitizers and actual ARM external/missing-tag
+replay pass. mGBA time edit/accept and Chis NOR-back fixtures pass and inspected.
+Begin clean same-source all3 packaging/hosted validation before replacing594.

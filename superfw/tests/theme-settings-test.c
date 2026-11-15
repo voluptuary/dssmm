@@ -1,4 +1,5 @@
 #include <assert.h>
+volatile unsigned frame_count;
 #include "../src/settings.c"
 unsigned lang_lookup(uint16_t code) { (void)code; return 0; }
 uint16_t lang_getcode(void) { return 0x6e65; }
@@ -19,6 +20,8 @@ FRESULT f_write(FIL *fp, const void *data, UINT size, UINT *written) {
   *written = size; return FR_OK;
 }
 int main(void) {
+  parse_ui_settings(0,"clock_seconds","86399");assert(menu_clock_seed==86399);
+  parse_ui_settings(0,"clock_seconds","86400");assert(menu_clock_seed==UINT32_MAX);
   parse_ui_settings(0,"carousel_animation","0"); /* Retired key is ignored. */
   assert(menu_font==FONT_STYLE_NATIVE);
   parse_ui_settings(0,"font","1");assert(menu_font==FONT_STYLE_DSSMM);
@@ -91,11 +94,11 @@ int main(void) {
   menu_theme = THEME_DSSMM_DARK; menu_accent = 3; artwork_mode = 2;
   browser_view = 2;
   assert(save_ui_settings());
-  assert(strstr(saved_settings, "ui_version=7\n"));
+  assert(strstr(saved_settings, "ui_version=8\n"));
   assert(strstr(saved_settings,"font=1\n"));
   assert(!strstr(saved_settings,"carousel_animation="));
   assert(strstr(saved_settings, "browser_view=2\n"));
-  assert(strstr(saved_settings, "theme=7\nfont=1\naccent=3\n"));
+  assert(strstr(saved_settings, "theme=7\nfont=1\nclock_seconds=4294967295\naccent=3\n"));
   menu_theme = 0; menu_accent = 0; artwork_mode = 0; browser_view = 0;
   menu_font=FONT_STYLE_NATIVE;
   parse_file(saved_settings, parse_ui_settings, 0);

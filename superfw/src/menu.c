@@ -305,7 +305,7 @@ static struct {
 } smenu;
 
 /* Start/settings navigation is independent of native tab numbering. */
-static uint8_t launcher_page,launcher_selected=1,launcher_category,launcher_settings_group;
+static uint8_t launcher_page,launcher_selected=1,launcher_category,launcher_settings_group,launcher_browser_panel=1;
 static bool launcher_valid[2];
 static void launcher_invalidate(void) {launcher_valid[0]=launcher_valid[1]=false;}
 
@@ -332,6 +332,7 @@ static struct {
   struct {
     t_dec_date val;
     int selector;
+    bool menu_clock;
     void (*callback)();                   // Function to call on "save"
   } rtcpop;
 
@@ -1934,6 +1935,17 @@ void render_popupq(volatile uint8_t *frame, unsigned fcnt) {
 }
 
 void render_rtcpop(volatile uint8_t *frame) {
+  if(spop.rtcpop.menu_clock) {
+    draw_central_text("Set menu time",frame,120,30);
+    char time[8];npf_snprintf(time,sizeof(time),"%02u:%02u",(unsigned)(uint8_t)spop.rtcpop.val.hour%24,(unsigned)(uint8_t)spop.rtcpop.val.min%60);
+    draw_central_text(time,frame,120,70);
+    char hours[3]={time[0],time[1],0},minutes[3]={time[3],time[4],0};
+    unsigned x=120-font_width(time)/2+(spop.rtcpop.selector==3?font_width(hours)/2:font_width(hours)+font_width(":")+font_width(minutes)/2);
+    draw_central_text("⯅",frame,x,52);draw_central_text("⯆",frame,x,88);
+    draw_central_text("A: Set   B: Cancel",frame,120,114);
+    draw_central_text("Clock runs while menu is open",frame,120,138);
+    return;
+  }
   draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   draw_central_text(msgs[lang_id][MSG_DEF_RTCVAL], frame, SCREEN_WIDTH/2, 32);
@@ -2280,8 +2292,8 @@ void reload_theme(unsigned thnum) {
  * in SuperFW; SD/Lite substitute Recents for the unsupported NOR browser. */
 static void launcher_corners(volatile uint8_t *frame,unsigned x,unsigned y,unsigned w,unsigned h) {
   for(unsigned row=0;row<h;++row) {
-    unsigned width=(row<2 || row>=h-2)?6:2;
-    if(row<6 || row>=h-6) {
+    unsigned width=(row<3 || row>=h-3)?8:4;
+    if(row<8 || row>=h-8) {
       dma_memset16(frame+(y+row)*240+x,dup8(HI_COLOR),width/2);
       dma_memset16(frame+(y+row)*240+x+w-width,dup8(HI_COLOR),width/2);
     }
@@ -2327,8 +2339,18 @@ static void render_start(volatile uint8_t *frame) {
   draw_central_text("Recents",frame,168,106);
 #endif
   const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{110,144,20,14}};
-  const unsigned *box=boxes[launcher_selected];
-  launcher_corners(frame,box[0],box[1],box[2],box[3]);
+  const unsigned *box=boxes[launcher_selected<4?launcher_selected:0];
+  if(launcher_selected<4)launcher_corners(frame,box[0],box[1],box[2],box[3]);
+}
+
+static void render_start_bar(volatile uint8_t *frame) {
+  dma_memset16(frame,dup8(FG_COLOR),240*16/2);
+  draw_text_ovf(menu_username,frame,3,1,132);
+  uint32_t seconds=launcher_clock_get();char text[12];
+  if(seconds==UINT32_MAX)strcpy(text,"--:--:--");
+  else npf_snprintf(text,sizeof(text),"%02u:%02u:%02u",(unsigned)(seconds/3600%24),(unsigned)(seconds/60%60),(unsigned)(seconds%60));
+  draw_rightj_text(text,frame,232,1);
+  if(launcher_selected==4)launcher_corners(frame,176,0,64,16);
 }
 
 static void render_settings_home(volatile uint8_t *frame) {
@@ -2411,6 +2433,7 @@ void menu_render(unsigned fcnt) {
       else {dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,144);render_settings_home(frame);}
       launcher_valid[framen]=true;
     }
+    if(launcher_page==1)render_start_bar(frame);
     REG_WIN0H=REG_WIN0V=0;
     return;
   }
@@ -2490,6 +2513,7 @@ void menu_init(int sram_testres) {
 
   reload_theme(menu_theme);
   launcher_page=menu_theme>=THEME_DSSMM_LIGHT?1:0;launcher_selected=1;
+  launcher_clock_set(menu_clock_seed);
 
   smenu.menu_tab = (recent_menu && smenu.recent.maxentries) ? MENUTAB_RECENT : MENUTAB_ROMBROWSE;
 
@@ -2736,7 +2760,8 @@ static void keypress_popup_loadgba(unsigned newkeys) {
       }
       if (spop.p.load.i.rtc_patch_enabled) {
         timestamp2date(spop.p.load.l.rtcval, &spop.rtcpop.val);
-        spop.rtcpop.callback = accept_rtc;
+        spop.rtcpop.menu_clock=false;
+    spop.rtcpop.callback = accept_rtc;
       }
     }
     else if (spop.submenu == GbaLoadPopPatch && spop.selector == GBAPatchGen) {
@@ -3083,7 +3108,8 @@ static void keypress_popup_norload(unsigned newkeys) {
       }
       if (uses_rtc) {
         timestamp2date(spop.p.norld.l.rtcval, &spop.rtcpop.val);
-        spop.rtcpop.callback = accept_rtc;
+        spop.rtcpop.menu_clock=false;
+    spop.rtcpop.callback = accept_rtc;
       }
     }
   }
@@ -3406,6 +3432,7 @@ static void keypress_menu_settings(unsigned newkeys) {
       rtcvalue_default = date2timestamp(&spop.rtcpop.val);
     }
     timestamp2date(rtcvalue_default, &spop.rtcpop.val);
+    spop.rtcpop.menu_clock=false;
     spop.rtcpop.callback = accept_rtc;
   }
   if (newkeys & KEY_BUTTA && smenu.set.selector == SettSave) {
@@ -3582,6 +3609,25 @@ static void keypress_menu_info(unsigned newkeys) {
 }
 
 
+static void accept_menu_clock(void) {
+  menu_clock_seed=(unsigned)spop.rtcpop.val.hour*3600+(unsigned)spop.rtcpop.val.min*60;
+  launcher_clock_set(menu_clock_seed);launcher_invalidate();
+  if(!save_ui_settings())spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];
+}
+static void open_menu_clock(void) {
+  uint32_t seconds=launcher_clock_get();if(seconds==UINT32_MAX)seconds=12*3600;
+  spop.rtcpop.val=(t_dec_date){.year=0,.month=1,.day=1,.hour=seconds/3600,.min=seconds/60%60};
+  spop.rtcpop.selector=3;spop.rtcpop.menu_clock=true;spop.rtcpop.callback=accept_menu_clock;
+}
+static void launcher_move(unsigned newkeys) {
+  if(launcher_selected==1 || launcher_selected==2)launcher_browser_panel=launcher_selected;
+  if(newkeys&KEY_BUTTDOWN)launcher_selected=launcher_selected==0?launcher_browser_panel:launcher_selected<=2?3:launcher_selected==3?4:0;
+  else if(newkeys&KEY_BUTTUP)launcher_selected=launcher_selected==0?4:launcher_selected==4?3:launcher_selected==3?launcher_browser_panel:0;
+  if(newkeys&KEY_BUTTLEFT && launcher_selected==2)launcher_selected=1;
+  if(newkeys&KEY_BUTTRIGHT && launcher_selected==1)launcher_selected=2;
+  if(launcher_selected==1 || launcher_selected==2)launcher_browser_panel=launcher_selected;
+}
+
 void menu_keypress(unsigned newkeys) {
   /* Actions/tools may reuse cartridge RAM; never reuse the preview afterward. */
   if (newkeys & (KEY_BUTTA | KEY_BUTTSEL | KEY_BUTTL | KEY_BUTTR))
@@ -3608,7 +3654,7 @@ void menu_keypress(unsigned newkeys) {
   }
   else if (spop.rtcpop.callback) {
     if (newkeys & KEY_BUTTLEFT)
-      spop.rtcpop.selector = MAX(0, spop.rtcpop.selector - 1);
+      spop.rtcpop.selector = MAX(spop.rtcpop.menu_clock?3:0, spop.rtcpop.selector - 1);
     if (newkeys & KEY_BUTTRIGHT)
       spop.rtcpop.selector = MIN(4, spop.rtcpop.selector + 1);
 
@@ -3660,10 +3706,7 @@ void menu_keypress(unsigned newkeys) {
       if((newkeys&KEY_BUTTSTA) && launcher_page!=1) {launcher_page=1;browser_invalidate_artwork();return;}
       if((newkeys&KEY_BUTTSTA) && launcher_page==1)newkeys=(newkeys&~KEY_BUTTSTA)|KEY_BUTTA;
       if(launcher_page==1) {
-        if(newkeys&KEY_BUTTDOWN)launcher_selected=launcher_selected==0?1:3;
-        if(newkeys&KEY_BUTTUP)launcher_selected=launcher_selected==3?1:0;
-        if(newkeys&KEY_BUTTLEFT && launcher_selected==2)launcher_selected=1;
-        if(newkeys&KEY_BUTTRIGHT && launcher_selected==1)launcher_selected=2;
+        launcher_move(newkeys);
         if(newkeys&KEY_BUTTB) {launcher_page=0;smenu.menu_tab=MENUTAB_ROMBROWSE;}
         if(newkeys&KEY_BUTTA) {
           browser_invalidate_artwork();
@@ -3676,7 +3719,8 @@ void menu_keypress(unsigned newkeys) {
 #else
             smenu.menu_tab=MENUTAB_RECENT;
 #endif
-          } else launcher_page=2;
+          } else if(launcher_selected==3)launcher_page=2;
+          else open_menu_clock();
         }
         return;
       }
@@ -3693,6 +3737,9 @@ void menu_keypress(unsigned newkeys) {
         }
         return;
       }
+#ifdef SUPPORT_NORGAMES
+      if((newkeys&KEY_BUTTB) && smenu.menu_tab==MENUTAB_NORBROWSE){launcher_page=1;launcher_selected=launcher_browser_panel=2;return;}
+#endif
       if((newkeys&KEY_BUTTB) && smenu.menu_tab>=MENUTAB_SETTINGS){launcher_page=2;return;}
     }
     // Menu change via trigger buttons

@@ -20,15 +20,17 @@ out='''#include <assert.h>
 #define KEY_BUTTUP 64
 #define KEY_BUTTDOWN 128
 #define MIN(a,b) ((a)<(b)?(a):(b))
-static unsigned menu_theme=6,launcher_page=1,launcher_selected=1,launcher_category,launcher_settings_group;
+static unsigned menu_theme=6,launcher_page=1,launcher_selected=1,launcher_category,launcher_settings_group,launcher_browser_panel=1;
 static struct {unsigned menu_tab;struct {int selector,seloff,maxentries;} recent;struct {unsigned selector;} set;} smenu;
-static unsigned recent_actions,invalidations;
+static unsigned recent_actions,invalidations,clock_opens;
+static void open_menu_clock(void){++clock_opens;}
 static void browser_invalidate_artwork(void){++invalidations;}
 static void launcher_invalidate(void){}
 static void keypress_menu_recent(unsigned keys){assert(keys==KEY_BUTTA);++recent_actions;}
 '''+s[a:b]+'\nstatic void press(unsigned newkeys) {\n'
 a=s.index('enum {\n  SettTitle1');b=s.index('\n};',a)+3
-out=out.replace('static void press(unsigned newkeys) {\n',s[a:b]+'\n'+s[s.index('/* Filter settings by category'):s.index('void render_settings(')]+'\nstatic void press(unsigned newkeys) {\n')
+nav=s[s.index('static void launcher_move('):s.index('\n}',s.index('static void launcher_move('))+2]
+out=out.replace('static void press(unsigned newkeys) {\n',s[a:b]+'\n'+s[s.index('/* Filter settings by category'):s.index('void render_settings(')]+'\n'+nav+'\nstatic void press(unsigned newkeys) {\n')
 a=s.index('    if(menu_theme>=THEME_DSSMM_LIGHT) {',s.index('void menu_keypress('));b=s.index('    // Menu change via trigger buttons',a)
 out+=s[a:b]+'''}
 int main(void) {
@@ -45,7 +47,7 @@ int main(void) {
  smenu.recent.maxentries=1;smenu.recent.selector=9;smenu.recent.seloff=4;
  press(KEY_BUTTSTA);assert(recent_actions==1 && launcher_page==1);
  assert(!smenu.recent.selector && !smenu.recent.seloff);
- press(KEY_BUTTDOWN);assert(launcher_selected==1);
+ press(KEY_BUTTDOWN);assert(launcher_selected==2);
  press(KEY_BUTTDOWN);assert(launcher_selected==3);
  press(KEY_BUTTA);assert(launcher_page==2);
  for(unsigned i=0;i<9;++i)press(KEY_BUTTDOWN);
@@ -77,6 +79,15 @@ int main(void) {
  assert(settings_position(SettCheatEn)==settings_group_total());
  assert(!settings_row_visible(DefsPatchEng,0));
  for(unsigned i=0;i<settings_group_total();++i)assert(settings_position(settings_option_at(i))==i);
+ launcher_page=1;launcher_selected=0;launcher_browser_panel=1;
+ const unsigned down[]={1,3,4,0};for(unsigned i=0;i<4;++i){press(KEY_BUTTDOWN);assert(launcher_selected==down[i]);}
+ const unsigned up[]={4,3,1,0};for(unsigned i=0;i<4;++i){press(KEY_BUTTUP);assert(launcher_selected==up[i]);}
+ launcher_selected=2;press(KEY_BUTTDOWN);assert(launcher_selected==3);press(KEY_BUTTUP);assert(launcher_selected==2);
+ launcher_selected=4;press(KEY_BUTTA);assert(clock_opens==1);
+#ifdef SUPPORT_NORGAMES
+ launcher_page=0;smenu.menu_tab=MENUTAB_NORBROWSE;press(KEY_BUTTB);assert(launcher_page==1 && launcher_selected==2);
+#endif
+ launcher_page=0;
  menu_theme=0;assert(settings_group_total()==SettMAX);
  press(KEY_BUTTSTA);assert(!launcher_page);
  assert(invalidations);

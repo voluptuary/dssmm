@@ -55,9 +55,11 @@ static const uint16_t accent_colors[ACCENT_COUNT - 1][2] = {
   { RGB2GBA(0xc0a0e0), RGB2GBA(0x9878b8) },
 };
 uint8_t menu_accent = 0;
+char menu_username[LAUNCHER_NAME_BYTES];
+uint32_t menu_clock_seed=UINT32_MAX;
 uint8_t menu_font = FONT_STYLE_NATIVE;
 uint8_t artwork_mode = 1;
-#define UI_SETTINGS_VERSION 7
+#define UI_SETTINGS_VERSION 8
 #define UI_SETTINGS_DSSMM_DEFAULTS_VERSION 2
 static uint8_t ui_settings_version = 0;
 
@@ -129,6 +131,7 @@ uint32_t rtcvalue_default = 45568800U;
 
 // Setting loading/saving routines
 bool save_ui_settings() {
+  menu_clock_seed=launcher_clock_get();
   // Create the directory (just in case it doesn't exist)
   f_mkdir(SUPERFW_DIR);
 
@@ -144,6 +147,7 @@ bool save_ui_settings() {
     "ui_version=%u\n"
     "theme=%u\n"
     "font=%u\n"
+    "clock_seconds=%lu\n"
     "accent=%u\n"
     "artwork=%u\n"
     "browser_view=%u\n"
@@ -151,7 +155,7 @@ bool save_ui_settings() {
     "recent_menu=%u\n"
     "anim_speed=%u\n"
     "hide_hidden=%u\n",
-    UI_SETTINGS_VERSION, menu_theme, menu_font, menu_accent, artwork_mode, browser_view,
+    UI_SETTINGS_VERSION, menu_theme, menu_font, (unsigned long)launcher_clock_get(), menu_accent, artwork_mode, browser_view,
     (lc & 0xFF), (lc >> 8), recent_menu, anim_speed, hide_hidden);
 
   UINT wrbytes;
@@ -245,7 +249,10 @@ static void parse_settings(void *usr, const char *var, const char *value) {
 }
 
 static void parse_ui_settings(void *usr, const char *var, const char *value) {
-  if (!strcmp(var, "ui_version")) {
+  if (!strcmp(var,"clock_seconds")) {
+    uint32_t seconds=parseuint(value);
+    menu_clock_seed=seconds<86400?seconds:UINT32_MAX;
+  } else if (!strcmp(var, "ui_version")) {
     ui_settings_version = parseuint(value);
   } else if (!strcmp(var, "langcode")) {
     uint16_t code = ((uint8_t)value[0]) | (((uint8_t)value[1]) << 8);
@@ -330,6 +337,12 @@ void load_settings() {
     f_close(&fd);
   }
   migrate_ui_settings();
+  menu_username[0]=0;
+  if(f_open(&fd,"/SYSTEM/NAME.TXT",FA_READ)==FR_OK || f_open(&fd,"/SYSTEM/NAME",FA_READ)==FR_OK) {
+    FRESULT read=f_read(&fd,buf,sizeof(buf),&rdbytes);
+    FRESULT close=f_close(&fd);
+    if(read==FR_OK && close==FR_OK)launcher_name_parse(menu_username,buf,rdbytes);
+  }
 }
 
 static bool save_pattern_has_files(const char *pattern) {

@@ -12,7 +12,7 @@ OBJCOPY		:= $(PREFIX)objcopy
 
 COMPRESSION_RATIO ?= 4
 
-GLOBAL_DEFINES = -D__GBA__
+GLOBAL_DEFINES = -D__GBA__ -DDSSMM_EXTERNAL_BACKGROUNDS
 
 # BOARD can be "sd", "lite", "chis"
 BOARD ?= sd
@@ -39,7 +39,7 @@ else
   $(error No valid board specified in BOARD)
 endif
 
-FWBINFILES=firmware.ewram.gba res/patches.db res/fonts.pack
+FWBINFILES=firmware.ewram.gba res/patches.db res/fonts-dssmm.pack
 
 ifeq ($(ENABLE_DISK_LOGGING),1)
   PAYLOADFLAGS += -DENABLE_DISK_LOGGING
@@ -133,7 +133,7 @@ MENUFILES=src/ingame.S \
           ${FATFSFILES}
 
 INFILES=src/gba_ewram_crt0.S \
-        src/main.c src/system_layout.c \
+        src/main.c src/system_layout.c src/launcher_profile.c \
         src/log.c \
         src/cimpl.c \
         src/settings.c \
@@ -237,4 +237,7 @@ clean:
 # Optional DSSMM bitmap/renderer metadata are shared by kernel and in-game payload.
 firmware.ewram.gba ingamemenu.payload: src/fonts/dssmm_ascii.h src/fonts/font_render.h
 
-firmware.ewram.gba: src/dssmm_background_data.h src/dssmm_background.h
+firmware.ewram.gba: src/dssmm_background_data.h src/dssmm_background.h src/dssmm_background_offsets.h res/fonts-dssmm.pack res/fonts-ext-dssmm.pack
+
+res/fonts-dssmm.pack res/fonts-ext-dssmm.pack src/dssmm_background_offsets.h &: res/fonts.pack res/fonts-ext.pack src/dssmm_background_data.h tools/pack-dssmm-resources.py
+	python3 tools/pack-dssmm-resources.py

@@ -123,3 +123,14 @@ used/limit/headroom and GBA RAM separately. Never raise hardware budgets to fit
 assets. Letter #/A–Z artwork is a generated SD-card CUSTOM pack (LETTER-FOLDER-ART.md),
 matching basenames globally and adding zero firmware/RAM cost. Preserve existing
 user CUSTOM overrides. Owner588 confirms the optional font works well on Chis.
+
+Owner594 feedback: Start needs NAME.TXT left/time right, stronger selection,
+NOR B→Start, and wrapping Up/Down through LastPlayed/SD-or-NOR/Settings/Time.
+Implementations are in development; see LAUNCHER-PORT.md. The selected time opens
+an HH/MM editor; software clock advances only while the menu runs, preserves
+game RTC defaults and uses unset markers until configured. Owner explicitly
+requested this clock after the initial hardware-RTC omission. No Auto themes.
+Username retains11 complete UTF8 characters from first line, optional BOM.
+Background streams now follow unchanged native font prefixes in the existing
+1.5MiB SDRAM resource area; keep prefixes, header data_size and native unpack
+paths intact. Enforce rounded resource budget, packed flash and GBA RAM separately.

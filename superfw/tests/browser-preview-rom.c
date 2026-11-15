@@ -10,6 +10,7 @@
 #include "ingame_preview.h"
 static const uint32_t empty_font[2] = {0, 0};
 void *font_base_addr = (void *)empty_font;
+volatile unsigned frame_count;
 static unsigned text_animation;
 
 #define REG_DISPCNT (*(volatile uint16_t *)0x04000000)
@@ -122,7 +123,8 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   fill_rect(frame, 0, 0, 240, 160, 0);
   if(PREVIEW_SCREEN==13 || PREVIEW_SCREEN==14) {
     dssmm_background_palette(PALETTE,menu_theme==THEME_DSSMM_DARK);
-    if(launcher_page==1)render_start(frame);
+    if(spop.rtcpop.callback){dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,false);render_rtcpop(frame);}
+    else if(launcher_page==1){render_start(frame);render_start_bar(frame);}
     else {
       dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,false);
       if(launcher_page==2){draw_central_text("Settings",frame,120,0);render_settings_home(frame);}
@@ -185,6 +187,7 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
 }
 
 int main(void) {
+  launcher_clock_set(13*3600+37*60+42);
   menu_font=PREVIEW_FONT;
   font_set_style(menu_font);
   PALETTE[0] = 0x18E3;  /* DSSMM-like dark blue-gray */
@@ -207,7 +210,7 @@ int main(void) {
   }
   load_fixtures();
   launcher_page=PREVIEW_SCREEN==14?2:1;
-  launcher_selected=PREVIEW_OPTION<4?PREVIEW_OPTION:1;
+  launcher_selected=PREVIEW_OPTION<5?PREVIEW_OPTION:1;
   launcher_category=PREVIEW_OPTION<5?PREVIEW_OPTION:0;
   smenu.recent.maxentries=1;
   strcpy(preview_sdram.rentries[0].fpath,browser_fixture_names[1]);
@@ -218,13 +221,14 @@ int main(void) {
   int selected = 1, offset = 0, vertical = PREVIEW_VERTICAL, box_mode = PREVIEW_BOX;
   unsigned old_keys = 0, back_page = 1, demo_frame = 0;
   for (;;) {
+    ++frame_count;
     unsigned keys = (unsigned)(~REG_KEYINPUT) & 0x03ff;
     unsigned pressed = keys & ~old_keys;
     old_keys = keys;
     if(PREVIEW_SCREEN==13 || PREVIEW_SCREEN==14) {
       unsigned newkeys=pressed;
       bool child=launcher_page==0 && smenu.menu_tab==MENUTAB_SETTINGS;
-      if(newkeys)preview_launcher_keypress(newkeys);
+      if(newkeys){if(spop.rtcpop.callback)preview_clock_keypress(newkeys);else preview_launcher_keypress(newkeys);}
       if(child && launcher_page==0 && smenu.menu_tab==MENUTAB_SETTINGS)settings_move(newkeys);
     }
     if(PREVIEW_SCREEN==2) {
