@@ -333,3 +333,11 @@ PREVIEW_OPTION uses actual settings scroll policy. Save9 lower-row screenshot pa
 ## 2026-11-14 — Production Light palette checked
 
 Preview extracts actual theme data/type; Light6 settings Save screenshot passes and visually reviewed. Foreground-presence smoke includes controls, documented. Production firmware unchanged; continue skinning/interactive/hardware validation.
+
+## 2026-11-14 — Edge crash hardware-confirmed fixed; artwork fails
+
+Owner Chis553 reports edge crash resolved but art still absent. Reverted Off neighbor artwork placeholders to native system icons as requested; helper removed, preview/cache tests adjusted. Cache/navigation regressions pass. Continue real SD→SDRAM artwork-path investigation, especially byte-write constraints; themed selection-row work also awaiting preview/build validation. Full goal incomplete.
+
+## 2026-11-15 — Reproduce carousel-only hardware memory defect
+
+Owner confirms List Box art works. Carousel metadata was in cartridge SDRAM despite bool/string byte writes; List metadata is internal. Fixed placement, reverted custom neighbor placeholders, deferred unrelated skin changes. ARM Thumb cache regression rejects Build553's byte store at0x080026a0 and passes corrected renderer; real ELF places816-byte metadata in IWRAM. Added mandatory linked-address check per board, optional Unicorn diagnostic and detailed evidence/limits. Finish numbered board validation and Chis hardware-test delivery, then pause per owner request; no physical artwork fix claimed yet.

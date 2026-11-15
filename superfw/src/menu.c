@@ -397,10 +397,6 @@ typedef struct {
   t_rentry rentries[RECENT_MAXFN_CNT];
   t_reg_entry_max nordata;
   struct {
-    bool cached, valid;
-    unsigned mode;
-    char rom[MAX_FN_LEN];
-    artwork_info info;
     uint16_t pixels[ARTWORK_MAX_PIXELS / 2];
   } carousel_art[3];
   uint16_t artwork_pixels[ARTWORK_MAX_PIXELS / 2];
@@ -1133,6 +1129,13 @@ static bool artwork_cached, artwork_valid;
 static char artwork_rom[MAX_FN_LEN];
 static unsigned artwork_cached_mode;
 static artwork_info preview_info;
+/* Byte flags and path strings must live in GBA RAM, not the 16-bit cart bus. */
+static struct {
+  bool cached, valid;
+  unsigned mode;
+  char rom[MAX_FN_LEN];
+  artwork_info info;
+} carousel_meta[3];
 static int browser_motion_offset;
 static bool browser_fast_reuse, browser_fast_valid[2];
 static int browser_fast_selection[2];
@@ -1142,8 +1145,8 @@ static void browser_invalidate_artwork(void) {
   browser_fast_valid[0] = browser_fast_valid[1] = false;
   artwork_cached = false;
   for (unsigned i = 0; i < 3; ++i) {
-    sdr_state->carousel_art[i].cached = false;
-    sdr_state->carousel_art[i].valid = false;
+    carousel_meta[i].cached = false;
+    carousel_meta[i].valid = false;
   }
 }
 
@@ -1504,40 +1507,6 @@ static unsigned browser_entry_icon(const t_centry *entry) {
          (entry->attr & AM_DIR) ? ICON_FOLDER : guessicon(entry->fname);
 }
 
-/* Original 16x16 placeholders: landscape title screen and upright game box.
- * Two-bit cells use existing theme roles, requiring no extra palette or OAM. */
-static void render_artwork_placeholder(volatile uint8_t *frame, unsigned x,
-                                       unsigned y, bool box) {
-  static const char title[16][17] = {
-    "................", "................", "oooooooooooooooo", "obbbbbbbbbbbbbbo",
-    "obssssssssssssbo", "obssssssssssssbo", "obssbbbbbbssssbo", "obssssssssssssbo",
-    "obssssssssssssbo", "obsssbbbbsssssbo", "obssssssssssssbo", "obbbbbbbbbbbbbbo",
-    "oooooooooooooooo", "................", "................", "................"
-  };
-  static const char cover[16][17] = {
-    "..oooooooooooo..", "..obbbbbbbbbbo..", "..obssssssssbo..", "..obbbbbbbbbbo..",
-    "..obssssssssbo..", "..obssssssssbo..", "..obsssbbsssbo..", "..obssbbbbssbo..",
-    "..obsbbbbbbsbo..", "..obssssssssbo..", "..obssssssssbo..", "..obbbbbbbbbbo..",
-    "..obssbbbsssbo..", "..obbbbbbbbbbo..", "..obbbbbbbbbbo..", "..oooooooooooo.."
-  };
-  x &= ~1u;
-  if (x > 224 || y > 144) return;
-  for (unsigned row = 0; row < 16; ++row) {
-    volatile uint16_t *dst = (volatile uint16_t *)frame + (y+row)*120+x/2;
-    for (unsigned col = 0; col < 16; col += 2) {
-      uint16_t pair = dst[col/2];
-      for (unsigned half = 0; half < 2; ++half) {
-        char cell = box ? cover[row][col+half] : title[row][col+half];
-        if (cell == '.') continue;
-        unsigned color = cell == 'o' ? FT_COLOR : cell == 'b' ? FG_COLOR : HI_COLOR;
-        unsigned shift = half*8;
-        pair = (pair & ~(255u << shift)) | (color << shift);
-      }
-      dst[col/2] = pair;
-    }
-  }
-}
-
 static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
   if (!browser_fast_reuse)
     dma_memset16(&frame[240 * 16], dup8(BG_COLOR), 240 * (144 - 16) / 2);
@@ -1568,16 +1537,16 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
         if (n <= 0 || (unsigned)n >= sizeof(rom)) continue;
         unsigned slot = (unsigned)index % 3;
-        if (sdr_state->carousel_art[slot].cached &&
-            sdr_state->carousel_art[slot].mode == artwork_mode &&
-            !strcmp(sdr_state->carousel_art[slot].rom, rom)) continue;
-        strbcpy(sdr_state->carousel_art[slot].rom, rom, MAX_FN_LEN);
-        sdr_state->carousel_art[slot].mode = artwork_mode;
-        sdr_state->carousel_art[slot].valid = artwork_load(rom, artwork_mode - 1,
+        if (carousel_meta[slot].cached &&
+            carousel_meta[slot].mode == artwork_mode &&
+            !strcmp(carousel_meta[slot].rom, rom)) continue;
+        strbcpy(carousel_meta[slot].rom, rom, MAX_FN_LEN);
+        carousel_meta[slot].mode = artwork_mode;
+        carousel_meta[slot].valid = artwork_load(rom, artwork_mode - 1,
             (uint8_t *)sdr_state->carousel_art[slot].pixels, ARTWORK_MAX_PIXELS,
             sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
-            &sdr_state->carousel_art[slot].info);
-        sdr_state->carousel_art[slot].cached = true;
+            &carousel_meta[slot].info);
+        carousel_meta[slot].cached = true;
         break;
       }
     }
@@ -1591,10 +1560,10 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
       bool drawn = false;
       if (artwork_mode && (carousel_animation || item->index == selected) && !(entry->attr & AM_DIR) && n > 0 && (unsigned)n < sizeof(rom) &&
-          sdr_state->carousel_art[slot].cached && sdr_state->carousel_art[slot].valid &&
-          sdr_state->carousel_art[slot].mode == artwork_mode &&
-          !strcmp(sdr_state->carousel_art[slot].rom, rom)) {
-        const artwork_info *info = &sdr_state->carousel_art[slot].info;
+          carousel_meta[slot].cached && carousel_meta[slot].valid &&
+          carousel_meta[slot].mode == artwork_mode &&
+          !strcmp(carousel_meta[slot].rom, rom)) {
+        const artwork_info *info = &carousel_meta[slot].info;
         unsigned x = item->x, width = item->w, height = item->h;
         if (info->width == 80) { width = height; x += (item->w - width) / 2; }
         if (!carousel_animation) {
@@ -1620,11 +1589,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
           icon_x = 52;
           icon_y = item->index < selected ? 24 : item->index > selected ? 128 : 80;
         }
-        if (!carousel_animation && artwork_mode && item->index != selected) {
-          if (!browser_fast_reuse)
-            render_artwork_placeholder(frame, icon_x, icon_y, artwork_mode == 2);
-        } else
-          render_icon(icon_x, icon_y, browser_entry_icon(entry));
+        render_icon(icon_x, icon_y, browser_entry_icon(entry));
       }
     }
     const t_centry *focus = sdr_state->filefilter[focus_index];

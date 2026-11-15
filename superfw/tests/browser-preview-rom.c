@@ -120,7 +120,7 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
       unsigned x = items[i].x + items[i].w/2 - 8;
       unsigned y = items[i].y + items[i].h/2 - 8;
       if (vertical) { x=52; y=items[i].index < selected ? 24 : 128; }
-      render_artwork_placeholder(frame,x,y,box_mode);
+      fill_rect(frame,x,y,16,16,3); /* Schematic system-icon stand-in. */
     } else if (!PREVIEW_ANIMATION) {
       browser_carousel_item native=items[i];
       native.w=box_mode ? 80 : 120; native.h=80;

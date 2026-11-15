@@ -16,7 +16,7 @@ source=Path(sys.argv[1]).read_text()
 start=source.index("static void draw_text_ovf_rotate(")
 end=source.index("\n}",start)+2
 text="#define SCREEN_WIDTH 240\n#define FT_COLOR 1\n#define FG_COLOR 3\n#define HI_COLOR 2\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
-for signature in ("static void draw_text_ovf(", "static void draw_central_text(", "static void render_artwork_placeholder("):
+for signature in ("static void draw_text_ovf(", "static void draw_central_text("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
 text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} tools; struct {unsigned selector,seloff;} uiset; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'

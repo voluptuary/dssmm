@@ -3,10 +3,11 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
-python3 - "$root/src/menu.c" "$tmp/test.c" <<'PY'
+python3 - "$root/src/menu.c" "${CAROUSEL_TEST_SOURCE:-$tmp/test.c}" <<'PY'
 from pathlib import Path
 import sys
-source=Path(sys.argv[1]).read_text()
+import os
+source=Path(os.environ.get("MENU_SOURCE",sys.argv[1])).read_text()
 def function(name):
  start=source.index('static void '+name+'(')
  end=source.index('\n}',start)+2
@@ -38,11 +39,17 @@ preamble=r'''
 typedef struct { unsigned attr; char fname[32]; } t_centry;
 static struct { struct { int selector,dispentries; char cpath[64]; } browser; } smenu;
 static struct state {
- struct { bool cached,valid; unsigned mode; char rom[MAX_FN_LEN]; artwork_info info;
- uint16_t pixels[ARTWORK_MAX_PIXELS/2]; } carousel_art[3];
+ CAROUSEL_STORAGE
  uint8_t artwork_bmp_buffer[ARTWORK_BMP_MAX_SIZE];
  t_centry *filefilter[3];
-} state, *sdr_state=&state;
+}
+#ifdef TEST_CART_BUS
+*sdr_state=(void *)0x08000000;
+#define state (*sdr_state)
+#else
+state, *sdr_state=&state;
+#endif
+CAROUSEL_METADATA
 static bool artwork_cached;
 static bool browser_fast_reuse, browser_fast_valid[2];
 static unsigned artwork_mode=1;
@@ -70,15 +77,6 @@ bool artwork_blit_scaled(volatile uint16_t *frame,const uint16_t *pixels,
 tests=r'''
 int main(void) {
  static uint8_t frame[240*160];
- render_artwork_placeholder(frame,0,0,false);
- assert(frame[2*240]==FT_COLOR && frame[0]==0 && frame[16]==0);
- memset(frame,0,sizeof(frame));
- render_artwork_placeholder(frame,0,0,true);
- assert(frame[0]==0 && frame[2]==FT_COLOR && frame[15*240+13]==FT_COLOR);
- memset(frame,0,sizeof(frame));
- render_artwork_placeholder(frame,239,150,true);
- for(unsigned i=0;i<sizeof(frame);++i) assert(frame[i]==0);
-
  t_centry entries[3]={{0,"one.gba"},{0,"two.gba"},{0,"missing.gba"}};
  for(unsigned i=0;i<3;++i) state.filefilter[i]=&entries[i];
  strcpy(smenu.browser.cpath,"/"); smenu.browser.selector=1;smenu.browser.dispentries=3;
@@ -95,7 +93,7 @@ int main(void) {
  browser_fast_valid[0]=browser_fast_valid[1]=true;
  browser_invalidate_artwork();
  assert(!browser_fast_valid[0] && !browser_fast_valid[1]);
- for(unsigned i=0;i<3;++i) assert(!state.carousel_art[i].cached && !state.carousel_art[i].valid);
+ for(unsigned i=0;i<3;++i) assert(!CACHE_META[i].cached && !CACHE_META[i].valid);
  assert(state.carousel_art[0].pixels[0]==0x1234);
  render_browser_carousel(frame,false);assert(loads==5);
  carousel_animation=0;artwork_mode=1;smenu.browser.selector=1;
@@ -135,8 +133,24 @@ int main(void) {
  return 0;
 }
 '''
-Path(sys.argv[2]).write_text(preamble+function('render_artwork_placeholder')+'\n'+function('browser_invalidate_artwork')+'\n'+function('render_browser_carousel')+'\n'+tests)
+# Use the actual storage and metadata declarations, so a regression putting
+# byte fields back on the cartridge bus is exercised by the ARM bus test too.
+a=source.index('  struct {',source.index('  t_reg_entry_max nordata;'))
+b=source.index('  } carousel_art[3];',a)+len('  } carousel_art[3];')
+preamble=preamble.replace('CAROUSEL_STORAGE',source[a:b])
+if '} carousel_meta[3];' in source:
+ b=source.index('} carousel_meta[3];')+len('} carousel_meta[3];')
+ a=source.rfind('static struct {',0,b)
+ preamble=preamble.replace('CAROUSEL_METADATA',source[a:b])
+ tests=tests.replace('CACHE_META','carousel_meta')
+else:
+ preamble=preamble.replace('CAROUSEL_METADATA','')
+ tests=tests.replace('CACHE_META','state.carousel_art')
+if 'static void render_artwork_placeholder(' in source:
+ preamble+='\n#define render_artwork_placeholder(...) ((void)0)\n'
+Path(sys.argv[2]).write_text(preamble+function('browser_invalidate_artwork')+'\n'+function('render_browser_carousel')+'\n'+tests)
 PY
+if [[ -n "${CAROUSEL_TEST_SOURCE:-}" ]]; then exit 0; fi
 gcc -O2 -Wall -Wextra -Wno-unused-variable -I "$root/src" "$tmp/test.c" "$root/src/browser_carousel.c" -o "$tmp/test"
 "$tmp/test"
 printf 'Production carousel cache loading, misses, motion and invalidation passed.\n'
