@@ -2066,3 +2066,12 @@ The SuperFW project now has `scripts/test-browser-preview-mgba.sh`, which report
 ## 2026-11-14 — SuperFW carousel/fast-mode integration checkpoint
 
 Merged SuperFW lane normally into dssmm as e3821b4. Hardware changes are confined to superfw/; root isolation, five project-policy tests and three merge tests pass. Clean three-board Build553/source3ce7d917 evidence is superfw/docs/build-553-validation.json; later commits only improve preview/testing/docs until this merge. User hardware Build534/hash126ae458 reports edge crash/missing carousel art/sluggishness; newer edge fix, AnimationOff native path/placeholders and page reuse require physical retest. mGBA validates isolated rendering only. No new release, physical qualification or full style parity. Push shared checkpoint, sync lanes via normal ancestry and collect all-project/lane CI; preserve user lock/BIOS limits and remaining project goal.
+
+## 2026-11-15 — Shared owner folder-art release asset
+
+Preserved owner upload8b466cb. Replaced only27 #/A–Z Title BMPs with centered
+unchanged80x80 Box data on120x80 transparent DST1 canvases. All other ZIP entries
+are byte-identical, including system icons and Box art. Canonical Folder-Art.zip
+plus reproducible prepare/check script are shared infrastructure. Owner requires
+this archive attached to every future kernel release. Check passes; no kernel
+code changed here. SuperFW work remains on its hardware lane.

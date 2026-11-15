@@ -155,3 +155,13 @@ Release retention policy: when a new prerelease is published for SuperFW, BLUE o
 
 
 Keep one public prerelease release page per SuperFW, BLUE and Original OMEGA lane. On each new prerelease publication, first archive superseded release bodies and asset metadata under `docs/history/releases/`, then remove the older release pages/assets while retaining git tags. Never prune stable DE releases or assets.
+
+## Shared folder artwork release asset
+
+Owner requires canonical root `Folder-Art.zip` on every future kernel release,
+for all four project lanes. Include it alongside firmware assets; this is artwork,
+not a source archive. Run `python3 scripts/prepare-folder-art.py Folder-Art.zip
+--check` before upload and verify the downloaded release asset matches. Preserve
+owner-added system icons. Only #/A–Z Title images use centered unscaled Box
+sprites on120x80 canvases; Box80x80 images remain unchanged. Historical releases
+need no retroactive change. Root archive maintenance belongs on dssmm.

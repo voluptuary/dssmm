@@ -3170,3 +3170,12 @@ SuperFW added an Xvfb screenshot smoke script that prints the emulator version a
 ## 2026-11-14 — Integrate SuperFW carousel and fast-mode work
 
 Normal merge e3821b4 imports only superfw/ changes; shared isolation and all project-policy/merge fixtures pass. Build553 all-board clean integrity/CI evidence retained privately. Hardware534 failures remain awaiting newer candidate retest; full parity incomplete. Next push/sync lanes, verify hosted checks, then owner-test release preparation under existing notes/retention policy. No release changed at this checkpoint.
+
+## 2026-11-15 — Shared owner folder-art release asset
+
+Preserved owner upload8b466cb. Replaced only27 #/A–Z Title BMPs with centered
+unchanged80x80 Box data on120x80 transparent DST1 canvases. All other ZIP entries
+are byte-identical, including system icons and Box art. Canonical Folder-Art.zip
+plus reproducible prepare/check script are shared infrastructure. Owner requires
+this archive attached to every future kernel release. Check passes; no kernel
+code changed here. SuperFW work remains on its hardware lane.
