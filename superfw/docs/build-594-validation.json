@@ -60,5 +60,28 @@
     "EWRAM:       50356 B        60 KB     81.96%",
     "IWRAM:       13400 B        32 KB     40.89%",
     "EWRAM:      255656 B       251 KB     99.47%"
-  ]
+  ],
+  "board_flash_budgets": [
+    {
+      "board": "sd",
+      "firmware_bytes": 504320,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 19968
+    },
+    {
+      "board": "lite",
+      "firmware_bytes": 472064,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 35840
+    },
+    {
+      "board": "chis",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "chis_main_ewram_bytes": 255656,
+  "main_ewram_limit_bytes": 257024,
+  "main_ewram_headroom_bytes": 1368
 }

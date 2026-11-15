@@ -502,3 +502,12 @@ Evidence build-594-validation.json. Root hardware-test now Chis594 with Start,
 backgrounds/settings hub and SYSTEM migration. Superseded own588 local files;
 owner confirms588 font good. Next transparent #/A–Z folder pack, global basename
 matches, then true category children and remaining DE surfaces. No parity claim.
+
+## 2026-11-15 — Global letter folders, size safeguards
+
+Added deterministic transparent #/A–Z closed-folder pack in both exact sizes,
+alpha PNGs, licenses and ready-to-copy SYSTEM ZIP. CUSTOM already matches global
+basenames; no firmware/RAM cost. All54 production decoder sanitizer checks pass.
+Added hard packed-image gates matching native board budgets, boundary tests and
+594 byte margins in evidence. Source remains594 for current hardware image.
+Owner confirms588 font works well. Continue categories and remaining DE parity.

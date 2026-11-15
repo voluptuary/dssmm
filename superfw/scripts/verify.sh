@@ -7,6 +7,8 @@ for tool in arm-none-eabi-gcc arm-none-eabi-g++ gcc g++ lcov; do
 done
 bash "$project_root/scripts/test-theme-settings.sh"
 bash "$project_root/scripts/test-system-layout.sh"
+python3 "$project_root/tests/test-firmware-limits.py"
+bash "$project_root/scripts/test-letter-folder-pack.sh"
 bash "$project_root/scripts/test-dssmm-font.sh"
 bash "$project_root/scripts/test-dssmm-background.sh"
 bash "$project_root/scripts/test-launcher-navigation.sh"

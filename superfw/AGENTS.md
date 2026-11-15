@@ -116,3 +116,10 @@ share launcher features; SD/Lite substitute Recents for unsupported NOR. Keep
 palette0..15 backgrounds separate from UI16..19/artwork20..235 and Info logo.
 Host sanitizer executables now disable PIE to avoid recurrent ASAN startup loops;
 sanitizers remain enabled. Firmware optimization flags are separate.
+
+Enforce board image budgets on every candidate: SD512KiB/Lite496KiB/Chis2MiB.
+Keep native linker MAX_FLASH_SIZE plus independent build/set size gates; record
+used/limit/headroom and GBA RAM separately. Never raise hardware budgets to fit
+assets. Letter #/A–Z artwork is a generated SD-card CUSTOM pack (LETTER-FOLDER-ART.md),
+matching basenames globally and adding zero firmware/RAM cost. Preserve existing
+user CUSTOM overrides. Owner588 confirms the optional font works well on Chis.

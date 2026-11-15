@@ -553,3 +553,16 @@ sets120x80 Title and80x80 Box, global basename matches anywhere. CUSTOM director
 lookup already matches full basename independent of parent; prepare compatible
 ready-to-copy pack and verify all54 via actual decoder before delivery. Preserve
 CUSTOM override priority if a future embedded fallback is added.
+
+## 2026-11-15 — Letter-folder pack and explicit image budgets
+
+Owner588 confirms font good. Generated54 closed-folder Title120x80/Box80x80 BMPs
+plus alpha PNG copies for #/A–Z, actual credited DE glyphs, DSSCC DST1 transparent
+canvas. Existing CUSTOM folder lookup already matches basenames globally, so pack
+needs no firmware additions. Ready-to-copy ZIP and preview in root hardware-test;
+all54 production decoder sanitizer tests pass. Component licenses included.
+Independent board size gates now reinforce native linker budgets and record
+used/limit/headroom.594 margins SD19968/Lite35840/Chis425472bytes, Chis main EWRAM
+1368static bytes. User explicitly requires keeping hardware size limits. No
+limit increases. Next integrate evidence/scripts, then true settings categories
+and remaining menu/dialog/DS behavior. Keep594 hardware image frozen during work.
