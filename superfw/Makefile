@@ -233,3 +233,6 @@ upkr.elf:	tools/upkr.cc
 clean:
 	rm -f ldscripts/*.i *.gba *.elf *.payload *.map res/*.comp emu/*.comp *.comp src/menu_messages.h src/messages_data.h
 
+
+# Optional DSSMM bitmap/renderer metadata are shared by kernel and in-game payload.
+firmware.ewram.gba ingamemenu.payload: src/fonts/dssmm_ascii.h src/fonts/font_render.h

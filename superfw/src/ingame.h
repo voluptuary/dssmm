@@ -17,6 +17,9 @@
  */
 
 
+/* Reserved palette word5 carries font style; structure/patch offsets unchanged. */
+#define IGM_FONT_PALETTE_SLOT 5
+
 #define MIN_SCRATCH_SPACE       (162*1024)        // IWRAM/EWRAM/VRAM + regs
 
 #define EWRAM_SPILL_SIZE        (62 * 1024)
@@ -54,7 +57,7 @@ typedef struct {
   uint32_t scratch_space_size;
   uint32_t menu_has_rtc_support;       // Whether the game is running with RTC patches
   uint32_t menu_anim_speed;            // Menu animation speed
-  uint16_t menu_palette[8];            // Palette colors for the menu
+  uint16_t menu_palette[8];            // Colors0..4, font style5, reserved6..7
   uint32_t savefile_backups;           // Backup count
   char savefile_pattern[256];          // File name (without the .sav) pattern
   char statefile_pattern[256];         // File name (without the .X.state) pattern

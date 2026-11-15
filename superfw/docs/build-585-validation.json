@@ -1,0 +1,62 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 585,
+  "boards": [
+    {
+      "source_tree_sha256": "175f06b588219b20259fbaa297eebaab66c4f2cb90bf746953c94b55766360dd",
+      "board": "sd",
+      "dssmm_build": 585,
+      "source_commit": "45e4dbbcc70fcb83d83d55b465e52118eb750ad0",
+      "source_dirty": false,
+      "firmware_sha256": "2ed3457c5be7a9a28801f8c1f5f66cb240f03da50f6b577de64e61a1d9cea56a",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "175f06b588219b20259fbaa297eebaab66c4f2cb90bf746953c94b55766360dd",
+      "board": "lite",
+      "dssmm_build": 585,
+      "source_commit": "45e4dbbcc70fcb83d83d55b465e52118eb750ad0",
+      "source_dirty": false,
+      "firmware_sha256": "18629b035f6737634df6ff62f593f4e166eeeb3163204533628e1c981433fa24",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "175f06b588219b20259fbaa297eebaab66c4f2cb90bf746953c94b55766360dd",
+      "board": "chis",
+      "dssmm_build": 585,
+      "source_commit": "45e4dbbcc70fcb83d83d55b465e52118eb750ad0",
+      "source_dirty": false,
+      "firmware_sha256": "4f1ae0b0e2648b05511a41bfa1217ecc9dcda95fefe24502930405ade00028fa",
+      "validation": "built; runtime and hardware validation not implied"
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43716700372",
+    "conclusion": "success"
+  },
+  "memory_usage": {
+    "sd": {
+      "iwram_bytes": 13672,
+      "ewram_bytes": 236928
+    },
+    "lite": {
+      "iwram_bytes": 13824,
+      "ewram_bytes": 237488
+    },
+    "chis": {
+      "iwram_bytes": 13416,
+      "ewram_bytes": 251732
+    }
+  },
+  "checks": [
+    "AGS planes0/native fixed-record/header-marker/trailing-file/NoIntro-path fixtures",
+    "all settings migrations and removed-key serialization",
+    "five-image lookahead and far-prefetch page/hot-copy invariants",
+    "both ARM bus regressions",
+    "four normal carousel mGBA views and production View input replay"
+  ],
+  "limits": [
+    "Original pack download still403; no actual pack bytes inspected.",
+    "Header compatibility/performance not physically confirmed on585."
+  ]
+}

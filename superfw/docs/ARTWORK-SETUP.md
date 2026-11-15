@@ -1,6 +1,6 @@
 # Make and install SuperFW artwork packs
 
-Current DSSMM SuperFW builds for Chis, SuperCard SD and SuperCard Lite support name-matched artwork made with [DS Style Card Companion (DSSCC)](https://github.com/voluptuary/dsscc), plus EZ-FLASH GBA title images matched by the four-letter game code in the ROM header. Artwork is shown for files in the SD browser; folder artwork is not supported.
+Current DSSMM SuperFW builds for Chis, SuperCard SD and SuperCard Lite support name-matched artwork made with [DS Style Card Companion (DSSCC)](https://github.com/voluptuary/dsscc), plus EZ-FLASH GBA title images matched by the four-letter game code in the ROM header. Development builds after585 also support CUSTOM folder artwork in the SD browser.
 
 ## Build a pack
 
@@ -38,3 +38,14 @@ For Custom output, place the files at `SYSTEM/IMGS/CUSTOM/Game Boy game (USA).bm
 Safely eject the SD card and start any current DSSMM SuperFW build. Title artwork and the DSSMM Light theme are the defaults on Chis, SuperCard SD and SuperCard Lite. An older unversioned UI configuration migrates from the former native defaults; settings saved by Test 2 or newer keep their explicit theme and artwork choices. To choose a mode yourself, open **UI settings → Artwork**, press Left/Right to select **List**, **Title** or **Box**, then choose **Save**. In the SD browser, **Start** also cycles those three modes. Recent and NOR views do not show artwork in this prototype.
 
 If the panel is blank, check the selected mode, image size, exact name, folder paths and that you copied the pack inside SYSTEM. Moving a ROM requires moving its mirrored artwork folder too. Renaming a ROM does not affect an EZ-FLASH game-code image, but filename-matched DSSCC artwork must keep the same base name. Leave and re-enter the folder, or cycle the artwork mode, to retry a cached miss. No extension-wide default artwork is supported yet. Generated transparency is supported, but colors are reduced to fit this early menu renderer. Please report visual or scrolling problems when testing on hardware.
+
+## Custom folder pictures (development builds after585)
+
+For a root folder called `Game Boy Advance`, place a120×80 Title picture at
+`SYSTEM/IMGS/CUSTOM/Game Boy Advance.bmp` and an80×80 Box picture at
+`SYSTEM/IMGS2/CUSTOM/Game Boy Advance.bmp`. Use DSSCC to generate the matching
+sizes/format. Keep the complete directory name, including dots; a folder named
+`Game.Boy` uses `Game.Boy.bmp`. Artwork-enabled List and carousel views use the
+matching picture; missing/invalid pictures retain the normal folder icon.
+Parent-directory entries do not have artwork. No mirrored or ROM-header fallback
+is used for directory pictures.

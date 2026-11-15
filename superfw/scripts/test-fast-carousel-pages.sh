@@ -18,7 +18,7 @@ static bool browser_fast_reuse,browser_fast_valid[2];
 static int browser_fast_selection[2];
 static unsigned browser_fast_view[2],browser_fast_mode[2];
 static int browser_motion_offset;
-static unsigned framen,browser_view=1,artwork_mode=1,carousel_animation;
+static unsigned framen,browser_view=1,artwork_mode=1;
 static struct {unsigned menu_tab;struct {int selector;} browser;} smenu={.menu_tab=1};
 static struct {struct {bool message;} qpop;struct {bool callback;} rtcpop;bool pop_num,alert_msg;} spop;
 static bool begin(void) {
@@ -34,7 +34,7 @@ int main(void) {
  framen=1;assert(begin() && !browser_fast_reuse);finish(true);
  browser_view=2;assert(begin() && !browser_fast_reuse);finish(true);
  artwork_mode=2;assert(begin() && !browser_fast_reuse);finish(true);
- carousel_animation=1;assert(begin());finish(true);assert(browser_fast_reuse || begin());
+ assert(begin());finish(true);assert(browser_fast_reuse || begin());
  for(unsigned kind=0;kind<6;++kind) {
   browser_fast_valid[0]=browser_fast_valid[1]=true;
   if(kind==0)spop.qpop.message=true;
@@ -42,11 +42,11 @@ int main(void) {
   if(kind==2)spop.pop_num=true;
   if(kind==3)spop.alert_msg=true;
   if(kind==4)smenu.menu_tab=2;
-  if(kind==5){carousel_animation=1;browser_motion_offset=48;}
+  if(kind==5){browser_motion_offset=48;}
   assert(!begin() && !browser_fast_reuse);
   assert(!browser_fast_valid[0] && !browser_fast_valid[1]);
   spop.qpop.message=spop.rtcpop.callback=spop.pop_num=spop.alert_msg=false;
-  smenu.menu_tab=1;carousel_animation=0;browser_motion_offset=0;
+  smenu.menu_tab=1;browser_motion_offset=0;
   assert(begin() && !browser_fast_reuse);
  }
  return 0;}
