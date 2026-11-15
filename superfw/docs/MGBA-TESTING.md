@@ -103,3 +103,28 @@ Cheat/state fixture output was inspected: memory Save/Load/Make-persistent,
 persistent Save/Load/Delete, persistent-copy Make-persistent/Cancel with option
 normalization, and enabled/disabled cheat rows. All four smoke checks pass.
 The test header initializes fake cheat entries in RAM and does not execute codes.
+
+## Production UI-settings input replay
+
+Screen2 now calls the extracted production keypress_menu_uisettings handler.
+Settings/theme resolver are actual functions; artwork invalidation/filter and
+SD persistence are fixture boundaries. save_ui_settings returns false (no SD
+write); parent alert dialog is omitted. UI selector/offset use the real signed
+types, preventing an unsigned mock from concealing top-bound behavior.
+
+PREVIEW_KEYS supplies space-separated X key names. Each key is held100ms and
+released200ms to avoid missing a press between GBA frames. For example:
+
+```sh
+PREVIEW_SCREEN=2 PREVIEW_OPTION=3 PREVIEW_THEME=6 PREVIEW_KEYS=Right \
+ PREVIEW_EXPECT_ANIMATION=1 bash scripts/test-browser-preview-mgba.sh
+```
+
+A two-pixel marker outside controls on the last scanline encodes actual Animation
+state (white On, black Off); the PNG checker asserts it independently of text.
+Checked On with Right, Off with two Rights plus five Downs to Accent, and four
+Ups clamping at Theme followed by Right changing Light to Dark. Screenshots were
+inspected and state assertions pass. The On input test also passes after make
+clean with no firmware-generated headers. Preview palette reload uses the actual
+production theme/accent resolver. No SD/FatFS/save action or full browser-filter
+integration is qualified, and no mGBA package/launch flags changed.

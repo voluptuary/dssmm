@@ -2170,7 +2170,7 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetHid: value = msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED]; break;
     case UiSetAccent: value = accent_names[menu_accent < ACCENT_COUNT ? menu_accent : 0]; break;
     }
-    if (menu_theme >= THEME_DSSMM_LIGHT && option == smenu.uiset.selector)
+    if (menu_theme >= THEME_DSSMM_LIGHT && (int)option == smenu.uiset.selector)
       draw_menu_selection(frame, row_y[row], 4, 236);
     draw_text_ovf(labels[option], frame, 8, row_y[row], 116);
     /* Localized native knob labels may already include their arrows. */

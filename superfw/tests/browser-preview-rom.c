@@ -102,6 +102,12 @@ static void card(volatile uint8_t *frame, const browser_carousel_item *item,
   (void)artwork_blit_scaled_cropped((volatile uint16_t *)frame,pixels,info,x,y,width,height);
 }
 
+static void reload_theme(unsigned theme) {
+  const t_theme_colors colors=menu_theme_colors(theme,menu_accent);
+  PALETTE[0]=colors.bg_color;PALETTE[1]=colors.ft_color;
+  PALETTE[2]=colors.hi_color;PALETTE[3]=colors.fg_color;
+}
+
 static void render(volatile uint8_t *frame, int vertical, int selected, int offset, int box_mode) {
   fill_rect(frame, 0, 0, 240, 160, 0);
   fill_rect(frame, 0, 0, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
@@ -140,7 +146,11 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   if (PREVIEW_SCREEN == 3) { render_settings(frame); return; }
   if (PREVIEW_SCREEN == 2) {
     fill_rect(frame,0,144,240,16,0);
-    render_ui_settings(frame); return;
+    render_ui_settings(frame);
+    /* Test-only state marker, white=On/black=Off; outside visible controls. */
+    unsigned marker=carousel_animation ? 236 : 237;
+    ((volatile uint16_t *)frame)[159*120]=marker|(marker<<8);
+    return;
   }
   if (PREVIEW_SCREEN == 1) { render_tools(frame); return; }
   browser_carousel_item items[3];
@@ -179,6 +189,7 @@ int main(void) {
     for(unsigned i=0;i<16;++i)PALETTE[128+i]=menu_icons_pal[i];
     PALETTE[128]=PALETTE[0];
   }
+  PALETTE[236]=0x7fff;PALETTE[237]=0;
   load_fixtures();
   preview_select_ui(PREVIEW_OPTION);
   smenu.set.selector = PREVIEW_OPTION < SettMAX ? PREVIEW_OPTION : SettSave;
@@ -190,6 +201,9 @@ int main(void) {
     unsigned keys = (unsigned)(~REG_KEYINPUT) & 0x03ff;
     unsigned pressed = keys & ~old_keys;
     old_keys = keys;
+    if(PREVIEW_SCREEN==2) {
+      if(pressed)keypress_menu_uisettings(pressed);
+    } else {
     if (pressed & KEY_LEFT) { if (selected > 0) { --selected; offset = browser_motion_retarget(offset, -1); } }
     if (pressed & KEY_RIGHT) { if (selected < 2) { ++selected; offset = browser_motion_retarget(offset, 1); } }
     if (pressed & KEY_UP) { if (selected > 0) { --selected; offset = browser_motion_retarget(offset, -1); } }
@@ -198,6 +212,7 @@ int main(void) {
     if (pressed & KEY_B) { selected = 1; offset = 0; }
     if (pressed & KEY_L) box_mode = 0;
     if (pressed & KEY_R) box_mode = 1;
+    }
     ++text_animation;
     if (PREVIEW_AUTOMOVE && ++demo_frame % 120 == 0) {
       int next = selected == 1 ? 0 : 1;
