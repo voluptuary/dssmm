@@ -59,3 +59,15 @@ checked: Light Chis Fast ROM, Dark SD Savegame-load lower page, and Save. Text
 uses production bounds/scrolling; long value fields can still truncate. This
 executes presentation only, not input/persistence/storage actions. No emulator
 package/version/launch setup changed.
+
+Screens4/5/6 preview the actual ROM-info, patching and loading renderers.
+Option0..5 selects ROM save type (6 exercises a long filename/unknown save),
+or0..4 selects the patch/loading row. Values are synthetic field fixtures,
+not real ROM launch or patch execution. Preview draws popup border/navigation
+arrows to expose title overlap; disk OAM and action handlers are excluded.
+Checked Light info/Flash128K, Dark long name, patch/In-game and loading/RTC.
+
+The build copies messages.h beside its generated messages_data.h, preventing
+an older firmware-generated src/messages_data.h from shadowing fresh preview
+messages through quoted includes. Preview remains independently buildable after
+make clean. No mGBA package, launch flags or BIOS policy changes.

@@ -98,7 +98,7 @@ pixels = Counter(tuple(row[i:i + 3]) for row in rows for i in range(0, stride, 3
 # Exclude schematic UI colors; other colors originate in decoded BMPs.
 ui_colors = {(24, 57, 49), (255, 255, 255), (255, 165, 123), (173, 173, 173)}
 art_pixels = sum(count for color, count in pixels.items() if color not in ui_colors)
-if os.environ.get("PREVIEW_SCREEN") in ("1", "2", "3"):
+if os.environ.get("PREVIEW_SCREEN") in ("1", "2", "3", "4", "5", "6"):
     background=tuple(rows[80][-3:])
     text_pixels = sum(tuple(row[i:i+3]) != background for row in rows[20:140] for i in range(0,stride,3))
     if text_pixels < 200: raise SystemExit("Menu text missing")

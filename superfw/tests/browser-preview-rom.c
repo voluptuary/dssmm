@@ -105,6 +105,26 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   fill_rect(frame, 0, 0, 240, 160, 0);
   fill_rect(frame, 0, 0, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
   fill_rect(frame, 0, 144, 240, 16, PREVIEW_THEME >= 0 ? 3 : 1);
+  if (PREVIEW_SCREEN >= 4 && PREVIEW_SCREEN <= 6) {
+    draw_box_outline(frame,2,238,18,158,FG_COLOR);
+    draw_text_ovf("⯇",frame,10,23,8);
+    draw_text_ovf("⯈",frame,222,23,8);
+  }
+  if (PREVIEW_SCREEN == 5) {
+    const t_load_gba_info info={0,true,true,true};
+    (void)render_gbarom_patching(frame,&info,PREVIEW_OPTION<5 ? PREVIEW_OPTION : 4);
+    return;
+  }
+  if (PREVIEW_SCREEN == 6) {
+    const t_load_gba_lcfg info={0,0,0,true,true};
+    (void)render_gbarom_loading(frame,&info,true,PREVIEW_OPTION<5 ? PREVIEW_OPTION : 4);
+    return;
+  }
+  if (PREVIEW_SCREEN == 4) {
+    render_gbarom_info(frame, PREVIEW_OPTION==6 ? "/Game Boy Advance/P/A very long synthetic title for scrolling checks (USA).gba" : browser_fixture_names[1], false, "FAKE", 0, PREVIEW_OPTION<6 ? PREVIEW_OPTION : -1);
+    draw_central_text(msgs[lang_id][MSG_LOAD_GBA],frame,120,134);
+    return;
+  }
   if (PREVIEW_SCREEN == 3) { render_settings(frame); return; }
   if (PREVIEW_SCREEN == 2) {
     fill_rect(frame,0,144,240,16,0);

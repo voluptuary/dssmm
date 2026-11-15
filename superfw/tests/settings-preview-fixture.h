@@ -18,3 +18,15 @@ typedef struct { int year,month,day,hour,min; } t_dec_date;
 static void timestamp2date(unsigned value,t_dec_date *out) {
   (void)value; *out=(t_dec_date){26,11,15,12,0};
 }
+
+/* Fields read by the production patch/loading presentation functions only. */
+typedef struct {
+ unsigned patch_type;
+ bool use_dsaving,ingame_menu_enabled,rtc_patch_enabled;
+} t_load_gba_info;
+typedef struct {
+ unsigned sram_load_type,sram_save_type,rtcval;
+ bool use_cheats,cheats_found;
+} t_load_gba_lcfg;
+#define ICON_DISK 0
+static void render_icon(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}

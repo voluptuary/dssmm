@@ -4,6 +4,7 @@ project_root="$(cd "$(dirname "$0")/.." && pwd)"
 out="$project_root/build/mgba"
 mkdir -p "$out"
 python3 "$project_root/res/messages.py" h main > "$out/messages_data.h"
+cp "$project_root/src/messages.h" "$out/messages.h"
 if [ -n "${DEVKITARM:-}" ] && [ -x "$DEVKITARM/bin/arm-none-eabi-gcc" ]; then
   export PATH="$DEVKITARM/bin:$PATH"
 fi
@@ -45,6 +46,14 @@ text+=source[a:b]+"\n"
 text+='#include "settings-preview-fixture.h"\n'
 a=source.index("void render_settings(");b=source.index("\n}",a)+2
 text+=source[a:b]+"\n"
+text+="static struct {unsigned anim;} spop;\nstatic const char *file_basename(const char *path) {const char *p=strrchr(path,'/');return p?p+1:path;}\n"
+a=source.index("static void render_gbarom_info(");b=source.index("\n}",a)+2
+text+=source[a:b]+"\n"
+a=source.index("enum {\n  GBAInfoCNT");b=source.index("\n};",a)+3
+text+=source[a:b]+"\n"
+for signature in ("static const char *render_gbarom_patching(","static const char *render_gbarom_loading("):
+ a=source.index(signature);b=source.index("\n}",a)+2
+ text+=source[a:b]+"\n"
 Path(sys.argv[2]).write_text(text)
 PY
 arm-none-eabi-gcc -O2 -Wall -Wextra -Werror -Wno-old-style-declaration -mcpu=arm7tdmi -mthumb \
