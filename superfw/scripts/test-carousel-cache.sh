@@ -106,6 +106,7 @@ int main(void) {
  unsigned prior_blits=blits;
  browser_motion_offset=128;smenu.browser.selector=2;
  render_browser_carousel(frame,true);assert(loads==3 && blits>prior_blits);
+ assert(carousel_hot_valid && carousel_hot_index==1); /* Visual focus during motion, not the new logical selection. */
  artwork_mode=2;render_browser_carousel(frame,false);assert(loads==3);
  browser_motion_offset=0;render_browser_carousel(frame,false);assert(loads==4);
  state.carousel_art[0].pixels[0]=0x1234;

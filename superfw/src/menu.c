@@ -1574,10 +1574,10 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
           !strcmp(carousel_meta[slot].rom, rom)) {
         const artwork_info *info = &carousel_meta[slot].info;
         const uint16_t *pixels = sdr_state->carousel_art[slot].pixels;
-        if (item->index == selected) {
-          if (!carousel_hot_valid || carousel_hot_index != selected) {
+        if (item->focused) {
+          if (!carousel_hot_valid || carousel_hot_index != item->index) {
             dma_memcpy16(carousel_hot_pixels, pixels, info->width*info->height/2);
-            carousel_hot_index = selected;
+            carousel_hot_index = item->index;
             carousel_hot_valid = true;
           }
           pixels = carousel_hot_pixels;
