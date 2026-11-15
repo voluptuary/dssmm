@@ -85,3 +85,11 @@ old config keys are ignored, new settings version6 omits the key. Cache5 images
 Center the SuperFW version/hash Info line until full DE styling. Produce numbered
 Chis hardware-test builds after all3 variant builds/gates; continue autonomously
 without requiring owner feedback. Owner will identify tested build numbers.
+
+## Owner585 confirmation and new focus goals
+
+Owner physically confirms Chis585's ROM-header images and five-image cache work.
+Prioritize docs/FOCUS-GOALS.md: CUSTOM directory artwork in Title/Box, then an
+optional credited DE DSSMM system font. Native fallback, byte-safe rendering and
+all3 variants remain required. Indexed filesystem work is deferred until these
+priorities are implemented; no such library/source change has been made.

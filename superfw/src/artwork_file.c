@@ -9,7 +9,7 @@ _Static_assert(offsetof(FATFS, win)%4 == 0, "FatFS sector cache must be word ali
 _Static_assert(offsetof(FIL, buf)%4 == 0, "FatFS file cache must be word aligned");
 #endif
 /* No truncated candidate opens, path traversal or directory scans. */
-bool artwork_path(char *out, size_t capacity, const char *rom, unsigned style, unsigned candidate) {
+static bool artwork_named_path(char *out, size_t capacity, const char *rom, unsigned style, unsigned candidate, bool directory) {
   if (!out || !capacity || !rom || rom[0] != '/' || !rom[1] || style > 1 || candidate > 1) return false;
   const char *base = rom + 1, *component = base;
   for (const char *p = base;; ++p) {
@@ -22,9 +22,9 @@ bool artwork_path(char *out, size_t capacity, const char *rom, unsigned style, u
       component = p + 1;
     }
   }
-  const char *dot = strrchr(component, '.');
+  const char *dot = directory ? component+strlen(component) : strrchr(component, '.');
   /* File previews only; folders and extensionless entries have no candidate. */
-  if (!dot || dot == component || !dot[1]) return false;
+  if (!directory && (!dot || dot == component || !dot[1])) return false;
   const char *name = candidate ? component : base;
   const char *prefix = style ? "/SYSTEM/IMGS2/" : "/SYSTEM/IMGS/";
   size_t pn = strlen(prefix), nn = dot - name, cn = candidate ? 7 : 0;
@@ -34,6 +34,12 @@ bool artwork_path(char *out, size_t capacity, const char *rom, unsigned style, u
   memcpy(out + pn + cn, name, nn);
   memcpy(out + pn + cn + nn, ".bmp", 5);
   return true;
+}
+bool artwork_path(char *out, size_t capacity, const char *rom, unsigned style, unsigned candidate) {
+  return artwork_named_path(out,capacity,rom,style,candidate,false);
+}
+bool artwork_directory_path(char *out, size_t capacity, const char *directory, unsigned style) {
+  return artwork_named_path(out,capacity,directory,style,1,true);
 }
 static bool artwork_gamecode_path(char *out, size_t capacity, const char gamecode[4]) {
   static const char prefix[] = "/SYSTEM/IMGS/";
@@ -165,4 +171,16 @@ bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capac
     }
   }
   return false;
+}
+
+/* Directories match their complete basename in CUSTOM; never probe a ROM header. */
+bool artwork_load_directory(const char *directory, unsigned style, uint8_t *pixels, size_t capacity,
+                            uint8_t *bmp, size_t bmp_capacity, artwork_info *info) {
+  char path[288];
+  if (!artwork_directory_path(path,sizeof(path),directory,style)) return false;
+  FIL file;
+  if (f_open(&file,path,FA_READ)!=FR_OK) return false;
+  bool ok=artwork_decode_file(&file,bmp,bmp_capacity,pixels,capacity,info,false);
+  FRESULT closed=f_close(&file);
+  return ok && closed==FR_OK && info->width==(style ? 80 : 120);
 }

@@ -4,7 +4,8 @@
 #include "fatfs/ff.h"
 #include "artwork_file.h"
 static unsigned opens, closes, seeks, fail_read, fail_seek, fail_close;
-static unsigned image_reads, fail_tail;
+static unsigned image_reads, fail_tail, rom_opens;
+static bool folder_title,folder_box;
 static int gamecode_header, rom_file, filename_custom, filename_mirror, box_custom, gamecode_art, gamecode_flat_art;
 static char last_path[288], last_rom_path[288];
 static char rom_code[5]="BPRE";
@@ -27,9 +28,11 @@ FRESULT f_open(FIL *fp, const TCHAR *path, BYTE mode) {
   rom_file=0;
   const char *dot=strrchr(path,'.');
   if(dot && (!strcmp(dot,".gba") || !strcmp(dot,".GBA"))) {
-    strcpy(last_rom_path,path);
+    ++rom_opens;strcpy(last_rom_path,path);
     rom_file=1; fp->obj.objsize=0xB0; fp->fptr=0; return FR_OK;
   }
+  if(folder_title && !strcmp(path,"/SYSTEM/IMGS/CUSTOM/Game Boy Advance.bmp")) goto image;
+  if(folder_box && !strcmp(path,"/SYSTEM/IMGS2/CUSTOM/Game Boy Advance.bmp")) goto image;
   if(filename_custom && !strcmp(path,"/SYSTEM/IMGS/CUSTOM/Game Boy game (USA).bmp")) goto image;
   if(filename_mirror && !strcmp(path,"/SYSTEM/IMGS/Game Boy Advance/P/Game Boy game (USA).bmp")) goto image;
   if(box_custom && !strcmp(path,"/SYSTEM/IMGS2/CUSTOM/Game.bmp")) goto image;
@@ -172,5 +175,25 @@ int main(void) {
   assert(!artwork_load("/Game.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
   fail_close=0; bmp[0]='X';
   assert(!artwork_load("/Game.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(artwork_directory_path(path,sizeof(path),"/Game Boy Advance",0));
+  assert(!strcmp(path,"/SYSTEM/IMGS/CUSTOM/Game Boy Advance.bmp"));
+  assert(artwork_directory_path(path,sizeof(path),"/Collections/Game.Boy Advance",1));
+  assert(!strcmp(path,"/SYSTEM/IMGS2/CUSTOM/Game.Boy Advance.bmp"));
+  assert(!artwork_directory_path(path,sizeof(path),"/..",0));
+  assert(!artwork_directory_path(path,sizeof(path),"/A/../Folder",0));
+  assert(!artwork_directory_path(path,12,"/Game Boy Advance",0));
+  unsigned before_folder_rom=rom_opens;
+  memcpy(bmp,"BM",2);put32(18,120);put32(34,19200);folder_title=true;
+  memcpy(bmp+6,"DST1",4);
+  assert(artwork_load_directory("/Game Boy Advance",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(info.width==120 && info.transparent && rom_opens==before_folder_rom);
+  assert(!strcmp(last_path,"/SYSTEM/IMGS/CUSTOM/Game Boy Advance.bmp"));
+  folder_box=true;put32(18,80);put32(34,12800);
+  assert(artwork_load_directory("/Game Boy Advance",1,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(info.width==80 && !strcmp(last_path,"/SYSTEM/IMGS2/CUSTOM/Game Boy Advance.bmp"));
+  assert(!artwork_load_directory("/Game Boy Advance",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  folder_box=folder_title=false;
+  assert(!artwork_load_directory("/Game Boy Advance",1,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(rom_opens==before_folder_rom);
   return 0;
 }

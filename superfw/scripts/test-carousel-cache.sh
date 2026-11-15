@@ -62,13 +62,17 @@ static bool browser_fast_reuse, browser_fast_valid[2];
 static unsigned artwork_mode=1;
 static unsigned carousel_animation=1;
 static int browser_motion_offset;
-static unsigned loads, blits, icons, scales;
+static unsigned loads, blits, icons, scales, directory_loads;
 static unsigned browser_entry_icon(const t_centry *entry) { (void)entry; return 0; }
 static void render_icon(int x,int y,unsigned icon) { (void)x;(void)y;(void)icon;++icons; }
 static bool artwork_load(const char *rom,unsigned mode,uint8_t *pixels,size_t capacity,
  uint8_t *bmp,size_t size,artwork_info *info) {
  (void)mode;(void)pixels;(void)capacity;(void)bmp;(void)size;
  ++loads; *info=(artwork_info){mode ? 80 : 120,80,false}; return !strstr(rom,"missing");
+}
+static bool artwork_load_directory(const char *rom,unsigned mode,uint8_t *pixels,size_t capacity,
+ uint8_t *bmp,size_t size,artwork_info *info) {
+ ++directory_loads;return artwork_load(rom,mode,pixels,capacity,bmp,size,info);
 }
 bool artwork_blit_frame(volatile uint16_t *frame,const uint16_t *pixels,
  const artwork_info *info,unsigned x,unsigned y) {
@@ -136,12 +140,12 @@ int main(void) {
  assert(loads==five_loads+5);
  smenu.browser.selector=3;render_browser_carousel(frame,false);
  assert(loads==five_loads+5);
- /* Directories cannot trigger image loads or consume cached file artwork. */
+ /* Directories use the dedicated CUSTOM loader, with normal caching/fallback. */
  browser_invalidate_artwork();
  for(unsigned i=0;i<5;++i) entries[i].attr=AM_DIR;
  before_loads=loads;before_blits=blits;before_icons=icons;
  render_browser_carousel(frame,false);
- assert(loads==before_loads && blits==before_blits && icons>before_icons);
+ assert(loads==before_loads+1 && directory_loads>0);
  for(unsigned i=0;i<5;++i)entries[i].attr=0;
  smenu.browser.selector=1;browser_invalidate_artwork();
  for(unsigned i=0;i<3;++i)render_browser_carousel(frame,false);

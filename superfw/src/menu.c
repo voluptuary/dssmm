@@ -1481,11 +1481,11 @@ static void render_browser_list(volatile uint8_t *frame) {
     const t_centry *selected = sdr_state->filefilter[smenu.browser.selector];
     char rom[MAX_FN_LEN];
     int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, selected->fname);
-    if (!selected->isdir && n > 0 && (unsigned)n < sizeof(rom)) {
+    if (n > 0 && (unsigned)n < sizeof(rom)) {
       if (!artwork_cached || artwork_cached_mode != artwork_mode || strcmp(artwork_rom, rom)) {
         strbcpy(artwork_rom, rom, sizeof(artwork_rom));
         artwork_cached_mode = artwork_mode;
-        artwork_valid = artwork_load(rom, artwork_mode - 1,
+        artwork_valid = (selected->isdir ? artwork_load_directory : artwork_load)(rom, artwork_mode - 1,
           (uint8_t *)sdr_state->artwork_pixels, ARTWORK_MAX_PIXELS,
           sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer), &preview_info);
         artwork_cached = true;  // Cache misses too; avoid SD probes every frame.
@@ -1537,7 +1537,6 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         int index = candidates[c];
         if (index < 0 || index >= smenu.browser.dispentries) continue;
         const t_centry *entry = sdr_state->filefilter[index];
-        if (entry->attr & AM_DIR) continue;
         char rom[MAX_FN_LEN];
         int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
         if (n <= 0 || (unsigned)n >= sizeof(rom)) continue;
@@ -1547,7 +1546,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
             !strcmp(carousel_meta[slot].rom, rom)) continue;
         strbcpy(carousel_meta[slot].rom, rom, MAX_FN_LEN);
         carousel_meta[slot].mode = artwork_mode;
-        carousel_meta[slot].valid = artwork_load(rom, artwork_mode - 1,
+        carousel_meta[slot].valid = ((entry->attr & AM_DIR) ? artwork_load_directory : artwork_load)(rom, artwork_mode - 1,
             (uint8_t *)sdr_state->carousel_art[slot].pixels, ARTWORK_MAX_PIXELS,
             sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
             &carousel_meta[slot].info);
@@ -1570,7 +1569,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       char rom[MAX_FN_LEN];
       int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
       bool drawn = false;
-      if (artwork_mode && !(entry->attr & AM_DIR) && n > 0 && (unsigned)n < sizeof(rom) &&
+      if (artwork_mode && n > 0 && (unsigned)n < sizeof(rom) &&
           carousel_meta[slot].cached && carousel_meta[slot].valid &&
           carousel_meta[slot].mode == artwork_mode &&
           !strcmp(carousel_meta[slot].rom, rom)) {
