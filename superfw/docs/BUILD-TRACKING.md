@@ -31,3 +31,12 @@ valid GBA header checksums, embedded sizes, and full firmware seals. It emits a
 JSON report on success. This is integrity/identity validation; it does not replace
 build logs, tests, or runtime/hardware qualification. It correctly rejects the
 existing diagnostic set because Lite was built with modified source.
+
+## Build 553 result and Build 561 retest
+
+Owner confirms Chis553 no longer crashes at the first entry and Box art works
+in List view; carousel artwork is absent. Build561 (76b7a493) moves byte-written
+carousel metadata from cartridge SDRAM into GBA RAM. Its ARM bus regression
+passes and553 fails. All three clean board builds and hosted CI pass; see
+build-561-validation.json. Chis561 is the current local hardware-test image.
+Physical artwork/performance confirmation is still pending.

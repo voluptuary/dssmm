@@ -341,3 +341,9 @@ Owner Chis553 reports edge crash resolved but art still absent. Reverted Off nei
 ## 2026-11-15 — Reproduce carousel-only hardware memory defect
 
 Owner confirms List Box art works. Carousel metadata was in cartridge SDRAM despite bool/string byte writes; List metadata is internal. Fixed placement, reverted custom neighbor placeholders, deferred unrelated skin changes. ARM Thumb cache regression rejects Build553's byte store at0x080026a0 and passes corrected renderer; real ELF places816-byte metadata in IWRAM. Added mandatory linked-address check per board, optional Unicorn diagnostic and detailed evidence/limits. Finish numbered board validation and Chis hardware-test delivery, then pause per owner request; no physical artwork fix claimed yet.
+
+## 2026-11-15 — Chis561 delivered; owner authorizes continued port
+
+Clean SD/Lite/Chis Build561 at76b7a493 share fingerprint and pass image identity/seal checks; each links816-byte metadata to IWRAM0x03000e74. Focused suites, ARM bus regression and all four AnimationOff mGBA Title/Box/orientation previews pass. Hosted full verifier43663344006 passed. Local upstream rerun hung with ASAN DEADLYSIGNAL in crc_test and was terminated; no local full-pass claim. Evidence: docs/build-561-validation.json.
+
+Copied Chis561 to root hardware-test/superfw-chis-build561.fw, SHA ffaf6863e320ec5aeb9c6521a7510167e58403e67508c17e9291f987cf8940ef, with manifest/guide. Removed our superseded553 local image/manifest; historical tracked evidence remains. Owner has switched models and explicitly revoked the requested pause: continue porting after delivery. Physical carousel result remains pending; retain561 unchanged while later menu work proceeds. No public release this turn.

@@ -58,5 +58,6 @@ ordinary byte writes there are invalid. Every board build checks the linked
 metadata address. See docs/CAROUSEL-ARTWORK-MEMORY.md for the ARM regression that
 fails on owner-tested Build553 and passes with the fix. Owner confirms List Box
 art works and edge crash is fixed, but corrected carousel art still requires
-physical retesting. Current task is restricted to this artwork defect: deliver
-a validated Chis candidate and pause for the owner's model switch.
+physical retesting. Owner has completed the model switch and authorized continuing the port after
+delivering the Chis candidate. Keep Build561 hardware-test image unchanged while
+awaiting physical results.

@@ -54,5 +54,5 @@ Retest the numbered Chis candidate using the same working Box pack, in both
 carousel orientations with Animation On and Off, then Title artwork. A Title
 pack that also fails in List may have a separate lookup/format issue; this fix
 does not claim to resolve unobserved pack formats. Physical timing and the
-owner's full SD contents cannot be reproduced locally. Pause after delivering
-the candidate so the owner can switch models; do not resume styling unprompted.
+owner's full SD contents cannot be reproduced locally. Owner subsequently completed the model switch and authorized resuming styling
+after candidate delivery. Build561 is frozen in hardware-test for that retest.
