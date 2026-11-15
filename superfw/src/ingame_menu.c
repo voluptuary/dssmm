@@ -598,7 +598,17 @@ void draw_popup(uint8_t *fb) {
   selbarpos = NOSELBAR;   // Disable bar to ensure we do not overdraw
 }
 
+/* Match the main kernel's solid selection rows without touching game state. */
+static void draw_menu_selection(uint8_t *fb, unsigned y) {
+  if (popup.msg || y > SCREEN_HEIGHT-16) return;
+  volatile uint16_t *out=(volatile uint16_t *)(fb+y*SCREEN_WIDTH);
+  for (unsigned row=0;row<16;++row)
+    for (unsigned col=4;col<236;col+=2)
+      out[row*SCREEN_WIDTH/2+col/2]=dup8(BL_COLOR);
+}
+
 void draw_main_menu(uint8_t *fb, unsigned framen) {
+  draw_menu_selection(fb,36+19*copt);
   bool havess = num_mem_savestates || num_dsk_savestates;
   draw_text(msgs[ingame_menu_lang][IMENU_MAIN0_BACK_GAME],  fb, 24, 36 + 19*0, HI_COLOR);
   draw_text(msgs[ingame_menu_lang][IMENU_MAIN1_RESET],      fb, 24, 36 + 19*1, HI_COLOR);
@@ -607,26 +617,29 @@ void draw_main_menu(uint8_t *fb, unsigned framen) {
   draw_text(msgs[ingame_menu_lang][IMENU_MAIN4_RTC],        fb, 24, 36 + 19*4, !has_rtc_support ? SH_COLOR : HI_COLOR);
   draw_text(msgs[ingame_menu_lang][IMENU_MAIN5_CHEATS],     fb, 24, 36 + 19*5, !cheat_base_addr ? SH_COLOR : HI_COLOR);
 
-  selbarpos = 36 + 19*copt;
+  selbarpos = NOSELBAR;
 }
 
 void draw_reset_menu(uint8_t *fb, unsigned framen) {
+  draw_menu_selection(fb,36+19*copt);
   for (unsigned i = 0; i <= IMENU_RST2_DEVSKIP - IMENU_RST0_GAME; i++)
     draw_text(msgs[ingame_menu_lang][IMENU_RST0_GAME + i],  fb, 24, 36 + 19*i, HI_COLOR);
   draw_text(msgs[ingame_menu_lang][IMENU_GOBACK], fb, 24, 93, HI_COLOR);
 
-  selbarpos = 36 + 19*copt;
+  selbarpos = NOSELBAR;
 }
 
 void draw_save_menu(uint8_t *fb, unsigned framen) {
+  draw_menu_selection(fb,36+19*copt);
   for (unsigned i = 0; i <= IMENU_SAVE2_RST - IMENU_SAVE0_OW; i++)
     draw_text(msgs[ingame_menu_lang][i + IMENU_SAVE0_OW],  fb, 24, 36 + 19*i, HI_COLOR);
   draw_text(msgs[ingame_menu_lang][IMENU_GOBACK], fb, 24, 93, HI_COLOR);
 
-  selbarpos = 36 + 19*copt;
+  selbarpos = NOSELBAR;
 }
 
 void draw_rtc_menu(uint8_t *fb, unsigned framen) {
+  if (copt == 6) draw_menu_selection(fb,130);
   char thour[3] = {'0' + rtc_date.hour/10, '0' + rtc_date.hour%10, 0};
   char tmins[3] = {'0' + rtc_date.min /10, '0' + rtc_date.min%10, 0};
   char tdays[3] = {'0' + rtc_date.day /10, '0' + rtc_date.day%10, 0};
@@ -652,7 +665,7 @@ void draw_rtc_menu(uint8_t *fb, unsigned framen) {
     draw_text_center("⯅", fb, SCREEN_WIDTH/2, 77, HI_COLOR);
     draw_text_center("⯆", fb, SCREEN_WIDTH/2, 107, HI_COLOR);
   } else
-    selbarpos = 130;
+    selbarpos = NOSELBAR;
 
   char tmp[64];
   npf_snprintf(tmp, sizeof(tmp), "%s: %s",
@@ -669,6 +682,7 @@ void draw_cheats_menu(uint8_t *fb, unsigned framen) {
                   (copt >= num_cheats - 2)        ? num_cheats - 5 :
                    copt - 2;
 
+  draw_menu_selection(fb,40+20*(copt-soff));
   unsigned off = 4, numdisp = 0;
   for (unsigned i = 0; i < num_cheats && numdisp < 5; i++) {
     t_cheathdr *e = (t_cheathdr*)(((uint8_t*)cheat_base_addr) + off);
@@ -684,7 +698,7 @@ void draw_cheats_menu(uint8_t *fb, unsigned framen) {
     }
   }
 
-  selbarpos = 40 + 20 * (copt - soff);
+  selbarpos = NOSELBAR;
 }
 
 // Walks over the active cheats, produces a cheat table and updates
@@ -742,9 +756,11 @@ void draw_states_menu(uint8_t *fb, unsigned framen) {
 
     if (makepers >= 0) {
       copt = copt & 1;
+      draw_menu_selection(fb,95+18*copt);
       draw_text(msgs[ingame_menu_lang][IMENU_MAKEPER], fb, 24, 95 + 18*0, HI_COLOR);
       draw_text(msgs[ingame_menu_lang][IMENU_CANCEL],  fb, 24, 95 + 18*1, HI_COLOR);
     } else {
+      draw_menu_selection(fb,95+18*copt);
       draw_text(msgs[ingame_menu_lang][IMENU_SSTATEP0_SAVE],  fb, 24, 95 + 18*0, HI_COLOR);
       draw_text(msgs[ingame_menu_lang][IMENU_SSTATEP1_LOAD],  fb, 24, 95 + 18*1,
                        (diskslot_valid[-state_slot - 1] ? HI_COLOR : SH_COLOR));
@@ -755,6 +771,7 @@ void draw_states_menu(uint8_t *fb, unsigned framen) {
     npf_snprintf(tmp, sizeof(tmp), msgs[ingame_menu_lang][IMENU_SSTATE_QN], state_slot + 1);
     draw_text_center(tmp,  fb, SCREEN_WIDTH / 2, 34, HI_COLOR);
 
+    draw_menu_selection(fb,95+18*copt);
     draw_text(msgs[ingame_menu_lang][IMENU_SSTATEQ0_SAVE],  fb, 24, 95 + 18*0, HI_COLOR);
     draw_text(msgs[ingame_menu_lang][IMENU_SSTATEQ1_LOAD],  fb, 24, 95 + 18*1,
                      (memslot_valid[state_slot] ? HI_COLOR : SH_COLOR));
@@ -762,7 +779,7 @@ void draw_states_menu(uint8_t *fb, unsigned framen) {
                      (memslot_valid[state_slot] ? HI_COLOR : SH_COLOR));
   }
 
-  selbarpos = 95 + 18*copt;
+  selbarpos = NOSELBAR;
 }
 
 
@@ -1160,6 +1177,7 @@ void setup_video_frame() {
   MEM_PALETTE[HI_COLOR] = ingame_menu_palette[2];
   MEM_PALETTE[SH_COLOR] = ingame_menu_palette[3];
   MEM_PALETTE[256 + BL_COLOR] = ingame_menu_palette[4];
+  MEM_PALETTE[BL_COLOR] = ingame_menu_palette[4];
 
   memory_copy16((uint16_t*)&MEM_PALETTE[ICON_PAL], menu_icons_pal, sizeof(menu_icons_pal) >> 1);
   MEM_PALETTE[ICON_PAL] = MEM_PALETTE[BG_COLOR]; // Transparent color to BG color

@@ -29,6 +29,14 @@ SDL_AUDIODRIVER=dummy xvfb-run -a bash -c '
   trap finish EXIT
   # First startup in a fresh Xvfb session can take several seconds.
   sleep 5
+  if [ -n "${PREVIEW_KEYS:-}" ]; then
+    for key in $PREVIEW_KEYS; do
+      xdotool keydown --clearmodifiers "$key"
+      sleep 0.1
+      xdotool keyup "$key"
+      sleep 0.2
+    done
+  fi
   xdotool key F12
   sleep 1
 ' _ "$out" "$emulator"
@@ -94,11 +102,17 @@ for _ in range(height):
             raise SystemExit(f"Unsupported PNG filter {method}")
     rows.append(row)
     previous = row
+if "PREVIEW_EXPECT_ANIMATION" in os.environ:
+    if os.environ.get("PREVIEW_SCREEN") != "2": raise SystemExit("Animation input assertion requires UI screen2")
+    expected=(255,255,255) if int(os.environ["PREVIEW_EXPECT_ANIMATION"]) else (0,0,0)
+    actual=tuple(rows[159][:3])
+    if actual!=expected: raise SystemExit(f"Animation state marker {actual}, expected {expected}")
+    print("Production UI input animation state verified.")
 pixels = Counter(tuple(row[i:i + 3]) for row in rows for i in range(0, stride, 3))
 # Exclude schematic UI colors; other colors originate in decoded BMPs.
 ui_colors = {(24, 57, 49), (255, 255, 255), (255, 165, 123), (173, 173, 173)}
 art_pixels = sum(count for color, count in pixels.items() if color not in ui_colors)
-if os.environ.get("PREVIEW_SCREEN") in ("1", "2", "3"):
+if os.environ.get("PREVIEW_SCREEN") in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"):
     background=tuple(rows[80][-3:])
     text_pixels = sum(tuple(row[i:i+3]) != background for row in rows[20:140] for i in range(0,stride,3))
     if text_pixels < 200: raise SystemExit("Menu text missing")
