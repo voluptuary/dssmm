@@ -136,12 +136,7 @@ enum {
   SettVerifyNOR,
   #endif
   SettFastEWRAM,
-  SettSaveLoc,
-  #ifdef SUPPORT_NORGAMES
-  SettSaveLocNOR,
-  #endif
   SettSaveBkp,
-  SettStateLoc,
   SettCheatEn,
   SettTitle2,
   DefsPatchEng,
@@ -862,7 +857,7 @@ static void browser_open_gba(const char *fn, uint32_t fs, bool prompt_patchgen) 
       prepare_gba_cheats((char*)&rmh->gcode[0], rmh->version, &spop.p.load.l, fn, lh_sett.use_cheats);
 
       // Load and set default and sane settings honoring defaults and preferences.
-      sram_filename_calc(fn, spop.p.load.l.savefn, save_path_default);
+      sram_filename_calc(fn, spop.p.load.l.savefn);
       prepare_gba_settings(&spop.p.load.l, spop.p.load.i.use_dsaving, lh_sett.rtcts, game_no_save);
 
       // Show load ROM menu.
@@ -890,7 +885,7 @@ static void browser_open_nor(const t_flash_game_entry * e) {
   prepare_gba_cheats((char*)&e->gamecode, e->gamever, &spop.p.norld.l, e->game_name, lh_sett.use_cheats);
 
   // Load and set default and sane settings honoring defaults and preferences.
-  sram_filename_calc(e->game_name, spop.p.norld.l.savefn, save_path_nor_default);
+  sram_filename_calc(e->game_name, spop.p.norld.l.savefn);
   WRITE_LOG("loadp: %d savep: %d uses_ds: %d gamens: %d",
             spop.p.norld.l.sram_load_type, spop.p.norld.l.sram_save_type,
             game_uses_dsaving, game_no_save);
@@ -985,7 +980,7 @@ static void recent_reload() {
 
 void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
   // Load: Sav/Reset Save: Reboot/Disable
-  sram_filename_calc(fn, spop.p.load.l.savefn, save_path_default);
+  sram_filename_calc(fn, spop.p.load.l.savefn);
   t_sram_load_policy lp = check_file_exists(spop.p.load.l.savefn) ? SaveLoadSav : SaveLoadReset;
   unsigned errsave = prepare_sram_based_savegame(lp, SaveReboot, spop.p.load.l.savefn);
   if (errsave) {
@@ -2002,33 +1997,8 @@ void render_settings(volatile uint8_t *frame) {
   }
 
   if (optnum++ >= baseopt && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_SETT_SAVET], frame, 8, offy + rowh*optcnt, 116);
-
-    if (save_path_default == SaveRomName)
-      draw_text_ovf(msgs[lang_id][MSG_NEXTTO_ROM], frame, value_x, offy + rowh*optcnt++, 104);
-    else {
-      npf_snprintf(tmp, sizeof(tmp), "< %s >", save_paths[save_path_default]);
-      draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
-    }
-  }
-
-  #ifdef SUPPORT_NORGAMES
-  if (optnum++ >= baseopt && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_SETT_SAVETX], frame, 8, offy + rowh*optcnt, 116);
-    npf_snprintf(tmp, sizeof(tmp), "< %s >", save_paths[save_path_nor_default]);
-    draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
-  }
-  #endif
-
-  if (optnum++ >= baseopt && optcnt < maxrows) {
     npf_snprintf(tmp, sizeof(tmp), "< %u >", backup_sram_default);
     draw_text_ovf(msgs[lang_id][MSG_SETT_SAVEBK], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
-  }
-
-  if (optnum++ >= baseopt && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_SETT_STATET], frame, 8, offy + rowh*optcnt, 116);
-    npf_snprintf(tmp, sizeof(tmp), "< %s >", savestates_paths_display[state_path_default]);
     draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
   }
 
@@ -2095,25 +2065,7 @@ void render_settings(volatile uint8_t *frame) {
   // Render bar below for help messge
   dma_memset16(&frame[240*140], dup8(FG_COLOR), 240*20/2);
 
-  if (smenu.set.selector == SettSaveLoc) {
-    if (save_path_default == SaveRomName)
-      draw_text_ovf_rotate(msgs[lang_id][MSG_SAVE_TYPE_NR], frame, 4, SCREEN_HEIGHT - 18, 232, &smenu.anim_state);
-    else {
-      npf_snprintf(tmp, sizeof(tmp), msgs[lang_id][MSG_SAVE_TYPE_PT], save_paths[save_path_default]);
-      draw_text_ovf_rotate(tmp, frame, 4, SCREEN_HEIGHT - 18, 232, &smenu.anim_state);
-    }
-  }
-  else if (smenu.set.selector == SettStateLoc) {
-    npf_snprintf(tmp, sizeof(tmp), msgs[lang_id][MSG_STATE_TYPE_PT], savestates_paths[state_path_default]);
-    draw_text_ovf_rotate(tmp, frame, 4, SCREEN_HEIGHT - 18, 232, &smenu.anim_state);
-  }
-  #ifdef SUPPORT_NORGAMES
-  else if (smenu.set.selector == SettSaveLocNOR) {
-    npf_snprintf(tmp, sizeof(tmp), msgs[lang_id][MSG_SAVE_TYPE_PTX], save_paths[save_path_nor_default]);
-    draw_text_ovf_rotate(tmp, frame, 4, SCREEN_HEIGHT - 18, 232, &smenu.anim_state);
-  }
-  #endif
-  else {
+  {
     unsigned help_msg = smenu.set.selector == SettBootType ? MSG_BOOT_TYPE_I0 + boot_bios_splash :
                         smenu.set.selector == SettSaveBkp  ? MSG_BACKUP_I :
                         smenu.set.selector == SettFastSD   ? MSG_FASTSD_I :
@@ -2375,6 +2327,9 @@ void menu_flip() {
   REG_DISPCNT = (REG_DISPCNT & ~0x10) | (framen << 4);
   framen ^= 1;
 }
+
+/* Cold setup/action paths favor size; rendering above retains -O2. */
+#pragma GCC optimize ("Os")
 
 void menu_init(int sram_testres) {
   browser_invalidate_artwork();
@@ -3263,14 +3218,6 @@ static void keypress_menu_settings(unsigned newkeys) {
   if (newkeys & KEY_BUTTLEFT) {
     if (smenu.set.selector == SettHotkey)
       hotkey_combo = (hotkey_combo + hotkey_listcnt - 1) % hotkey_listcnt;
-    else if (smenu.set.selector == SettSaveLoc)
-      save_path_default = (save_path_default + SaveDirCNT - 1) % SaveDirCNT;
-    #ifdef SUPPORT_NORGAMES
-    else if (smenu.set.selector == SettSaveLocNOR)
-      save_path_nor_default = (save_path_nor_default + SaveDirNORCNT - 1) % SaveDirNORCNT;
-    #endif
-    else if (smenu.set.selector == SettStateLoc)
-      state_path_default = (state_path_default + StateDirCNT - 1) % StateDirCNT;
     else if (smenu.set.selector == SettSaveBkp)
       backup_sram_default = backup_sram_default ? backup_sram_default - 1 : 0;
     else if (smenu.set.selector == DefsPatchEng)
@@ -3281,14 +3228,6 @@ static void keypress_menu_settings(unsigned newkeys) {
   if (newkeys & KEY_BUTTRIGHT) {
     if (smenu.set.selector == SettHotkey)
       hotkey_combo = (hotkey_combo + 1) % hotkey_listcnt;
-    else if (smenu.set.selector == SettSaveLoc)
-      save_path_default = (save_path_default + 1) % SaveDirCNT;
-    #ifdef SUPPORT_NORGAMES
-    else if (smenu.set.selector == SettSaveLocNOR)
-      save_path_nor_default = (save_path_nor_default + 1) % SaveDirNORCNT;
-    #endif
-    else if (smenu.set.selector == SettStateLoc)
-      state_path_default = (state_path_default + 1) % StateDirCNT;
     else if (smenu.set.selector == SettSaveBkp)
       backup_sram_default = MIN(MAX_BACKUP_CNT, backup_sram_default + 1);
     else if (smenu.set.selector == DefsPatchEng)

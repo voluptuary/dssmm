@@ -1,22 +1,34 @@
 # SuperFW SD-card folders
 
-Newer DSSMM SuperFW builds group user-facing system data under `SYSTEM`, alongside the DSSCC artwork folders. `/.superfw` remains the private SuperFW configuration/data directory.
+Current development builds use one fixed `SYSTEM` layout on SD, Lite and Chis.
+Settings, per-game configurations, patch cache, cheats, external emulators,
+recent list, flash backups and pending-save/test markers formerly in `.superfw`
+now live directly inside `SYSTEM`. Artwork remains in `SYSTEM/IMGS` and
+`SYSTEM/IMGS2`. New saves use `SYSTEM/SAVEGAME`; disk states use
+`SYSTEM/SAVESTATE`. Directory-choice settings have been removed.
+
+On first boot the firmware moves the contents of `.superfw` into `SYSTEM`,
+merging subdirectories. It never replaces an existing destination file. A file
+conflict or storage error stops startup before pending SRAM is processed;
+resolve duplicates on a computer and retry. Keep the wanted copy of both files
+while resolving any conflict. Interrupted moves resume on the next boot. The
+legacy directory is removed only after it is empty. No game ROM is moved.
+
+Existing root `SAVEGAME`, `SAVES`, `SAVESTATE`, `SYSTEM/SAVES`, and saves beside
+ROMs remain detectable when no preferred SYSTEM save exists, to avoid silently
+starting a fresh save. Existing backup/temp save sets remain together. These
+compatibility reads are automatic, not user-selectable locations. Move old save
+sets into the canonical folders manually after backing them up if desired.
 
 ```text
-SD card/
-├── SYSTEM/
-│   ├── IMGS/              # title artwork
-│   ├── IMGS2/             # box artwork
-│   ├── SAVEGAME/          # default GBA save location
-│   ├── SAVES/             # alternate GBA save location
-│   ├── SAVESTATE/         # disk savestates
-│   └── superfwlog.txt     # optional diagnostic log
-├── .superfw/              # private settings, cache, recent list and tools
-└── Games/                 # your game folders stay where they are
+SYSTEM/
+  settings.txt, ui-settings.txt, recent.txt
+  config/, patches/, cheats/, emulators/
+  SAVEGAME/, SAVESTATE/
+  IMGS/, IMGS2/
+  pending-save.txt, pending-sram-test.txt  (when needed)
+  flash_backup-*.bin, superfwlog.txt      (when created)
 ```
 
-The selected save policy chooses `SYSTEM/SAVEGAME` or `SYSTEM/SAVES`. Savestates default to `SYSTEM/SAVESTATE`; the alternate `.superfw/savestate` option remains available. ROMs are not moved.
-
-Older cards may still have saves in root-level `/SAVEGAME/` or `/SAVES/`, and states in `/SAVESTATE/`. SuperFW checks those legacy locations when no matching SYSTEM file exists and continues using an existing legacy save set, including its backup files. It does not delete or automatically move those files. When the save-location setting is one of the system folders, games with no legacy save use the SYSTEM paths; the optional “next to ROM” policy remains unchanged. Keep a backup before manually moving saves, and verify in-game save contents before deleting old copies.
-
-The current DSSMM builds for Chis, SuperCard SD and SuperCard Lite default to the DSSMM Light theme and Title artwork. Older unversioned UI settings migrate from the former native defaults; versioned settings from Test 2 and newer preserve explicit choices. You can change the mode at **UI settings → Artwork** and save it; `Start` in the SD browser also cycles List, Title and Box.
+Physical migration, saves and in-game behavior require hardware validation;
+host fixture tests verify merging, conflict refusal, retry and resource paths.

@@ -60,12 +60,7 @@ extern const t_combo_key hotkey_list[13];
 extern const uint8_t animspd_lut[5];
 #define animspd_cnt (sizeof(animspd_lut)/sizeof(animspd_lut[0]))
 
-enum { SaveSavegameDir = 0, SaveSavesDir = 1, SaveRomName = 2, SaveDirNORCNT = 2, SaveDirCNT = 3 };
-enum { StateSavestateDir = 0, StateSuperFWSavestateDir = 1, StateDirCNT = 2 };
 
-extern const char *save_paths[2];
-extern const char *savestates_paths[2];
-extern const char *savestates_paths_display[2];
 
 // ROM loading and launching config settings
 typedef struct {
@@ -93,9 +88,6 @@ extern uint8_t boot_bios_splash;
 extern uint8_t use_slowld;
 extern uint8_t use_fastew;
 extern uint8_t use_verify_nor;
-extern uint8_t save_path_default;
-extern uint8_t save_path_nor_default;
-extern uint8_t state_path_default;
 extern uint8_t backup_sram_default;
 extern uint8_t hotkey_combo;
 extern uint8_t enable_cheats;

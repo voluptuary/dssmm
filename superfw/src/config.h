@@ -41,20 +41,20 @@
 #define SUPERFW_LOG_FILEPATH      "/SYSTEM/superfwlog.txt"
 #define DISK_SAVESTATE_SLOTS      5
 
-#define SUPERFW_DIR               "/.superfw"
-#define ROMCONFIG_PATH            "/.superfw/config/"
-#define PATCHDB_PATH              "/.superfw/patches/"
-#define CHEATS_PATH               "/.superfw/cheats/"
-#define EMULATORS_PATH            "/.superfw/emulators/"
-#define GBC_EMULATOR_PATH         "/.superfw/emulators/gbc-emu.gba"
-#define SETTINGS_FILEPATH         "/.superfw/settings.txt"
-#define RECENT_FILEPATH           "/.superfw/recent.txt"
-#define UISETTINGS_FILEPATH       "/.superfw/ui-settings.txt"
-#define FLASHBACKUPTMP_FILEPATH   "/.superfw/flash_backup.tmp"
-#define FLASHBACKUP_FILEPTRN      "/.superfw/flash_backup-%02x%02x%02x%02x.bin"
+#define SUPERFW_DIR               "/SYSTEM"
+#define ROMCONFIG_PATH            "/SYSTEM/config/"
+#define PATCHDB_PATH              "/SYSTEM/patches/"
+#define CHEATS_PATH               "/SYSTEM/cheats/"
+#define EMULATORS_PATH            "/SYSTEM/emulators/"
+#define GBC_EMULATOR_PATH         "/SYSTEM/emulators/gbc-emu.gba"
+#define SETTINGS_FILEPATH         "/SYSTEM/settings.txt"
+#define RECENT_FILEPATH           "/SYSTEM/recent.txt"
+#define UISETTINGS_FILEPATH       "/SYSTEM/ui-settings.txt"
+#define FLASHBACKUPTMP_FILEPATH   "/SYSTEM/flash_backup.tmp"
+#define FLASHBACKUP_FILEPTRN      "/SYSTEM/flash_backup-%02x%02x%02x%02x.bin"
 
-#define PENDING_SAVE_FILEPATH     "/.superfw/pending-save.txt"
-#define PENDING_SRAM_TEST         "/.superfw/pending-sram-test.txt"
+#define PENDING_SAVE_FILEPATH     "/SYSTEM/pending-save.txt"
+#define PENDING_SRAM_TEST         "/SYSTEM/pending-sram-test.txt"
 
 #endif
 

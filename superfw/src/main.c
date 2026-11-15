@@ -20,6 +20,7 @@
 
 #include "gbahw.h"
 #include "settings.h"
+#include "system_layout.h"
 #include "save.h"
 #include "patchengine.h"
 #include "supercard_driver.h"
@@ -95,6 +96,13 @@ void init_sdcard_and_mount() {
   ret = f_mount(&sdfs, "0:", 1);
   if (ret)
     fatal_init_error("Cannot mount FATfs: %d", ret);
+
+  ret=system_layout_migrate();
+  if(ret) {
+    display_info_msg("Move .superfw files into SYSTEM.");
+    display_info_msg("Resolve duplicates; keep your saves.");
+    fatal_init_error("SYSTEM migration stopped: %d",ret);
+  }
 }
 
 void check_pending_saves() {

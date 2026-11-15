@@ -4,16 +4,12 @@
 static struct { const char *cname; } hotkey_list[] = {{"L + R"}};
 static unsigned hotkey_combo, boot_bios_splash, use_slowld, use_fastew=1;
 #ifdef SUPPORT_NORGAMES
-static unsigned use_verify_nor=1, save_path_nor_default;
+static unsigned use_verify_nor=1;
 #endif
-static unsigned save_path_default, state_path_default, backup_sram_default=3;
+static unsigned backup_sram_default=3;
 static unsigned enable_cheats=1, patcher_default, ingamemenu_default=1;
 static unsigned rtcpatch_default, rtcspeed_default, rtcvalue_default;
 static unsigned autoload_default=1, autosave_default=1, autosave_prefer_ds=1;
-enum { SaveRomName=2 };
-static const char *save_paths[]={"/SYSTEM/SAVEGAME/","/SYSTEM/SAVES/"};
-static const char *savestates_paths[]={"/SYSTEM/SAVESTATE/","/.superfw/"};
-static const char *savestates_paths_display[]={"SYSTEM",".superfw"};
 typedef struct { int year,month,day,hour,min; } t_dec_date;
 static void timestamp2date(unsigned value,t_dec_date *out) {
   (void)value; *out=(t_dec_date){26,11,15,12,0};

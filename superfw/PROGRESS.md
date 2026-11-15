@@ -472,3 +472,13 @@ Chis588 in root hardware-test with CUSTOM directory art and optional actual DE
 ASCII font. Updated guide/manifests and removed superseded own585 artifacts.
 No public release or physical588 qualification. Normal integration e7759f3
 pushed; finish evidence integration/sync and retain session BIOS/scratch.
+
+## 2026-11-15 — SYSTEM-only resources and simpler settings
+
+Moved configuration/cache/cheat/emulator/recent/backup/pending resource paths to
+SYSTEM. Added resumable no-overwrite startup migration before pending SRAM;
+conflict/errors stop boot. Removed directory choices; canonical SAVEGAME and
+SAVESTATE with legacy save-set detection. Sanitized host migration and all3
+settings fixtures pass; production settings preview pending. Historical
+release notes remain accurate for those older binaries. Continue Start screen,
+DE backgrounds and categorized navigation after numbered validation checkpoint.

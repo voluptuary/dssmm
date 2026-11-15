@@ -22,7 +22,13 @@ Published checkpoint: superfw-test1 is a prerelease at source8a22da16c2d755de8fc
 Build identity: the Info page shows `SuperFW <version> (<8-digit upstream build hash>)`, then `DSSMM Build N`. `N` is `git rev-list --count HEAD` over full repository history; kernel CI fetches full history. Override with `DSSMM_BUILD_NUMBER=N` only for controlled reproducible builds. Preserve `VERSION_SLUG_WORD` in the firmware header as the upstream commit identifier; it is also displayed after the SuperFW version.
 
 
-SYSTEM storage: new save files use `/SYSTEM/SAVEGAME/` or `/SYSTEM/SAVES/`; disk states use `/SYSTEM/SAVESTATE/`; the debug log uses `/SYSTEM/superfwlog.txt`. Preserve `.superfw`. Legacy `/SAVEGAME`, `/SAVES`, and `/SAVESTATE` data is detected and continues to be used for matching games when no SYSTEM copy exists; never remove these fallback reads without a verified migration and regression coverage. See `docs/SYSTEM-LAYOUT.md`.
+SYSTEM storage (owner update): all `.superfw` resources now target `/SYSTEM`.
+Read docs/SYSTEM-LAYOUT.md. Startup migrates legacy contents before pending SRAM
+handling, merging directories without overwriting files; conflicts/errors stop
+boot for manual resolution. Directory settings are retired; new saves/states use
+fixed SAVEGAME/SAVESTATE. Preserve automatic legacy save reads to avoid data loss.
+Earlier preserve-.superfw instructions are superseded by the explicit owner
+request. Run test-system-layout.sh plus all-board settings/launch checks.
 
 
 ## Workspace cleanup

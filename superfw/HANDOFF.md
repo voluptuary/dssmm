@@ -500,3 +500,18 @@ Evidence docs/build-588-validation.json. Root hardware-test now contains Chis588
 and manifest/guide; superseded own585 local artifacts after preserving evidence.
 Folder CUSTOM and optional font need physical observation. Owner585 confirms
 header art and five-cache behavior. Continue broader parity autonomously.
+
+## 2026-11-15 — Fixed SYSTEM storage owner update
+
+Owner explicitly supersedes preserve-.superfw: all resources now use SYSTEM,
+with directory choices removed from UI, persisted output and parsing. Migration
+runs immediately after mount and before pending-SRAM handling: rename absent
+targets, recursively merge existing dirs (depth8/path bounds), never overwrite
+files; conflict/error stops boot. Partial moves resume. Only empty source dirs
+are deleted. Existing root/alternate/next-ROM save sets still auto-detected if
+canonical data absent. Added real host-filesystem adapter tests for resources,
+art preservation, pending-marker conflict, failed move and retry. All-board
+settings tests pass. Cold action/setup code uses Os, renderers keep O2 to fit
+Chis. New storage policy still needs physical testing. Next clean all3 storage
+checkpoint and hardware image, then proceed with actual Start/assets/settings
+work; owner requests continuous autonomous progression until DE parity.
