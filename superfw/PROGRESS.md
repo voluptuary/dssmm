@@ -351,3 +351,9 @@ Copied Chis561 to root hardware-test/superfw-chis-build561.fw, SHA ffaf6863e320e
 ## 2026-11-15 — Solid themed menu selection rows
 
 Continued port after owner revoked pause. UI-settings/Tools for DSSMM Light/Dark use accent fills behind text and avoid native tiled overlays; upstream themes unchanged. mGBA Light/Dark settings/lower row and last Tools action visually fit, cache/page regressions pass, Chis selection-code link fits. Removed duplicate knob arrows seen in preview. Follow-up hosted suite needed; current test image remains561 with metadata fix. Physical artwork and full menu parity remain pending.
+
+## 2026-11-15 — Follow-up menu validation complete
+
+Source fd719d515a65ec7249bb829f2d306f0917e35df8 passed hosted full SuperFW verification43663757321 (three board builds, linked metadata gate and host suites). Final Dark lower-settings screenshot verifies duplicate arrows removed; earlier Light/settings and Tools screenshots inspected. Cleaned generated compiler/host-test/build folders after retaining validation evidence; kept root hardware-test Chis561 and its matching manifest/guide intact. User devcontainer lock, session scratch and private BIOS preserved.
+
+Next: await owner561 physical carousel result, then continue settings/game/in-game menu parity and real interaction/performance coverage. Do not treat isolated mGBA previews as card emulation. The mandatory artwork fix is published to the superfw source branch, not a new public release. Current development source is newer than the intentionally frozen561 test image.
