@@ -98,3 +98,8 @@ preserved in fixtures; no warning suppression was added for their comparisons.
 Icon palette128..143 is loaded only for Screen12, protecting artwork palettes
 in other previews. Actual read/write/delete/make-persistent operations and game
 state restoration are never invoked. No mGBA setup change.
+
+Cheat/state fixture output was inspected: memory Save/Load/Make-persistent,
+persistent Save/Load/Delete, persistent-copy Make-persistent/Cancel with option
+normalization, and enabled/disabled cheat rows. All four smoke checks pass.
+The test header initializes fake cheat entries in RAM and does not execute codes.
