@@ -73,3 +73,15 @@ BMP staging is a separate cartridge-bus constraint: requests directly into SDRAM
 must use word-aligned buffers/counts. Read the final1..3bytes into GBA RAM and
 copy them with halfword stores; do not restore a whole-file memcpy tail there.
 The optional ARM adapter test reproduces a byte-store fault in the old code.
+
+## Build582 owner follow-up (2026-11-15)
+
+Header Title only renders AGS/TCHK; see docs/HEADER-ART-COMPATIBILITY.md and
+historical fix944ac13 (planes0, not DST1). Match native bounded opaque code-record
+semantics, keep filename parsing strict and retain CUSTOM priority. Owner removes
+the Animation toggle/instant-mode feature: normal carousel transitions remain,
+old config keys are ignored, new settings version6 omits the key. Cache5 images
+(selected±2), prioritizing visible3 and avoiding redraw/hot-copy for outer loads.
+Center the SuperFW version/hash Info line until full DE styling. Produce numbered
+Chis hardware-test builds after all3 variant builds/gates; continue autonomously
+without requiring owner feedback. Owner will identify tested build numbers.

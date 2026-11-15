@@ -104,7 +104,6 @@ enum {
   UiSetTheme = 0,
   UiSetArtwork,
   UiSetView,
-  UiSetAnimation,
   UiSetLang,
   UiSetRect,
   UiSetASpd,
@@ -398,7 +397,7 @@ typedef struct {
   t_reg_entry_max nordata;
   struct {
     uint16_t pixels[ARTWORK_MAX_PIXELS / 2];
-  } carousel_art[3];
+  } carousel_art[ARTWORK_CACHE_SLOTS];
   uint16_t artwork_pixels[ARTWORK_MAX_PIXELS / 2];
   uint8_t artwork_bmp_buffer[ARTWORK_BMP_MAX_SIZE] __attribute__((aligned(4)));
 } t_sdram_state;
@@ -1135,7 +1134,7 @@ static struct {
   unsigned mode;
   char rom[MAX_FN_LEN];
   artwork_info info;
-} carousel_meta[3];
+} carousel_meta[ARTWORK_CACHE_SLOTS];
 /* Selected artwork is sampled repeatedly during motion. Keep a hot copy in
  * EWRAM; the linker bounds this NOLOAD allocation on every board. */
 static uint16_t carousel_hot_pixels[ARTWORK_MAX_PIXELS/2] __attribute__((section(".sbss")));
@@ -1150,7 +1149,7 @@ static void browser_invalidate_artwork(void) {
   browser_fast_valid[0] = browser_fast_valid[1] = false;
   artwork_cached = false;
   carousel_hot_valid = false;
-  for (unsigned i = 0; i < 3; ++i) {
+  for (unsigned i = 0; i < ARTWORK_CACHE_SLOTS; ++i) {
     carousel_meta[i].cached = false;
     carousel_meta[i].valid = false;
   }
@@ -1517,8 +1516,8 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
   if (!browser_fast_reuse)
     dma_memset16(&frame[240 * 16], dup8(BG_COLOR), 240 * (144 - 16) / 2);
   else {
-    unsigned tx = vertical ? (carousel_animation ? 98 : 128) : 40, ty = vertical ? 85 : 122;
-    unsigned tw = vertical ? (carousel_animation ? 136 : 106) : 162;
+    unsigned tx = vertical ? 98 : 40, ty = vertical ? 85 : 122;
+    unsigned tw = vertical ? 136 : 162;
     for (unsigned row = 0; row < 16; ++row)
       dma_memset16(frame + (ty+row)*240 + tx, dup8(BG_COLOR), tw/2);
     dma_memset16(frame + 144*240, dup8(BG_COLOR), 240*16/2);
@@ -1532,9 +1531,9 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
     unsigned item_count = browser_carousel_layout(vertical, selected,
         smenu.browser.dispentries, browser_motion_offset, items);
     /* Populate one missing slot per settled frame, selected entry first. */
-    const int candidates[3] = {selected, selected - 1, selected + 1};
+    const int candidates[ARTWORK_CACHE_SLOTS] = {selected, selected-1, selected+1, selected-2, selected+2};
     if (artwork_mode && browser_motion_offset == 0) {
-      for (unsigned c = 0; c < 3u; ++c) {
+      for (unsigned c = 0; c < ARTWORK_CACHE_SLOTS; ++c) {
         int index = candidates[c];
         if (index < 0 || index >= smenu.browser.dispentries) continue;
         const t_centry *entry = sdr_state->filefilter[index];
@@ -1542,7 +1541,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         char rom[MAX_FN_LEN];
         int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
         if (n <= 0 || (unsigned)n >= sizeof(rom)) continue;
-        unsigned slot = (unsigned)index % 3;
+        unsigned slot = (unsigned)index % ARTWORK_CACHE_SLOTS;
         if (carousel_meta[slot].cached &&
             carousel_meta[slot].mode == artwork_mode &&
             !strcmp(carousel_meta[slot].rom, rom)) continue;
@@ -1553,9 +1552,12 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
             sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
             &carousel_meta[slot].info);
         carousel_meta[slot].cached = true;
-        carousel_hot_valid = false;
-        browser_fast_reuse = false;
-        browser_fast_valid[0] = browser_fast_valid[1] = false;
+        if (carousel_hot_valid && (unsigned)carousel_hot_index%ARTWORK_CACHE_SLOTS==slot)
+          carousel_hot_valid=false;
+        if (index >= selected-1 && index <= selected+1) {
+          browser_fast_reuse = false;
+          browser_fast_valid[0] = browser_fast_valid[1] = false;
+        }
         break;
       }
     }
@@ -1564,7 +1566,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       const browser_carousel_item *item = &items[i];
       const t_centry *entry = sdr_state->filefilter[item->index];
       if (item->focused) focus_index = item->index;
-      unsigned slot = (unsigned)item->index % 3;
+      unsigned slot = (unsigned)item->index % ARTWORK_CACHE_SLOTS;
       char rom[MAX_FN_LEN];
       int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
       bool drawn = false;
@@ -1585,21 +1587,14 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         int x = item->x;
         unsigned width = item->w, height = item->h;
         if (info->width == 80) { width = height; x += (item->w - width) / 2; }
-        if (!carousel_animation) {
-          int delta = item->index-selected;
-          int native_x = vertical ? (120-info->width)/2 : (240-info->width)/2 + delta*(int)info->width;
-          int native_y = vertical ? 48+delta*80 : 27;
-          drawn = browser_fast_reuse || artwork_blit_cropped((volatile uint16_t *)frame,
-              pixels, info, native_x, native_y);
-          if (drawn) continue;
-        }
+
         x &= ~1u;
         width &= ~1u;
         if (browser_fast_reuse) drawn = true;
         else if (width == info->width && height == info->height && x >= 0 && x+(int)width <= 240 && item->y >= 16 && item->y+(int)height <= 144)
           drawn = artwork_blit_frame((volatile uint16_t *)frame,
               pixels, info, x,
-              !carousel_animation && vertical ? 48 : item->y);
+              item->y);
         else
           drawn = artwork_blit_scaled_cropped((volatile uint16_t *)frame,
               pixels, info, x, item->y, width, height);
@@ -1607,18 +1602,15 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       if (!drawn) {
         unsigned icon_x = MAX(0, MIN(224, item->x + item->w/2 - 8));
         unsigned icon_y = MAX(16, MIN(128, item->y + item->h/2 - 8));
-        if (!carousel_animation && vertical) {
-          icon_x = 52;
-          icon_y = item->index < selected ? 24 : item->index > selected ? 128 : 80;
-        }
+
         render_icon(icon_x, icon_y, browser_entry_icon(entry));
       }
     }
     const t_centry *focus = sdr_state->filefilter[focus_index];
 
     if (vertical)
-      draw_text_ovf_rotate(focus->fname, frame, carousel_animation ? 98 : 128, 85,
-                           carousel_animation ? 136 : 106, &smenu.anim_state);
+      draw_text_ovf_rotate(focus->fname, frame, 98, 85,
+                           136, &smenu.anim_state);
     else
       draw_text_ovf_rotate(focus->fname, frame, 40, 122, 162, &smenu.anim_state);
   }
@@ -2152,7 +2144,7 @@ void render_ui_settings(volatile uint8_t *frame) {
   const unsigned row_y[] = { 20, 38, 56, 74, 92, 110 };
   char tmpbuf[64];
   const char * const labels[UiSetSave] = {
-    msgs[lang_id][MSG_UIS_THEME], "Artwork", "Browser view", "Animation", msgs[lang_id][MSG_UIS_LANG],
+    msgs[lang_id][MSG_UIS_THEME], "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
     msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent"
   };
   for (unsigned row = 0; row < sizeof(row_y) / sizeof(row_y[0]); ++row) {
@@ -2163,7 +2155,6 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetTheme: value = theme_names[menu_theme < THEME_COUNT ? menu_theme : 0]; break;
     case UiSetArtwork: value = artwork_names[artwork_mode < 3 ? artwork_mode : 0]; break;
     case UiSetView: value = view_names[browser_view < 3 ? browser_view : 0]; break;
-    case UiSetAnimation: value = carousel_animation ? "On" : "Off"; break;
     case UiSetLang: value = msgs[lang_id][MSG_LANG_NAME]; break;
     case UiSetRect: value = msgs[lang_id][recent_menu ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED]; break;
     case UiSetASpd: value = msgs[lang_id][MSG_UIS_SPD0 + anim_speed]; break;
@@ -2198,7 +2189,7 @@ void render_info(volatile uint8_t *frame) {
   case 0:
     npf_snprintf(tmp, sizeof(tmp), "SuperFW %lu.%lu (%08lx)", vmaj, vmin,
                  (unsigned long)VERSION_SLUG_WORD);
-    draw_text_ovf(tmp, frame, 12, 70, 216);
+    draw_central_text_ovf(tmp, frame, 120, 70, 216);
     npf_snprintf(tmp, sizeof(tmp), "DSSMM Build %lu", (unsigned long)DSSMM_BUILD_NUMBER);
     draw_central_text(tmp, frame, 120, 95);
     draw_central_text(FW_FLAVOUR " variant", frame, 120, 114);
@@ -2298,7 +2289,7 @@ static const struct {
 void menu_render(unsigned fcnt) {
   objnum = 0;
   volatile uint8_t *frame = &MEM_VRAM_U8[0xA000*framen];
-  if (smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view && carousel_animation)
+  if (smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view)
     browser_motion_offset = browser_motion_advance(browser_motion_offset, fcnt);
   else
     browser_motion_offset = 0;
@@ -3199,7 +3190,7 @@ static void keypress_menu_browse(unsigned newkeys) {
   else if (smenu.browser.selector >= smenu.browser.seloff + BROWSER_ROWS)
     smenu.browser.seloff = smenu.browser.selector - BROWSER_ROWS + 1;
 
-  if (browser_view && carousel_animation && smenu.browser.selector != old_selector &&
+  if (browser_view && smenu.browser.selector != old_selector &&
       (newkeys & (KEY_BUTTUP | KEY_BUTTDOWN | KEY_BUTTLEFT | KEY_BUTTRIGHT))) {
     browser_motion_offset = browser_motion_retarget(browser_motion_offset,
                                                      smenu.browser.selector - old_selector);
@@ -3356,10 +3347,7 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       browser_motion_offset = 0;
       browser_invalidate_artwork();
     }
-    else if (smenu.uiset.selector == UiSetAnimation) {
-      carousel_animation ^= 1;
-      browser_motion_offset = 0;
-    }
+
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = menu_accent ? menu_accent - 1 : 0;
     else if (smenu.uiset.selector == UiSetASpd)
@@ -3381,10 +3369,7 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       browser_motion_offset = 0;
       browser_invalidate_artwork();
     }
-    else if (smenu.uiset.selector == UiSetAnimation) {
-      carousel_animation ^= 1;
-      browser_motion_offset = 0;
-    }
+
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = MIN(ACCENT_COUNT - 1, menu_accent + 1);
     else if (smenu.uiset.selector == UiSetASpd)

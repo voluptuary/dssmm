@@ -43,7 +43,7 @@ static struct { struct { int selector,dispentries; char cpath[64]; } browser; } 
 static struct state {
  CAROUSEL_STORAGE
  uint8_t artwork_bmp_buffer[ARTWORK_BMP_MAX_SIZE];
- t_centry *filefilter[3];
+ t_centry *filefilter[5];
 }
 #ifdef TEST_CART_BUS
 *sdr_state=(void *)0x08000000;
@@ -93,8 +93,8 @@ bool artwork_blit_scaled_cropped(volatile uint16_t *frame,const uint16_t *pixels
 tests=r'''
 int main(void) {
  static uint8_t frame[240*160];
- t_centry entries[3]={{0,"one.gba"},{0,"two.gba"},{0,"missing.gba"}};
- for(unsigned i=0;i<3;++i) state.filefilter[i]=&entries[i];
+ t_centry entries[5]={{0,"one.gba"},{0,"two.gba"},{0,"missing.gba"},{0,"four.gba"},{0,"five.gba"}};
+ for(unsigned i=0;i<5;++i) state.filefilter[i]=&entries[i];
  strcpy(smenu.browser.cpath,"/"); smenu.browser.selector=1;smenu.browser.dispentries=3;
  render_browser_carousel(frame,false);assert(loads==1);
  render_browser_carousel(frame,false);assert(loads==2);
@@ -114,31 +114,14 @@ int main(void) {
  browser_invalidate_artwork();
  assert(!browser_fast_valid[0] && !browser_fast_valid[1]);
  assert(!carousel_hot_valid);
- for(unsigned i=0;i<3;++i) assert(!CACHE_META[i].cached && !CACHE_META[i].valid);
+ for(unsigned i=0;i<ARTWORK_CACHE_SLOTS;++i) assert(!CACHE_META[i].cached && !CACHE_META[i].valid);
  assert(state.carousel_art[0].pixels[0]==0x1234);
  render_browser_carousel(frame,false);assert(loads==5);
- carousel_animation=0;artwork_mode=1;smenu.browser.selector=1;
- browser_motion_offset=0;browser_invalidate_artwork();
- unsigned fast_loads=loads;
- unsigned before_scales=scales;
- render_browser_carousel(frame,true);
- render_browser_carousel(frame,false);
- assert(scales==before_scales); /* Off must never invoke resampling. */
- assert(loads==fast_loads+2); /* One native neighbor load per settled frame. */
- render_browser_carousel(frame,true); /* Finish neighbor population before reuse. */
- unsigned reuse_blits=blits;
- browser_fast_reuse=true;
+ browser_motion_offset=0;
+ render_browser_carousel(frame,true);render_browser_carousel(frame,true);
+ unsigned reuse_blits=blits;browser_fast_reuse=true;
  render_browser_carousel(frame,true);assert(blits==reuse_blits);
  browser_fast_reuse=false;
- for(unsigned style=1;style<=2;++style) {
-   artwork_mode=style;browser_invalidate_artwork();
-   fast_loads=loads;before_scales=scales;
-   render_browser_carousel(frame,true);
-   render_browser_carousel(frame,false);
-   render_browser_carousel(frame,true);
-   assert(scales==before_scales && loads==fast_loads+3);
- }
- carousel_animation=1;
  /* A directory change must never display cache entries from the old path. */
  unsigned before_loads=loads, before_blits=blits, before_icons=icons;
  strcpy(smenu.browser.cpath,"/another/"); browser_motion_offset=128;
@@ -146,22 +129,37 @@ int main(void) {
  assert(loads==before_loads && blits==before_blits && icons>before_icons);
  browser_motion_offset=0;render_browser_carousel(frame,false);
  assert(loads==before_loads+1);
+ /* Five-slot lookahead survives a forward step with all near art ready. */
+ browser_motion_offset=0;smenu.browser.dispentries=5;smenu.browser.selector=2;
+ browser_invalidate_artwork();unsigned five_loads=loads;
+ for(unsigned i=0;i<5;++i)render_browser_carousel(frame,false);
+ assert(loads==five_loads+5);
+ smenu.browser.selector=3;render_browser_carousel(frame,false);
+ assert(loads==five_loads+5);
  /* Directories cannot trigger image loads or consume cached file artwork. */
  browser_invalidate_artwork();
- for(unsigned i=0;i<3;++i) entries[i].attr=AM_DIR;
+ for(unsigned i=0;i<5;++i) entries[i].attr=AM_DIR;
  before_loads=loads;before_blits=blits;before_icons=icons;
  render_browser_carousel(frame,false);
  assert(loads==before_loads && blits==before_blits && icons>before_icons);
+ for(unsigned i=0;i<5;++i)entries[i].attr=0;
+ smenu.browser.selector=1;browser_invalidate_artwork();
+ for(unsigned i=0;i<3;++i)render_browser_carousel(frame,false);
+ browser_fast_valid[0]=browser_fast_valid[1]=true;browser_fast_reuse=true;
+ unsigned far_blits=blits,far_copies=hot_copies,far_loads=loads;
+ render_browser_carousel(frame,false);
+ assert(loads==far_loads+1 && blits==far_blits && hot_copies==far_copies);
+ assert(browser_fast_valid[0] && browser_fast_valid[1] && browser_fast_reuse);
  return 0;
 }
 '''
 # Use the actual storage and metadata declarations, so a regression putting
 # byte fields back on the cartridge bus is exercised by the ARM bus test too.
 a=source.index('  struct {',source.index('  t_reg_entry_max nordata;'))
-b=source.index('  } carousel_art[3];',a)+len('  } carousel_art[3];')
+b=source.index('];',source.index('  } carousel_art',a))+2
 preamble=preamble.replace('CAROUSEL_STORAGE',source[a:b])
-if '} carousel_meta[3];' in source:
- b=source.index('} carousel_meta[3];')+len('} carousel_meta[3];')
+if '} carousel_meta[' in source:
+ b=source.index('];',source.index('} carousel_meta['))+2
  a=source.rfind('static struct {',0,b)
  preamble=preamble.replace('CAROUSEL_METADATA',source[a:b])
  tests=tests.replace('CACHE_META','carousel_meta')

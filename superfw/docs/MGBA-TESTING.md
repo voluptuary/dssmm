@@ -128,3 +128,14 @@ inspected and state assertions pass. The On input test also passes after make
 clean with no firmware-generated headers. Preview palette reload uses the actual
 production theme/accent resolver. No SD/FatFS/save action or full browser-filter
 integration is qualified, and no mGBA package/launch flags changed.
+
+## Owner582 follow-up: retired Animation mode
+
+The Animation toggle and experimental instant-mode preview have been removed.
+PREVIEW_ANIMATION/PREVIEW_EXPECT_ANIMATION now reject stale invocations rather
+than silently report a state assertion for a removed feature. UI settings3 is
+Language;2 is Browser view. Current input check uses Screen2/Option2/Right to
+change Horizontal to Vertical; screenshot passes and was inspected. All four
+normal carousel art/orientation screenshots pass. Other UI key replay remains
+available; old Animation-specific examples above are historical and superseded.
+No emulator package, launch mapping or BIOS policy changed.

@@ -64,7 +64,7 @@ static bool artwork_gamecode_root_path(char *out, size_t capacity, const char ga
 }
 typedef struct {
   const uint8_t *bytes;
-  bool legacy;
+  bool legacy, legacy_marked;
 } artwork_buffer;
 static bool read_buffer(void *context, uint32_t offset, void *data, size_t size) {
   const artwork_buffer *input = context;
@@ -82,12 +82,14 @@ static bool read_buffer(void *context, uint32_t offset, void *data, size_t size)
       [26]=1,[28]=16,[34]=0x00,[35]=0x4b
     };
     memcpy(data, header, sizeof(header));
+    if (input->legacy_marked) memcpy((uint8_t *)data+6,"DST1",4);
   }
   return true;
 }
 static bool artwork_decode_file(FIL *file, uint8_t *bmp, size_t bmp_capacity,
                                 uint8_t *pixels, size_t capacity, artwork_info *info, bool gamecode) {
   FSIZE_t file_size = f_size(file);
+  if (gamecode && file_size > ARTWORK_BMP_MAX_SIZE) file_size=ARTWORK_BMP_MAX_SIZE;
   UINT got = 0;
   if (!bmp || ((uintptr_t)bmp & 3) || bmp_capacity > ARTWORK_BMP_MAX_SIZE ||
       file_size < 54 || file_size > bmp_capacity || ((file_size+1)&~(FSIZE_t)1) > bmp_capacity ||
@@ -106,12 +108,17 @@ static bool artwork_decode_file(FIL *file, uint8_t *bmp, size_t bmp_capacity,
     for (unsigned i=0;i<remaining;i+=2)
       ((volatile uint16_t *)(bmp+bulk))[i/2]=tail[i]|((uint16_t)tail[i+1]<<8);
   }
-  artwork_buffer input = {bmp, false};
-  if (artwork_decode(read_buffer, &input, (uint32_t)file_size, pixels, capacity, info)) return true;
-  /* Match native EZ fixed-record semantics only for game-code fallbacks.
-   * Filename/DSSCC art keeps strict validation and its own transparency. */
-  if (!gamecode || file_size != 54+120*80*2 || bmp[0] != 'B' || bmp[1] != 'M') return false;
-  input.legacy = true;
+  artwork_buffer input = {.bytes=bmp};
+  if (gamecode) {
+    if (file_size != ARTWORK_BMP_MAX_SIZE) return false;
+    /* Native DE validates DST1 geometry but ignores legacy file-size fields.
+     * Everything unmarked uses the fixed top-down RGB555 record unchanged. */
+    static const uint8_t layout[24]={54,0,0,0,40,0,0,0,120,0,0,0,
+                                    0xb0,0xff,0xff,0xff,1,0,16,0,0,0,0,0};
+    input.legacy=true;
+    input.legacy_marked=bmp[0]=='B' && bmp[1]=='M' &&
+      !memcmp(bmp+6,"DST1",4) && !memcmp(bmp+10,layout,sizeof(layout));
+  }
   return artwork_decode(read_buffer, &input, (uint32_t)file_size, pixels, capacity, info);
 }
 bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capacity,

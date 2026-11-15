@@ -8,9 +8,8 @@ Unsupported hardware features remain excluded.
 | Surface | Current implementation | Remaining qualification/work |
 | --- | --- | --- |
 | SD browser | List/horizontal/vertical, filename artwork, CUSTOM priority, Title code fallback, palette, scrolling labels | Header Title still failed on owner561; legacy fallback needs physical result. Full DE chrome/typography and recent/NOR artwork remain incomplete. |
-| Carousel On | DE neighbor positions, clipped scaling, focused-last drawing, no SD reads during motion, settled-page reuse | Physically sluggish on561; later hot-cache/lookup optimizations not measured on card. Fluidity is not established. |
-| Carousel Off | Native-size selected/previous/next, screen/body edge crop, no scaling, idle-page reuse | User-requested behavior implemented after561;582 is ready for hardware testing. |
-| Artwork storage | Halfword SDRAM pixels; byte metadata in IWRAM; focused image hot copy in EWRAM | 561 filename result confirms metadata fix. Newest focus refinement is newer than571. |
+| Carousel | DE neighbor positions, clipped scaling, focused-last drawing, no SD reads during motion, settled-page reuse | Physically sluggish on561; later hot-cache/lookup optimizations not measured on card. Fluidity is not established. |
+| Artwork storage | Halfword SDRAM pixels; byte metadata in IWRAM; focused image hot copy in EWRAM | 561 filename result confirms metadata fix. Current cache is selected±2; outer prefetch avoids redraw/copy. |
 | Main/UI settings and Tools | Bounded left-aligned rows, solid accent selections on Light/Dark; native themes retained | Actual renderers previewed; production UI-settings input exercised in mGBA for toggles, scrolling and top bound. Storage/filter boundaries are mocked; persistence remains host-tested. Long localized strings may truncate. |
 | ROM info/patch/loading | Bounded left labels, solid Light/Dark selections, navigation-safe headings, compact English labels/date | Actual renderer previews pass; real launch/NOR actions not exercised by previews. |
 | In-game menus | Theme palette inherited; solid selection rows across main/reset/save/RTC update/cheats/states | All six renderers previewed with fake state, including memory/disk/make-persistent views. Game-state/save/restore qualification needs real card. Logo, dialogs, typography and slot composition retain native SuperFW elements. |
@@ -22,17 +21,17 @@ Unsupported hardware features remain excluded.
   art absent.
 - Chis561: owner confirms filename art renders; ROM-header Title does not. On
   remains slow, delayed neighbors; Off had no observed gain in that older design.
-- Chis571/hash3d0b1a80: superseded local local `hardware-test` image. Includes native
+- Chis571/hash3d0b1a80: superseded local `hardware-test` image. Includes native
   cropped neighbors, settled reuse, faster color conversion, selected EWRAM copy,
   legacy code-art record fallback and aligned clipped scaling. No owner result was reported.
 - SD/Lite have no physical qualification. Chis582/hash842bad38 is the current frozen hardware-test image; it includes all
-  UI/focus-cache refinements plus aligned BMP-tail staging. No owner582 result yet. See numbered validation JSON and journals.
+  UI/focus-cache refinements plus aligned BMP-tail staging. Owner582 reports only AGS/TCHK header Title, improving but slow navigation, and brief neighbor fallback icons. New reader/lookahead changes need physical confirmation. See numbered validation JSON and journals.
 
 ## Performance constraints and next checks
 
-1. Measure582 on the same card and artwork pack before claiming a speed gain.
+1. Compare the next numbered build with the owner582 result before claiming a speed gain.
 2. Storage reads remain synchronous. Large FAT directories/path probes and
-   initial three-image loading may stall input even when drawing is fast.
+   initial five-image loading may stall input even when drawing is fast.
 3. Animated scaling is software; DMA accelerates opaque/native transfers.
    Focused pixels now use GBA EWRAM, and idle frames do not repeatedly scale.
    A fully affine/OAM renderer would require a separate video-layout design;
@@ -50,3 +49,8 @@ Keep build582 unchanged until superseded with a clean numbered all-board set.
 Preserve BIOS and session scratch outside the repository until the whole session
 ends. Keep journals current and remove superseded generated artifacts after
 retaining evidence. No full parity, gameplay or physical timing claim yet.
+
+Animation/instant-mode setting was removed at owner request; settings6 ignores the
+retired key while preserving other choices. Normal carousel transitions remain.
+See HEADER-ART-COMPATIBILITY.md for exact DE commit944ac13 and native code-art
+semantics; the original pack has not been downloaded successfully.

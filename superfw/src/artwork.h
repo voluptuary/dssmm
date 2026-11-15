@@ -8,6 +8,7 @@
  * Index zero in decoded data is a transparent sentinel, never opaque black. */
 #define ARTWORK_PALETTE_BASE 20
 #define ARTWORK_PALETTE_SIZE 216
+#define ARTWORK_CACHE_SLOTS 5
 #define ARTWORK_MAX_PIXELS (120 * 80)
 #define ARTWORK_BMP_MAX_SIZE (54 + 120 * 160)
 typedef bool (*artwork_read_fn)(void *context, uint32_t offset, void *data, size_t size);
