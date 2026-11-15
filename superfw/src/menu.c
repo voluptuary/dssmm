@@ -1136,6 +1136,11 @@ static struct {
   char rom[MAX_FN_LEN];
   artwork_info info;
 } carousel_meta[3];
+/* Selected artwork is sampled repeatedly during motion. Keep a hot copy in
+ * EWRAM; the linker bounds this NOLOAD allocation on every board. */
+static uint16_t carousel_hot_pixels[ARTWORK_MAX_PIXELS/2] __attribute__((section(".sbss")));
+static bool carousel_hot_valid;
+static int carousel_hot_index;
 static int browser_motion_offset;
 static bool browser_fast_reuse, browser_fast_valid[2];
 static int browser_fast_selection[2];
@@ -1144,6 +1149,7 @@ static unsigned browser_fast_view[2], browser_fast_mode[2];
 static void browser_invalidate_artwork(void) {
   browser_fast_valid[0] = browser_fast_valid[1] = false;
   artwork_cached = false;
+  carousel_hot_valid = false;
   for (unsigned i = 0; i < 3; ++i) {
     carousel_meta[i].cached = false;
     carousel_meta[i].valid = false;
@@ -1547,6 +1553,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
             sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
             &carousel_meta[slot].info);
         carousel_meta[slot].cached = true;
+        carousel_hot_valid = false;
         browser_fast_reuse = false;
         browser_fast_valid[0] = browser_fast_valid[1] = false;
         break;
@@ -1566,6 +1573,15 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
           carousel_meta[slot].mode == artwork_mode &&
           !strcmp(carousel_meta[slot].rom, rom)) {
         const artwork_info *info = &carousel_meta[slot].info;
+        const uint16_t *pixels = sdr_state->carousel_art[slot].pixels;
+        if (item->index == selected) {
+          if (!carousel_hot_valid || carousel_hot_index != selected) {
+            dma_memcpy16(carousel_hot_pixels, pixels, info->width*info->height/2);
+            carousel_hot_index = selected;
+            carousel_hot_valid = true;
+          }
+          pixels = carousel_hot_pixels;
+        }
         int x = item->x;
         unsigned width = item->w, height = item->h;
         if (info->width == 80) { width = height; x += (item->w - width) / 2; }
@@ -1574,7 +1590,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
           int native_x = vertical ? (120-info->width)/2 : (240-info->width)/2 + delta*(int)info->width;
           int native_y = vertical ? 48+delta*80 : 27;
           drawn = browser_fast_reuse || artwork_blit_cropped((volatile uint16_t *)frame,
-              sdr_state->carousel_art[slot].pixels, info, native_x, native_y);
+              pixels, info, native_x, native_y);
           if (drawn) continue;
         }
         x &= ~1u;
@@ -1582,11 +1598,11 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         if (browser_fast_reuse) drawn = true;
         else if (width == info->width && height == info->height && x >= 0 && x+(int)width <= 240 && item->y >= 16 && item->y+(int)height <= 144)
           drawn = artwork_blit_frame((volatile uint16_t *)frame,
-              sdr_state->carousel_art[slot].pixels, info, x,
+              pixels, info, x,
               !carousel_animation && vertical ? 48 : item->y);
         else
           drawn = artwork_blit_scaled_cropped((volatile uint16_t *)frame,
-              sdr_state->carousel_art[slot].pixels, info, x, item->y, width, height);
+              pixels, info, x, item->y, width, height);
       }
       if (!drawn) {
         unsigned icon_x = MAX(0, MIN(224, item->x + item->w/2 - 8));
@@ -3186,6 +3202,7 @@ static void keypress_menu_browse(unsigned newkeys) {
     browser_motion_offset = browser_motion_retarget(browser_motion_offset,
                                                      smenu.browser.selector - old_selector);
     artwork_cached = false;
+  carousel_hot_valid = false;
   }
 }
 

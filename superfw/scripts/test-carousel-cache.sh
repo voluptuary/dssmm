@@ -52,6 +52,11 @@ static struct state {
 state, *sdr_state=&state;
 #endif
 CAROUSEL_METADATA
+static uint16_t carousel_hot_pixels[ARTWORK_MAX_PIXELS/2];
+static bool carousel_hot_valid;
+static int carousel_hot_index;
+static unsigned hot_copies;
+#define dma_memcpy16(d,s,n) (memcpy((d),(s),(n)*2),++hot_copies)
 static bool artwork_cached;
 static bool browser_fast_reuse, browser_fast_valid[2];
 static unsigned artwork_mode=1;
@@ -95,6 +100,9 @@ int main(void) {
  render_browser_carousel(frame,false);assert(loads==2);
  render_browser_carousel(frame,false);assert(loads==3);
  render_browser_carousel(frame,false);assert(loads==3); /* negative cache too */
+ unsigned stable_copies=hot_copies;
+ render_browser_carousel(frame,false);
+ assert(hot_copies==stable_copies); /* Stable selected pixels stay in GBA RAM. */
  unsigned prior_blits=blits;
  browser_motion_offset=128;smenu.browser.selector=2;
  render_browser_carousel(frame,true);assert(loads==3 && blits>prior_blits);
@@ -104,6 +112,7 @@ int main(void) {
  browser_fast_valid[0]=browser_fast_valid[1]=true;
  browser_invalidate_artwork();
  assert(!browser_fast_valid[0] && !browser_fast_valid[1]);
+ assert(!carousel_hot_valid);
  for(unsigned i=0;i<3;++i) assert(!CACHE_META[i].cached && !CACHE_META[i].valid);
  assert(state.carousel_art[0].pixels[0]==0x1234);
  render_browser_carousel(frame,false);assert(loads==5);
