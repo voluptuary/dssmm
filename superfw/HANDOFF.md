@@ -878,3 +878,10 @@ no stale cartridge pointers are reused. Native save/recent failures stop before
 loading. Actual production-handler sanitized test covers plugin/native failures
 and those early aborts. No card driver changed. This also covers legacy emulator
 load failures, not just the new portable plugin path.
+
+617 full verifier/hosted43789880974 stopped at production compilation: new recovery
+helper called browser_invalidate_artwork before its static declaration. Focused
+mock-handler tests had provided that declaration, hiding the integration issue.
+Added the real forward declaration and made the cache test's function extractor
+skip prototypes. Focused cache/recovery tests pass. Do not count617 as a passing
+firmware build or distribute it. Freeze corrected source and rerun full gates.

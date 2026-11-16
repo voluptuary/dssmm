@@ -632,3 +632,7 @@ Failed plugin/native emulator loads now rebuild overwritten SDRAM browser/NOR/
 recent tables and invalidate artwork before showing the error. Production-handler
 sanitizer test passes; save/recent failures abort before loading. Source freeze
 and clean full-all3 validation next, including final UI/GG/legacy-save changes.
+
+617 full/hosted stopped on missing static forward declaration in recovery path;
+fixed it and the cache function extractor's prototype handling. Rerun full clean
+all3 validation;613 remains hardware-test. No failed run is reported as passed.

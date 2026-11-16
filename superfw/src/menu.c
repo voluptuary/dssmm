@@ -1000,6 +1000,7 @@ static void recent_reload() {
   smenu.recent.maxentries = recent_load_merged(sdr_state->rentries,(t_rentry*)sdr_state->scratch);
 }
 
+static void browser_invalidate_artwork(void);
 static void browser_reload(void);
 static void flashbrowser_reload(void);
 /* Failed loads can already have overwritten directory/cache tables in SDRAM. */
