@@ -3179,3 +3179,12 @@ are byte-identical, including system icons and Box art. Canonical Folder-Art.zip
 plus reproducible prepare/check script are shared infrastructure. Owner requires
 this archive attached to every future kernel release. Check passes; no kernel
 code changed here. SuperFW work remains on its hardware lane.
+
+## 2026-11-16 — Local folder-art release input
+
+Owner removed public root Folder-Art.zip (f47afa6), requests using the hardware-test
+copy for future releases, and authorizes relocating it. Moved that exact corrected
+archive to /workspaces/dssmm/.release-assets/folder-art.zip; ignored locally and
+by root policy. Preserve during cleanup; attach it on all future kernel releases,
+including owner system icons. SHA256 b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5.
+prepare-folder-art.py --check passes. Do not re-add the binary to the repository.

@@ -158,10 +158,14 @@ Keep one public prerelease release page per SuperFW, BLUE and Original OMEGA lan
 
 ## Shared folder artwork release asset
 
-Owner requires canonical root `Folder-Art.zip` on every future kernel release,
+Owner requires local `.release-assets/folder-art.zip` on every future kernel release,
 for all four project lanes. Include it alongside firmware assets; this is artwork,
-not a source archive. Run `python3 scripts/prepare-folder-art.py Folder-Art.zip
+not a source archive. Run `python3 scripts/prepare-folder-art.py /workspaces/dssmm/.release-assets/folder-art.zip
 --check` before upload and verify the downloaded release asset matches. Preserve
 owner-added system icons. Only #/A–Z Title images use centered unscaled Box
 sprites on120x80 canvases; Box80x80 images remain unchanged. Historical releases
-need no retroactive change. Root archive maintenance belongs on dssmm.
+need no retroactive change. The owner removed the public repository ZIP; do not
+re-add it. Preserve this ignored local archive during cleanup. Root release-policy
+maintenance belongs on dssmm. If the local archive is missing in a later session,
+recover the exact asset from the latest published release or owner backup before
+publishing; never substitute the smaller generated letter-only pack.
