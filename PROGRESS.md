@@ -3199,3 +3199,11 @@ work remain confined to superfw/. No other card driver changed. Full DE parity
 is ongoing. Owner folder artwork stays ignored in .release-assets/folder-art.zip;
 preserve and attach on future releases. Sync hardware lanes normally after this
 integration; do not reset/force-push.
+
+2026-11-16 integration CI43781689758 stopped at root policy: new universal
+prepare-folder-art.py was missing from the explicit shared-tool registry. Local
+combined check output had masked the earlier make failure with later passing
+unit tests; do not claim that policy invocation passed. Registered this exact
+universal artwork tool and added a regression assertion; unknown root hardware
+tools remain rejected. Rerun each gate with fail-fast shell status and all hosted
+checks. Build603 hardware-lane kernel validation is separate and remains recorded.
