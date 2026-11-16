@@ -1,0 +1,54 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 638,
+  "boards": [
+    {
+      "source_tree_sha256": "dc45932e62e4134f0643af516d2def06d509e2d055ce4d4952f6980d017b281f",
+      "board": "sd",
+      "dssmm_build": 638,
+      "source_commit": "6d02c1915dfece4bb90b9c0353c5215b0228a1a8",
+      "source_dirty": false,
+      "firmware_sha256": "56432aa1446addf428c03e6152382bd0b5716a762adf6d66ccd9b4f91db578e6",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 520704,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 3584
+    },
+    {
+      "source_tree_sha256": "dc45932e62e4134f0643af516d2def06d509e2d055ce4d4952f6980d017b281f",
+      "board": "lite",
+      "dssmm_build": 638,
+      "source_commit": "6d02c1915dfece4bb90b9c0353c5215b0228a1a8",
+      "source_dirty": false,
+      "firmware_sha256": "3fa648b9db0505c6c493eaf27be1ad8cecd89c1ff6655a78b01ac38afb91fc7f",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 487936,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 19968
+    },
+    {
+      "source_tree_sha256": "dc45932e62e4134f0643af516d2def06d509e2d055ce4d4952f6980d017b281f",
+      "board": "chis",
+      "dssmm_build": 638,
+      "source_commit": "6d02c1915dfece4bb90b9c0353c5215b0228a1a8",
+      "source_dirty": false,
+      "firmware_sha256": "a026037ccedbb7c14918e08ede5041aa0f75e35596dc2967f48eb591f547ad0c",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43886442413",
+    "conclusion": "success"
+  },
+  "checks": [
+    "Full clean all3 local verifier with native IGM ARM replay passed",
+    "NOR production confirmation/backend/payload host sanitizer and failure tests passed, including native uint16 DMA counts and2MiB scratch",
+    "Actual FatFs FAT16/FAT32 RAM-disk save/unmount/remount90 combinations each passed",
+    "Source/size/header/hash/seal identity checks passed",
+    "Restart-only error panel passed mGBA screen15"
+  ],
+  "limitations": "No new physical NOR/card validation. Plugin Exit, PCE loading, physical settings persistence and full DE parity remain unresolved."
+}

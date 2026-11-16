@@ -744,3 +744,8 @@ use actual helper signature and pass.637 local run intentionally stopped, no
 637 image delivered. Owner authorizes next validated release; prepared Test6 notes
 with immediate predecessor folded into concise past summaries. Clean final gates
 and integration/publication still pending; preserve Test5/624 until replaced.
+
+638 full/all3/nativeIGM ARM, host regressions, package integrity and hosted
+43886442413 passed. Chis638 delivered hardware-test; report build-638-validation.
+Native flash limits unchanged: SD3584B/Lite19968B/Chis425472B headroom. Next integrate
+normally, all4 CI, publish authorized Test6 and archive/prune Test5, then porting.

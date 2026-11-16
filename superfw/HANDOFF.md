@@ -1150,3 +1150,12 @@ prepared;638 full/nativeIGM/all3/hosted/package gates required before delivery a
 publication. Integrate normally, verify integration checks, archive Test5 metadata
 BEFORE pruning its release page/assets; retain tag/stableDE/other lanes. Continue
 port after publication; do not conflate physical validation with mocks.
+
+638/source6d02c1915dfece4bb90b9c0353c5215b0228a1a8 passes full clean local verifier,
+all3/nativeIGM ARM replay and hosted43886442413. Package source/hash/header/seals
+pass; SD520704/524288 (3584free), Lite487936/507904 (19968free), Chis1671680/2097152
+(425472free). Chis638 image/manifest/guide delivered hardware-test, superseding
+our632 copy after evidence retained. docs/build-638-validation.json records exact
+checks/limits. Next normal integration+all4 CI, Test6 publication using this source
+and staged /tmp/dssmm-release-test6 assets, then archive/prune Test5 page retaining
+tag. Owner authorized publication; no approval pause. Continue624 parity queue.
