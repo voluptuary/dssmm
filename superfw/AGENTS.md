@@ -207,3 +207,10 @@ full NOR carousel remains a goal. Help logo uses palette236..238, preserving BG0
 and artwork20..235. Continue unresolved plugin Exit/PCE/physical settings/parity.
 Owner authorized Test6 release after the newest corrections pass all gates;638
 publication was not completed, so publish the next validated correction, not638.
+
+Current release is superfw-test6, Build640/source4a85efb8. Publication evidence:
+docs/releases/superfw-test6-publication.json. All3/local/nativeIGM/all4 CI/download
+checks passed; no new physical qualification. Older Test5 page pruned after exact
+archive, tag retained. Chis640 in hardware-test is current; keep it frozen while
+porting continues. Physical settings/PCE/plugin Exit/NOR carousel/full parity remain
+open; do not repeat older current-release/current-build claims above.
