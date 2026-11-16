@@ -1,0 +1,78 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 613,
+  "boards": [
+    {
+      "source_tree_sha256": "9053c9dde90f52dcf4fa0fd440543ea5c4c0ac1537f2e713758d65d7180abfd9",
+      "board": "sd",
+      "dssmm_build": 613,
+      "source_commit": "652aed373bbc4bce1fdc51c3593b1a07c915a369",
+      "source_dirty": false,
+      "firmware_sha256": "125dc512ff504c6376f9496da9390a07a58cb4df917c45289d93a0ea0d9e139e",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 521216,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 3072
+    },
+    {
+      "source_tree_sha256": "9053c9dde90f52dcf4fa0fd440543ea5c4c0ac1537f2e713758d65d7180abfd9",
+      "board": "lite",
+      "dssmm_build": 613,
+      "source_commit": "652aed373bbc4bce1fdc51c3593b1a07c915a369",
+      "source_dirty": false,
+      "firmware_sha256": "00c5dade68c546b91484a79712af5fa15ea112a93a0fe45230484f9e64a73bc7",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 488448,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 19456
+    },
+    {
+      "source_tree_sha256": "9053c9dde90f52dcf4fa0fd440543ea5c4c0ac1537f2e713758d65d7180abfd9",
+      "board": "chis",
+      "dssmm_build": 613,
+      "source_commit": "652aed373bbc4bce1fdc51c3593b1a07c915a369",
+      "source_dirty": false,
+      "firmware_sha256": "50290cfe4158b123d7304380c24d18988be96a2bbf3ffd3816d2365e7186d3a5",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43782888780",
+    "conclusion": "success",
+    "source_commit": "652aed373bbc4bce1fdc51c3593b1a07c915a369"
+  },
+  "checks": [
+    "Standard complete verifier passes on clean same-source SD/Lite/Chis, including board limits, integrity, internal GBA artwork metadata and upstream host suites",
+    "All12 stored background assets pass pixel-exact host and actual ARM embedded/standard/extended/missing-tag checks with read-only resources and halfword VRAM writes",
+    "Artwork full-height clipping/guards, five-cache and stable-page tests pass",
+    "All3 native IGM raw/host/ELF/ARM unpacker correspondence and guards pass",
+    "mGBA0.10.1 Light/DSSMM-font horizontal/vertical background and art previews inspected; synthetic cartridge files and pixels, not physical SuperCard storage"
+  ],
+  "limits": "No physical Build613 qualification. Full DE visual/interaction parity remains incomplete. mGBA fixture renders every frame from synthetic ROM data, unlike firmware hot-cache/page reuse; timings are not physical firmware measurements.",
+  "resource_budget": {
+    "appended_background_bytes": 18436,
+    "rounded_extended_headroom_bytes": 499712,
+    "native_font_prefix_unchanged": true
+  },
+  "memory_log": [
+    "IWRAM:        2504 B         4 KB     61.13%",
+    "EWRAM:       50564 B        60 KB     82.30%",
+    "IWRAM:       14312 B        32 KB     43.68%",
+    "EWRAM:      235320 B       251 KB     91.56%",
+    "IWRAM:        2672 B         4 KB     65.23%",
+    "EWRAM:       50732 B        60 KB     82.57%",
+    "IWRAM:       14480 B        32 KB     44.19%",
+    "EWRAM:      235492 B       251 KB     91.62%",
+    "IWRAM:        2264 B         4 KB     55.27%",
+    "EWRAM:       50356 B        60 KB     81.96%",
+    "IWRAM:       14072 B        32 KB     42.94%",
+    "EWRAM:      249076 B       251 KB     96.91%"
+  ],
+  "preview_timing_observation": {
+    "vertical_scene_cycles": 1226595,
+    "scope": "Full redraw in mGBA synthetic ROM fixture, with ROM code/art and no firmware selected-hot/page-cache path. Needs component profiling; do not equate to physical kernel performance."
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 615,
+  "boards": [
+    {
+      "source_tree_sha256": "285d777e88024a7bca2e8c850f6e91822895e6d6a615b44a42c1e735b65cce33",
+      "board": "sd",
+      "dssmm_build": 615,
+      "source_commit": "580906ddf6fdda5e08ac19a0b81fdc8fbc145b8e",
+      "source_dirty": false,
+      "firmware_sha256": "cb1f365ce7746020c24d76d2453e7468c72c24a6e3415a269270a73d362ed6ab",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 521216,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 3072
+    },
+    {
+      "source_tree_sha256": "285d777e88024a7bca2e8c850f6e91822895e6d6a615b44a42c1e735b65cce33",
+      "board": "lite",
+      "dssmm_build": 615,
+      "source_commit": "580906ddf6fdda5e08ac19a0b81fdc8fbc145b8e",
+      "source_dirty": false,
+      "firmware_sha256": "b4e29363e3393ac35e2168ff4ba32528fc6dbfa368d76b772176ec402dde5dfa",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 488960,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 18944
+    },
+    {
+      "source_tree_sha256": "285d777e88024a7bca2e8c850f6e91822895e6d6a615b44a42c1e735b65cce33",
+      "board": "chis",
+      "dssmm_build": 615,
+      "source_commit": "580906ddf6fdda5e08ac19a0b81fdc8fbc145b8e",
+      "source_dirty": false,
+      "firmware_sha256": "5029a50320d7ee923fa1b1ca0df47619698d2d36afb2a81f8137950cbf4686d6",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43785459391",
+    "conclusion": "success"
+  },
+  "checks": [
+    "Clean same-source all3 builds, complete verifier and size/resource/integrity gates pass",
+    "All3 GG/SMS plugin resolution/native flags and exact Game Gear icon/palette/VRAM-budget tests pass",
+    "GB/GG save names, case, NoIntro tags, dotted stems, backup/temp/legacy and state names pass",
+    "Settings highlight frame/gap and expanded Start corners pass guarded sanitizer tests; mGBA screenshots inspected",
+    "All3 IGM host/ELF/ARM equality passes"
+  ],
+  "distribution": "Not distributed: subsequent follow-up preserves already-existing saves created by the historical dotted-name shortening rule. Build613 remains current hardware-test until new full gates.",
+  "limits": "No physical615/emulator/save qualification; full DE parity remains unfinished.",
+  "memory_log": [
+    "IWRAM:        2504 B         4 KB     61.13%",
+    "EWRAM:       50564 B        60 KB     82.30%",
+    "IWRAM:       14312 B        32 KB     43.68%",
+    "EWRAM:      235708 B       251 KB     91.71%",
+    "IWRAM:        2672 B         4 KB     65.23%",
+    "EWRAM:       50732 B        60 KB     82.57%",
+    "IWRAM:       14480 B        32 KB     44.19%",
+    "EWRAM:      235896 B       251 KB     91.78%",
+    "IWRAM:        2264 B         4 KB     55.27%",
+    "EWRAM:       50356 B        60 KB     81.96%",
+    "IWRAM:       14072 B        32 KB     42.94%",
+    "EWRAM:      249496 B       251 KB     97.07%"
+  ]
+}

@@ -9,7 +9,10 @@ import sys
 import os
 source=Path(os.environ.get("MENU_SOURCE",sys.argv[1])).read_text()
 def function(name):
- start=source.index('static void '+name+'(')
+ signature='static void '+name+'('
+ start=source.index(signature)
+ while ';' in source[start:source.index('{',start)]:
+  start=source.index(signature,start+len(signature))
  end=source.index('\n}',start)+2
  return source[start:end]
 preamble=r'''

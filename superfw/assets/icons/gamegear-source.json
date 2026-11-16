@@ -1,0 +1,15 @@
+{
+  "credit": "DS Style / DSSMM DE contributors; Apache-2.0 retained in docs/licenses",
+  "reference": "ezfomegade/images/icon_GG.h",
+  "reference_sha256": "aaabcb441d0bb422468652ee65ef3ac46b841e1deece18d5dddfa739fc0bc69d",
+  "pixels_sha256": "59f3fb406c09f5160f973fc9939b8ff22b0027a37da5c61205ba74e9ed5a9372",
+  "dimensions": [
+    16,
+    14
+  ],
+  "sprite_canvas": [
+    16,
+    16
+  ],
+  "placement": "one transparent row above and below; native icon palette IDs unchanged"
+}
