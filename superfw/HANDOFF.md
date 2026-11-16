@@ -745,3 +745,160 @@ Owner archive stays .release-assets/folder-art.zip, full contents preserved.
 No public release in this milestone. Full DE generic/H/V backgrounds, footer
 removal outside List, final font/art alignment, System/Help/dialog parity remain
 unfinished. Continue port autonomously;603 remains frozen during later work.
+
+## 2026-11-16 — Post603 background parity slice
+
+603 remains frozen. Added credited lossless Light/Dark H/V/Help assets plus
+48-row repeating DS grid, with reference hashes. DBG3 read-only resource blob
+18436bytes (old6035676), rounded extended headroom499712; all native prefixes
+remain byte-identical. SD compressed standard resource grows2616bytes in an
+isolated pack comparison; complete board image limit still must pass. Never
+infer the complete image fits from this partial measurement.
+
+Main renderer now draws DS H/V, grid and Help backgrounds before headers;
+carousels preserve existing page/cache reuse. DS carousel and Info/NOR footer
+bars removed, List/native retained. Artwork clipped at screen160 rather than
+old144, retaining full lower vertical neighbors. Info native logo palette is
+isolated to native themes; DS Help uses ordinary SuperFW text without palette
+collision. Existing version/hash stays centered. Caption wrapping/alignment and
+remaining settings/dialog visual parity remain next.
+
+Focused host all12-background pixel checks, actual ARM embedded/standard/extended/
+missing-tag checks, artwork clip/guard tests, cache/page tests and Chis diagnostic
+link pass. mGBA Light+DSSMM-font horizontal/vertical screenshots inspected:
+actual panels/grid and art, no bottom bar. Diagnostic EWRAM249060/IWRAM14072;
+no new candidate yet. Freeze, clean all3/full verifier/CI before replacing603.
+
+Root integration CI43781689758 caught unregistered universal folder-art tool;
+root ba4c310 registers that exact universal tool with regression test, preserving
+unknown hardware-tool rejection. All4 jobs now pass in43782162091. Policy fix
+is normally synchronized to all5 branches. Root edits stayed on dssmm. Current
+SuperFW source work remains under superfw/. Owner archive remains ignored local.
+
+## 2026-11-16 — Build613 background candidate delivered
+
+Source652aed373bbc4bce1fdc51c3593b1a07c915a369 count613; clean full verifier,
+all3 package/source/integrity/flash/resource/RAM gates and hosted43782888780 pass.
+All12 asset pixels/ARM readonly+halfword tests and artwork full160-height/cache/
+page checks pass. All3 native IGM host/ELF/ARM equivalence passes. mGBA H/V Light
+DSSMM-font screenshots inspected. Evidence docs/build-613-validation.json.
+Hardware-test now Chis613/manifest/guide, superseding own603 artifacts after
+retaining historical evidence. No physical613 validation and no public release.
+SD521216 leaves3072bytes, Lite488448 leaves19456, Chis1671680 leaves425472.
+
+mGBA synthetic full-redraw vertical fixture reports1226595cycles. It uses ROM
+code/art and lacks the actual firmware selected hot cache/page reuse; never
+claim that number is physical kernel FPS. Still, profile background/art/caption
+costs next before heavier skinning; consider run-fill background decoding and
+actual GBA DMA for long spans if measured/equivalent. Do not allocate large new
+GBA buffers or weaken SD's limit. Existing verified613 stays frozen. Continue
+caption wrapping/alignment from DE font metrics, settings/System/Help/dialog
+look/feel and performance autonomously; parity is not complete.
+
+## 2026-11-16 — Owner603 UI feedback and GG/save follow-up
+
+Owner reports603 Start/settings UI issues (not gameplay/plugin/save validation).
+Settings gear marker now expands1px on every side, x111/y142/w20/h16; four corners
+and masked odd-x writes retained. English labels exactly Show hidden, Fast ROM
+Load, Verify flash, EWRAM boost. Help hint exactly "Unlock: Down, Up, Left, Right,
+A in 5 sec". DSSMM submenu highlight14px instead of16 fits9-row geometry and
+preserves bottom frame151 with gap150; native font retains16px. Dedicated actual
+helper pixel/canary test and four-corner test pass. Interface bottom row screenshot
+inspected in mGBA: label fits and frame remains visible; Start screenshot follows.
+
+Owner wants GG to use SMS emulator but own icon. Shared Pogo extension helper maps
+GG→sms for resolver and loader; original GG filename/native wrapper flags remain.
+Actual native first/second emulator header flags and shared lookup tests pass on
+all3. No GG sprite existed: appended exact DE16x14 RGB555 icon to16x16 tile/palette
+with transparent row top/bottom; native IDs/colors unchanged. Read GAME-GEAR.md.
+All3 icon byte/pixel/palette/VRAM/icon-lookup checks pass (or rerun if interrupted).
+Bounded title copies also remove fixed-length reads beyond short emulator names.
+
+Owner asks regression checks for two-character GB/GG save filenames. Those worked;
+new realistic tests exposed separate repeated extension-stripping bug for dotted
+basenames. Now append .sav once after deriving stem, bounds-checked; .gb/.gg,
+uppercase, NoIntro, dots, legacy/backup/tmp and state-stem tests pass all3. Old
+shortened dotted-name saves are left untouched; cannot safely infer ownership
+when prefixes collide. Documented backup/manual rename, not automatic guesswork.
+
+Current613 remains frozen. New feedback/GG/save changes need clean same-source
+all3/full verifier/CI before next hardware-test image. Keep all3 synchronized;
+SD613 had3072bytes headroom, so added icon/code must pass real image gates. Broader
+performance profiling, caption/font/settings/dialog parity still active.
+
+615/source580906ddf6fdda5e08ac19a0b81fdc8fbc145b8e passes clean all3/full local
+verifier and hosted43785459391. Evidence build-615-validation.json; not distributed
+because existing dotted-name save compatibility needs a follow-up. New complete
+basenames stay canonical, but when no correctly named save exists, detect exact
+historical shortened names in current/legacy locations and preserve prior access
+without moving/renaming files. Correctly named saves always win. This retains
+old behavior/data; it cannot undo old prefix collisions. All3 focused name tests
+pass including correct-vs-shortened priority and legacy temporary saves.613
+remains frozen until complete new gates. Start expanded-marker screenshot also
+inspected. Root owner folder artwork still preserved in ignored .release-assets.
+
+Private timing prototype /tmp/dssmm-render-profile/profile.c (uncommitted) splits
+synthetic full-redraw costs: BG790922, art502309, total1296968cycles as screenshot
+profile-0.png. Values vary slightly and use ROM code/art, not actual firmware
+hot/page caches. Background is worth optimizing; compare a run-fill codec and
+DMA spans against all source pixels, actual mGBA hardware path and SD budget.
+Do not call these physical firmware FPS or remove the existing page/cache path.
+
+## 2026-11-16 — Measured background DMA optimization
+
+Private same-scene component timing: LZ BG790922→run-fill DMA310810cycles (~61%
+less), art502309 unchanged, total1296968→906856 (~30% less). ROM fixture only,
+not physical/kernel FPS. Adopted bounded DBR1 pair-run codec with native DMA3
+halfword fills for long spans, aligned CPU tails; no new GBA buffers/driver or
+cache/page changes. Raw blob58652 vsold18436, UPKR standard resource280401 vs
+279494 (+907bytes), rounded ext resource headroom458752. Real firmware gates
+still needed, especially SD. Read BACKGROUND-PERFORMANCE.md.
+
+All12 host source-pixel/guard and actual ARM internal/external/missing-tag checks
+pass. New optional test-background-mgba.sh compiles actual __GBA__ DMA path,
+captures12 stock0.10.1 SDL frames and compares every38400 pixels plus padding
+canaries; all pass. PNG decoder factored from existing browser script into shared
+standard-library helper (no Pillow/new package). Browser artwork proof now counts
+chromatic cube pixels, not gray backgrounds; new host tests reject all12 raw
+backgrounds as art and cover all5 PNG filters. Current browser mGBA passes with
+6142 chromatic synthetic-art pixels. Standard preview timing now has optional
+BG/art/total counters; no timer reads outside timing mode. Root standard mGBA
+setup is unchanged; add this harness method to root local-development docs at
+next normal integration. No emulator patch/private BIOS required.
+
+Next freeze and clean all3/full verifier/CI plus final mGBA checks, deliver next
+numbered Chis image including603 feedback, GG and legacy-save follow-ups.613
+stays frozen until then. Remaining DE caption/font/settings/System/Help/dialog
+parity and artwork scaling performance remain active; not100% parity.
+
+Follow-up before freezing run-fill source: failed emulator/plugin loads can have
+already overwritten SDRAM directory/cache tables. The menu now clears directory
+counts and rebuilds browser/NOR/recents plus cache state before showing an error;
+no stale cartridge pointers are reused. Native save/recent failures stop before
+loading. Actual production-handler sanitized test covers plugin/native failures
+and those early aborts. No card driver changed. This also covers legacy emulator
+load failures, not just the new portable plugin path.
+
+617 full verifier/hosted43789880974 stopped at production compilation: new recovery
+helper called browser_invalidate_artwork before its static declaration. Focused
+mock-handler tests had provided that declaration, hiding the integration issue.
+Added the real forward declaration and made the cache test's function extractor
+skip prototypes. Focused cache/recovery tests pass. Do not count617 as a passing
+firmware build or distribute it. Freeze corrected source and rerun full gates.
+
+## 2026-11-16 — Build618 delivered after owner feedback and DMA gates
+
+Clean source4fc627ac724a1a337b43419f9ebcc86013738b3d count618: standard full local
+verifier/all3 identity/seal/source/flash/resource/RAM gates pass; hosted43790527480
+passes exact source. All3 IGM host/ELF/ARM checks and current carousel bus replay
+pass. Actual mGBA __GBA__ DMA path matches every source pixel/guard on12 scenes;
+portable/ARM decoder paths also pass. Owner603 spacing/labels/hint and GG/save
+follow-ups included. Evidence docs/build-618-validation.json. Hardware-test now
+Chis618/manifest/guide, superseding own613 while preserving tracked history.
+
+SD522752/524288 leaves1536bytes; Lite489984/507904 leaves17920; Chis1671680/2097152
+leaves425472. Main Chis IWRAM14072/EWRAM249668; native resource prefix unchanged,
+DBR1 blob58652 and rounded extended458752free. Do not add unbudgeted assets or
+raise limits. Owner603 UI evidence separate, no physical618/plugin/save/NOR write
+or firmware-FPS qualification. No public release yet. Continue DE caption/font/
+menu/dialog parity and profile remaining art cost;618 stays frozen.

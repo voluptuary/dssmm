@@ -46,3 +46,7 @@ Recovery checks also validated all 20 `.mb`/`.mbz` files in the repository's
 existing EZFODE plugin pack against the RAM bounds and complete compressed-stream
 validator. This establishes format acceptance, not successful emulator gameplay.
 No new hardware candidate or release is implied by these focused checks.
+
+Game Gear (`.gg`) aliases the `sms` plugin key, so it uses the same emulator as
+`.sms` while keeping its original filename, native GG mode flags and Game Gear
+icon. See GAME-GEAR.md for icon credits and two-character save-name coverage.

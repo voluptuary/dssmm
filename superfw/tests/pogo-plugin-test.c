@@ -22,7 +22,7 @@ static unsigned available_plugins=1;
 FRESULT f_stat(const TCHAR *path,FILINFO *info) {
   const char *suffix=strrchr(path,'.');unsigned bit=!strcmp(suffix,".bin")?1:!strcmp(suffix,".gba")?2:!strcmp(suffix,".mb")?4:8;
   if(!(available_plugins&bit))return FR_NO_FILE;
-  assert(!strncmp(path,"/SYSTEM/PLUG/nes.",17));
+  assert(!strncmp(path,"/SYSTEM/PLUG/nes.",17) || !strncmp(path,"/SYSTEM/PLUG/sms.",17));
   memset(info,0,sizeof(*info));return FR_OK;
 }
 static uint32_t ps=257,fs=8193,abi[24];static jmp_buf launched;
@@ -56,6 +56,15 @@ int main(void) {
   available_plugins=8;assert(find_pogo_plugin("/Game.NES",resolved)&&!strcmp(resolved,"/SYSTEM/PLUG/nes.mbz"));
   available_plugins=0;assert(!find_pogo_plugin("/Game.NES",resolved));
   assert(!find_pogo_plugin("/no-extension",resolved));available_plugins=1;
+  assert(find_pogo_plugin("/Sonic.GG",resolved)&&!strcmp(resolved,"/SYSTEM/PLUG/sms.bin"));
+  assert(find_pogo_plugin("/Sonic.SMS",resolved)&&!strcmp(resolved,"/SYSTEM/PLUG/sms.bin"));
+  const t_emu_loader *gg=get_emu_info("gg"),*sms=get_emu_info("sms");
+  for(unsigned i=0;gg[i].emu_name;i++)assert(!strcmp(gg[i].emu_name,sms[i].emu_name));
+  uint8_t header[64] __attribute__((aligned(4)));
+  assert(gg[0].hndlr(header,"/Sonic.gg",1234)==40 && header[8]==1);
+  assert(sms[0].hndlr(header,"/Sonic.sms",1234)==40 && header[8]==0);
+  gg[1].hndlr(header,"/Sonic.gg",1234);assert(header[8]==4);
+  sms[1].hndlr(header,"/Sonic.sms",1234);assert(header[8]==0);
   uint32_t fo,to,ram[24],table[22];
   assert(pogo_layout(257,8193,&fo,&to)&&fo==260&&to==32768);
   assert(!pogo_layout(0,1,&fo,&to));assert(!pogo_layout(1,0,&fo,&to));

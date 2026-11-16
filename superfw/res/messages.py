@@ -61,8 +61,8 @@ en_strings = [
   "MSG_SETT_SAVEBK": "Save backup #",
   "MSG_SETT_STATET": "Savestate path",
   "MSG_SETT_CHTEN":  "Enable cheats",
-  "MSG_SETT_FASTSD": "Fast ROM loading",
-  "MSG_SETT_FASTEW": "EWRAM overclock",
+  "MSG_SETT_FASTSD": "Fast ROM Load",
+  "MSG_SETT_FASTEW": "EWRAM boost",
 
   "MSG_TOOLS0_SDRAM": "SDRAM memory test",
   "MSG_TOOLS1_SRAM":  "SRAM memory test",
@@ -79,7 +79,7 @@ en_strings = [
   "MSG_UIS_LANG":  "Language",
   "MSG_UIS_RECNT": "Recent ROMs",
   "MSG_UIS_ANSPD": "Text speed",
-  "MSG_UIS_BHID":  "Show hidden files",
+  "MSG_UIS_BHID":  "Show hidden",
   "MSG_UIS_SAVE":  "Save to SD card",
 
   "MSG_UIS_SPD0":  "Very slow",
@@ -187,7 +187,7 @@ en_strings = [
   "MSG_SAVOPT_MSG_WERR": "Could not write sav file!",    # alertmsg
   "MSG_REMEMB_CFG_OK": "Config saved!",                  # alertmsg
 
-  "MSG_FWUP_HOTKEY":   "Unlock: Down Up Left Right A (5 sec)",
+  "MSG_FWUP_HOTKEY":   "Unlock: Down, Up, Left, Right, A in 5 sec",
   "MSG_FWUP_ENABLED":  "Update flashing is enabled",
   "MSG_FWUPD_MENU": "Firmware update",
   "MSG_FWUPD_UNK":  "Unknown firmware type",
@@ -242,7 +242,7 @@ en_strings = [
   "MSG_TOOLS5_FCLR":  "Erase flash",
   "MSG_SETT_SAVETX":  "Flash saves",
   "MSG_SAVE_TYPE_PTX":"Save file lives (for in-flash games) in %s dir",
-  "MSG_SETT_VERNOR":  "Verify flashing",
+  "MSG_SETT_VERNOR":  "Verify flash",
   "MSG_VERNOR_I":     "Checks ROMs written to flash",
   }),
 ]

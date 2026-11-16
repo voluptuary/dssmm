@@ -380,6 +380,16 @@ static bool make_file_pattern(char *pattern, unsigned size, const char *path, co
   return true;
 }
 
+/* Preserve saves made by the old double-stripping rule without renaming or
+ * overriding a correctly named save. New saves always use the complete stem. */
+static bool legacy_shortened_pattern(char *out,const char *full_stem) {
+  if(!find_extension(full_stem))return false;
+  char shortened[MAX_FN_LEN];strbcpy(shortened,full_stem,sizeof(shortened));
+  replace_extension(shortened,"");
+  if(!save_pattern_has_files(shortened))return false;
+  strbcpy(out,shortened,MAX_FN_LEN);return true;
+}
+
 void sram_filename_calc(const char *rom, char *savefn) {
   char pattern[MAX_FN_LEN];
   if (!make_file_pattern(pattern,sizeof(pattern),SAVER_DIR,rom)) {savefn[0]=0;return;}
@@ -394,8 +404,23 @@ void sram_filename_calc(const char *rom, char *savefn) {
       if(save_pattern_has_files(candidate))strbcpy(pattern,candidate,sizeof(pattern));
     }
   }
-  strbcpy(savefn,pattern,MAX_FN_LEN);
-  replace_extension(savefn,".sav");
+  if(!save_pattern_has_files(pattern)) {
+    const char * const paths[]={SAVER_DIR,LEGACY_SYSTEM_SAVEGAME_DIR,LEGACY_SAVEGAME_DIR,SAVES_DIR,LEGACY_SAVES_DIR};
+    bool found=false;
+    for(unsigned i=0;i<sizeof(paths)/sizeof(*paths) && !found;++i) {
+      char candidate[MAX_FN_LEN];
+      if(make_file_pattern(candidate,sizeof(candidate),paths[i],rom))
+        found=legacy_shortened_pattern(pattern,candidate);
+    }
+    if(!found) {
+      char candidate[MAX_FN_LEN];strbcpy(candidate,rom,sizeof(candidate));replace_extension(candidate,"");
+      legacy_shortened_pattern(pattern,candidate);
+    }
+  }
+  /* The ROM extension is already removed. Append once: replacing again
+   * would remove a real dot in names such as Game.v1.2 (USA).gg. */
+  int length=npf_snprintf(savefn,MAX_FN_LEN,"%s.sav",pattern);
+  if(length<0 || (unsigned)length>=MAX_FN_LEN)savefn[0]=0;
 }
 
 void savestate_filename_calc(const char *rom, char *statefn) {

@@ -588,3 +588,58 @@ manifest and guide; superseded own599 files after retaining historical evidence.
 No physical603/plugin/save qualification or full parity claim. SD flash headroom
 5632bytes; keep all3 budget gates. Owner full folder ZIP stays ignored in
 .release-assets. Next: remaining DS backgrounds/footer/dialog/settings parity.
+
+Post603: lossless H/V/Help backgrounds and procedural-source DS grid now feed
+read-only DBG3 resource streams. DS menus use these backgrounds, carousel/footer
+bars removed outside List/native themes, vertical art can reach y159. Existing
+cache/page reuse and centered Info identity preserved. Full12-background host/
+ARM pixel/readonly checks, artwork/cache/page checks and Chis diagnostic link
+pass; mGBA H/V screenshots inspected. Resource growth2616compressed bytes only
+is a preliminary figure; clean all3/full budget checks still needed.603 frozen.
+Root shared-tool registry correction ba4c310 passes all4 CI43782162091; synced
+normally. Continue remaining caption/font/menu/dialog parity after next gates.
+
+613 all3/full verifier/hosted43782888780 and additional asset/art/cache/ARM/mGBA
+checks pass. New numbered Chis613 hardware-test image supplied;603 evidence kept.
+SD flash has3072bytes remaining. Synthetic full-redraw mGBA timing warrants
+component profiling, not a physical-FPS conclusion. Continue performance and
+remaining caption/font/settings/dialog parity; no full completion/hardware claim.
+
+Owner603 feedback: gear corner spacing expands1px, labels shortened, exact comma/
+5-sec unlock hint, and14px DSSMM highlight preserving submenu bottom frame/gap.
+Focused geometry tests and Interface mGBA bottom-row inspection pass. GG now uses
+SMS plugin/native emulator list with original GG flags and exact credited DE GG
+icon; appends no-changes native sprite/palette entries. All3 plugin/header/icon
+checks pass. GB/GG save regression tests uncovered a separate dotted-stem double
+strip; fixed bounded .sav append and verified all3 legacy/backup/state names.
+613 remains current until clean all3/full/CI gates on this source. Continue parity.
+
+615 all3/full/hosted43785459391 passed but not distributed: added exact historical
+dotted-name save fallback to preserve existing data before next candidate. Full
+names remain preferred/new default; no old files moved. Focused all3 filename
+priority/legacy-temp tests pass.613 current. Private mGBA component timing points
+to background decode as a worthwhile next optimization; ROM-fixture timing is
+not physical firmware FPS. Continue autonomous parity/performance work.
+
+Background run-fill+native DMA prototype reduces same-scene mGBA BG cost~61%,
+total~30%, with identical art cost. Adopted bounded DBR1 codec with no new buffers;
+resource-only compressed growth907bytes. All12 source/ARM/actual-DMA mGBA pixels
+and guards pass. Shared PNG reader and stronger artwork oracle avoid counting DS
+gray panels as art; host filter/background tests pass. Full image gates next;
+613 current. Physical FPS/save/runtime qualification and full parity not claimed.
+
+Failed plugin/native emulator loads now rebuild overwritten SDRAM browser/NOR/
+recent tables and invalidate artwork before showing the error. Production-handler
+sanitizer test passes; save/recent failures abort before loading. Source freeze
+and clean full-all3 validation next, including final UI/GG/legacy-save changes.
+
+617 full/hosted stopped on missing static forward declaration in recovery path;
+fixed it and the cache function extractor's prototype handling. Rerun full clean
+all3 validation;613 remains hardware-test. No failed run is reported as passed.
+
+618 source4fc627ac all3/full local/hosted43790527480 and supplementary host/ARM/
+actual-DMA mGBA checks pass. Delivered new Chis618 hardware-test, manifest/guide;
+613 history retained. Includes owner603 UI/hint, GG shared SMS+icon and save-name/
+legacy data follow-ups plus lossless DMA backgrounds/error recovery. SD has1536B
+headroom; no raised limits/new buffers. Physical qualification/parity incomplete;
+continue caption/font/menu/dialog/performance work autonomously.

@@ -1,6 +1,9 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "dssmm_background.h"
 #include "dssmm_background_data.h"
+#ifdef __GBA__
+#include "gbahw.h"
+#endif
 #ifdef DSSMM_EXTERNAL_BACKGROUNDS
 #include "dssmm_background_offsets.h"
 extern void *font_base_addr;
@@ -29,7 +32,7 @@ void dssmm_background_clear(volatile uint8_t *frame,bool dark,unsigned x,unsigne
   }
 }
 void dssmm_background_draw(volatile uint8_t *frame,bool dark,unsigned kind) {
-  if(kind==DSSMM_BG_GRID || kind>DSSMM_BG_SETTINGS){dssmm_background_clear(frame,dark,0,0,240,160);return;}
+  if(kind==DSSMM_BG_LIST || kind>DSSMM_BG_HELP){dssmm_background_clear(frame,dark,0,0,240,160);return;}
 #ifdef DSSMM_EXTERNAL_BACKGROUNDS
 #ifdef FONTS_EXT
   const unsigned base=DSSMM_BG_BASE_EXTENDED;
@@ -43,20 +46,29 @@ void dssmm_background_draw(volatile uint8_t *frame,bool dark,unsigned kind) {
   const uint16_t *source=(const uint16_t *)(asset+dssmm_stream_offsets[dark][kind-1]);
   unsigned words=dssmm_stream_lengths[dark][kind-1];
 #else
-  const uint16_t *source=kind==DSSMM_BG_SETTINGS?(dark?dssmm_dark_settings:dssmm_light_settings):(dark?dssmm_dark_start:dssmm_light_start);
-  unsigned words=kind==DSSMM_BG_SETTINGS?(dark?sizeof(dssmm_dark_settings):sizeof(dssmm_light_settings)):(dark?sizeof(dssmm_dark_start):sizeof(dssmm_light_start));
-  words/=2;
+  static const uint16_t * const streams[2][6]={
+    {dssmm_light_start,dssmm_light_settings,dssmm_light_horizontal,dssmm_light_vertical,dssmm_light_grid,dssmm_light_help},
+    {dssmm_dark_start,dssmm_dark_settings,dssmm_dark_horizontal,dssmm_dark_vertical,dssmm_dark_grid,dssmm_dark_help}
+  };
+  static const unsigned lengths[2][6]={
+    {sizeof(dssmm_light_start)/2,sizeof(dssmm_light_settings)/2,sizeof(dssmm_light_horizontal)/2,sizeof(dssmm_light_vertical)/2,sizeof(dssmm_light_grid)/2,sizeof(dssmm_light_help)/2},
+    {sizeof(dssmm_dark_start)/2,sizeof(dssmm_dark_settings)/2,sizeof(dssmm_dark_horizontal)/2,sizeof(dssmm_dark_vertical)/2,sizeof(dssmm_dark_grid)/2,sizeof(dssmm_dark_help)/2}
+  };
+  const uint16_t *source=streams[dark][kind-1];
+  unsigned words=lengths[dark][kind-1];
 #endif
   volatile uint16_t *out=(volatile uint16_t *)frame;
   unsigned pos=0;
   while(pos<19200) {
     if(!words--){dssmm_background_clear(frame,dark,0,0,240,160);return;}
-    unsigned token=*source++;
-    if(token<256)out[pos++]=(token&15)|((token>>4)<<8);
-    else {
-      unsigned length=(token>>11)+3,dist=(token&2047)+1;
-      if(token<2048 || dist>pos || length>19200-pos){dssmm_background_clear(frame,dark,0,0,240,160);return;}
-      while(length--){out[pos]=out[pos-dist];++pos;}
-    }
+    unsigned token=*source++,length=(token>>8)+1;
+    uint16_t value=(token&15)|((token&240)<<4);
+    if(length>19200-pos){dssmm_background_clear(frame,dark,0,0,240,160);return;}
+#ifdef __GBA__
+    if(length>=8)dma_memset16(out+pos,value,length);
+    else
+#endif
+      for(unsigned i=0;i<length;++i)out[pos+i]=value;
+    pos+=length;
   }
 }
