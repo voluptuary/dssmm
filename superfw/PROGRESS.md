@@ -598,3 +598,9 @@ pass; mGBA H/V screenshots inspected. Resource growth2616compressed bytes only
 is a preliminary figure; clean all3/full budget checks still needed.603 frozen.
 Root shared-tool registry correction ba4c310 passes all4 CI43782162091; synced
 normally. Continue remaining caption/font/menu/dialog parity after next gates.
+
+613 all3/full verifier/hosted43782888780 and additional asset/art/cache/ARM/mGBA
+checks pass. New numbered Chis613 hardware-test image supplied;603 evidence kept.
+SD flash has3072bytes remaining. Synthetic full-redraw mGBA timing warrants
+component profiling, not a physical-FPS conclusion. Continue performance and
+remaining caption/font/settings/dialog parity; no full completion/hardware claim.

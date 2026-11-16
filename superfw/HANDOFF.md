@@ -774,3 +774,23 @@ root ba4c310 registers that exact universal tool with regression test, preservin
 unknown hardware-tool rejection. All4 jobs now pass in43782162091. Policy fix
 is normally synchronized to all5 branches. Root edits stayed on dssmm. Current
 SuperFW source work remains under superfw/. Owner archive remains ignored local.
+
+## 2026-11-16 — Build613 background candidate delivered
+
+Source652aed373bbc4bce1fdc51c3593b1a07c915a369 count613; clean full verifier,
+all3 package/source/integrity/flash/resource/RAM gates and hosted43782888780 pass.
+All12 asset pixels/ARM readonly+halfword tests and artwork full160-height/cache/
+page checks pass. All3 native IGM host/ELF/ARM equivalence passes. mGBA H/V Light
+DSSMM-font screenshots inspected. Evidence docs/build-613-validation.json.
+Hardware-test now Chis613/manifest/guide, superseding own603 artifacts after
+retaining historical evidence. No physical613 validation and no public release.
+SD521216 leaves3072bytes, Lite488448 leaves19456, Chis1671680 leaves425472.
+
+mGBA synthetic full-redraw vertical fixture reports1226595cycles. It uses ROM
+code/art and lacks the actual firmware selected hot cache/page reuse; never
+claim that number is physical kernel FPS. Still, profile background/art/caption
+costs next before heavier skinning; consider run-fill background decoding and
+actual GBA DMA for long spans if measured/equivalent. Do not allocate large new
+GBA buffers or weaken SD's limit. Existing verified613 stays frozen. Continue
+caption wrapping/alignment from DE font metrics, settings/System/Help/dialog
+look/feel and performance autonomously; parity is not complete.
