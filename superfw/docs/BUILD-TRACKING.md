@@ -58,3 +58,18 @@ root hardware-test supersedes585 locally. See build-588-validation.json for
 local ASAN startup limitation and successful full non-PIE sanitizer rerun.
 Owner physically confirms585 header art/cache; new directory CUSTOM and font
 remain unqualified on hardware.
+
+## Image budgets are mandatory
+
+The native linker enforces the complete packed image budget. build.sh and
+check-build-set.py independently reject oversized images and report byte margins:
+SD512KiB, Lite496KiB, Chis2048KiB, matching board-specific upstream MAXFSIZE.
+Do not loosen these limits to make a build pass. The main GBA RAM link and
+carousel placement gates remain separate; packed-size margin does not imply RAM
+headroom. Background streams total3070bytes and use existing VRAM, with no new
+framebuffer. SD-card artwork packs add no firmware bytes.
+
+Validated594 image sizes/margins: SD504320/524288bytes (19968free),
+Lite472064/507904 (35840free), Chis1671680/2097152 (425472free).
+Chis main EWRAM255656/257024 leaves1368static bytes; runtime stack peaks/timing
+are not established by this accounting. See build-594-validation.json.

@@ -28,12 +28,18 @@
 
 #pragma GCC optimize ("Os")
 
-NOINLINE bool recent_flush(const t_rentry *rentries, unsigned rcount) {
+static bool recent_flush_file(const char *path,const t_rentry *rentries,unsigned rcount,bool sd_only) {
   WRITE_LOG("Flushing recently played games (%d entries)", rcount);
 
-  // Flush to disk!
+  char temporary[64],backup[64];
+  if(strlen(path)+5>sizeof(temporary))return false;
+  strcpy(temporary,path);strcat(temporary,".tmp");
+  strcpy(backup,path);strcat(backup,".bak");
+  if(f_stat(path,0)==FR_NO_FILE && f_stat(backup,0)==FR_OK)
+    if(f_rename(backup,path)!=FR_OK)return false;
+  // Write a replacement before moving the previous history aside.
   FIL fo;
-  if (FR_OK != f_open(&fo, RECENT_FILEPATH, FA_WRITE | FA_CREATE_ALWAYS))
+  if (FR_OK != f_open(&fo, temporary, FA_WRITE | FA_CREATE_ALWAYS))
     return false;
 
   // Write stuff to disk. Use a 1KiB buffer and flush as full blocks fill.
@@ -41,7 +47,10 @@ NOINLINE bool recent_flush(const t_rentry *rentries, unsigned rcount) {
   char tmpbuf[1024];
   tmpbuf[0] = 0;
 
+  unsigned sd_count=0;
   for (unsigned i = 0; i < rcount; i++) {
+    if(sd_only && ((rentries[i].flags&FLAG_RECENT_NOR) || rentries[i].fpath[0]!='/'))continue;
+    if(sd_only && sd_count++==10)break;
     unsigned fnlen = strlen(rentries[i].fpath);
     if (rentries[i].flags & FLAG_RECENT_NOR) {
       memcpy(&tmpbuf[coff], "nor:", 4);
@@ -72,11 +81,32 @@ NOINLINE bool recent_flush(const t_rentry *rentries, unsigned rcount) {
     }
   }
 
-  f_close(&fo);
+  if(f_close(&fo)!=FR_OK)return false;
+  bool existed=f_stat(path,0)==FR_OK;
+  if(f_stat(backup,0)==FR_OK && f_unlink(backup)!=FR_OK)return false;
+  if(existed && f_rename(path,backup)!=FR_OK)return false;
+  if(f_rename(temporary,path)!=FR_OK) {
+    if(existed)f_rename(backup,path);
+    return false;
+  }
+  if(existed)f_unlink(backup);
   return true;
 }
 
+NOINLINE bool recent_flush(const t_rentry *entries,unsigned count) {
+  FRESULT result=f_mkdir(SYSTEM_DIR);
+  if(result!=FR_OK && result!=FR_EXIST)return false;
+  return recent_flush_file(PRIVATE_RECENT_FILEPATH,entries,count,false) &&
+         recent_flush_file(RECENT_FILEPATH,entries,count,true);
+}
+
 NOINLINE unsigned insert_recent_fn(t_rentry *rentries, unsigned rcount, const char *fn, unsigned flags) {
+  /* Native word copies round upward: stage the bounded name in padded GBA
+   * RAM, also protecting a filename that aliases the table being reordered. */
+  char stable[MAX_FN_LEN] __attribute__((aligned(4)));
+  size_t length=strlen(fn);
+  if(length>=sizeof(stable))return rcount;
+  memset(stable,0,(length+4)&~3u);memcpy(stable,fn,length+1);fn=stable;
   WRITE_LOG("Adding/bumping recently played game: '%s' [%x]", fn, flags);
 
   for (unsigned i = 0; i < rcount; i++) {
@@ -117,6 +147,12 @@ NOINLINE unsigned delete_recent(t_rentry *rentries, unsigned rcount, unsigned en
 }
 
 NOINLINE unsigned recent_load(const char *fpath, t_rentry *rentries) {
+  char backup[64];
+  if(strlen(fpath)+5<=sizeof(backup)) {
+    strcpy(backup,fpath);strcat(backup,".bak");
+    if(f_stat(fpath,0)==FR_NO_FILE && f_stat(backup,0)==FR_OK)
+      if(f_rename(backup,fpath)!=FR_OK)return 0;
+  }
   FIL fi;
   if (FR_OK != f_open(&fi, fpath, FA_READ))
     return 0;
@@ -127,8 +163,9 @@ NOINLINE unsigned recent_load(const char *fpath, t_rentry *rentries) {
   while (nentries < RECENT_MAXFN_CNT) {
     if (bcount <= 512) {
       UINT rdbytes;
-      if (FR_OK != f_read(&fi, &tmp[bcount], 512, &rdbytes))
-        return nentries;
+      if (FR_OK != f_read(&fi, &tmp[bcount], 512, &rdbytes)) {
+        f_close(&fi);return nentries;
+      }
       bcount += rdbytes;
       tmp[bcount] = 0;
     }
@@ -143,6 +180,7 @@ NOINLINE unsigned recent_load(const char *fpath, t_rentry *rentries) {
     *p = 0;        // Add the string end char.
 
     unsigned cnt = p - tmp + 1;
+    if(p>tmp && p[-1]=='\r')p[-1]=0;
     if (cnt > 1 && cnt < sizeof(rentries[nentries].fpath)) {
       rentries[nentries].flags = 0;
       if (!memcmp(tmp, "nor:", 4)) {
@@ -172,3 +210,18 @@ NOINLINE unsigned recent_load(const char *fpath, t_rentry *rentries) {
 }
 
 
+
+/* Use shared SD order when another kernel changes it, retaining older SuperFW
+ * entries and private NOR names without putting nor: records in DE RECENT.TXT. */
+unsigned recent_load_merged(t_rentry *entries,t_rentry *scratch) {
+  unsigned count=recent_load(PRIVATE_RECENT_FILEPATH,entries);
+  unsigned shared=recent_load(RECENT_FILEPATH,scratch);
+  if(!count){memcpy32(entries,scratch,shared*sizeof(*entries));return shared;}
+  unsigned first_sd=0;
+  while(first_sd<count && (entries[first_sd].flags&FLAG_RECENT_NOR))++first_sd;
+  if(!shared || (first_sd<count && !strcmp(entries[first_sd].fpath,scratch[0].fpath)))return count;
+  /* Reverse insertion keeps the shared newest-first order. */
+  for(unsigned i=shared;i;i--)
+    count=insert_recent_fn(entries,count,scratch[i-1].fpath,scratch[i-1].flags);
+  return count;
+}

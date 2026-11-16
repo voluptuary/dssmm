@@ -22,7 +22,13 @@ Published checkpoint: superfw-test1 is a prerelease at source8a22da16c2d755de8fc
 Build identity: the Info page shows `SuperFW <version> (<8-digit upstream build hash>)`, then `DSSMM Build N`. `N` is `git rev-list --count HEAD` over full repository history; kernel CI fetches full history. Override with `DSSMM_BUILD_NUMBER=N` only for controlled reproducible builds. Preserve `VERSION_SLUG_WORD` in the firmware header as the upstream commit identifier; it is also displayed after the SuperFW version.
 
 
-SYSTEM storage: new save files use `/SYSTEM/SAVEGAME/` or `/SYSTEM/SAVES/`; disk states use `/SYSTEM/SAVESTATE/`; the debug log uses `/SYSTEM/superfwlog.txt`. Preserve `.superfw`. Legacy `/SAVEGAME`, `/SAVES`, and `/SAVESTATE` data is detected and continues to be used for matching games when no SYSTEM copy exists; never remove these fallback reads without a verified migration and regression coverage. See `docs/SYSTEM-LAYOUT.md`.
+SYSTEM storage (owner update): all `.superfw` resources now target `/SYSTEM`.
+Read docs/SYSTEM-LAYOUT.md. Startup migrates legacy contents before pending SRAM
+handling, merging directories without overwriting files; conflicts/errors stop
+boot for manual resolution. Directory settings are retired; new saves/states use
+fixed SAVEGAME/SAVESTATE. Preserve automatic legacy save reads to avoid data loss.
+Earlier preserve-.superfw instructions are superseded by the explicit owner
+request. Run test-system-layout.sh plus all-board settings/launch checks.
 
 
 ## Workspace cleanup
@@ -100,3 +106,52 @@ Unicode fallback. In-game font uses reserved palette word5, not a new payload
 field. Run test-dssmm-font.sh alongside settings/artwork/bus tests. Current folder
 CUSTOM loader is implemented for List+Art and carousels; full basename including
 dots, no header lookup for directories. Both features need physical retesting.
+
+Owner continuation: work continuously without awaiting feedback until stopped or
+DE parity is reached, supplying numbered hardware-test builds at validated
+milestones. Read LAUNCHER-PORT.md and current UI-PARITY map. Start/category hub and
+lossless DE backgrounds are implemented but category children/dialogs remain
+unfinished. Never claim100% parity based on presentation fixtures. All3 variants
+share launcher features; SD/Lite substitute Recents for unsupported NOR. Keep
+palette0..15 backgrounds separate from UI16..19/artwork20..235 and Info logo.
+Host sanitizer executables now disable PIE to avoid recurrent ASAN startup loops;
+sanitizers remain enabled. Firmware optimization flags are separate.
+
+Enforce board image budgets on every candidate: SD512KiB/Lite496KiB/Chis2MiB.
+Keep native linker MAX_FLASH_SIZE plus independent build/set size gates; record
+used/limit/headroom and GBA RAM separately. Never raise hardware budgets to fit
+assets. Letter #/A–Z artwork is a generated SD-card CUSTOM pack (LETTER-FOLDER-ART.md),
+matching basenames globally and adding zero firmware/RAM cost. Preserve existing
+user CUSTOM overrides. Owner588 confirms the optional font works well on Chis.
+
+Owner594 feedback: Start needs NAME.TXT left/time right, stronger selection,
+NOR B→Start, and wrapping Up/Down through LastPlayed/SD-or-NOR/Settings/Time.
+Implementations are in development; see LAUNCHER-PORT.md. The selected time opens
+an HH/MM editor; software clock advances only while the menu runs, preserves
+game RTC defaults and uses unset markers until configured. Owner explicitly
+requested this clock after the initial hardware-RTC omission. No Auto themes.
+Username retains12 complete UTF8 characters from first line, optional BOM.
+Background streams now follow unchanged native font prefixes in the existing
+1.5MiB SDRAM resource area; keep prefixes, header data_size and native unpack
+paths intact. Enforce rounded resource budget, packed flash and GBA RAM separately.
+
+## Build603 continuation (2026-11-16)
+
+Read docs/build-603-validation.json and current HANDOFF. Build603/hashf28de96b is
+the current Chis hardware-test image; all3 packages/full local verifier and
+hosted43780888958 pass. No physical603/plugin/game/save qualification. Portable
+Pogoshell PLUG BIN/GBA/MB/MBZ now precedes native fallback; never import EZ-FLASH
+card drivers. Read PLUGIN-COMPATIBILITY.md. Shared SETTINGS.TXT retains unknown
+values/private namespaced extras, saves on exit and retires legacy UI sidecar
+only on success. RECENT.TXT holds10 portable SD paths; native/NOR history stays
+in SUPERFW-RECENT.TXT. Always record selection before launch independently of
+menu visibility. New saves use SYSTEM/SAVER with legacy auto-detection.
+
+Owner full artwork archive now lives at ignored root .release-assets/folder-art.zip.
+Preserve it during cleanup and attach it on all future kernel releases; do not
+re-add the public repository ZIP or substitute the generated letter-only pack.
+All3 builds enforce exact raw/packed/ELF IGM correspondence; DSSMM_ARM_IGM=1 adds
+actual native ARM halfword-unpacker replay. Remaining full DE background/menu/
+dialog/font alignment parity work is active. Continue autonomously with numbered
+hardware-test milestones. SD603 has only5632bytes flash headroom: optimize or move
+assets within existing budgets; never increase hardware limits.

@@ -3170,3 +3170,32 @@ SuperFW added an Xvfb screenshot smoke script that prints the emulator version a
 ## 2026-11-14 — Integrate SuperFW carousel and fast-mode work
 
 Normal merge e3821b4 imports only superfw/ changes; shared isolation and all project-policy/merge fixtures pass. Build553 all-board clean integrity/CI evidence retained privately. Hardware534 failures remain awaiting newer candidate retest; full parity incomplete. Next push/sync lanes, verify hosted checks, then owner-test release preparation under existing notes/retention policy. No release changed at this checkpoint.
+
+## 2026-11-15 — Shared owner folder-art release asset
+
+Preserved owner upload8b466cb. Replaced only27 #/A–Z Title BMPs with centered
+unchanged80x80 Box data on120x80 transparent DST1 canvases. All other ZIP entries
+are byte-identical, including system icons and Box art. Canonical Folder-Art.zip
+plus reproducible prepare/check script are shared infrastructure. Owner requires
+this archive attached to every future kernel release. Check passes; no kernel
+code changed here. SuperFW work remains on its hardware lane.
+
+## 2026-11-16 — Local folder-art release input
+
+Owner removed public root Folder-Art.zip (f47afa6), requests using the hardware-test
+copy for future releases, and authorizes relocating it. Moved that exact corrected
+archive to /workspaces/dssmm/.release-assets/folder-art.zip; ignored locally and
+by root policy. Preserve during cleanup; attach it on all future kernel releases,
+including owner system icons. SHA256 b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5.
+prepare-folder-art.py --check passes. Do not re-add the binary to the repository.
+
+## 2026-11-16 — SuperFW Build603 integration
+
+Merged the SuperFW lane normally after clean SD/Lite/Chis Build603 and full
+local verifier plus hosted43780888958 passed. Candidate sourcef28de96b and
+project validation report retain hardware/runtime limits; owner Chis image is
+in hardware-test. Portable plugin ABI, shared settings/recents and presentation
+work remain confined to superfw/. No other card driver changed. Full DE parity
+is ongoing. Owner folder artwork stays ignored in .release-assets/folder-art.zip;
+preserve and attach on future releases. Sync hardware lanes normally after this
+integration; do not reset/force-push.
