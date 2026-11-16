@@ -1030,3 +1030,23 @@ lookahead windows and preserve cross-chunk matches, fail safely on capacity or
 IO errors without caching partial patches. This is potentially substantial;
 checkpoint first-pass changes before proceeding. Owner wants audit then port,
 no input pause. Root release sync completed normally, baseline checks all4 pass.
+
+Audit second pass: bounded patch scanner signatures/setup tables and128operation
+capacity, fixed IRQ insertion clobbering RTC group, and added scan windows with
+4096Blookbehind/64Blookahead so cross-boundary matches and table skips are retained.
+Production read/seek/size/short-read failures now close/restoreSD and nevercache
+partial patches. CLI padding workaround removed. Exact allocations/capacity/
+whole-vs-window regression and actual9MiB+3 reader fault tests pass. NDS optional
+DLDI-null/invalidshift and early-return handle leaks fixed; synthetic-RAM tests
+pass (not DS hardware). Whole-programCppcheck late diagnostics also contained
+NDSnull and third-party nanoprintf byte-casts: earlier journal's 'onlywarning'
+statement was premature. Cache-byte-copy/float-byte-casts explained; NDSfixed.
+
+Scanner expansion hit Lite stack limit48Bover during a dirty preliminary build;
+existing256B artwork filename cache moved to EWRAM (hotmetadata stays IWRAM).
+PreliminaryLite nowstack16592>=16384; no limits changed, no dirty build delivered.
+New native ELF checker verifies cold caches and reserve. Audit report and current
+performance guide consolidated; new gates on clean frozen source next. Test5/
+Chis624 remain frozen. After audit checkpoint and all3 gates, deliver next numbered
+Chis hardware test then continue menu parity; do not republish624 or claim new
+physical qualification. User's devcontainer-lock/private retained files intact.

@@ -512,45 +512,43 @@ static bool loadrom_progress_abort(unsigned done, unsigned total) {
 
 
 bool generate_patches_progress(const char *fn, unsigned fs) {
-  // Open ROM and load it in the SDRAM. We load it in 4MB chunks. Not ideal but
-  // we want to preserve the data loaded in the SDRAM (ie. fonts).
   FIL fd;
-  FRESULT res = f_open(&fd, fn, FA_READ);
-  if (res != FR_OK)
-    return false;
+  if (f_open(&fd, fn, FA_READ) != FR_OK) return false;
+  if (f_size(&fd) != fs) {f_close(&fd);return false;}
 
   t_patch_builder pb;
   patchengine_init(&pb, fs);
-  const unsigned max_hiscratch = 8*1024*1024;
+  const unsigned capacity = 8*1024*1024;
+  const unsigned step = capacity - PATCH_SCAN_LOOKBEHIND - PATCH_SCAN_LOOKAHEAD;
 
-  for (unsigned i = 0; i < fs; i += max_hiscratch) {
-    for (unsigned j = 0; j < max_hiscratch && i + j < fs; j += 4096) {
-      UINT rdbytes;
+  for (unsigned scan = 0; scan < fs; scan += step) {
+    unsigned start = scan > PATCH_SCAN_LOOKBEHIND ? scan-PATCH_SCAN_LOOKBEHIND : 0;
+    unsigned available = MIN(capacity, fs-start);
+    unsigned begin = scan-start, count = MIN(step, fs-scan);
+    if (f_lseek(&fd, start) != FR_OK) goto read_failed;
+    for (unsigned j = 0; j < available; j += 4096) {
+      UINT got;
       uint32_t tmp[4096/4];
-      if (FR_OK != f_read(&fd, tmp, sizeof(tmp), &rdbytes))
-        return false;
-
+      unsigned expected = MIN(sizeof(tmp), available-j);
+      if (f_read(&fd, tmp, expected, &got) != FR_OK || got != expected) goto read_failed;
+      unsigned padded = (expected+3)&~3u;
+      memset((uint8_t*)tmp+expected, 0, padded-expected);
       set_supercard_mode(MAPPED_SDRAM, true, false);
-      dma_memcpy32(&hiscratch[j], tmp, sizeof(tmp)/4);
+      dma_memcpy32(&hiscratch[j], tmp, padded/4);
       set_supercard_mode(MAPPED_SDRAM, true, true);
-      if (j & ~0xFFFF)
-        loadrom_progress((i*2 + j) >> 8, fs >> 7);
+      if (!(j & 0xffff)) loadrom_progress((scan*2+j)>>8, MAX(1,fs>>7));
     }
-    // Amount to process.
-    unsigned blksize = MIN(max_hiscratch, fs - i);
-
-    void upd_pe_prog(unsigned prog) {
-      unsigned p = i*2 + blksize + prog*4;
-      loadrom_progress(p >> 8, fs >> 7);
+    void upd_pe_prog(unsigned progress) {
+      loadrom_progress((scan*2+count+progress*4)>>8, MAX(1,fs>>7));
     }
-
-    // Process patches. Adds them to the existing patchset.
+    pb.rom_offset = start;
     set_supercard_mode(MAPPED_SDRAM, true, false);
-    patchengine_process_rom((uint32_t*)hiscratch, blksize, &pb, upd_pe_prog);
+    bool ok = patchengine_process_window((uint32_t*)hiscratch, available,
+                                         begin, begin+count, &pb, upd_pe_prog);
     set_supercard_mode(MAPPED_SDRAM, true, true);
+    if (!ok) goto read_failed;
   }
-
-  f_close(&fd);
+  if (f_close(&fd) != FR_OK) return false;
   patchengine_finalize(&pb);
 
   WRITE_LOG("Patch engine done. Found wcnt: %d save: %d (save mode: %d) irqh: %d rtc: %d",
@@ -558,6 +556,10 @@ bool generate_patches_progress(const char *fn, unsigned fs) {
 
   // Proceed to write patches to their cache.
   return write_patches_cache(fn, &pb.p);
+
+read_failed:
+  f_close(&fd);
+  return false;
 }
 
 bool dump_flashmem_backup() {
@@ -1171,7 +1173,8 @@ static void browser_reload_filter() {
 // Loads a new directory list in the ROM browser.
 // TODO: Implement filtering (.gba/.rom/.bin... etc) using settings
 static bool artwork_cached, artwork_valid;
-static char artwork_rom[MAX_FN_LEN];
+/* Cold filename storage leaves IWRAM for pixel loops and the native stack. */
+static char artwork_rom[MAX_FN_LEN] __attribute__((section(".sbss"),aligned(4)));
 static unsigned artwork_cached_mode;
 static artwork_info preview_info;
 /* Byte flags and path strings must live in GBA RAM, not the 16-bit cart bus. */

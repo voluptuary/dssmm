@@ -690,3 +690,11 @@ host/ARM/mGBA; blob25332Bsmaller. Scaler integer stepping matches division-oracl
 pixels and cuts synthetic art42%/total20%.40-source forcedCppcheck audited. Full
 all3 gates still pending; next patch scanner bounds/capacity/chunk/IO audit, then
 continued parity.624 release/hardware-test remain frozen; no physical claims.
+
+Audit second pass fixes scanner read/capacity/group-order bugs with explicit
+lookbehind/lookahead windows; exact allocations, whole/window equivalence and
+production9MiB+3 fault/cleanup tests pass. NDSnull/shift/handle bugs fixed with
+synthetic tests. LateCppcheck diagnostics corrected earlier incomplete warning
+summary; third-party byte-casts/cache-copy explained. Extra scanner code needed
+256B cold filename relocation to EWRAM; preliminaryLite stack16592>=16384.
+Freeze clean source for full-all3 gates/new hardware test, then resume DE parity.

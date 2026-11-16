@@ -24,10 +24,17 @@ must retain the16KiB user-stack reserve and board-specific flash limits.
 ## Static analysis and limits
 
 Cppcheck2.10 warning/performance/portability with inconclusive checks and `--force`
-processed all40 source C files. The remaining directsave_emu cache-magic warning
+processed all40 source C files. The directsave_emu cache-magic warning
 is an analyzer limitation: load_cache_metadata writes every byte of the entire
 local struct from volatile SRAM before inspecting it. No blanket suppression or
-extra runtime initialization was added. The earlier scaler warning disappeared
+extra runtime initialization was added. Final whole-program analysis also reported two nanoprintf float-to-byte casts
+(valid C object-representation access in retained third-party code) and an NDS
+optional-driver null dereference. The NDS defect and its early-return file-handle
+leaks are now fixed and covered by a synthetic-RAM/fault test. The earlier
+first-pass journal saying only the cache warning remained preceded these final
+whole-program diagnostics; this paragraph corrects that claim.
+
+The earlier scaler warning disappeared
 after the sampling rewrite; duplicate-condition and zero-divisor findings fixed.
 
 Actual ARM artwork/cache bus checks and all10 mGBA background pixels pass.
@@ -35,10 +42,32 @@ Shared settings save/reload tests still cover360 combinations per board. Broader
 owner-reported physical settings loss remains unreproduced; host tests alone do
 not close it. Plugin Exit and physical SMS/GG/PCE timing need further work.
 
-## Next inspection
+## Native scanner and loader corrections
 
-The native patch scanner's CLI explicitly allocates extra padding to mask
-out-of-range reads. Inspect all signature/flash-structure bounds, patch-table
-capacity, chunk overlap and production read/error handling together before
-changing this path. Preserve valid matches across chunk boundaries and never
-cache a partial patch set after failure. Continue menu parity after the audit.
+The scanner now bounds every signature and flash-setup structure read, enforces
+its128-operation capacity, and inserts operations without clobbering later IRQ/
+RTC groups. Failure propagates instead of caching a partial patch set. Explicit
+4096-byte lookbehind and64-byte lookahead windows preserve literal loads and
+cross-boundary signatures; setup-table skip state also crosses windows. The CLI
+uses exact allocations instead of padding to hide overreads.
+
+Production patch generation verifies file size, seeks and exact reads, pads only
+the final word, restores SD mapping and closes the file on failure. Scanner tests
+compare complete-ROM output with overlapped windows, including a boundary-spanning
+signature/setup table and a maximum-backoff literal. Exact allocation and capacity
+sanitizers pass. The actual production reader is exercised with a9MiB+3 synthetic
+file, short/error reads and scanner failure; no failed run writes a patch cache.
+
+The NDS loader now owns its handle in one wrapper, accepts a null optional driver
+and rejects invalid driver-size shifts. Tests cover synthetic RAM only, not DS
+hardware execution. Broader DLDI relocation qualification is separate.
+
+The expanded scanner initially exceeded Lite's IWRAM stack budget by48bytes.
+Moving the existing256-byte list/Start artwork filename cache to EWRAM restores
+the minimum reserve without moving hot metadata or reducing the stack. Preliminary
+Lite link passes with16592bytes user stack; clean all3/full gates remain pending.
+
+After those gates, continue porting the remaining DE menu grouping/navigation,
+shared preference behavior and artwork alignment. Physical plugin Exit and the
+owner's broader preference-loss report remain open; no hardware input is required
+to continue other porting work.

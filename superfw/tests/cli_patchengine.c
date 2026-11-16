@@ -42,14 +42,23 @@ int main(int argc, char **argv) {
 
   t_patch_builder pb;
   patchengine_init(&pb, st.st_size);
-  char *tmp = malloc(BLK_SIZE + 64);   // FIXME: the scanner overruns the buffer sometimes.
-
-  while (true) {
-    int r = fread(tmp, 1, BLK_SIZE, fd);
-    if (r <= 0)
-      break;
-
-    patchengine_process_rom((uint32_t*)tmp, r, &pb, dummy);
+  uint32_t *tmp = malloc(BLK_SIZE);
+  if (!tmp) {fclose(fd);return 1;}
+  const unsigned step = BLK_SIZE-PATCH_SCAN_LOOKBEHIND-PATCH_SCAN_LOOKAHEAD;
+  for (unsigned scan=0; scan<(unsigned)st.st_size; scan+=step) {
+    unsigned start=scan>PATCH_SCAN_LOOKBEHIND?scan-PATCH_SCAN_LOOKBEHIND:0;
+    unsigned available=(unsigned)st.st_size-start;
+    if (available>BLK_SIZE) available=BLK_SIZE;
+    unsigned count=(unsigned)st.st_size-scan;
+    if (count>step) count=step;
+    if (fseek(fd,start,SEEK_SET) || fread(tmp,1,available,fd)!=available) {
+      free(tmp);fclose(fd);return 1;
+    }
+    pb.rom_offset=start;
+    if (!patchengine_process_window(tmp,available,scan-start,scan-start+count,&pb,dummy)) {
+      fprintf(stderr,"Patch scan failed; no partial result is usable.\n");
+      free(tmp);fclose(fd);return 1;
+    }
   }
 
   free(tmp);
