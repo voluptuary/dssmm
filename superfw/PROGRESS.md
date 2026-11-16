@@ -663,3 +663,9 @@ SMS/PCE ARM startup replay confirms narrowly patched0x4000 write. IWRAM renderer
 placement passes12 actual mGBA source-pixel/guard scenes; synthetic total~41%
 lower vs prior run-fill, not physical FPS. Next candidate/Test5 publication
 explicitly authorized with folder-art.zip; freeze and full all3 gates next.
+
+623 full/hosted43868144493 stopped at Lite's enforced16KiB stack reserve after
+hot-code relocation. No candidate distributed. Cold576B settings text cache now
+moves to EWRAM; minimum stack unchanged. New full-all3 gates required. After
+Test5 publication owner requests adversarial cleanup/correctness/performance
+audit, then continued porting; do not mix audit into release source.

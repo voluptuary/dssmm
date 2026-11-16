@@ -965,3 +965,12 @@ production RAM/stack/all3 budgets pending. Owner authorizes next validated
 hardware-test milestone publication as Test5, including full folder-art.zip and
 brief user setup. Canonical notes rewritten for actual accumulated changes and
 explicit unresolved persistence/Exit/physical validation limits. No release yet.
+
+623/sourceeb5b39da SD passed but Lite link correctly rejected IWRAM16192 with
+minimum user-stack16KiB. Full verifier and hosted43868144493 FAILED; do not
+publish623 or describe it as validated. Moved cold shared-settings raw-value
+cache576bytes to existing byte-writable EWRAM .sbss; no stack-limit changes.
+Rerun clean all3/full/CI on corrected source. User also authorizes AFTER release
+an adversarial SuperFW source audit for errors/performance/orphaned code and
+concise maintainable organization/comments, then continued autonomous porting.
+Keep audit changes separate from frozen release source.

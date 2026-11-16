@@ -137,7 +137,9 @@ uint32_t rtcvalue_default = 45568800U;
 /* DE-compatible keys precede kernel-specific values in one portable file. */
 enum {SharedTheme,SharedColour,SharedHidden,SharedClean,SharedView,SharedArt,SharedLanguage,SharedClock,SharedCount};
 static const char * const shared_keys[]={"Theme","Colour","Hide system files","Clean list","View mode","Thumbnails","Language","Clock format"};
-static struct {char value[64];unsigned baseline;bool long_value;} shared_values[SharedCount];
+/* Cold text cache belongs in EWRAM; retain IWRAM for rendering and stack. */
+static struct {char value[64];unsigned baseline;bool long_value;} shared_values[SharedCount]
+  __attribute__((section(".sbss"),aligned(4)));
 static bool shared_seen,unified_seen;
 static int shared_view=-1;
 static unsigned shared_current(unsigned id) {
