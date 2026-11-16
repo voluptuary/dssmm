@@ -1132,3 +1132,10 @@ in SD packaging to strengthen final NOR preflight. NOR availability now includes
 trampoline bytes, aligned hole bounds and overflow-safe arithmetic; allocation
 failure aborts before writer. Native control/backend/payload regression tests pass.
 Final frozen source636 full gates next; no634/635 candidate distributed.
+
+636/e894d25 passed clean full/nativeIGM/all3 verifier, integrity and hosted
+43885295944. Evidence docs/build-636-validation.json; no hardware delivery yet.
+Final retry review isolates NOR-only DS/IGM choices in local variables instead of
+mutating the shared normal-load settings after a failed write. Regression asserts
+launch options remain unchanged. Freeze637 for final full gates/delivery, then
+continue624 UI/plugin/persistence queue. Public Test5 stays624.

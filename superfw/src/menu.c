@@ -3063,8 +3063,6 @@ static void confirm_nor_write(bool confirm) {
     spop.alert_msg = msgs[lang_id][MSG_ERR_READ];
     return;
   }
-  if (!dirsav_avail_flash(&spop.p.norwr.i)) spop.p.norwr.i.use_dsaving = false;
-  if (!ingame_menu_avail_flash(&spop.p.norwr.i)) spop.p.norwr.i.ingame_menu_enabled = false;
   if (nor_replace_games) {
     if (!flashmgr_wipe(ROM_FLASHMETA_ADDR, FLASH_METADATA_SIZE)) {
       spop.alert_msg = msgs[lang_id][MSG_ERR_NORUPD];
@@ -3078,14 +3076,16 @@ static void confirm_nor_write(bool confirm) {
   }
   const t_load_gba_info *info = &spop.p.norwr.i;
   const t_patch *p = get_game_patch(info);
+  const bool dirsaving = info->use_dsaving && dirsav_avail_flash(info);
+  const bool ingame_menu = info->ingame_menu_enabled && ingame_menu_avail_flash(info);
 
   // Allocate the last entry for the new game.
   t_flash_game_entry ne = {
     .gamecode = *(uint32_t*)info->romh.gcode,
     .gamever = info->romh.version,
     .numblks = blkcnt,
-    .gattrs = (info->use_dsaving         ? GATTR_SAVEDS : 0) |
-              (info->ingame_menu_enabled ? GATTR_IGM    : 0) |
+    .gattrs = (dirsaving                 ? GATTR_SAVEDS : 0) |
+              (ingame_menu               ? GATTR_IGM    : 0) |
               (info->rtc_patch_enabled   ? GATTR_RTC    : 0) |
               GATTR_SAVEM(p),
     .bnoffset = (uint8_t)(file_basename(info->romfn) - info->romfn),
@@ -3102,7 +3102,7 @@ static void confirm_nor_write(bool confirm) {
 
   // Go ahead and start the flasher-loader with patching support.
   unsigned errc = flash_gba_nor(info->romfn, info->romfs, &info->romh, p,
-                                info->use_dsaving, info->ingame_menu_enabled,
+                                dirsaving, ingame_menu,
                                 info->rtc_patch_enabled,
                                 ne.blkmap, loadrom_progress,
                                 sdr_state->scratch, scratch_mem_size);

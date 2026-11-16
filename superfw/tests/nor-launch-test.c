@@ -32,8 +32,6 @@ static unsigned f_size(FIL *fd) {(void)fd;return source_size;}
 static int f_close(FIL *fd) {(void)fd;closes++;return close_ok?0:1;}
 static bool flashmgr_wipe(unsigned addr,unsigned size) {(void)addr;(void)size;wipes++;if(wipe_ok){smenu.fbrowser.freeblks=31;smenu.fbrowser.maxentries=0;}return wipe_ok;}
 static void flashbrowser_reload(void) {}
-static bool dirsav_avail_flash(const void *info) {(void)info;return false;}
-static bool ingame_menu_avail_flash(const void *info) {(void)info;return false;}
 #include "nor-actions.h"
 static void reset(unsigned size,unsigned free,unsigned count) {
  memset(&spop,0,sizeof(spop));spop.p.norwr.i.romfs=size;source_size=size;
@@ -42,8 +40,10 @@ static void reset(unsigned size,unsigned free,unsigned count) {
 }
 int main(void) {
  reset(8*1024*1024,31,0);request_nor_write();assert(!nor_replace_games&&spop.qpop.option==0&&!spop.qpop.clear_popup_ok);
+ spop.p.norwr.i.use_dsaving=spop.p.norwr.i.ingame_menu_enabled=true;
  spop.qpop.callback(false);assert(!writes&&!wipes&&!opens);
  spop.qpop.callback(true);assert(writes==1&&!wipes&&opens==closes);
+ assert(spop.p.norwr.i.use_dsaving&&spop.p.norwr.i.ingame_menu_enabled);
  reset(8*1024*1024,2,4);request_nor_write();assert(!nor_replace_games);spop.qpop.callback(true);assert(writes==1&&!wipes);
  reset(8*1024*1024+1,2,4);request_nor_write();assert(nor_replace_games&&strstr(spop.qpop.message,"Erase"));spop.qpop.callback(false);assert(!wipes&&!writes);spop.qpop.callback(true);assert(wipes==1&&writes==1);
  reset(MAX_GBA_ROM_SIZE,8,1);request_nor_write();spop.qpop.callback(true);assert(writes==1&&!wipes);

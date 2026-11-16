@@ -733,3 +733,8 @@ checked/aligned hole bounds before replacement confirmation. Honor allocator
 failure before calling writer (avoids using an incomplete block map). Added real
 availability-function regression tests; final clean gates on636 next. No635 image
 distributed; hosted635 result tracked separately from final636 gates.
+
+636 full local/nativeIGM/all3/integrity/hosted43885295944 passed. Before delivery,
+removed mutation of normal Load DS/IGM options during NOR attempts; canceled or
+failed NOR writes retain the original launch configuration. Mock regression
+passes. Final637 frozen gates next;636 evidence preserved, no physical claims.
