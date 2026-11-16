@@ -177,3 +177,12 @@ publishing the next validated hardware-test milestone as a prerelease for all3,
 with retained full .release-assets/folder-art.zip and brief extraction guidance.
 Continue normal four-section notes and per-lane prerelease retention. No physical
 SD/Lite qualification or complete DE parity is implied.
+
+Current public SuperFW prerelease is superfw-test5 (Build624/sourcea4cafcaf),
+published with three images and full folder-art.zip after all3/local and all4
+integration CI; publication record is docs/releases/superfw-test5-publication.json.
+Older Test4 release removed after exact archive, tag retained. Keep624 frozen.
+Owner requests an adversarial correctness/performance/debt audit after this
+publication, including orphan cleanup and concise useful comments/organization,
+then continued autonomous porting and numbered hardware-test builds. Broader
+settings loss/plugin Exit/SD-Lite physical validation/parity remain unresolved.

@@ -990,3 +990,22 @@ wait integration gates, publish existing frozen624 images+full folder-art.zip,
 verify downloads/metadata, delete oldTest4 release ONLY(tagkept), journal andsync.
 Then perform owner-requested adversarial audit and continue porting. Do not claim
 pluginExit, broader physical settings loss, SD/Lite physical or full DE parity fixed.
+
+## 2026-11-16 — Test5 published, audit next
+
+superfw-test5 is published as prerelease at exact sourcea4cafcaf, Build624, with
+Chis/SD/Lite images and full owner folder-art.zip. Four-section notes carry a
+brief root-extract/SYSTEM-merge instruction. All4 downloaded assets byte-match;
+body/prerelease/tag match. HardwareCI43868556156 and all4 integration43868982790
+pass. Old Test4 release page/assets removed only after root archive15858e7 and
+new downloads verified; git tag kept. BLUE/OMEGA each retain their sole newest
+prerelease, stable DEv8.4.0 remains latest. Publication evidence in
+superfw-test5-publication.json; Chis624 remains root hardware-test. Root README
+and release baseline checkpoint being updated on dssmm, then normal sync.
+
+Now perform requested adversarial audit, confined to SuperFW: correctness,
+settings persistence, plugin timing/Exit boundaries, renderer/cache/performance,
+orphan/deprecated code, concise comments and logical maintainable structure.
+Keep release624 frozen. Prioritize reproducible bugs and measurable gains; retain
+history/licenses and do not weaken hardware budgets or tests. Continue porting
+after audit; no feedback/input pause expected. No full parity/physical claim.
