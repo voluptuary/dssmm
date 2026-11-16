@@ -669,3 +669,16 @@ hot-code relocation. No candidate distributed. Cold576B settings text cache now
 moves to EWRAM; minimum stack unchanged. New full-all3 gates required. After
 Test5 publication owner requests adversarial cleanup/correctness/performance
 audit, then continued porting; do not mix audit into release source.
+
+624 clean all3/full local/nativeIGM-ARM and hosted43868556156 pass; exact source
+hash/package/size/seals checked, all360 UI combinations/board survive roundtrip.
+Chis624 delivered hardware-test; old618 superseded.16KiB stack minimum intact,
+Chis17304Bactual; SD1024Bflashfree. Integration31ab1e88/43868982790 before Test5
+publication; then download/retention evidence and adversarial audit. No public
+release or complete physical qualification yet.
+
+Test5 published at sourcea4cafcaf/Build624 after all3 local/hardwareCI and all4
+integrationCI pass. Chis/SD/Lite+full folder-art.zip downloaded and byte-verified;
+notes match. Test4 page/assets pruned after exact archive, tag retained; BLUE/
+OMEGA sole prereleases and stable DElatest unchanged. Evidence publicationJSON.
+Next requested adversarial source audit, then continued autonomous DE parity.
