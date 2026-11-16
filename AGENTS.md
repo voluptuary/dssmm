@@ -1,5 +1,7 @@
 # DSSMM shared-tree working architecture
 
+Always work in the most token-efficient manner possible: reuse existing findings and validation evidence, read only relevant context, batch independent checks, and avoid duplicate work or unnecessary output. Preserve correctness, required testing, and clear continuation notes.
+
 Repository: https://github.com/voluptuary/dssmm. Default/integration branch:
 `dssmm`. Hardware/project branches: `ezfomegade`, `ezfomega`, `ezfblue`, `superfw`. Do not recreate
 retired `main` or `ezfode` branches.

@@ -1,5 +1,7 @@
 # ezfblue — current working architecture
 
+Always work in the most token-efficient manner possible: reuse existing findings and validation evidence, read only relevant context, batch independent checks, and avoid duplicate work or unnecessary output. Preserve correctness, required testing, and clear continuation notes.
+
 Target: EZ-FLASH OMEGA Definitive Edition B / BLUE. Repository: voluptuary/dssmm.
 Read root AGENTS.md plus this directory's HANDOFF.md and PROGRESS.md first.
 
