@@ -3188,3 +3188,14 @@ archive to /workspaces/dssmm/.release-assets/folder-art.zip; ignored locally and
 by root policy. Preserve during cleanup; attach it on all future kernel releases,
 including owner system icons. SHA256 b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5.
 prepare-folder-art.py --check passes. Do not re-add the binary to the repository.
+
+## 2026-11-16 — SuperFW Build603 integration
+
+Merged the SuperFW lane normally after clean SD/Lite/Chis Build603 and full
+local verifier plus hosted43780888958 passed. Candidate sourcef28de96b and
+project validation report retain hardware/runtime limits; owner Chis image is
+in hardware-test. Portable plugin ABI, shared settings/recents and presentation
+work remain confined to superfw/. No other card driver changed. Full DE parity
+is ongoing. Owner folder artwork stays ignored in .release-assets/folder-art.zip;
+preserve and attach on future releases. Sync hardware lanes normally after this
+integration; do not reset/force-push.
