@@ -50,3 +50,22 @@ No new hardware candidate or release is implied by these focused checks.
 Game Gear (`.gg`) aliases the `sms` plugin key, so it uses the same emulator as
 `.sms` while keeping its original filename, native GG mode flags and Game Gear
 icon. See GAME-GEAR.md for icon credits and two-character save-name coverage.
+
+## Build618 hardware follow-up
+
+The owner reports NES, GB, GBC and NGPC plugins launch on Chis; GG freezes white,
+SMS reaches a black screen with an accessible emulator menu, and PCE does not
+load. These observations do not qualify gameplay or saves. SMSAdvance and
+PCEAdvance in the existing pack both reset WAITCNT to `0x14` during startup,
+which is too fast for SuperCard cartridge SDRAM. The loader now recognizes the
+complete ARM MOV/LDR/STRH sequence and its WAITCNT literal, replacing just the
+MOV value with `0x4000` (default cartridge waits and prefetch). No SD plugin is
+modified, and game bytes are never scanned or patched. This applies to recognized
+uncompressed BIN/GBA/MB startup code; MBZ timing adaptation remains unsupported.
+
+The owner also reports a crash on emulator Exit. These plugins' cart reset
+routines do not provide a verified return to SuperFW, particularly a chain-loaded
+copy. This remains a separate compatibility issue; the startup timing correction
+does not claim to fix Exit. Power cycling remains the available return method.
+Upstream SuperFW already documents a WAITCNT-patched bundled PCEAdvance in
+`emu/README.md`; the timing correction follows that hardware requirement.

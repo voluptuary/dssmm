@@ -643,3 +643,29 @@ actual-DMA mGBA checks pass. Delivered new Chis618 hardware-test, manifest/guide
 legacy data follow-ups plus lossless DMA backgrounds/error recovery. SD has1536B
 headroom; no raised limits/new buffers. Physical qualification/parity incomplete;
 continue caption/font/menu/dialog/performance work autonomously.
+
+Corrected a manual prototype-counter transcription: LZ BG700922, not790922;
+exact font-glyph comparison resolves a black panel-border overlap. RLE BG gain
+~56%, total~30%. Historical notes retained with correction. Timing rectangle
+clears before printing and exact-glyph reader added. Private IWRAM hot-code
+prototype shows further improvement; not firmware-qualified or adopted yet.
+
+Owner618 follow-up underway: identified SMS/PCE startup WAITCNT=0x14, added
+validated-chain safe timing correction; physical exit still unqualified. Single
+RECENT.TXT replaces private sidecar after successful commit. Unified prefs already
+existed; exhaustive roundtrip found/fixed artwork-Off carousel ambiguity with
+namespaced field. Other reported persistence loss not yet reproduced. Four-key
+unlock/rootB/opaque Help-System-flash panels/compact rows/gear/caption edits need
+clean all3/full gates before next candidate;618 stays frozen. See HANDOFF.
+
+New native-style GG cartridge icon passes all3 sprite/lookup checks. Exact real
+SMS/PCE ARM startup replay confirms narrowly patched0x4000 write. IWRAM renderer
+placement passes12 actual mGBA source-pixel/guard scenes; synthetic total~41%
+lower vs prior run-fill, not physical FPS. Next candidate/Test5 publication
+explicitly authorized with folder-art.zip; freeze and full all3 gates next.
+
+623 full/hosted43868144493 stopped at Lite's enforced16KiB stack reserve after
+hot-code relocation. No candidate distributed. Cold576B settings text cache now
+moves to EWRAM; minimum stack unchanged. New full-all3 gates required. After
+Test5 publication owner requests adversarial cleanup/correctness/performance
+audit, then continued porting; do not mix audit into release source.

@@ -9,22 +9,24 @@ int main(void){char tmp[]="/tmp/dssmm-recents-XXXXXX";assert(mkdtemp(tmp));strcp
  for(unsigned i=0;i<20;i++){char name[256];snprintf(name,sizeof(name),"/Game Boy Advance/%u/Game (USA) %u.gba",i,i);count=insert_recent_fn(entries,count,name,FLAG_RECENT_SD);}
  assert(count==20);count=insert_recent_fn(entries,count,"/NOR Game.gba",FLAG_RECENT_NOR);assert(count==21);
  assert(recent_flush(entries,count));
- char text[10000];read_file(RECENT_FILEPATH,text,sizeof(text));assert(!strstr(text,"nor:"));
- assert(!strncmp(text,"/Game Boy Advance/19/",21));unsigned lines=0;for(char *p=text;*p;p++)lines+=*p=='\n';assert(lines==10);
+ char text[10000];read_file(RECENT_FILEPATH,text,sizeof(text));assert(!strncmp(text,"nor:/NOR Game.gba\n",17));
+ assert(f_stat(PRIVATE_RECENT_FILEPATH,0)==FR_NO_FILE);
  unsigned n=recent_load_merged(loaded,scratch);assert(n==21&&!strcmp(loaded[0].fpath,"/NOR Game.gba")&&loaded[0].flags==FLAG_RECENT_NOR);
+ /* A previous build's sidecar is merged behind canonical entries. */
+ write_file(PRIVATE_RECENT_FILEPATH,text);
  write_file(RECENT_FILEPATH,"/External (Europe).gba\r\n/Game Boy Advance/19/Game (USA) 19.gba\r\n");
  n=recent_load_merged(loaded,scratch);assert(n==22&&!strcmp(loaded[0].fpath,"/External (Europe).gba"));
  assert(!strcmp(loaded[1].fpath,"/Game Boy Advance/19/Game (USA) 19.gba"));
- assert(recent_flush(loaded,n));read_file(RECENT_FILEPATH,text,sizeof(text));assert(!strstr(text,"nor:")&&!strchr(text,'\r'));
- unsigned same=insert_recent_fn(loaded,n,"/External (Europe).gba",FLAG_RECENT_SD);assert(same==n&&!strcmp(loaded[0].fpath,"/External (Europe).gba"));
- char before[10000];read_file(PRIVATE_RECENT_FILEPATH,before,sizeof(before));
+ char before[10000];read_file(RECENT_FILEPATH,before,sizeof(before));
  short_write=1;assert(!recent_flush(loaded,n));short_write=0;
- read_file(PRIVATE_RECENT_FILEPATH,text,sizeof(text));assert(!strcmp(text,before));
- assert(f_rename(PRIVATE_RECENT_FILEPATH,PRIVATE_RECENT_FILEPATH ".bak")==FR_OK);
+ read_file(RECENT_FILEPATH,text,sizeof(text));assert(!strcmp(text,before));assert(f_stat(PRIVATE_RECENT_FILEPATH,0)==FR_OK);
+ assert(recent_flush(loaded,n));assert(f_stat(PRIVATE_RECENT_FILEPATH,0)==FR_NO_FILE);
+ read_file(RECENT_FILEPATH,text,sizeof(text));assert(strstr(text,"nor:")&&!strchr(text,'\r'));
+ unsigned same=insert_recent_fn(loaded,n,"/External (Europe).gba",FLAG_RECENT_SD);assert(same==n&&!strcmp(loaded[0].fpath,"/External (Europe).gba"));
+ assert(f_rename(RECENT_FILEPATH,RECENT_FILEPATH ".bak")==FR_OK);
  assert(recent_load_merged(loaded,scratch)==n);
  for(unsigned i=0;i<8;i++)assert(!handles[i]);
- f_unlink(PRIVATE_RECENT_FILEPATH ".tmp");
- assert(f_unlink(RECENT_FILEPATH)==FR_OK);assert(f_unlink(PRIVATE_RECENT_FILEPATH)==FR_OK);
+ assert(f_unlink(RECENT_FILEPATH)==FR_OK);
  char q[1024];path(q,"/SYSTEM");assert(!rmdir(q));assert(!rmdir(root));
- puts("Recent writes create SYSTEM, portable SD newest-first10, private NOR history, DE reorder/CRLF and failures passed.");
+ puts("Recent writes create SYSTEM, single-file SD/NOR history, legacy migration, CRLF, recovery and failed-write preservation passed.");
 }

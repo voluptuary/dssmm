@@ -16,7 +16,7 @@ A complete SD/Lite/Chis firmware size check is required; resource-only compariso
 is not proof that the firmware fits.
 
 In the same mGBA0.10.1 synthetic vertical scene, a component-timed prototype
-measured background790922→310810cycles (about61% less), with artwork502309cycles
+measured background700922→310810cycles (about56% less), with artwork502309cycles
 unchanged. Total redraw1296968→906856cycles (about30% less). These are ROM-fixture
 measurements, not physical flash-card/kernel FPS: the fixture lacks the firmware's
 selected-art hot cache and idle-page reuse, and code/art memory mapping differs.
@@ -50,3 +50,13 @@ all non-UI pixels. The previous heuristic could mistake richer gray DS backgroun
 for artwork. PNG decoding is shared by both screenshot harnesses; no Pillow or
 other new package dependency is needed. Emulator package and flags remain stock;
 keep any private BIOS outside the repository and release assets.
+
+## Internal-RAM hot functions
+
+The background run decoder and clipped artwork scaler now use the existing
+`IWRAM_CODE` placement, with no new image buffer. In the same explicit Light,
+DSSMM-font, vertical fixture the counters are BG184241, Art254317 and All532310
+cycles, compared with the previous run-fill fixture's 310810/502309/906856.
+This is about41% less total fixture time, not a measured physical firmware FPS.
+All12 actual mGBA background pixel/guard comparisons pass. Production linked
+IWRAM/stack and all3 flash limits must also pass before distributing a build.

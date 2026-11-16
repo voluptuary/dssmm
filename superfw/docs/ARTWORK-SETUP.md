@@ -35,7 +35,7 @@ For Custom output, place the files at `SYSTEM/IMGS/CUSTOM/Game Boy game (USA).bm
 
 ## Show artwork in SuperFW
 
-Safely eject the SD card and start any current DSSMM SuperFW build. Title artwork and the DSSMM Light theme are the defaults on Chis, SuperCard SD and SuperCard Lite. An older unversioned UI configuration migrates from the former native defaults; settings saved by Test 2 or newer keep their explicit theme and artwork choices. To choose a mode yourself, open **UI settings → Artwork**, press Left/Right to select **List**, **Title** or **Box**, then choose **Save**. In the SD browser, **Start** also cycles those three modes. Recent and NOR views do not show artwork in this prototype.
+Safely eject the SD card and start any current DSSMM SuperFW build. Title artwork and the DSSMM Light theme are the defaults on Chis, SuperCard SD and SuperCard Lite. An older unversioned UI configuration migrates from the former native defaults; settings saved by Test 2 or newer keep their explicit theme and artwork choices. To choose a mode yourself, open **Settings → Interface → Artwork**, press Left/Right to select **List**, **Title** or **Box**, then leave the submenu to save. In the SD browser, **Start** opens the Start screen. Recent and NOR views do not show artwork in this prototype.
 
 If the panel is blank, check the selected mode, image size, exact name, folder paths and that you copied the pack inside SYSTEM. Moving a ROM requires moving its mirrored artwork folder too. Renaming a ROM does not affect an EZ-FLASH game-code image, but filename-matched DSSCC artwork must keep the same base name. Leave and re-enter the folder, or cycle the artwork mode, to retry a cached miss. No extension-wide default artwork is supported yet. Generated transparency is supported, but colors are reduced to fit this early menu renderer. Please report visual or scrolling problems when testing on hardware.
 
@@ -56,3 +56,8 @@ The optional [letter-folder pack](LETTER-FOLDER-ART.md) provides transparent clo
 folders for # and A–Z in Title120×80 and Box80×80. Merge its SYSTEM folder onto
 the card. CUSTOM folder names match globally: E.bmp applies to every directory
 named E, regardless of parent. Keep your own matching CUSTOM files if preferred.
+
+Published releases include `folder-art.zip`: extract it at the SD card root and
+merge its `SYSTEM` folder. Preserve your own same-named CUSTOM pictures if you
+prefer them. Title letter art uses the original 80×80 folder on a transparent
+120×80 canvas, without stretching; Box stays 80×80.

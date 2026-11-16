@@ -1580,7 +1580,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       dma_memset16(&frame[240 * 16],dup8(BG_COLOR),240*(144-16)/2);
   } else {
     unsigned tx = vertical ? 98 : 40, ty = vertical ? 85 : 122;
-    unsigned tw = vertical ? 136 : 162;
+    unsigned tw = vertical ? 136 : 160;
     if(menu_theme>=THEME_DSSMM_LIGHT)dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,tx,ty,tw,16);
     else for (unsigned row = 0; row < 16; ++row)
       dma_memset16(frame + (ty+row)*240 + tx, dup8(BG_COLOR), tw/2);
@@ -1677,7 +1677,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       draw_text_ovf_rotate(shown, frame, 98, 85,
                            136, &smenu.anim_state);
     else
-      draw_text_ovf_rotate(shown, frame, 40, 122, 162, &smenu.anim_state);
+      draw_text_ovf_rotate(shown, frame, 40, 122, 160, &smenu.anim_state);
   }
 
   if(menu_theme<THEME_DSSMM_LIGHT) {
@@ -1700,8 +1700,8 @@ void render_browser(volatile uint8_t *frame) {
 #pragma GCC optimize ("Os")
 
 void render_fw_flash_popup(volatile uint8_t *frame) {
-  // Render a box to give a pop-up feeling
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  // Opaque notification panel hides the browser underneath.
+  draw_box_full(frame, 2, 240-2, 18, 158, FT_COLOR, BG_COLOR);
 
   draw_central_text(msgs[lang_id][MSG_FWUPD_MENU], frame, 120, 30);
 
@@ -2261,6 +2261,7 @@ void render_ui_settings(volatile uint8_t *frame) {
 }
 
 void render_info(volatile uint8_t *frame) {
+  if(menu_theme>=THEME_DSSMM_LIGHT)draw_box_full(frame,2,238,18,158,FT_COLOR,BG_COLOR);
   uint32_t vmaj = VERSION_WORD >> 16;
   uint32_t vmin = VERSION_WORD & 0xFFFF;
   char tmp[64], tmp2[32];
@@ -2322,13 +2323,16 @@ void render_info(volatile uint8_t *frame) {
 }
 
 void render_tools(volatile uint8_t *frame) {
-  if (menu_theme >= THEME_DSSMM_LIGHT)
-    draw_menu_selection(frame, 26 + 22*smenu.tools.selector, 18, 236);
+  unsigned pitch=menu_theme<THEME_DSSMM_LIGHT?22:menu_font==FONT_STYLE_DSSMM?14:18;
+  if (menu_theme >= THEME_DSSMM_LIGHT) {
+    draw_box_full(frame,2,238,18,158,FT_COLOR,BG_COLOR);
+    draw_menu_selection(frame, 26 + pitch*smenu.tools.selector, 18, 236);
+  }
   for (unsigned i = 0; i < ToolsMAX; i++)
-    draw_text_ovf(msgs[lang_id][MSG_TOOLS0_SDRAM + i], frame, 22, 26 + 22 * i, 206);
+    draw_text_ovf(msgs[lang_id][MSG_TOOLS0_SDRAM + i], frame, 22, 26 + pitch * i, 206);
 
   smenu.anim_state = (smenu.anim_state + 1) & 255;
-  draw_central_text("▸", frame, 11 + (smenu.anim_state >> 6), 26 + 22 * smenu.tools.selector);
+  draw_central_text("▸", frame, 11 + (smenu.anim_state >> 6), 26 + pitch * smenu.tools.selector);
 
   if (menu_theme < THEME_DSSMM_LIGHT)
     for (unsigned i = 0; i < 240; i += 16)
@@ -2420,7 +2424,7 @@ static void render_start(volatile uint8_t *frame) {
 #else
   draw_central_text("Recents",frame,168,106);
 #endif
-  const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{111,142,20,16}};
+  const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{109,142,23,16}};
   const unsigned *box=boxes[launcher_selected<4?launcher_selected:0];
   if(launcher_selected<4)launcher_corners(frame,box[0],box[1],box[2],box[3]);
 }
@@ -2512,7 +2516,7 @@ void menu_render(unsigned fcnt) {
         dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,144);
       else {
         unsigned kind=smenu.menu_tab==MENUTAB_ROMBROWSE?(browser_view==2?DSSMM_BG_VERTICAL:DSSMM_BG_HORIZONTAL):
-                      smenu.menu_tab==MENUTAB_INFO?DSSMM_BG_HELP:DSSMM_BG_GRID;
+                      DSSMM_BG_GRID;
         dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,kind);
         dma_memset16(frame,dup8(FG_COLOR),240*16/2);
       }
@@ -3842,6 +3846,7 @@ void menu_keypress(unsigned newkeys) {
 #ifdef SUPPORT_NORGAMES
       if((newkeys&KEY_BUTTB) && smenu.menu_tab==MENUTAB_NORBROWSE){launcher_page=1;launcher_selected=launcher_browser_panel=2;return;}
 #endif
+      if((newkeys&KEY_BUTTB) && smenu.menu_tab==MENUTAB_ROMBROWSE && !strcmp(smenu.browser.cpath,"/")){launcher_page=1;launcher_selected=launcher_browser_panel=1;return;}
       if((newkeys&KEY_BUTTB) && smenu.menu_tab>=MENUTAB_SETTINGS){launcher_page=2;return;}
     }
     // Menu change via trigger buttons
