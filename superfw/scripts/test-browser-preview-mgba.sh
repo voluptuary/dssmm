@@ -64,7 +64,7 @@ pixels = Counter(tuple(row[i:i + 3]) for row in rows for i in range(0, stride, 3
 # Actual BMP quantization uses the six-level RGB cube. Neutral DS backgrounds
 # must never count as artwork merely because they contain many gray shades.
 art_pixels=artwork_pixel_count(rows)
-if os.environ.get("PREVIEW_SCREEN") in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"):
+if os.environ.get("PREVIEW_SCREEN") in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"):
     background=tuple(rows[80][-3:])
     text_pixels = sum(tuple(row[i:i+3]) != background for row in rows[20:140] for i in range(0,stride,3))
     if text_pixels < 200: raise SystemExit("Menu text missing")

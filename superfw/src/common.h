@@ -258,6 +258,7 @@ struct struct_t_patch;
 #define ERR_NO_PAYLOAD_SPACE    0x3
 #define ERR_LOAD_NOEMU          0x4
 #define ERR_FLASH_OP            0x5
+#define ERR_LOAD_RESTART        0x6  // Cartridge resources changed; menu cannot resume.
 
 // Prepares the save game files, readin and writing files in some cases.
 unsigned prepare_savegame(t_sram_load_policy loadp, t_sram_save_policy savep, EnumSavetype stype, t_dirsave_info *dsinfo, const char *savefn);

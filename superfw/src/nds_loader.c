@@ -112,16 +112,12 @@ bool validate_nds_header(const t_nds_header *header) {
 //  - Patching the provided DLDI driver (if any)
 // Returns error if the NDS file doesn't exist, looks invalid in any way, etc.
 
-unsigned load_nds(const char *filename, const void *dldi_driver) {
-  FIL fd;
-  FRESULT res = f_open(&fd, filename, FA_READ);
-  if (res != FR_OK)
-    return ERR_FILE_ACCESS;
+static unsigned load_nds_file(FIL *fd, const void *dldi_driver) {
 
   // Read header directly to its RAM destination.
   t_nds_header *hdr = (t_nds_header*)NDS_HEADER_ADDR;
   UINT rdbytes;
-  if (FR_OK != f_read(&fd, hdr, sizeof(*hdr), &rdbytes) || rdbytes != sizeof(*hdr))
+  if (FR_OK != f_read(fd, hdr, sizeof(*hdr), &rdbytes) || rdbytes != sizeof(*hdr))
     return ERR_FILE_ACCESS;
 
   // Disable header check, many homebrew do not follow the header format.
@@ -132,7 +128,11 @@ unsigned load_nds(const char *filename, const void *dldi_driver) {
   bool arm7_on_wram = (hdr->arm7_entrypoint >> 24) == 3;
 
   const t_dldi_driver *driver = (t_dldi_driver*)dldi_driver;
-  const unsigned driver_size = (1 << driver->h.req_size);
+  unsigned driver_size = 0;
+  if (driver) {
+    if (driver->h.req_size >= 32) return ERR_NDS_BADHEADER;
+    driver_size = 1u << driver->h.req_size;
+  }
 
   // ARM9 size, addresses and entrypoint
   if (hdr->arm9_load_size > MAINRAM_MAX_PAYLOAD)
@@ -171,9 +171,9 @@ unsigned load_nds(const char *filename, const void *dldi_driver) {
   // begining of the main ram, then move it to VRAM-D. The ARM7 knows how to copy it if needed.
   uint8_t *arm7_addr = arm7_on_wram ? (uint8_t*)((uintptr_t)MAINRAM_TMP_WRAM7_ADDR) :
                                       (uint8_t*)((uintptr_t)hdr->arm7_load_addr);
-  if (FR_OK != f_lseek(&fd, hdr->arm7_rom_offset))
+  if (FR_OK != f_lseek(fd, hdr->arm7_rom_offset))
     return ERR_FILE_ACCESS;
-  if (FR_OK != f_read(&fd, arm7_addr, hdr->arm7_load_size, &rdbytes) ||
+  if (FR_OK != f_read(fd, arm7_addr, hdr->arm7_load_size, &rdbytes) ||
                       rdbytes != hdr->arm7_load_size)
     return ERR_FILE_ACCESS;
 
@@ -198,13 +198,12 @@ unsigned load_nds(const char *filename, const void *dldi_driver) {
 
   // Proceed to load the arm9 payload now
   uint8_t *arm9_addr = (uint8_t*)((uintptr_t)hdr->arm9_load_addr);
-  if (FR_OK != f_lseek(&fd, hdr->arm9_rom_offset))
+  if (FR_OK != f_lseek(fd, hdr->arm9_rom_offset))
     return ERR_FILE_ACCESS;
-  if (FR_OK != f_read(&fd, arm9_addr, hdr->arm9_load_size, &rdbytes) ||
+  if (FR_OK != f_read(fd, arm9_addr, hdr->arm9_load_size, &rdbytes) ||
                       rdbytes != hdr->arm9_load_size)
     return ERR_FILE_ACCESS;
 
-  f_close(&fd);
 
   if (dldi_driver) {
     // Find patching points in the ARM9 payload
@@ -225,3 +224,12 @@ unsigned load_nds(const char *filename, const void *dldi_driver) {
   return 0;
 }
 
+
+/* Keep one owner for the handle, including every validation/read failure. */
+unsigned load_nds(const char *filename, const void *dldi_driver) {
+  FIL file;
+  if (f_open(&file, filename, FA_READ) != FR_OK) return ERR_FILE_ACCESS;
+  unsigned result = load_nds_file(&file, dldi_driver);
+  FRESULT closed = f_close(&file);
+  return result ? result : closed == FR_OK ? 0 : ERR_FILE_ACCESS;
+}

@@ -1,0 +1,53 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 632,
+  "boards": [
+    {
+      "source_tree_sha256": "af16d99ae53c1cf16d55a7b3ea691329470dac0dc22ac5ac9a832fbd0f4cc90f",
+      "board": "sd",
+      "dssmm_build": 632,
+      "source_commit": "c22ac3a83fed6cc4b764ea2f36afee8669c7ceaf",
+      "source_dirty": false,
+      "firmware_sha256": "cac72e65f851668cf2cb7358148ebd1593ed863537a8f0fd2dca40f12c8ea4de",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 519680,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 4608
+    },
+    {
+      "source_tree_sha256": "af16d99ae53c1cf16d55a7b3ea691329470dac0dc22ac5ac9a832fbd0f4cc90f",
+      "board": "lite",
+      "dssmm_build": 632,
+      "source_commit": "c22ac3a83fed6cc4b764ea2f36afee8669c7ceaf",
+      "source_dirty": false,
+      "firmware_sha256": "ee358feb6c3921a3ebfb925a60e38a72a4f0ce63988660559dbfdc36c0042eb4",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 487424,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 20480
+    },
+    {
+      "source_tree_sha256": "af16d99ae53c1cf16d55a7b3ea691329470dac0dc22ac5ac9a832fbd0f4cc90f",
+      "board": "chis",
+      "dssmm_build": 632,
+      "source_commit": "c22ac3a83fed6cc4b764ea2f36afee8669c7ceaf",
+      "source_dirty": false,
+      "firmware_sha256": "aa824816565c4fc64d33778d9375e1fe6a6356e01e8e66a1bf0b18b8688db9b5",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43874378364",
+    "conclusion": "success"
+  },
+  "checks": [
+    "Full local all3 verifier with native IGM ARM replay passed",
+    "Host sanitizer/oracle/fault tests passed, including new scanner windows/capacity and NDS optional-driver cleanup",
+    "All10 active background host/ARM/mGBA source pixels and guards passed",
+    "All3 identities/hashes/size/header/full-image seals passed"
+  ],
+  "limitations": "Synthetic tests only; no new physical validation. Audit continues on IGM sizing and GBA failure recovery. Test5 release remains frozen624."
+}

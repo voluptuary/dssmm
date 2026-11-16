@@ -2131,3 +2131,15 @@ setup; no emulator/package/BIOS change. Project owner now requests adversarial
 correctness/optimization/cleanup audit before further parity work; keep it under
 superfw/. Keep Chis624 hardware-test and private BIOS/scratch/archive. Sync lanes
 normally after checkpoint; no reset/force. No full parity/physical qualification.
+
+SuperFW Test6 (Build640/source4a85efb8) is published and downloaded byte-verified:
+Chis/SD/Lite + retained full folder-art.zip. Full local/all3/nativeIGM, hardwareCI
+43978497350 and all4 integration43979085712 passed. Normal code merge2ca3782;
+exact Test5/other-lane archivec55ba49 pushed before retention pruning. Test5 tag
+retained; BLUE/OMEGA/DE metadata/assets unchanged, DEv8.4.0stilllatest. Root README
+and projects.json now point to Test6/source640. Project publicationJSON holds
+releaseid/hash/metadata evidence; hardware-test Chis640 remains local candidate.
+Help preview screen16 and panel/FatFs fixtures documented local-development; no
+mGBA package/flags/BIOS setup change. Finish normal five-lane sync and verifyremote
+refs. Project-only continuation: unresolved physical settings/PCE/Exit/NORcarousel/
+DE parity. Preserve privateBIOS/session scratch/fullZIP/ownerdevcontainerlock.

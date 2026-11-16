@@ -18,7 +18,7 @@ static unsigned REG_WAITCNT;
 static bool use_fastew=false;
 typedef void(*progress_fn)(unsigned,unsigned);
 static int missing=0,fail_read=0,short_read=0,close_error=0,opens=0,closes=0;
-static unsigned available_plugins=1;
+static unsigned available_plugins=1,expected_mode;
 FRESULT f_stat(const TCHAR *path,FILINFO *info) {
   const char *suffix=strrchr(path,'.');unsigned bit=!strcmp(suffix,".bin")?1:!strcmp(suffix,".gba")?2:!strcmp(suffix,".mb")?4:8;
   if(!(available_plugins&bit))return FR_NO_FILE;
@@ -28,7 +28,10 @@ FRESULT f_stat(const TCHAR *path,FILINFO *info) {
 static uint32_t ps=257,fs=8193,abi[24];static jmp_buf launched;
 FRESULT f_open(FIL *f,const TCHAR *path,BYTE mode) {
   (void)mode;opens++;
-  if(strstr(path,"/PLUG/") && (missing || !strstr(path,".bin")))return FR_NO_FILE;
+  if(strstr(path,"/PLUG/")) {
+    const char *suffix=strrchr(path,'.');unsigned bit=!strcmp(suffix,".bin")?1:!strcmp(suffix,".gba")?2:!strcmp(suffix,".mb")?4:8;
+    if(missing || !(available_plugins&bit))return FR_NO_FILE;
+  }
   memset(f,0,sizeof(*f));f->obj.objsize=strstr(path,"/PLUG/")?ps:fs;return FR_OK;
 }
 FRESULT f_read(FIL *f,void *buf,UINT n,UINT *got) {
@@ -46,7 +49,7 @@ static void rom_copy_write16(void *dst,const void *src,unsigned n) {
   memcpy(dst,src,n);
 }
 static void memcpy32(void *dst,const void *src,unsigned n){assert(dst==(void*)0x0203fbf8);assert(n==96);memcpy(abi,src,n);}
-void launch_pogo_reset(bool fast,unsigned mode,unsigned size){assert(!fast && !mode && size==ps);longjmp(launched,1);}
+void launch_pogo_reset(bool fast,unsigned mode,unsigned size){assert(!fast && mode==expected_mode && size==(mode==1?(ps+3)&~3u:ps));longjmp(launched,1);}
 #include "pogo-loader-under-test.h"
 int main(void) {
   char resolved[64];
@@ -103,6 +106,11 @@ int main(void) {
   assert(cartridge[fo+fs]==0&&cartridge[fo+fs+3]==0xcc);
   uint32_t *loaded=(uint32_t*)(cartridge+to);
   assert(loaded[0]==0xfab0babe&&loaded[20]==fs&&loaded[21]+0x08008008==abi[1]);
+  /* Raw MB tail is already zero-filled; reset must copy its padded word. */
+  available_plugins=4;expected_mode=1;
+  if(!setjmp(launched)){load_pogo_plugin("/Game.PCE",fs,NULL);assert(0);}
+  assert(cartridge[ps]==0 && cartridge[ps+1]==0 && cartridge[ps+2]==0);
+  available_plugins=1;expected_mode=0;
   missing=1;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_NOEMU);missing=0;
   fail_read=1;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_BADROM);fail_read=0;
   short_read=1;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_BADROM);short_read=0;

@@ -1,0 +1,55 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 640,
+  "boards": [
+    {
+      "source_tree_sha256": "990fb967e35c4b5201d0e5d4d8c73c102db46ade04a306c8dd411bc2c3d96936",
+      "board": "sd",
+      "dssmm_build": 640,
+      "source_commit": "4a85efb8d8e35e66259d89be133890fb458d4e36",
+      "source_dirty": false,
+      "firmware_sha256": "3f6394d81c03901e88760b9abe3d84a1a59bd47665b4a2838049ff5dd3be0d35",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 520704,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 3584
+    },
+    {
+      "source_tree_sha256": "990fb967e35c4b5201d0e5d4d8c73c102db46ade04a306c8dd411bc2c3d96936",
+      "board": "lite",
+      "dssmm_build": 640,
+      "source_commit": "4a85efb8d8e35e66259d89be133890fb458d4e36",
+      "source_dirty": false,
+      "firmware_sha256": "4e1cd13c734a02152bd01ce1900aa60640ba5a76b3807fdac996e030556f623e",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 488448,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 19456
+    },
+    {
+      "source_tree_sha256": "990fb967e35c4b5201d0e5d4d8c73c102db46ade04a306c8dd411bc2c3d96936",
+      "board": "chis",
+      "dssmm_build": 640,
+      "source_commit": "4a85efb8d8e35e66259d89be133890fb458d4e36",
+      "source_dirty": false,
+      "firmware_sha256": "3a8ffcd5baf1661462631ce21912660db0a3d04cada14d0e6b8f4bd42916c405",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43978497350",
+    "conclusion": "success"
+  },
+  "checks": [
+    "Full clean all3 verifier including native IGM ARM replay passed",
+    "Canonical-only settings: conflicting UI/US sidecars ignored, all3 roundtrips, corrupt-save rollback and actual FAT16/FAT32 remount90 UI combinations each passed",
+    "Generated lined panels match original Settings right-panel pixels and preserve headers/guards",
+    "Actual mGBA0.10.1 Help/ROM/System previews reviewed; Chis native ARM syntax passed",
+    "Raw MB padded-size, revised GG icon/native palette and Start marker guard checks passed",
+    "All3 source/number/hash/size/header/full-image seal integrity passed"
+  ],
+  "limitations": "No new physical validation. Reported powercycle settings loss/PCE loading/GG-SMS Exit still require hardware confirmation; NOR carousel/full parity unfinished."
+}

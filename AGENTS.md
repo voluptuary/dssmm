@@ -188,3 +188,15 @@ BLUE/OMEGA newest prereleases and stable DEv8.4.0 remain unchanged. Earlier Chis
 artwork/boot observations do not qualify new plugin timings, Exit, full settings
 persistence, SD/Lite physical operation or complete DE parity. Owner requests
 adversarial SuperFW audit next, then continued autonomous porting; keep624 frozen.
+
+## SuperFW Test6 integration/release checkpoint
+
+Current SuperFW prerelease is superfw-test6, Build640/source4a85efb8, with all3
+firmware assets and full folder-art.zip verified by download. HardwareCI43978497350,
+all4 integrationCI43979085712 and full local/nativeIGM checks passed. Exact prior
+Test5 metadata archived at docs/history/releases/prerelease-retention-test6.json
+before its release page/assets were removed; tags retained. Other lanes and
+stable DEv8.4.0latest unchanged. Publication record is under superfw/docs/releases/.
+Root README links/registry baseline refreshed at this validated release checkpoint.
+No new physical qualification:640 settings persistence/PCE/plugin Exit/NOR/full
+DE parity remain unconfirmed/incomplete. See project journals; continue work there.

@@ -140,7 +140,9 @@ static const char * const shared_keys[]={"Theme","Colour","Hide system files","C
 /* Cold text cache belongs in EWRAM; retain IWRAM for rendering and stack. */
 static struct {char value[64];unsigned baseline;bool long_value;} shared_values[SharedCount]
   __attribute__((section(".sbss"),aligned(4)));
-static bool shared_seen,unified_seen;
+static bool shared_seen;
+static bool settings_read_ok=true;
+bool settings_loaded_ok(void) {return settings_read_ok;}
 static int shared_view=-1;
 static unsigned shared_current(unsigned id) {
   switch(id) {
@@ -177,6 +179,7 @@ static bool settings_owned(const char *key) {
   return false;
 }
 bool save_settings(void) {
+  if (!settings_read_ok) return false;
   menu_clock_seed=launcher_clock_get();
   const char * const colors[]={"Pale Blue","Blue","Green","Orange","Purple"};
   const char * const views[]={"List","Horizontal","Vertical","List + art"};
@@ -204,7 +207,6 @@ bool save_settings(void) {
   if(n<0 || (unsigned)n>=sizeof(extra))return false;
   return settings_write_text(common,extra,settings_owned);
 }
-bool save_ui_settings(void) {return save_settings();}
 
 static void parse_settings(void *usr, const char *var, const char *value) {
   unsigned valu = parseuint(value);
@@ -322,7 +324,6 @@ static bool setting_on(const char *value) {return !strcasecmp(value,"On") || !st
 static void read_setting(const char *key,const char *value) {
   if(!strncasecmp(key,"SuperFW.",8)) {
     key+=8;
-    if(!strcmp(key,"ui_version"))unified_seen=true;
     if(!strcmp(key,"artwork_off")){artwork_disabled=setting_on(value);return;}
     if(!strcmp(key,"native_theme")) {unsigned n=parseuint(value);if(n<6)menu_theme=n;return;}
     parse_settings(0,key,value);parse_ui_settings(0,key,value);return;
@@ -346,13 +347,11 @@ static void read_setting(const char *key,const char *value) {
   }
   parse_settings(0,key,value);parse_ui_settings(0,key,value);
 }
-static void probe_setting(const char *key,const char *value) {(void)value;if(!strcasecmp(key,"SuperFW.ui_version"))unified_seen=true;}
+
 void load_settings(void) {
   ui_settings_version=0;
-  bool exists;artwork_disabled=false;unified_seen=shared_seen=false;shared_view=-1;memset(shared_values,0,sizeof(shared_values));
-  settings_read_text(SETTINGS_FILEPATH,probe_setting,&exists);
-  if(!unified_seen)settings_read_text(UISETTINGS_FILEPATH,read_setting,&exists);
-  settings_read_text(SETTINGS_FILEPATH,read_setting,&exists);
+  bool exists;artwork_disabled=false;shared_seen=false;shared_view=-1;memset(shared_values,0,sizeof(shared_values));
+  settings_read_ok=settings_read_text(SETTINGS_FILEPATH,read_setting,&exists);
   if(shared_view>=0){browser_view=shared_view==3?0:shared_view;artwork_mode=shared_view?thumbnail_preference:0;}
   else if(artwork_mode)thumbnail_preference=artwork_mode;
   if(artwork_disabled)artwork_mode=0;

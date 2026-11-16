@@ -153,7 +153,7 @@ INFILES=src/gba_ewram_crt0.S \
         src/misc.c \
         src/util.c \
         src/utf_util.c \
-        src/emu.c src/pogo_plugin.c \
+        src/emu.c src/pogo_plugin.c src/loader_layout.c \
         src/fileutil.c \
         src/asmutil.S \
         src/gbahw.c \
