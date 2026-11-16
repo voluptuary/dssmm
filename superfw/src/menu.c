@@ -638,7 +638,7 @@ static const t_patch * get_game_patch(const t_load_gba_info *info) {
 
 bool ingame_menu_avail_sdram(const t_load_gba_info *info) {
   const t_patch *p = get_game_patch(info);
-  unsigned required;
+  uint32_t required;
   t_loader_layout layout;
   if (!loader_menu_size(ingame_menu_runtime_size,font_block_size(),spop.p.load.l.cheats_size,&required) ||
       !loader_plan(info->romfs,required,0,p?p->hole_addr:0,p?p->hole_size:0,&layout))

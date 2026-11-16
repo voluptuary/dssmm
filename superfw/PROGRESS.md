@@ -720,3 +720,8 @@ now handles32MiB/no-patch, exact reads, odd-byte padding and close cleanup. Mock
 NOR control/backend tests pass without physical writes. Audit3 common loader and
 settings read diagnostics/FatFs FAT16/FAT32 remount gates added. Exploratory full
 verifier stopped before builds to include NOR fixes; clean full gates pending.
+
+First clean audit3/selector gate failed the SD compile: devkitARM uint32_t is
+unsigned long, while three helper output locals were unsigned int (host typedefs
+masked mismatch). Corrected locals to uint32_t; no firmware delivered from634.
+Rerun full clean gates on next committed source; preserve this failed result.

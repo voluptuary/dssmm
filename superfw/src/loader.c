@@ -131,7 +131,7 @@ bool load_ingame_menu(
 ) {
   const unsigned menu_size = ingame_menu_runtime_size;
   const unsigned fontsz = font_block_size();
-  unsigned required;
+  uint32_t required;
   if ((base_addr&3) || base_addr<GBA_ROM_BASE || base_addr>GBA_ROM_BASE+MAX_GBA_ROM_SIZE ||
       total_size>GBA_ROM_BASE+MAX_GBA_ROM_SIZE-base_addr ||
       !loader_menu_size(menu_size,fontsz,cheats,&required) || required>total_size)
@@ -240,7 +240,7 @@ unsigned load_gba_rom(
   if (fs<sizeof(t_rom_header) || fs>MAX_GBA_ROM_SIZE) return ERR_LOAD_BADROM;
   bool use_rtc_patches = rtcinfo != NULL;
 
-  unsigned menu_bytes=0;
+  uint32_t menu_bytes=0;
   if (ingame_menu && !loader_menu_size(ingame_menu_runtime_size,font_block_size(),cheats,&menu_bytes))
     return ERR_LOAD_MENU;
   t_loader_layout layout;
