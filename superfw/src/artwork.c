@@ -1,3 +1,4 @@
+#include "compiler.h"
 /* DSSMM artwork reader. SPDX-License-Identifier: GPL-3.0-or-later
  * Input format: voluptuary/dsscc, documented in docs/DSSCC-FORMAT-AUDIT.md.
  * Original decoder implementation; no generator source is incorporated. */
@@ -153,7 +154,7 @@ bool artwork_blit_cropped(volatile uint16_t *frame, const uint16_t *pixels,
 }
 
 /* Keep source sampling anchored to the complete rectangle when its edges clip. */
-bool artwork_blit_scaled_cropped(volatile uint16_t *frame, const uint16_t *pixels,
+IWRAM_CODE NOINLINE bool artwork_blit_scaled_cropped(volatile uint16_t *frame, const uint16_t *pixels,
                                  const artwork_info *info, int x, int y,
                                  unsigned width, unsigned height) {
   if (!frame || !pixels || !info || ((uintptr_t)frame&1) || ((uintptr_t)pixels&1) ||

@@ -12,6 +12,21 @@ bool pogo_layout(uint32_t ps,uint32_t fs,uint32_t *fo,uint32_t *to) {
   if (table>PAYLOAD_LIMIT-88) return false;
   *fo=start;*to=table;return true;
 }
+/* SMSAdvance/PCEAdvance write WAITCNT=0x14 on entry, which makes cartridge
+ * reads too fast for SuperCard SDRAM. Match the complete ARM instruction chain
+ * and its in-block literal; change only the MOV value, never the register or a
+ * guessed data constant. On-disk plugins and game bytes remain untouched. */
+bool pogo_fix_waitcnt(uint32_t *data,uint32_t size) {
+  for(unsigned i=0;i+12<=size;i+=4) {
+    unsigned n=i/4,ldr=data[n+1];
+    if(data[n]!=0xe3a00014 || (ldr&0xfffff000)!=0xe59f1000 || data[n+2]!=0xe1c100b0)continue;
+    unsigned literal=i+12+(ldr&4095);
+    if((literal&3) || literal>size-4 || data[literal/4]!=0x04000204)continue;
+    data[n]=0xe3a00901; /* mov r0,#0x4000: default waits plus prefetch */
+    return true;
+  }
+  return false;
+}
 static void short_name(char out[32],const char *name) {
   const char *base=strrchr(name,'/');base=base?base+1:name;
   size_t n=strlen(base);memset(out,0,32);
