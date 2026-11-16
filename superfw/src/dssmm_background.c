@@ -1,6 +1,9 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "dssmm_background.h"
 #include "dssmm_background_data.h"
+#ifdef __GBA__
+#include "gbahw.h"
+#endif
 #ifdef DSSMM_EXTERNAL_BACKGROUNDS
 #include "dssmm_background_offsets.h"
 extern void *font_base_addr;
@@ -58,12 +61,14 @@ void dssmm_background_draw(volatile uint8_t *frame,bool dark,unsigned kind) {
   unsigned pos=0;
   while(pos<19200) {
     if(!words--){dssmm_background_clear(frame,dark,0,0,240,160);return;}
-    unsigned token=*source++;
-    if(token<256)out[pos++]=(token&15)|((token>>4)<<8);
-    else {
-      unsigned length=(token>>11)+3,dist=(token&2047)+1;
-      if(token<2048 || dist>pos || length>19200-pos){dssmm_background_clear(frame,dark,0,0,240,160);return;}
-      while(length--){out[pos]=out[pos-dist];++pos;}
-    }
+    unsigned token=*source++,length=(token>>8)+1;
+    uint16_t value=(token&15)|((token&240)<<4);
+    if(length>19200-pos){dssmm_background_clear(frame,dark,0,0,240,160);return;}
+#ifdef __GBA__
+    if(length>=8)dma_memset16(out+pos,value,length);
+    else
+#endif
+      for(unsigned i=0;i<length;++i)out[pos+i]=value;
+    pos+=length;
   }
 }

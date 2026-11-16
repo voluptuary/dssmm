@@ -12,6 +12,14 @@ static const uint32_t empty_font[2] = {0, 0};
 void *font_base_addr = (void *)empty_font;
 volatile unsigned frame_count;
 static unsigned text_animation;
+static uint32_t profile_bg,profile_art;
+static uint32_t profile_now(void) {
+ volatile uint16_t *t=(volatile uint16_t*)0x04000100;
+ uint16_t before,after,low;
+ do {before=t[2];low=t[0];after=t[2];}while(before!=after);
+ return low|((uint32_t)after<<16);
+}
+
 
 #define REG_DISPCNT (*(volatile uint16_t *)0x04000000)
 #define REG_VCOUNT (*(volatile uint16_t *)0x04000006)
@@ -177,16 +185,20 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   if (PREVIEW_SCREEN == 1) { render_tools(frame); return; }
   if(menu_theme>=THEME_DSSMM_LIGHT) {
     dssmm_background_palette(PALETTE,menu_theme==THEME_DSSMM_DARK);
+    uint32_t began=PREVIEW_TIMING?profile_now():0;
     dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,vertical?DSSMM_BG_VERTICAL:DSSMM_BG_HORIZONTAL);
+    if(PREVIEW_TIMING)profile_bg=profile_now()-began;
     fill_rect(frame,0,0,240,16,FG_COLOR);
   }
   browser_carousel_item items[3];
   unsigned n = browser_carousel_layout(vertical, selected, 3, offset, items);
+  uint32_t began_art=PREVIEW_TIMING?profile_now():0;
   int focus = selected;
   for (unsigned i = 0; i < n; ++i) {
     card(frame, &items[i], vertical, box_mode);
     if (items[i].focused) focus = items[i].index;
   }
+  if(PREVIEW_TIMING)profile_art=profile_now()-began_art;
   draw_text_ovf_rotate(browser_fixture_names[focus], frame,
       vertical ? 98 : 40, vertical ? 85 : 122, vertical ? 136 : 162, &text_animation);
 }
@@ -270,8 +282,12 @@ int main(void) {
       timers[1] = 0; timers[3] = 0;
       uint32_t cycles = timers[0] | ((uint32_t)timers[2] << 16);
       char timing[48];
-      snprintf(timing, sizeof(timing), "Draw: %lu cycles", (unsigned long)cycles);
-      draw_text_idx8_bus16(timing, (uint8_t *)back + 144*240 + 8, 240, 0);
+      snprintf(timing,sizeof(timing),"BG %lu",(unsigned long)profile_bg);
+      draw_text_idx8_bus16(timing,(uint8_t*)back+112*240+96,240,FT_COLOR);
+      snprintf(timing,sizeof(timing),"Art %lu",(unsigned long)profile_art);
+      draw_text_idx8_bus16(timing,(uint8_t*)back+128*240+96,240,FT_COLOR);
+      snprintf(timing,sizeof(timing),"All %lu",(unsigned long)cycles);
+      draw_text_idx8_bus16(timing,(uint8_t*)back+144*240+96,240,FT_COLOR);
     }
     wait_vblank();
     REG_DISPCNT = 4 | 0x0400 | (back_page ? 0x0010 : 0);

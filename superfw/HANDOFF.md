@@ -843,3 +843,38 @@ profile-0.png. Values vary slightly and use ROM code/art, not actual firmware
 hot/page caches. Background is worth optimizing; compare a run-fill codec and
 DMA spans against all source pixels, actual mGBA hardware path and SD budget.
 Do not call these physical firmware FPS or remove the existing page/cache path.
+
+## 2026-11-16 — Measured background DMA optimization
+
+Private same-scene component timing: LZ BG790922→run-fill DMA310810cycles (~61%
+less), art502309 unchanged, total1296968→906856 (~30% less). ROM fixture only,
+not physical/kernel FPS. Adopted bounded DBR1 pair-run codec with native DMA3
+halfword fills for long spans, aligned CPU tails; no new GBA buffers/driver or
+cache/page changes. Raw blob58652 vsold18436, UPKR standard resource280401 vs
+279494 (+907bytes), rounded ext resource headroom458752. Real firmware gates
+still needed, especially SD. Read BACKGROUND-PERFORMANCE.md.
+
+All12 host source-pixel/guard and actual ARM internal/external/missing-tag checks
+pass. New optional test-background-mgba.sh compiles actual __GBA__ DMA path,
+captures12 stock0.10.1 SDL frames and compares every38400 pixels plus padding
+canaries; all pass. PNG decoder factored from existing browser script into shared
+standard-library helper (no Pillow/new package). Browser artwork proof now counts
+chromatic cube pixels, not gray backgrounds; new host tests reject all12 raw
+backgrounds as art and cover all5 PNG filters. Current browser mGBA passes with
+6142 chromatic synthetic-art pixels. Standard preview timing now has optional
+BG/art/total counters; no timer reads outside timing mode. Root standard mGBA
+setup is unchanged; add this harness method to root local-development docs at
+next normal integration. No emulator patch/private BIOS required.
+
+Next freeze and clean all3/full verifier/CI plus final mGBA checks, deliver next
+numbered Chis image including603 feedback, GG and legacy-save follow-ups.613
+stays frozen until then. Remaining DE caption/font/settings/System/Help/dialog
+parity and artwork scaling performance remain active; not100% parity.
+
+Follow-up before freezing run-fill source: failed emulator/plugin loads can have
+already overwritten SDRAM directory/cache tables. The menu now clears directory
+counts and rebuilds browser/NOR/recents plus cache state before showing an error;
+no stale cartridge pointers are reused. Native save/recent failures stop before
+loading. Actual production-handler sanitized test covers plugin/native failures
+and those early aborts. No card driver changed. This also covers legacy emulator
+load failures, not just the new portable plugin path.

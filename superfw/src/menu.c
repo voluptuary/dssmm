@@ -1000,6 +1000,16 @@ static void recent_reload() {
   smenu.recent.maxentries = recent_load_merged(sdr_state->rentries,(t_rentry*)sdr_state->scratch);
 }
 
+static void browser_reload(void);
+static void flashbrowser_reload(void);
+/* Failed loads can already have overwritten directory/cache tables in SDRAM. */
+static void recover_emu_browser(void) {
+  smenu.browser.filecount=smenu.browser.dispentries=0;
+  smenu.browser.selector=smenu.browser.seloff=0;
+  browser_invalidate_artwork();
+  browser_reload();flashbrowser_reload();recent_reload();
+}
+
 void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
   char stable_filename[MAX_FN_LEN];
   strbcpy(stable_filename,fn,sizeof(stable_filename));fn=stable_filename;
@@ -1016,6 +1026,7 @@ void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
   else {
     unsigned plugin_error=load_extemu_rom(fn,fs,&pogo_plugin_loader,loadrom_progress);
     if(plugin_error!=ERR_LOAD_NOEMU) {
+      recover_emu_browser();
       spop.alert_msg=msgs[lang_id][MSG_ERR_READ];return;
     }
     // Try to load the emu and ROM, keep trying if there's more than one emulatior option.
@@ -1027,6 +1038,7 @@ void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
         break;
       ldinfo++;
     }
+    recover_emu_browser();
     unsigned errmsg = (errcode == ERR_LOAD_NOEMU) ? MSG_ERR_NOEMU :
                                                     MSG_ERR_READ;
     spop.alert_msg = msgs[lang_id][errmsg];

@@ -620,3 +620,15 @@ names remain preferred/new default; no old files moved. Focused all3 filename
 priority/legacy-temp tests pass.613 current. Private mGBA component timing points
 to background decode as a worthwhile next optimization; ROM-fixture timing is
 not physical firmware FPS. Continue autonomous parity/performance work.
+
+Background run-fill+native DMA prototype reduces same-scene mGBA BG cost~61%,
+total~30%, with identical art cost. Adopted bounded DBR1 codec with no new buffers;
+resource-only compressed growth907bytes. All12 source/ARM/actual-DMA mGBA pixels
+and guards pass. Shared PNG reader and stronger artwork oracle avoid counting DS
+gray panels as art; host filter/background tests pass. Full image gates next;
+613 current. Physical FPS/save/runtime qualification and full parity not claimed.
+
+Failed plugin/native emulator loads now rebuild overwritten SDRAM browser/NOR/
+recent tables and invalidate artwork before showing the error. Production-handler
+sanitizer test passes; save/recent failures abort before loading. Source freeze
+and clean full-all3 validation next, including final UI/GG/legacy-save changes.
