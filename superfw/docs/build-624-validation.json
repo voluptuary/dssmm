@@ -1,0 +1,89 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 624,
+  "boards": [
+    {
+      "source_tree_sha256": "bc9856230502759de13de90408878c341869b490ab5977251a9780e5caae9307",
+      "board": "sd",
+      "dssmm_build": 624,
+      "source_commit": "a4cafcaf1da9539234c01de0a6933d0816371698",
+      "source_dirty": false,
+      "firmware_sha256": "29d70c50d01cee459c117256e4c509fd13176cf85d32b74ba4ee677159a54a24",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 523264,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 1024
+    },
+    {
+      "source_tree_sha256": "bc9856230502759de13de90408878c341869b490ab5977251a9780e5caae9307",
+      "board": "lite",
+      "dssmm_build": 624,
+      "source_commit": "a4cafcaf1da9539234c01de0a6933d0816371698",
+      "source_dirty": false,
+      "firmware_sha256": "e77015683ac146560840119ba40e142edd48548a2e5b10ab1d92ddaf3e5419e6",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 490496,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 17408
+    },
+    {
+      "source_tree_sha256": "bc9856230502759de13de90408878c341869b490ab5977251a9780e5caae9307",
+      "board": "chis",
+      "dssmm_build": 624,
+      "source_commit": "a4cafcaf1da9539234c01de0a6933d0816371698",
+      "source_dirty": false,
+      "firmware_sha256": "4c2f26673e6f2063b2ae9a87ded007d3d98dba3e9283669b447324130c3255b3",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43868556156",
+    "conclusion": "success",
+    "source_commit": "a4cafcaf1da9539234c01de0a6933d0816371698"
+  },
+  "checks": [
+    "Full make verify-superfw passed with all three clean builds and DSSMM_ARM_IGM=1 native IGM replay",
+    "All 360 theme/accent/view/artwork combinations per board save and reload through actual settings and IO code",
+    "All 12 source backgrounds match host and actual mGBA pixels with padding guards",
+    "ARM background bus/read-only-resource and plugin reset checks passed",
+    "Real supplied sms.mb/pce.mb ARM startup changes only instruction 0x1ac and writes WAITCNT 0x4000",
+    "Number/source/hash/size/header/full-image seal verified for every board",
+    "Start gear and compact System screenshots inspected in stock mGBA 0.10.1",
+    "Full owner folder-art archive checked: 27 Title canvases, unchanged Box/other entries"
+  ],
+  "gba_memory": {
+    "chis_iwram_bytes": 15208,
+    "chis_ewram_bytes": 250712,
+    "ewram_limit_bytes": 257024,
+    "chis_user_stack_bytes": 17304,
+    "minimum_user_stack_bytes": 16384,
+    "cold_shared_settings_cache_bytes": 576,
+    "shared_settings_cache": "GBA EWRAM .sbss; no cartridge byte stores"
+  },
+  "fixture_timing": {
+    "scope": "mGBA ROM fixture; not physical firmware FPS",
+    "background_cycles": 184241,
+    "artwork_cycles": 254317,
+    "total_cycles": 532310
+  },
+  "plugin_startup_replay": [
+    {
+      "plugin": "sms.mb",
+      "sha256": "221fca086ab02ad34a4950695d81d71d12454a0d9bceb9af58c1299c3e4aecb3",
+      "changed_instruction": "0x1ac",
+      "waitcnt": "0x4000",
+      "scope": "ARM timing fix and startup write, not physical gameplay/exit validation"
+    },
+    {
+      "plugin": "pce.mb",
+      "sha256": "c4b356da9dd3853b7be74af949a66a0f72ac36541fa4bf4293e7efb5bba35a60",
+      "changed_instruction": "0x1ac",
+      "waitcnt": "0x4000",
+      "scope": "ARM timing fix and startup write, not physical gameplay/exit validation"
+    }
+  ],
+  "physical_limits": "No new physical validation claimed. Owner reports earlier Chis ROM-header/filename artwork and cache improvements; SMS/GG/PCE startup changes need hardware testing, plugin Exit and broader settings persistence remain unresolved. SD/Lite physically untested."
+}

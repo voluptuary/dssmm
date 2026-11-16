@@ -28,7 +28,7 @@
 
 #pragma GCC optimize ("Os")
 
-static bool recent_flush_file(const char *path,const t_rentry *rentries,unsigned rcount,bool sd_only) {
+static bool recent_flush_file(const char *path,const t_rentry *rentries,unsigned rcount) {
   WRITE_LOG("Flushing recently played games (%d entries)", rcount);
 
   char temporary[64],backup[64];
@@ -47,10 +47,7 @@ static bool recent_flush_file(const char *path,const t_rentry *rentries,unsigned
   char tmpbuf[1024];
   tmpbuf[0] = 0;
 
-  unsigned sd_count=0;
   for (unsigned i = 0; i < rcount; i++) {
-    if(sd_only && ((rentries[i].flags&FLAG_RECENT_NOR) || rentries[i].fpath[0]!='/'))continue;
-    if(sd_only && sd_count++==10)break;
     unsigned fnlen = strlen(rentries[i].fpath);
     if (rentries[i].flags & FLAG_RECENT_NOR) {
       memcpy(&tmpbuf[coff], "nor:", 4);
@@ -96,8 +93,11 @@ static bool recent_flush_file(const char *path,const t_rentry *rentries,unsigned
 NOINLINE bool recent_flush(const t_rentry *entries,unsigned count) {
   FRESULT result=f_mkdir(SYSTEM_DIR);
   if(result!=FR_OK && result!=FR_EXIST)return false;
-  return recent_flush_file(PRIVATE_RECENT_FILEPATH,entries,count,false) &&
-         recent_flush_file(RECENT_FILEPATH,entries,count,true);
+  if(!recent_flush_file(RECENT_FILEPATH,entries,count))return false;
+  /* Retire the old sidecar only after the canonical replacement commits. */
+  f_unlink(PRIVATE_RECENT_FILEPATH);
+  f_unlink(PRIVATE_RECENT_FILEPATH ".bak");
+  return true;
 }
 
 NOINLINE unsigned insert_recent_fn(t_rentry *rentries, unsigned rcount, const char *fn, unsigned flags) {
@@ -211,15 +211,13 @@ NOINLINE unsigned recent_load(const char *fpath, t_rentry *rentries) {
 
 
 
-/* Use shared SD order when another kernel changes it, retaining older SuperFW
- * entries and private NOR names without putting nor: records in DE RECENT.TXT. */
+/* Import the old sidecar once, keeping canonical RECENT.TXT newest-first.
+ * NOR records retain their existing nor: encoding in the single history file. */
 unsigned recent_load_merged(t_rentry *entries,t_rentry *scratch) {
   unsigned count=recent_load(PRIVATE_RECENT_FILEPATH,entries);
   unsigned shared=recent_load(RECENT_FILEPATH,scratch);
   if(!count){memcpy32(entries,scratch,shared*sizeof(*entries));return shared;}
-  unsigned first_sd=0;
-  while(first_sd<count && (entries[first_sd].flags&FLAG_RECENT_NOR))++first_sd;
-  if(!shared || (first_sd<count && !strcmp(entries[first_sd].fpath,scratch[0].fpath)))return count;
+  if(!shared)return count;
   /* Reverse insertion keeps the shared newest-first order. */
   for(unsigned i=shared;i;i--)
     count=insert_recent_fn(entries,count,scratch[i-1].fpath,scratch[i-1].flags);

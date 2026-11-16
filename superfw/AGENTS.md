@@ -1,5 +1,7 @@
 # SuperFW project instructions
 
+Always work in the most token-efficient manner possible: reuse existing findings and validation evidence, read only relevant context, batch independent checks, and avoid duplicate work or unnecessary output. Preserve correctness, required testing, and clear continuation notes.
+
 This project targets SuperCard GBA flash carts and derivatives/clones. Its codebase is upstream SuperFW by davidgfnet, pinned and documented in `docs/UPSTREAM.md`. Read root `AGENTS.md` and this project's `HANDOFF.md` and `PROGRESS.md` before project work.
 
 On branch `superfw`, edit only `superfw/`, including its journals. All repository branches retain the complete shared tree; never remove other project directories. Merge this lane normally into `dssmm`, then synchronize `dssmm` back to this lane. Integrate through `dssmm`, not another hardware branch. Root build/CI/policy changes belong on `dssmm`.
@@ -155,3 +157,32 @@ actual native ARM halfword-unpacker replay. Remaining full DE background/menu/
 dialog/font alignment parity work is active. Continue autonomously with numbered
 hardware-test milestones. SD603 has only5632bytes flash headroom: optimize or move
 assets within existing budgets; never increase hardware limits.
+
+## Post618 owner corrections and next release
+
+Owner explicitly wants only SYSTEM/RECENT.TXT: new commits consolidate the legacy
+SUPERFW-RECENT sidecar after successful canonical writes. This supersedes the
+Build603 dual-history instruction above. Keep NOR's nor: records without claiming
+portable NOR history on EZ-FLASH. Unified SETTINGS.TXT is already implemented;
+version10 adds artwork_off for the carousel/Off combination common DE keys cannot
+express. Exhaustive all3 roundtrips cover all themes/accents/views/art modes;
+other owner-reported physical persistence loss is still under investigation.
+
+Use the new original SuperFW-style Game Gear cartridge icon, not the earlier DE
+handheld icon. SMS/PCE portable plugins need safe startup WAITCNT; recognize exact
+instruction/address chains, never patch guessed constants or selected game data.
+Do not claim plugin Exit works. Internal-RAM hot renderer placement requires
+linked RAM/stack, all3 flash budgets and source-pixel validation. Owner requests
+publishing the next validated hardware-test milestone as a prerelease for all3,
+with retained full .release-assets/folder-art.zip and brief extraction guidance.
+Continue normal four-section notes and per-lane prerelease retention. No physical
+SD/Lite qualification or complete DE parity is implied.
+
+Current public SuperFW prerelease is superfw-test5 (Build624/sourcea4cafcaf),
+published with three images and full folder-art.zip after all3/local and all4
+integration CI; publication record is docs/releases/superfw-test5-publication.json.
+Older Test4 release removed after exact archive, tag retained. Keep624 frozen.
+Owner requests an adversarial correctness/performance/debt audit after this
+publication, including orphan cleanup and concise useful comments/organization,
+then continued autonomous porting and numbered hardware-test builds. Broader
+settings loss/plugin Exit/SD-Lite physical validation/parity remain unresolved.

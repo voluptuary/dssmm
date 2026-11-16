@@ -2116,3 +2116,18 @@ reader/stronger artwork oracle and optional component counters documented in
 local-development.md. Synthetic ROM timing is not physical kernel FPS. Future
 changes to emulator setup/harness must update these records. Root integration
 policy tests next, then hosted all4 and normal branch synchronization.
+
+## 2026-11-16 — SuperFW Test5 release checkpoint
+
+Integrated hardware lane normally (31ab1e88); all4 hosted43868982790 passed.
+Test5/sourcea4cafcaf/Build624 published with Chis/SD/Lite+full folder-art.zip after
+all3/full local/nativeIGM ARM and hardwareCI43868556156. All4 downloaded assets
+match; project publication record includes exact identities/limits. Test4 page/
+assets removed after archive15858e7, tag retained; BLUE/OMEGA sole prereleases
+and stable DElatest unchanged. README now reflects actual Start/settings/artwork
+controls and current hardware limits; SuperFW snapshot baseline refreshed to the
+validated release input. New mGBA exact-glyph timing reader uses existing stock
+setup; no emulator/package/BIOS change. Project owner now requests adversarial
+correctness/optimization/cleanup audit before further parity work; keep it under
+superfw/. Keep Chis624 hardware-test and private BIOS/scratch/archive. Sync lanes
+normally after checkpoint; no reset/force. No full parity/physical qualification.

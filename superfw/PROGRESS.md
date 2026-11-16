@@ -643,3 +643,42 @@ actual-DMA mGBA checks pass. Delivered new Chis618 hardware-test, manifest/guide
 legacy data follow-ups plus lossless DMA backgrounds/error recovery. SD has1536B
 headroom; no raised limits/new buffers. Physical qualification/parity incomplete;
 continue caption/font/menu/dialog/performance work autonomously.
+
+Corrected a manual prototype-counter transcription: LZ BG700922, not790922;
+exact font-glyph comparison resolves a black panel-border overlap. RLE BG gain
+~56%, total~30%. Historical notes retained with correction. Timing rectangle
+clears before printing and exact-glyph reader added. Private IWRAM hot-code
+prototype shows further improvement; not firmware-qualified or adopted yet.
+
+Owner618 follow-up underway: identified SMS/PCE startup WAITCNT=0x14, added
+validated-chain safe timing correction; physical exit still unqualified. Single
+RECENT.TXT replaces private sidecar after successful commit. Unified prefs already
+existed; exhaustive roundtrip found/fixed artwork-Off carousel ambiguity with
+namespaced field. Other reported persistence loss not yet reproduced. Four-key
+unlock/rootB/opaque Help-System-flash panels/compact rows/gear/caption edits need
+clean all3/full gates before next candidate;618 stays frozen. See HANDOFF.
+
+New native-style GG cartridge icon passes all3 sprite/lookup checks. Exact real
+SMS/PCE ARM startup replay confirms narrowly patched0x4000 write. IWRAM renderer
+placement passes12 actual mGBA source-pixel/guard scenes; synthetic total~41%
+lower vs prior run-fill, not physical FPS. Next candidate/Test5 publication
+explicitly authorized with folder-art.zip; freeze and full all3 gates next.
+
+623 full/hosted43868144493 stopped at Lite's enforced16KiB stack reserve after
+hot-code relocation. No candidate distributed. Cold576B settings text cache now
+moves to EWRAM; minimum stack unchanged. New full-all3 gates required. After
+Test5 publication owner requests adversarial cleanup/correctness/performance
+audit, then continued porting; do not mix audit into release source.
+
+624 clean all3/full local/nativeIGM-ARM and hosted43868556156 pass; exact source
+hash/package/size/seals checked, all360 UI combinations/board survive roundtrip.
+Chis624 delivered hardware-test; old618 superseded.16KiB stack minimum intact,
+Chis17304Bactual; SD1024Bflashfree. Integration31ab1e88/43868982790 before Test5
+publication; then download/retention evidence and adversarial audit. No public
+release or complete physical qualification yet.
+
+Test5 published at sourcea4cafcaf/Build624 after all3 local/hardwareCI and all4
+integrationCI pass. Chis/SD/Lite+full folder-art.zip downloaded and byte-verified;
+notes match. Test4 page/assets pruned after exact archive, tag retained; BLUE/
+OMEGA sole prereleases and stable DElatest unchanged. Evidence publicationJSON.
+Next requested adversarial source audit, then continued autonomous DE parity.
