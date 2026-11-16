@@ -885,3 +885,20 @@ mock-handler tests had provided that declaration, hiding the integration issue.
 Added the real forward declaration and made the cache test's function extractor
 skip prototypes. Focused cache/recovery tests pass. Do not count617 as a passing
 firmware build or distribute it. Freeze corrected source and rerun full gates.
+
+## 2026-11-16 — Build618 delivered after owner feedback and DMA gates
+
+Clean source4fc627ac724a1a337b43419f9ebcc86013738b3d count618: standard full local
+verifier/all3 identity/seal/source/flash/resource/RAM gates pass; hosted43790527480
+passes exact source. All3 IGM host/ELF/ARM checks and current carousel bus replay
+pass. Actual mGBA __GBA__ DMA path matches every source pixel/guard on12 scenes;
+portable/ARM decoder paths also pass. Owner603 spacing/labels/hint and GG/save
+follow-ups included. Evidence docs/build-618-validation.json. Hardware-test now
+Chis618/manifest/guide, superseding own613 while preserving tracked history.
+
+SD522752/524288 leaves1536bytes; Lite489984/507904 leaves17920; Chis1671680/2097152
+leaves425472. Main Chis IWRAM14072/EWRAM249668; native resource prefix unchanged,
+DBR1 blob58652 and rounded extended458752free. Do not add unbudgeted assets or
+raise limits. Owner603 UI evidence separate, no physical618/plugin/save/NOR write
+or firmware-FPS qualification. No public release yet. Continue DE caption/font/
+menu/dialog parity and profile remaining art cost;618 stays frozen.

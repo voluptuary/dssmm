@@ -636,3 +636,10 @@ and clean full-all3 validation next, including final UI/GG/legacy-save changes.
 617 full/hosted stopped on missing static forward declaration in recovery path;
 fixed it and the cache function extractor's prototype handling. Rerun full clean
 all3 validation;613 remains hardware-test. No failed run is reported as passed.
+
+618 source4fc627ac all3/full local/hosted43790527480 and supplementary host/ARM/
+actual-DMA mGBA checks pass. Delivered new Chis618 hardware-test, manifest/guide;
+613 history retained. Includes owner603 UI/hint, GG shared SMS+icon and save-name/
+legacy data follow-ups plus lossless DMA backgrounds/error recovery. SD has1536B
+headroom; no raised limits/new buffers. Physical qualification/parity incomplete;
+continue caption/font/menu/dialog/performance work autonomously.
