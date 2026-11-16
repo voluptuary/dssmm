@@ -9,6 +9,7 @@ import sys
 s=Path(sys.argv[1]).read_text()
 a=s.index('enum {\n  MENUTAB_RECENT');b=s.index('\n};',a)+3
 out='''#include <assert.h>
+#include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
 #define THEME_DSSMM_LIGHT 6
@@ -25,7 +26,7 @@ static unsigned menu_font=1;
 #define KEY_BUTTDOWN 128
 #define MIN(a,b) ((a)<(b)?(a):(b))
 static unsigned menu_theme=6,launcher_page=1,launcher_selected=1,launcher_category,launcher_settings_group,launcher_browser_panel=1;
-static struct {unsigned menu_tab;struct {int selector,seloff,maxentries;} recent;struct {unsigned selector;} set;} smenu;
+static struct {unsigned menu_tab;struct {int selector,seloff,maxentries;} recent;struct {unsigned selector;} set;struct {char cpath[256];} browser;} smenu;
 static unsigned recent_actions,invalidations,clock_opens,saves;
 static bool save_ok=true;
 static bool save_settings(void){++saves;return save_ok;}
@@ -98,6 +99,8 @@ int main(void) {
 #ifdef SUPPORT_NORGAMES
  launcher_page=0;smenu.menu_tab=MENUTAB_NORBROWSE;press(KEY_BUTTB);assert(launcher_page==1 && launcher_selected==2);
 #endif
+ launcher_page=0;smenu.menu_tab=MENUTAB_ROMBROWSE;strcpy(smenu.browser.cpath,"/Games/");press(KEY_BUTTB);assert(!launcher_page);
+ strcpy(smenu.browser.cpath,"/");press(KEY_BUTTB);assert(launcher_page==1 && launcher_selected==1);
  launcher_page=0;
  menu_theme=0;assert(settings_group_total()==SettMAX);
  press(KEY_BUTTSTA);assert(!launcher_page);

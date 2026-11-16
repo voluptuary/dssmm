@@ -5,13 +5,14 @@ MB and MBZ in the usual order. Without that plugin, both retain the native
 SuperFW SMS emulator fallback list. Game Gear launches keep their original `.gg`
 filename and the native GG-specific wrapper flags; they are not renamed to SMS.
 
-Game Gear entries use the existing DE Game Gear icon. SuperFW had no GG icon in
-its native file set. The exact `ezfomegade/images/icon_GG.h` 16×14 RGB555 pixels
-are retained under `assets/icons/gamegear.rgb555`, with one transparent row above
-and below for a16×16 GBA sprite. Credit DS Style / DSSMM contributors; the retained
-Apache-2.0 asset license is at `licenses/dssmm-font-apache-2.0.txt`. The generator
-appends sprite/palette entries without changing native IDs/colors and preserves
-reserved selector slot255. No foreign card driver is imported.
+Game Gear entries use original DSSMM cartridge pixel art matching SuperFW's
+small beveled cartridge icons, replacing the earlier imported DE handheld-system
+picture. The dark cartridge, recessed label and GG marking fit a transparent
+16×16 sprite. Editable pixel rows/palette and credits are recorded in
+`assets/icons/gamegear-source.json`; `gamegear.png` is a transparent preview and
+`gamegear.rgb555` supplies the firmware generator. The new art is GPL-3.0-or-later;
+upstream SuperFW icon authors retain their credits. Native sprite/palette IDs
+remain unchanged, and selector palette slot255 stays reserved.
 
 The native save-name routine strips an extension by finding the final dot, so
 both two-character GB/GG and three-character extensions are supported. Focused
@@ -32,6 +33,6 @@ validation, not physical emulator/save-cycle qualification or interchangeability
 of differing emulator state formats.
 
 Run `bash scripts/test-gamegear-icon.sh`, `bash scripts/test-pogo-plugins.sh` and
-`bash scripts/test-theme-settings.sh`. The icon test checks every imported pixel,
+`bash scripts/test-theme-settings.sh`. The icon test checks every cartridge pixel,
 transparent padding, palette/VRAM budgets and actual extension-icon lookup on all
 three variants. Plugin tests check shared GG/SMS resolution and native GG flags.

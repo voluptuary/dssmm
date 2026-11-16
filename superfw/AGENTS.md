@@ -157,3 +157,23 @@ actual native ARM halfword-unpacker replay. Remaining full DE background/menu/
 dialog/font alignment parity work is active. Continue autonomously with numbered
 hardware-test milestones. SD603 has only5632bytes flash headroom: optimize or move
 assets within existing budgets; never increase hardware limits.
+
+## Post618 owner corrections and next release
+
+Owner explicitly wants only SYSTEM/RECENT.TXT: new commits consolidate the legacy
+SUPERFW-RECENT sidecar after successful canonical writes. This supersedes the
+Build603 dual-history instruction above. Keep NOR's nor: records without claiming
+portable NOR history on EZ-FLASH. Unified SETTINGS.TXT is already implemented;
+version10 adds artwork_off for the carousel/Off combination common DE keys cannot
+express. Exhaustive all3 roundtrips cover all themes/accents/views/art modes;
+other owner-reported physical persistence loss is still under investigation.
+
+Use the new original SuperFW-style Game Gear cartridge icon, not the earlier DE
+handheld icon. SMS/PCE portable plugins need safe startup WAITCNT; recognize exact
+instruction/address chains, never patch guessed constants or selected game data.
+Do not claim plugin Exit works. Internal-RAM hot renderer placement requires
+linked RAM/stack, all3 flash budgets and source-pixel validation. Owner requests
+publishing the next validated hardware-test milestone as a prerelease for all3,
+with retained full .release-assets/folder-art.zip and brief extraction guidance.
+Continue normal four-section notes and per-lane prerelease retention. No physical
+SD/Lite qualification or complete DE parity is implied.

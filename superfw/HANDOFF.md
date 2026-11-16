@@ -902,3 +902,66 @@ DBR1 blob58652 and rounded extended458752free. Do not add unbudgeted assets or
 raise limits. Owner603 UI evidence separate, no physical618/plugin/save/NOR write
 or firmware-FPS qualification. No public release yet. Continue DE caption/font/
 menu/dialog parity and profile remaining art cost;618 stays frozen.
+
+Performance counter correction: the old LZ background was700922cycles, not790922.
+The panel's black border crossed the old debug digits and made a0 look like9.
+Matched every glyph against the actual DSSMM font while excluding that border
+row (zero glyph errors); Art502309 and All1296968 were already correct. Run-fill
+BG310810 therefore improves~56%, not61%; total906856 still improves~30%. Current
+performance guide/report618 corrected; historical journals remain intact with
+this explicit correction. Debug counters now clear their rectangle first, with
+an exact-glyph reader to avoid future manual transcription errors.
+
+Private next optimization: both hot background/scaler functions placed in IWRAM
+using existing project attributes, verified symbols at03000000/03000484 in stock
+GBA preview. Prototype BG184237/Art254309/All532283cycles, all internally consistent
+with93737other cycles. This is still ROM-fixture comparison, not physical FPS.
+Not applied to firmware yet; must inspect linked IWRAM/budgets, full pixels and
+actual bus behavior before adoption. Both standard/native linkers accept .iwram*.
+
+## 2026-11-16 — Owner618 follow-up in progress
+
+Owner physical618: GG white/frozen, SMS black but emulator menu opens; emulator
+Exit crashed. NES/GB/GBC/NGPC launch reported working. No gameplay/save or exit
+qualification inferred. SMS/PCE plugins in existing DE pack both contain ARM
+startup MOV r0,#0x14 / literal LDR r1,WAITCNT / STRH r0,[r1], resetting cartridge
+timing too fast for SuperCard SDRAM. Upstream bundled PCE explicitly has a
+WAITCNT patch (emu/README.md). New runtime correction validates entire chain
+and in-block address literal, changes MOV to #0x4000 before loading, leaves SD
+files/game bytes untouched. Raw BIN/GBA/MB only; compressed payload correction
+not claimed. Native hardware driver unchanged. Existing plugin exit code still
+assumes a different cart; safe return to chain-loaded DSSMM is unresolved.
+
+Owner wants one RECENT.TXT: writes now commit full SD/NOR history there and only
+then retire SUPERFW-RECENT.TXT/.bak. Legacy data merged behind canonical order;
+failed replacement keeps originals. NOR uses existing nor: encoding; DE's reader
+only understands SD records (may stop at NOR), a real cross-kernel limit rather
+than another hidden sidecar. Updated real-FatFs-fixture migration/failure tests.
+
+Unified SETTINGS.TXT was already present in618. Fresh/legacy host and actual
+compiled618 ARM shared-field parsing pass. New exhaustive real save/reload test
+found carousel artwork Off was lost: common DE view/art fields cannot express
+that combination. Added namespaced artwork_off (version10), preserving standard
+common keys. All8themes*5accents*3views*3art modes tested on all3 variants. Broader
+owner accent/view/theme loss still not reproduced; do not claim all physical
+persistence fixed merely from host checks. Continue tracing actual menu routes.
+
+Owner618 UI edits: root SD B→Start, four-key Down/Up/Left/Right unlock in5sec,
+exact shorter hint; opaque framed firmware/Help/System panels without QR/carousel
+backdrop; compact System row pitch; wider gear corners x109/w23; H caption width
+160 protects panel's right border. Focused checks passing; production all3/full
+validation pending.618 remains frozen until clean new-source gates. Preserve
+user untracked devcontainer-lock and retained private BIOS/scratch/artwork ZIP.
+
+Next candidate also replaces DE handheld GG sprite with original GPL cartridge
+pixel art in the native SuperFW style (editable JSON/raw/PNG); all3 icon tests
+pass and palette growth drops35→4entries. Actual ARM correction on owner-existing
+sms.mb/pce.mb changes only instruction0x1ac and writes WAITCNT0x4000; fixture
+records hashes, no binaries copied. Optional script test-plugin-waitcnt-arm.py
+accepts a supplied plugin directory. Background/scaler now use IWRAM_CODE;
+all12 actual mGBA source pixels/guards pass and explicit Light/Font/Vertical
+fixture measures184241/254317/532310cycles vs310810/502309/906856. Not physical FPS;
+production RAM/stack/all3 budgets pending. Owner authorizes next validated
+hardware-test milestone publication as Test5, including full folder-art.zip and
+brief user setup. Canonical notes rewritten for actual accumulated changes and
+explicit unresolved persistence/Exit/physical validation limits. No release yet.

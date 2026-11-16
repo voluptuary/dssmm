@@ -187,7 +187,7 @@ en_strings = [
   "MSG_SAVOPT_MSG_WERR": "Could not write sav file!",    # alertmsg
   "MSG_REMEMB_CFG_OK": "Config saved!",                  # alertmsg
 
-  "MSG_FWUP_HOTKEY":   "Unlock: Down, Up, Left, Right, A in 5 sec",
+  "MSG_FWUP_HOTKEY":   "Unlock: Down, Up, Left, Right in 5 sec",
   "MSG_FWUP_ENABLED":  "Update flashing is enabled",
   "MSG_FWUPD_MENU": "Firmware update",
   "MSG_FWUPD_UNK":  "Unknown firmware type",

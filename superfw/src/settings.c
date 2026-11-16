@@ -62,8 +62,9 @@ uint32_t menu_clock_seed=UINT32_MAX;
 uint8_t menu_font = FONT_STYLE_NATIVE;
 uint8_t clean_list=0,hide_system_files=1,menu_clock_24=1;
 static uint8_t thumbnail_preference=1;
+static bool artwork_disabled;
 uint8_t artwork_mode = 1;
-#define UI_SETTINGS_VERSION 9
+#define UI_SETTINGS_VERSION 10
 #define UI_SETTINGS_DSSMM_DEFAULTS_VERSION 2
 static uint8_t ui_settings_version = 0;
 
@@ -165,7 +166,7 @@ static const char *language_name(void) {
     if(code==((uint8_t)language_names[i].code[0]|((uint8_t)language_names[i].code[1]<<8)))return language_names[i].name;
   return "English (US)";
 }
-static const char * const native_keys[]={"ui_version","theme","native_theme","font","clock_seconds","accent","artwork","browser_view","langcode","recent_menu","anim_speed","hide_hidden","hotkey_opt","boot_to_bios","sram_backup_count","enable_cheats","enable_slowld","enable_fastewram","enable_norwrcheck","default_patcher","default_igmenu","default_rtcpatch","default_rtctick","default_loadgame","default_savegame","prefer_directsave","default_rtcts"};
+static const char * const native_keys[]={"artwork_off","ui_version","theme","native_theme","font","clock_seconds","accent","artwork","browser_view","langcode","recent_menu","anim_speed","hide_hidden","hotkey_opt","boot_to_bios","sram_backup_count","enable_cheats","enable_slowld","enable_fastewram","enable_norwrcheck","default_patcher","default_igmenu","default_rtcpatch","default_rtctick","default_loadgame","default_savegame","prefer_directsave","default_rtcts"};
 static bool settings_owned(const char *key) {
   for(unsigned i=0;i<SharedCount;++i)if(!strcasecmp(key,shared_keys[i]))
     return !(shared_values[i].long_value && shared_current(i)==shared_values[i].baseline);
@@ -189,13 +190,13 @@ bool save_settings(void) {
   }
   char extra[1536];
   int n=npf_snprintf(extra,sizeof(extra),
-    "SuperFW.ui_version=%u\nSuperFW.native_theme=%u\nSuperFW.font=%u\nSuperFW.clock_seconds=%lu\n"
+    "SuperFW.ui_version=%u\nSuperFW.native_theme=%u\nSuperFW.font=%u\nSuperFW.artwork_off=%u\nSuperFW.clock_seconds=%lu\n"
     "SuperFW.recent_menu=%u\nSuperFW.anim_speed=%u\nSuperFW.hide_hidden=%u\n"
     "SuperFW.hotkey_opt=%u\nSuperFW.boot_to_bios=%u\nSuperFW.sram_backup_count=%u\nSuperFW.enable_cheats=%u\n"
     "SuperFW.enable_slowld=%u\nSuperFW.enable_fastewram=%u\nSuperFW.enable_norwrcheck=%u\n"
     "SuperFW.default_patcher=%u\nSuperFW.default_igmenu=%u\nSuperFW.default_rtcpatch=%u\nSuperFW.default_rtctick=%u\n"
     "SuperFW.default_loadgame=%u\nSuperFW.default_savegame=%u\nSuperFW.prefer_directsave=%u\nSuperFW.default_rtcts=%lu\n",
-    UI_SETTINGS_VERSION,menu_theme<6?menu_theme:255,menu_font,(unsigned long)menu_clock_seed,recent_menu,anim_speed,hide_hidden,
+    UI_SETTINGS_VERSION,menu_theme<6?menu_theme:255,menu_font,!artwork_mode,(unsigned long)menu_clock_seed,recent_menu,anim_speed,hide_hidden,
     hotkey_combo,boot_bios_splash,backup_sram_default,enable_cheats,use_slowld,use_fastew,use_verify_nor,
     (unsigned)patcher_default,ingamemenu_default,rtcpatch_default,rtcspeed_default,autoload_default,autosave_default,autosave_prefer_ds,(unsigned long)rtcvalue_default);
   if(n<0 || (unsigned)n>=sizeof(extra))return false;
@@ -320,6 +321,7 @@ static void read_setting(const char *key,const char *value) {
   if(!strncasecmp(key,"SuperFW.",8)) {
     key+=8;
     if(!strcmp(key,"ui_version"))unified_seen=true;
+    if(!strcmp(key,"artwork_off")){artwork_disabled=setting_on(value);return;}
     if(!strcmp(key,"native_theme")) {unsigned n=parseuint(value);if(n<6)menu_theme=n;return;}
     parse_settings(0,key,value);parse_ui_settings(0,key,value);return;
   }
@@ -345,12 +347,13 @@ static void read_setting(const char *key,const char *value) {
 static void probe_setting(const char *key,const char *value) {(void)value;if(!strcasecmp(key,"SuperFW.ui_version"))unified_seen=true;}
 void load_settings(void) {
   ui_settings_version=0;
-  bool exists;unified_seen=shared_seen=false;shared_view=-1;memset(shared_values,0,sizeof(shared_values));
+  bool exists;artwork_disabled=false;unified_seen=shared_seen=false;shared_view=-1;memset(shared_values,0,sizeof(shared_values));
   settings_read_text(SETTINGS_FILEPATH,probe_setting,&exists);
   if(!unified_seen)settings_read_text(UISETTINGS_FILEPATH,read_setting,&exists);
   settings_read_text(SETTINGS_FILEPATH,read_setting,&exists);
   if(shared_view>=0){browser_view=shared_view==3?0:shared_view;artwork_mode=shared_view?thumbnail_preference:0;}
   else if(artwork_mode)thumbnail_preference=artwork_mode;
+  if(artwork_disabled)artwork_mode=0;
   if(shared_seen)ui_settings_version=UI_SETTINGS_VERSION;else migrate_ui_settings();
   for(unsigned i=0;i<SharedCount;++i)shared_values[i].baseline=shared_current(i);
   menu_username[0]=0;FIL fd;UINT size;char name[64];

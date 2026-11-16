@@ -5,6 +5,8 @@
 #include <stdint.h>
 /* Portable Pogoshell ABI, independently implemented from the format used by
  * DSSMM/DS Style on EZ-FLASH. No EZ-FLASH storage protocol is used. */
+/* Recognized FluBBa ARM startup: retain safe SuperCard ROM wait states. */
+bool pogo_fix_waitcnt(uint32_t *data,uint32_t size);
 bool pogo_layout(uint32_t plugin_size, uint32_t file_size,
                  uint32_t *file_offset, uint32_t *table_offset);
 bool pogo_ram_valid(const uint8_t *data, uint32_t size, unsigned mode);
