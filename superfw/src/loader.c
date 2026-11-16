@@ -53,6 +53,17 @@
 
 extern bool slowsd;
 
+/* DMA3 helpers use a 16-bit halfword count. */
+static void rom_fill16(void *dst, unsigned bytes) {
+  uint8_t *out = dst;
+  while (bytes) {
+    unsigned count = MIN(bytes, LOAD_BS);
+    dma_memset16(out, 0xffff, count / 2);
+    out += count;
+    bytes -= count;
+  }
+}
+
 static void rom_write16_exact(void *dst,const void *src,unsigned size) {
   unsigned bulk=size&~31u;
   if(bulk)rom_copy_write16(dst,src,bulk);
@@ -296,7 +307,7 @@ unsigned load_gba_rom(
   if (gap_start>fs) {
     unsigned padded=(fs+3)&~3u;
     set_supercard_mode(MAPPED_SDRAM,true,false);
-    dma_memset16(ptr+padded,0xffff,(gap_start-padded)/2);
+    rom_fill16(ptr+padded,gap_start-padded);
     set_supercard_mode(MAPPED_SDRAM,true,true);
   }
   if (progress) progress(1, 1);  // Mark as complete
@@ -391,7 +402,7 @@ unsigned flash_gba_nor(
 
   t_flash_erase_state erst;
   for (uint32_t bigoff = 0; bigoff < fs; bigoff += ssize) {
-    dma_memset16(scratch, 0xffff, ssize / 2);
+    rom_fill16(scratch, ssize);
     // Start clearing the flash block we will be writing to!
     flash_erase_fsm_start(&erst, GBA_ROM_BASE_WS1 + bigoff, flashinfo.blksize, ssize / flashinfo.blksize);
 

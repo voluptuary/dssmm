@@ -738,3 +738,9 @@ distributed; hosted635 result tracked separately from final636 gates.
 removed mutation of normal Load DS/IGM options during NOR attempts; canceled or
 failed NOR writes retain the original launch configuration. Mock regression
 passes. Final637 frozen gates next;636 evidence preserved, no physical claims.
+
+638 correction chunks native fills within DMA16-bit count;2MiB NOR scratch tests
+use actual helper signature and pass.637 local run intentionally stopped, no
+637 image delivered. Owner authorizes next validated release; prepared Test6 notes
+with immediate predecessor folded into concise past summaries. Clean final gates
+and integration/publication still pending; preserve Test5/624 until replaced.

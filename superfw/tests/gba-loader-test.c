@@ -19,7 +19,7 @@ FRESULT f_lseek(FIL *f,FSIZE_t offset){return seek_error||fseek(handles[f->obj.i
 static void set_supercard_mode(unsigned area,bool write,bool read){assert(area==MAPPED_SDRAM);writable=write;sd=read;}
 void rom_copy_write16(void *dst,const void *src,unsigned size){assert(writable&&!sd&&!(size&31));memcpy(dst,src,size);}
 static void dma_memcpy32(void *dst,const void *src,unsigned words){assert(writable&&!sd);memcpy(dst,src,words*4);}
-static void dma_memset16(void *dst,uint16_t value,unsigned count){assert(writable&&!sd);uint16_t *p=dst;while(count--)*p++=value;}
+static void dma_memset16(void *dst,uint16_t value,uint16_t count){assert(writable&&!sd);uint16_t *p=dst;while(count--)*p++=value;}
 static unsigned font_block_size(void){return 696872;}
 static void savestate_filename_calc(const char *fn,char *out){(void)fn;strcpy(out,"/SYSTEM/SAVESTATE/Game");}
 static bool load_ingame_menu(uint32_t base,uint32_t space,bool useds,const char *save,const char *state,bool rtc,unsigned cheats){

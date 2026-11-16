@@ -41,7 +41,7 @@ static int f_read(FIL *f,void *buf,unsigned count,UINT *rd) {
 }
 static void set_superchis_normap(const uint8_t *map) {(void)map;mapped++;}
 static void reset_superchis_normap(void) {assert(mapped);mapped--;}
-static void dma_memset16(void *dst,unsigned value,unsigned count) {for(unsigned i=0;i<count;i++)((uint16_t*)dst)[i]=value;}
+static void dma_memset16(void *dst,uint16_t value,uint16_t count) {for(unsigned i=0;i<count;i++)((uint16_t*)dst)[i]=value;}
 static void dma_memcpy32(void *dst,const void *src,unsigned count) {memcpy(dst,src,count*4);}
 static void flash_erase_fsm_start(t_flash_erase_state *st,unsigned addr,unsigned size,unsigned count) {(void)st;(void)addr;(void)size;(void)count;erased++;}
 static int flash_erase_fsm_step(t_flash_erase_state *st) {(void)st;return 1;}
@@ -56,13 +56,13 @@ static bool flash_program_buffered(unsigned addr,const void *data,unsigned count
 #include "nor-loader.h"
 static void reset(unsigned size) {fs=size;closed=erased=programmed=mapped=0;short_at=UINT32_MAX;read_error=close_error=false;}
 int main(void) {
- uint8_t *scratch=malloc(128*1024);assert(scratch);uint8_t map[8]={0};t_rom_header hdr={0};
- reset(10003);assert(!flash_gba_nor("rom",fs,&hdr,NULL,false,false,false,map,NULL,scratch,128*1024));assert(closed==1&&!mapped&&programmed==10004);
- reset(MAX_GBA_ROM_SIZE);assert(!flash_gba_nor("rom",fs,&hdr,NULL,false,false,false,map,NULL,scratch,128*1024));assert(programmed==fs&&closed==1&&!mapped);
- reset(MAX_GBA_ROM_SIZE);assert(flash_gba_nor("rom",fs,&hdr,NULL,true,false,false,map,NULL,scratch,128*1024)==ERR_LOAD_BADROM);assert(!erased&&!mapped);
- reset(10003);short_at=8192;assert(flash_gba_nor("rom",fs,&hdr,NULL,false,false,false,map,NULL,scratch,128*1024)==ERR_LOAD_BADROM);assert(closed==1&&!mapped&&!programmed);
- reset(10003);assert(flash_gba_nor("rom",fs+1,&hdr,NULL,false,false,false,map,NULL,scratch,128*1024)==ERR_LOAD_BADROM);assert(closed==1&&!mapped&&!erased);
- reset(10003);read_error=true;assert(flash_gba_nor("rom",fs,&hdr,NULL,false,false,false,map,NULL,scratch,128*1024)==ERR_LOAD_BADROM);assert(closed==1&&!mapped&&!programmed);
- reset(10003);close_error=true;assert(flash_gba_nor("rom",fs,&hdr,NULL,false,false,false,map,NULL,scratch,128*1024)==ERR_LOAD_BADROM);assert(closed==1&&!mapped);
+ uint8_t *scratch=malloc(2*1024*1024);assert(scratch);uint8_t map[8]={0};t_rom_header hdr={0};
+ reset(10003);assert(!flash_gba_nor("rom",fs,&hdr,NULL,false,false,false,map,NULL,scratch,2*1024*1024));assert(closed==1&&!mapped&&programmed==10004);
+ reset(MAX_GBA_ROM_SIZE);assert(!flash_gba_nor("rom",fs,&hdr,NULL,false,false,false,map,NULL,scratch,2*1024*1024));assert(programmed==fs&&closed==1&&!mapped);
+ reset(MAX_GBA_ROM_SIZE);assert(flash_gba_nor("rom",fs,&hdr,NULL,true,false,false,map,NULL,scratch,2*1024*1024)==ERR_LOAD_BADROM);assert(!erased&&!mapped);
+ reset(10003);short_at=8192;assert(flash_gba_nor("rom",fs,&hdr,NULL,false,false,false,map,NULL,scratch,2*1024*1024)==ERR_LOAD_BADROM);assert(closed==1&&!mapped&&!programmed);
+ reset(10003);assert(flash_gba_nor("rom",fs+1,&hdr,NULL,false,false,false,map,NULL,scratch,2*1024*1024)==ERR_LOAD_BADROM);assert(closed==1&&!mapped&&!erased);
+ reset(10003);read_error=true;assert(flash_gba_nor("rom",fs,&hdr,NULL,false,false,false,map,NULL,scratch,2*1024*1024)==ERR_LOAD_BADROM);assert(closed==1&&!mapped&&!programmed);
+ reset(10003);close_error=true;assert(flash_gba_nor("rom",fs,&hdr,NULL,false,false,false,map,NULL,scratch,2*1024*1024)==ERR_LOAD_BADROM);assert(closed==1&&!mapped);
  free(scratch);puts("NOR writer: 32MiB/no-patch, odd tails, exact reads, source size, payload and cleanup guards passed (mock flash).");
 }

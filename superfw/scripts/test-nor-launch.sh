@@ -21,8 +21,10 @@ gcc -Wall -Wextra -Werror -fsanitize=address,undefined -fno-pie -no-pie -I "$tmp
 python3 - "$root/src/loader.c" "$tmp/nor-loader.h" <<'PY'
 from pathlib import Path
 import sys
-s=Path(sys.argv[1]).read_text();start=s.index('unsigned flash_gba_nor(');end=s.index('\n}',start)+2
-Path(sys.argv[2]).write_text(s[start:end])
+s=Path(sys.argv[1]).read_text();parts=[]
+for name in ['static void rom_fill16(', 'unsigned flash_gba_nor(']:
+ start=s.index(name);end=s.index('\n}',start)+2;parts.append(s[start:end])
+Path(sys.argv[2]).write_text('\n'.join(parts))
 PY
 gcc -Wall -Wextra -Werror -Wno-unused-parameter -fsanitize=address,undefined -fno-pie -no-pie -I "$tmp" "$root/tests/nor-loader-test.c" -o "$tmp/loader"
 "$tmp/loader"

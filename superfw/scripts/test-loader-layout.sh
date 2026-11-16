@@ -10,7 +10,7 @@ python3 - "$root/src/loader.c" "$tmp/gba-load-under-test.h" <<'PY'
 from pathlib import Path
 import sys
 source=Path(sys.argv[1]).read_text();parts=[]
-for prefix in ['static void rom_write16_exact(', 'unsigned load_gba_rom(']:
+for prefix in ['static void rom_fill16(', 'static void rom_write16_exact(', 'unsigned load_gba_rom(']:
  start=source.index(prefix);end=source.index('\n}',start)+2;parts.append(source[start:end])
 Path(sys.argv[2]).write_text('\n'.join(parts))
 PY

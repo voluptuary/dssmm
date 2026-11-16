@@ -1139,3 +1139,14 @@ Final retry review isolates NOR-only DS/IGM choices in local variables instead o
 mutating the shared normal-load settings after a failed write. Regression asserts
 launch options remain unchanged. Freeze637 for final full gates/delivery, then
 continue624 UI/plugin/persistence queue. Public Test5 stays624.
+
+Owner explicitly authorizes publishing the newest validated correction as next
+release (Test6), all3 assets + retained full folder-art.zip, four-section notes.
+637 local run stopped during host checks after native DMA signature review found
+new NOR2MiB padding passed1MiB halfword count into uint16_t helper (truncates).
+Chunk fills at8KiB now match hardware DMA bounds; mocks use native uint16_t and
+NOR test uses actual2MiB scratch. All targeted tests pass. Canonical Test6 notes
+prepared;638 full/nativeIGM/all3/hosted/package gates required before delivery and
+publication. Integrate normally, verify integration checks, archive Test5 metadata
+BEFORE pruning its release page/assets; retain tag/stableDE/other lanes. Continue
+port after publication; do not conflate physical validation with mocks.
