@@ -23,7 +23,7 @@ for signature in ("static void draw_text_ovf_color(", "static void draw_text_ovf
  text+=source[start:end]+"\n"
 text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} tools; struct {unsigned selector;} set; unsigned menu_tab; struct {int selector,seloff,maxentries;} recent; struct {int selector,seloff;} uiset; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
 text+="extern void dma_memset16(volatile void *, uint16_t, uint16_t);\n#define dup8(x) ((x)|((x)<<8))\n#define npf_snprintf snprintf\n#define THEME_COUNT 8\n#define ACCENT_COUNT 5\n#define THEME_DSSMM_LIGHT 6\n#define THEME_DSSMM_DARK 7\n"
-text+="static uint8_t menu_theme=6,artwork_mode=1,browser_view=1,recent_menu=1,anim_speed=1,hide_hidden=1,menu_accent,menu_font;\n"
+text+="static uint8_t menu_theme=6,artwork_mode=1,browser_view=1,recent_menu=1,anim_speed=1,hide_hidden=1,menu_accent,menu_font,clean_list;\n"
 text+='static void render_dssmm_settings_background(volatile uint8_t *,const char *);\n'
 for signature in ('static unsigned settings_visible_rows(', 'static unsigned ui_visible_rows('):
  a=source.index(signature);b=source.index('\n}',a)+2
@@ -31,12 +31,12 @@ for signature in ('static unsigned settings_visible_rows(', 'static unsigned ui_
 text+='static const char * const accent_names[5]={"Default","Blue","Green","Orange","Purple"};\n'
 a=source.index("enum {\n  UiSetTheme");b=source.index("\n};",a)+3
 text+=source[a:b]+"\n"
-for signature in ("static void draw_box_outline(","static void draw_box_full(","static void draw_button_box(","static void draw_menu_selection(","void render_ui_settings("):
+for signature in ("static void draw_box_outline(","static void draw_box_full(","static void draw_menu_selection(","void render_ui_settings("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
-a=source.index("  if (smenu.uiset.selector == UiSetSave)",source.index("static void keypress_menu_uisettings("))
+a=source.index("  if (smenu.uiset.selector < smenu.uiset.seloff)",source.index("static void keypress_menu_uisettings("))
 b=source.index("  // Apply settings immediately",a)
-text+="static void preview_select_ui(unsigned option) {\nunsigned rows=ui_visible_rows();\nsmenu.uiset.selector=option>UiSetSave?UiSetSave:option;\n"+source[a:b]+"}\n"
+text+="static void preview_select_ui(unsigned option) {\nunsigned rows=ui_visible_rows();\nsmenu.uiset.selector=option>UiSetMAX?UiSetMAX:option;\n"+source[a:b]+"}\n"
 settings=Path(sys.argv[1]).with_name("settings.c").read_text()
 header=Path(sys.argv[1]).with_name("settings.h").read_text()
 a=header.index("typedef struct {\n  uint16_t fg_color");b=header.index("} t_theme_colors;",a)+len("} t_theme_colors;")
@@ -65,7 +65,7 @@ for signature in ("static const char *render_gbarom_patching(","static const cha
  b=source.index("\n}",a)+2
  text+=source[a:b]+"\n"
 text+="\n#define KEY_BUTTA 1\n#define KEY_BUTTUP 64\n#define KEY_BUTTDOWN 128\n#define KEY_BUTTLEFT 32\n#define KEY_BUTTRIGHT 16\n#define animspd_cnt 5\n#define MAX(a,b) ((a)>(b)?(a):(b))\n#define MIN(a,b) ((a)<(b)?(a):(b))\n"
-text+="static int browser_motion_offset;\nstatic void browser_invalidate_artwork(void) {}\nstatic void browser_reload_filter(void) {}\nstatic bool save_ui_settings(void) {return false;} /* No SD persistence in fixture. */\nstatic void reload_theme(unsigned theme);\n"
+text+="static int browser_motion_offset;\nstatic void browser_invalidate_artwork(void) {}\nstatic void browser_reload_filter(void) {}\nstatic void reload_theme(unsigned theme);\n"
 a=source.index("static void keypress_menu_uisettings(");b=source.index("\n}",a)+2
 text+=source[a:b]+"\n"
 a=settings.index("static const uint16_t accent_colors[");b=settings.index("\n};",a)+3
@@ -73,6 +73,8 @@ text+=settings[a:b]+"\n"
 a=settings.index("t_theme_colors menu_theme_colors(");b=settings.index("\n}",a)+2
 text+=settings[a:b]+"\n"
 text+='#define strbcpy(d,s,n) snprintf(d,n,"%s",s)\n#include "dssmm_background.h"\n#include "launcher_profile.h"\n#include "recent.h"\n'
+utilities=Path(sys.argv[1]).with_name("util.c").read_text()
+text+=utilities[utilities.index("void clean_display_name("):]+"\n"
 text+='static uint8_t launcher_page=1,launcher_selected=1,launcher_category,launcher_browser_panel=1;\nstatic void launcher_invalidate(void) {}\nstatic char menu_username[LAUNCHER_NAME_BYTES]="Test User";\n'
 a=source.index("enum {\n  MENUTAB_RECENT");b=source.index("\n};",a)+3
 text+=source[a:b]+"\n"

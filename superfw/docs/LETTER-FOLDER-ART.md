@@ -20,3 +20,9 @@ Run `python3 tools/generate-letter-folders.py` to regenerate the pack and PNGs.
 The verifier decodes all54 BMPs through the production decoder with sanitizers,
 checking dimensions, transparency, color variation and guarded output. Physical
 folder artwork is still awaiting owner observation; owner confirms588 font good.
+
+The 120×80 Title canvas now centers the unchanged 80×80 Box sprite with transparent
+20-pixel side margins; the folder itself is not stretched. For release attachments,
+use the owner's full `.release-assets/folder-art.zip` local archive, which also
+contains additional system icons. The generator's smaller letter-only ZIP is
+not a replacement for that archive. Preserve the local release input during cleanup.

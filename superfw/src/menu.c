@@ -113,8 +113,9 @@ enum {
   UiSetASpd,
   UiSetHid,
   UiSetAccent,
-  UiSetSave,
-  UiSetMAX = UiSetSave,
+  UiSetClean,
+  UiSetSave, /* retired sentinel; no selectable Save action */
+  UiSetMAX = UiSetClean,
 };
 
 enum {
@@ -149,8 +150,8 @@ enum {
   DefsLoadPol,
   DefsSavePol,
   DefsPrefDS,
-  SettSave,
-  SettMAX
+  SettSave, /* retired sentinel; no selectable Save action */
+  SettMAX = SettSave
 };
 
 enum {
@@ -817,6 +818,7 @@ static void prepare_gba_settings(t_load_gba_lcfg *data, bool uses_dsaving, uint3
 }
 
 
+static bool insert_recent_flush(const char *fn,unsigned flags);
 static void browser_open_gba(const char *fn, uint32_t fs, bool prompt_patchgen) {
   if (fs > MAX_GBA_ROM_SIZE) {
     // The ROM is too big to be loaded!
@@ -848,6 +850,9 @@ static void browser_open_gba(const char *fn, uint32_t fs, bool prompt_patchgen) 
                          !spop.p.load.i.patches_datab_found && !spop.p.load.i.patches_cache_found);
       bool no_engine  = (ld_sett.patch_policy == PatchEngine && !spop.p.load.i.patches_cache_found);
       bool issfw = is_superfw(rmh);
+      if(prompt_patchgen && !issfw && !insert_recent_flush(spop.p.load.i.romfn,FLAG_RECENT_SD)) {
+        spop.alert_msg="Could not update recent games.";return;
+      }
 
       if (prompt_patchgen && !issfw && (no_patches || no_engine)) {
         // No patches found, ask the user if they want to generate patches
@@ -903,6 +908,9 @@ static void browser_open_nor(const t_flash_game_entry * e) {
             game_uses_dsaving, game_no_save);
   prepare_gba_settings(&spop.p.norld.l, game_uses_dsaving, lh_sett.rtcts, game_no_save);
 
+  if(!insert_recent_flush(e->game_name,FLAG_RECENT_NOR)) {
+    spop.alert_msg="Could not update recent games.";return;
+  }
   // Save entry pointer
   spop.p.norld.e = e;
 
@@ -970,6 +978,7 @@ unsigned guess_file_type(const uint8_t *header) {
 static bool insert_recent_flush(const char *fn, unsigned flags) {
   // Insert element.
   smenu.recent.maxentries = insert_recent_fn(sdr_state->rentries, smenu.recent.maxentries, fn, flags);
+  launcher_invalidate();
   return recent_flush(sdr_state->rentries, smenu.recent.maxentries);
 }
 
@@ -987,12 +996,13 @@ static void recent_reload() {
   smenu.recent.selector = 0;
   smenu.recent.seloff = 0;
   smenu.anim_state = 0;
-  smenu.recent.maxentries = recent_load(RECENT_FILEPATH, sdr_state->rentries);
+  smenu.recent.maxentries = recent_load_merged(sdr_state->rentries,(t_rentry*)sdr_state->scratch);
 }
 
 void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
   char stable_filename[MAX_FN_LEN];
   strbcpy(stable_filename,fn,sizeof(stable_filename));fn=stable_filename;
+  if(!insert_recent_flush(fn,FLAG_RECENT_SD)){spop.alert_msg="Could not update recent games.";return;}
   // Load: Sav/Reset Save: Reboot/Disable
   sram_filename_calc(fn, spop.p.load.l.savefn);
   t_sram_load_policy lp = check_file_exists(spop.p.load.l.savefn) ? SaveLoadSav : SaveLoadReset;
@@ -1010,8 +1020,6 @@ void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
     // Try to load the emu and ROM, keep trying if there's more than one emulatior option.
     unsigned errcode = ERR_LOAD_NOEMU;
     while (ldinfo->emu_name) {
-      if (recent_menu)
-        insert_recent_flush(fn, FLAG_RECENT_SD);
 
       errcode = load_extemu_rom(fn, fs, ldinfo, loadrom_progress);
       if (errcode && errcode != ERR_LOAD_NOEMU)
@@ -1410,8 +1418,9 @@ void render_recent(volatile uint8_t *frame) {
       break;
 
     t_rentry *e = &sdr_state->rentries[smenu.recent.seloff + i];
-    char *fn = &e->fpath[e->fname_offset];
-    render_icon(2, (i+1)*16, guessicon(fn));
+    const char *fn = &e->fpath[e->fname_offset];
+    char display[MAX_FN_LEN];if(clean_list){clean_display_name(display,sizeof(display),fn);fn=display;}
+    render_icon(2, (i+1)*16, guessicon(e->fpath+e->fname_offset));
 
     // Animate the row entries if they are too long!
     if (i == smenu.recent.selector - smenu.recent.seloff)
@@ -1448,6 +1457,7 @@ void render_flashbrowser(volatile uint8_t *frame) {
 
       // Animate the row entries if they are too long!
       const char *romname = &e->game_name[e->bnoffset];
+      char display[MAX_FN_LEN];if(clean_list){clean_display_name(display,sizeof(display),romname);romname=display;}
       if (i == smenu.fbrowser.selector - smenu.fbrowser.seloff)
         draw_text_ovf_rotate(romname, frame, 20, (1 + i) * 16,
                              SCREEN_WIDTH - 26 - font_width(szstr), &smenu.anim_state);
@@ -1499,12 +1509,14 @@ static void render_browser_list(volatile uint8_t *frame) {
         draw_rightj_text(szstr, frame, SCREEN_WIDTH - 2, (1 + i) * 16);
       }
 
+      char display[MAX_FN_LEN];const char *shown=e->fname;
+      if(clean_list && !(e->attr&AM_DIR)){clean_display_name(display,sizeof(display),shown);shown=display;}
       // Animate the row entries if they are too long!
       if (i == smenu.browser.selector - smenu.browser.seloff)
-        draw_text_ovf_rotate(e->fname, frame, 20, (1 + i) * 16,
+        draw_text_ovf_rotate(shown, frame, 20, (1 + i) * 16,
                              list_width - 26 - font_width(szstr), &smenu.anim_state);
       else
-        draw_text_ovf(e->fname, frame, 20, (1 + i) * 16, list_width - 26 - font_width(szstr));
+        draw_text_ovf(shown, frame, 20, (1 + i) * 16, list_width - 26 - font_width(szstr));
     }
 
     for (unsigned i = 0; i < list_width; i += 16)
@@ -1643,11 +1655,13 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
     }
     const t_centry *focus = sdr_state->filefilter[focus_index];
 
+    char display[MAX_FN_LEN];const char *shown=focus->fname;
+    if(clean_list && !(focus->attr&AM_DIR)){clean_display_name(display,sizeof(display),shown);shown=display;}
     if (vertical)
-      draw_text_ovf_rotate(focus->fname, frame, 98, 85,
+      draw_text_ovf_rotate(shown, frame, 98, 85,
                            136, &smenu.anim_state);
     else
-      draw_text_ovf_rotate(focus->fname, frame, 40, 122, 162, &smenu.anim_state);
+      draw_text_ovf_rotate(shown, frame, 40, 122, 162, &smenu.anim_state);
   }
 
   draw_text_leftovf(smenu.browser.cpath, frame, 8, 144, SCREEN_WIDTH - 88);
@@ -2008,12 +2022,12 @@ static unsigned ui_visible_rows(void) {
 }
 
 /* Filter settings by category while retaining original enum/action identities. */
-static const uint8_t settings_games[]={SettHotkey,SettSaveBkp,SettCheatEn,DefsPatchEng,DefsGamMenu,DefsRTCEnb,DefsRTCVal,DefsRTCSpeed,DefsLoadPol,DefsSavePol,DefsPrefDS,SettSave};
+static const uint8_t settings_games[]={SettHotkey,SettSaveBkp,SettCheatEn,DefsPatchEng,DefsGamMenu,DefsRTCEnb,DefsRTCVal,DefsRTCSpeed,DefsLoadPol,DefsSavePol,DefsPrefDS};
 static const uint8_t settings_hardware[]={SettBootType,SettFastSD,
 #ifdef SUPPORT_NORGAMES
   SettVerifyNOR,
 #endif
-  SettFastEWRAM,SettSave};
+  SettFastEWRAM};
 static unsigned settings_group_total(void) {
   if(menu_theme<THEME_DSSMM_LIGHT || !launcher_settings_group)return SettMAX;
   return launcher_settings_group==1?sizeof(settings_games):sizeof(settings_hardware);
@@ -2152,17 +2166,6 @@ void render_settings(volatile uint8_t *frame) {
     draw_text_ovf_color(msgs[lang_id][autosave_prefer_ds ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
-  if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    if(ds_style) {
-      unsigned y=offy+rowh*optcnt;
-      draw_text_ovf("Save settings",frame,23,y,88);
-      draw_text_ovf_color("< Save >",frame,value_x,y,104,smenu.set.selector==SettSave?SELECTED_TEXT:FT_COLOR);
-    } else {
-      draw_button_box(frame,20,220,112,132,smenu.set.selector==SettSave);
-      draw_central_text(msgs[lang_id][MSG_UIS_SAVE],frame,120,114);
-    }
-  }
-
   if(!ds_style) {
   // Render bar below for help messge
   dma_memset16(&frame[240*140], dup8(FG_COLOR), 240*20/2);
@@ -2204,11 +2207,11 @@ void render_ui_settings(volatile uint8_t *frame) {
   char tmpbuf[64];
   const char * const labels[UiSetSave] = {
     msgs[lang_id][MSG_UIS_THEME], "Font", "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
-    msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent"
+    msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent", "Clean list"
   };
   for (unsigned row = 0; row < rows; ++row) {
     unsigned option = smenu.uiset.seloff + row;
-    if(option>UiSetSave || (!ds_style && option==UiSetSave))break;
+    if(option>UiSetMAX)break;
     unsigned y=(ds_style?24:20)+row*line_h;
     const char *value = "";
     switch (option) {
@@ -2220,12 +2223,12 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetRect: value = msgs[lang_id][recent_menu ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED]; break;
     case UiSetASpd: value = msgs[lang_id][MSG_UIS_SPD0 + anim_speed]; break;
     case UiSetHid: value = msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED]; break;
-    case UiSetSave: value="Save";break;
+    case UiSetClean: value=msgs[lang_id][clean_list?MSG_KNOB_ENABLED:MSG_KNOB_DISABLED];break;
     case UiSetAccent: value = accent_names[menu_accent < ACCENT_COUNT ? menu_accent : 0]; break;
     }
     if (ds_style && (int)option == smenu.uiset.selector)
       draw_menu_selection(frame,y,112,224);
-    draw_text_ovf(option==UiSetSave?"Save settings":labels[option],frame,ds_style?23:8,y,ds_style?88:116);
+    draw_text_ovf(labels[option],frame,ds_style?23:8,y,ds_style?88:116);
     /* Localized native knob labels may already include their arrows. */
     npf_snprintf(tmpbuf, sizeof(tmpbuf), value[0] == '<' ? "%s" : "< %s >", value);
     draw_text_ovf_color(tmpbuf,frame,value_x,y,104,ds_style && (int)option==smenu.uiset.selector?SELECTED_TEXT:FT_COLOR);
@@ -2235,10 +2238,7 @@ void render_ui_settings(volatile uint8_t *frame) {
     for (unsigned i = 0; i < 240; i += 16)
       render_icon_trans(i, 20+(smenu.uiset.selector-smenu.uiset.seloff)*18, 63);
 
-  if(!ds_style) {
-  draw_button_box(frame, 20, 220, 132, 152, smenu.uiset.selector == UiSetSave);
-  draw_central_text(msgs[lang_id][MSG_UIS_SAVE], frame, 120, 134);
-  }
+
 }
 
 void render_info(volatile uint8_t *frame) {
@@ -2367,7 +2367,8 @@ static void render_start(volatile uint8_t *frame) {
   if(smenu.recent.maxentries) {
     const t_rentry *entry=&sdr_state->rentries[0];
     strbcpy(title_buffer,file_basename(entry->fpath),sizeof(title_buffer));
-    char *extension=strrchr(title_buffer,'.');if(extension)*extension=0;
+    if(clean_list)clean_display_name(title_buffer,sizeof(title_buffer),entry->fpath);
+    else {char *extension=strrchr(title_buffer,'.');if(extension)*extension=0;}
     title=title_buffer;
     if(artwork_mode && !(entry->flags&FLAG_RECENT_NOR)) {
       if(!artwork_cached || artwork_cached_mode!=artwork_mode || strcmp(artwork_rom,entry->fpath)) {
@@ -2378,7 +2379,7 @@ static void render_start(volatile uint8_t *frame) {
         artwork_cached=true;
       }
       if(artwork_valid)artwork_blit_scaled_cropped((volatile uint16_t *)frame,
-          sdr_state->artwork_pixels,&preview_info,preview_info.width==80?40:30,48,preview_info.width==80?40:60,40);
+          sdr_state->artwork_pixels,&preview_info,preview_info.width==80?40:28,46,preview_info.width==80?40:58,preview_info.width==80?40:38);
       else draw_central_text("GBA",frame,60,60);
     }
   }
@@ -2867,9 +2868,6 @@ static void keypress_popup_loadgba(unsigned newkeys) {
       spop.alert_msg = msgs[lang_id][MSG_REMEMB_CFG_OK];
     }
     else if (GbaLoadPopInfo == spop.submenu) {
-      // Insert the ROM into the recent list (or move it around). Flush to disk!
-      if (recent_menu)
-        insert_recent_flush(spop.p.load.i.romfn, FLAG_RECENT_SD);
 
       // Honor load.patch_type.
       const t_patch *p = get_game_patch(&spop.p.load.i);
@@ -3151,8 +3149,6 @@ static void keypress_popup_norload(unsigned newkeys) {
         .ts_step = rtcspeed_default
       };
 
-      if (recent_menu)
-        insert_recent_flush(e->game_name, FLAG_RECENT_NOR);
 
       // TODO Handle errors, finish missing stuff.
       unsigned err = launch_gba_nor(
@@ -3515,13 +3511,7 @@ static void keypress_menu_settings(unsigned newkeys) {
     spop.rtcpop.menu_clock=false;
     spop.rtcpop.callback = accept_rtc;
   }
-  if (newkeys & KEY_BUTTA && smenu.set.selector == SettSave) {
-    smenu.set.selector = settings_option_at(0);
-    if (save_settings())
-      spop.alert_msg = msgs[lang_id][MSG_OK_SETSAVE];
-    else
-      spop.alert_msg = msgs[lang_id][MSG_ERR_SETSAVE];
-  }
+
 }
 
 static void keypress_menu_uisettings(unsigned newkeys) {
@@ -3546,6 +3536,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       menu_accent = menu_accent ? menu_accent - 1 : 0;
     else if (smenu.uiset.selector == UiSetASpd)
       anim_speed = anim_speed ? anim_speed - 1 : 0;
+    else if (smenu.uiset.selector == UiSetClean)
+      clean_list ^= 1;
     else if (smenu.uiset.selector == UiSetHid)
       hide_hidden ^= 1;
     else if (smenu.uiset.selector == UiSetRect)
@@ -3570,6 +3562,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       menu_accent = MIN(ACCENT_COUNT - 1, menu_accent + 1);
     else if (smenu.uiset.selector == UiSetASpd)
       anim_speed = MIN(animspd_cnt - 1, anim_speed + 1);
+    else if (smenu.uiset.selector == UiSetClean)
+      clean_list ^= 1;
     else if (smenu.uiset.selector == UiSetHid)
       hide_hidden ^= 1;
     else if (smenu.uiset.selector == UiSetRect)
@@ -3578,19 +3572,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       lang_id = (lang_id + 1) % LANG_COUNT;
   }
 
-  if (newkeys & KEY_BUTTA && smenu.uiset.selector == UiSetSave) {
-    smenu.uiset.selector = 0;
-    smenu.uiset.seloff = 0;
-    if (save_ui_settings())
-      spop.alert_msg = msgs[lang_id][MSG_OK_SETSAVE];
-    else
-      spop.alert_msg = msgs[lang_id][MSG_ERR_SETSAVE];
-  }
-
   unsigned rows=ui_visible_rows();
-  if (smenu.uiset.selector == UiSetSave)
-    smenu.uiset.seloff=menu_theme<THEME_DSSMM_LIGHT?UiSetSave-6:MAX(0,UiSetSave+1-(int)rows);
-  else if (smenu.uiset.selector < smenu.uiset.seloff)
+  if (smenu.uiset.selector < smenu.uiset.seloff)
     smenu.uiset.seloff = smenu.uiset.selector;
   else if (smenu.uiset.selector >= smenu.uiset.seloff + (int)rows)
     smenu.uiset.seloff = smenu.uiset.selector-(int)rows+1;
@@ -3782,6 +3765,13 @@ void menu_keypress(unsigned newkeys) {
       keyfns[spop.pop_num](newkeys);
     }
   } else {
+    /* Persist before every route out of settings. A failed save leaves the
+     * menu and edited values intact, with an actionable native error dialog. */
+    bool settings_tab=!launcher_page && (smenu.menu_tab==MENUTAB_SETTINGS || smenu.menu_tab==MENUTAB_UILANG);
+    if(settings_tab && (newkeys&(KEY_BUTTB|KEY_BUTTSTA|KEY_BUTTL|KEY_BUTTR))) {
+      if(!save_settings()){spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];return;}
+      if(menu_theme<THEME_DSSMM_LIGHT && (newkeys&KEY_BUTTB)){smenu.menu_tab=MENUTAB_ROMBROWSE;return;}
+    }
     if(menu_theme>=THEME_DSSMM_LIGHT) {
       if(newkeys)launcher_invalidate();
       if((newkeys&KEY_BUTTSTA) && launcher_page!=1) {launcher_page=1;browser_invalidate_artwork();return;}

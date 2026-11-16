@@ -563,3 +563,14 @@ byte-identical via host, ELF and ARM unpack replay. Unified settings IO tests no
 cover unknown/legacy retention, repeated saves, rollback and oversized files.
 Remaining user settings/recents/Clean list/background/parity work remains active;
 no new candidate/release yet. Keep599 frozen until clean full/all-board gates pass.
+
+2026-11-16 follow-up: automatic settings save on exit (failed save retains menu),
+no Save button, display-only Clean list across game titles, and minor Start art
+position/size correction. Recents record selection before launch regardless of
+visibility; separate DE-compatible10-SD history and private native/NOR history,
+merge external order, safe replacement/recovery and CRLF support. Fixed actual
+native word-copy filename overread uncovered by new sanitizer test. Focused
+settings/navigation/art/background/file-IO checks pass; preview builds. Freeze
+for complete all3/ARM/mGBA/hosted validation before new hardware candidate.
+Owner archive moved to ignored .release-assets/folder-art.zip; retain/attach on
+all future releases. Remaining menu parity work continues after this milestone.

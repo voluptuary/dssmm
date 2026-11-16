@@ -694,3 +694,35 @@ and guards pass. scripts/build.sh now enforces host/ELF IGM package validation;
 DSSMM_ARM_IGM=1 adds optional Unicorn replay per board. Still rerun clean all3,
 full verifier, background ARM and hosted checks after source freeze before a new
 hardware-test image;599 remains frozen. Continue remaining owner goals autonomously.
+
+## 2026-11-16 — Settings/recents follow-up source freeze
+
+Save buttons are removed; exiting settings/submenus saves unified SETTINGS.TXT
+and blocks navigation on failure while retaining values. Production routing test
+now covers successful and failed autosave. Clean list option strips NoIntro tags
+and extensions only from displayed files in browser/carousels/Recents/NOR/Start;
+untouched names still drive IO/artwork/header matching. Sanitized name tests pass.
+Start Box art moves up2; Title is58x38 at even x28/y46, moving up/left slightly.
+Updated preview extractor after Save removal; production-renderer preview builds.
+
+Recents now record at successful selection before launch and independently of
+Recent-menu visibility. Shared RECENT.TXT contains10 newest SD paths; private
+SUPERFW-RECENT.TXT retains native/NOR history. Merge external shared ordering;
+identical first SD title retains private NOR ordering (external same-title
+reselection is inherently indistinguishable). Writers create SYSTEM, check closes,
+write replacement/backup before commit and recover backups. CRLF accepted.
+Sanitizers found a native rounded memcpy32 filename overread; staged bounded,
+aligned padded filename also prevents aliasing during reordering. Focused actual
+file-IO tests cover shared/private order, failures, rollback and recovery.
+
+Owner removes public Folder-Art.zip and authorizes relocating local copy. Exact
+archive now /workspaces/dssmm/.release-assets/folder-art.zip, SHA256
+b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5. Preserve this ignored
+input, attach on every future kernel release. Root policy0b5148f pushed after
+owner deletionf47afa6; never re-add public ZIP. Generated letter-only pack now
+also uses centered80x80 sprites on120x80 canvas; not a substitute for owner pack.
+
+Next: freeze checkpoint, clean full all3 verifier and optional ARM IGM/background/
+plugin reset replays, mGBA screenshots, hosted CI. Do not replace599 until gates
+pass. Full generic/H/V backgrounds, footer removal outside List, final DE-font
+alignment, System/Help/dialog parity remain unfinished. Keep goal active.

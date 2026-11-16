@@ -10,6 +10,9 @@ rows=(root/'assets/fonts/dssmm-ascii-rows.bin').read_bytes()
 def rgb(r,g,b):return r|(g<<5)|(b<<10)
 outline=rgb(6,6,0);highlight=rgb(31,31,18);top=rgb(31,24,12);bottom=rgb(24,18,6);ink=rgb(6,6,6)
 def pixels(width,letter):
+ if width==120:
+  square=pixels(80,letter)
+  return [value for y in range(80) for value in ([0]*20+square[y*80:(y+1)*80]+[0]*20)]
  out=[0]*(width*80);left,right=8,width-8;tab=left+(right-left)//3
  for y in range(14,72):
   for x in range(left,right):

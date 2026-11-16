@@ -208,3 +208,25 @@ void memmove32(void *dst, void *src, unsigned count) {
 }
 
 
+
+/* Presentation only: callers retain the untouched filename for IO/artwork. */
+void clean_display_name(char *out,unsigned capacity,const char *name) {
+  if(!capacity)return;
+  const char *base=file_basename(name),*end=base+strlen(base),*dot=strrchr(base,'.');
+  if(dot && dot>base)end=dot;
+  unsigned used=0;bool space=false;
+  for(const char *p=base;p<end;) {
+    if(*p=='(' || *p=='[') {
+      char close=*p=='('?')':']';const char *q=p+1;unsigned depth=1;
+      while(q<end && depth){if(*q==*p)++depth;else if(*q==close)--depth;++q;}
+      if(!depth){p=q;space=used!=0;continue;}
+    }
+    if(*p==' ' || *p=='\t'){space=used!=0;++p;continue;}
+    if(space && used+1<capacity)out[used++]=' ';
+    space=false;if(used+1>=capacity)break;
+    out[used++]=*p++;
+  }
+  out[used]=0;
+  /* A file made entirely of tags still needs an identifiable label. */
+  if(!used)strbcpy(out,base,capacity);
+}
