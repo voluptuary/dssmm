@@ -1,0 +1,53 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 598,
+  "boards": [
+    {
+      "source_tree_sha256": "bf590eb83333280b2e3a6e8787889a79b4e73a556945466c1a1ed8a269d9ca7d",
+      "board": "sd",
+      "dssmm_build": 598,
+      "source_commit": "3508d7328ccdb14f61b7cd9a35ab8d2f36b7d078",
+      "source_dirty": false,
+      "firmware_sha256": "61422f0c5b868d8d58c0773c7a8a12fcf19456fb3d32a30d9ec0b51b74b9cdeb",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 505856,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 18432
+    },
+    {
+      "source_tree_sha256": "bf590eb83333280b2e3a6e8787889a79b4e73a556945466c1a1ed8a269d9ca7d",
+      "board": "lite",
+      "dssmm_build": 598,
+      "source_commit": "3508d7328ccdb14f61b7cd9a35ab8d2f36b7d078",
+      "source_dirty": false,
+      "firmware_sha256": "3e99c2253460d93bf254ba37f09801ac6fdc00ce1b71ac4f819832d8209885f6",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 473600,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 34304
+    },
+    {
+      "source_tree_sha256": "bf590eb83333280b2e3a6e8787889a79b4e73a556945466c1a1ed8a269d9ca7d",
+      "board": "chis",
+      "dssmm_build": 598,
+      "source_commit": "3508d7328ccdb14f61b7cd9a35ab8d2f36b7d078",
+      "source_dirty": false,
+      "firmware_sha256": "70cf2b4c0a965a33c285d11e7726536990c19aeaa415deddb98017fb08481a24",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43725948594",
+    "conclusion": "success"
+  },
+  "distribution": "Not distributed: owner requested12-character display limit immediately after this checkpoint.",
+  "checks": [
+    "Standard full verifier and all3 clean package/memory/flash gates pass",
+    "Actual ARM embedded/normal/extended/missing-tag background replay passes",
+    "Profile/editor/navigation sanitizers and mGBA time/NOR-back fixtures pass"
+  ],
+  "limits": "Software menu clock only; no off/game wall time or physical598 qualification. Full DE parity unfinished."
+}

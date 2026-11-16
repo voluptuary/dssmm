@@ -18,6 +18,7 @@ preamble=r'''
 #include <string.h>
 #include "artwork.h"
 #include "browser_carousel.h"
+#include "util.h"
 #define MAX_FN_LEN 256
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -27,6 +28,10 @@ preamble=r'''
 #define FT_COLOR 18
 #define HI_COLOR 19
 #define SCREEN_WIDTH 240
+#define THEME_DSSMM_LIGHT 6
+#define THEME_DSSMM_DARK 7
+static unsigned menu_theme,clean_list;
+#define dssmm_background_clear(...) ((void)0)
 #define SCREEN_HEIGHT 160
 #define MSG_BROW_EMPTY 0
 #define dma_memset16(...) ((void)0)

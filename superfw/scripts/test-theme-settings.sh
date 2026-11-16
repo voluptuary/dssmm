@@ -11,7 +11,7 @@ for variant in sd lite chis; do
   esac
   gcc -O0 -fshort-enums -ffunction-sections -fdata-sections "${flags[@]}" \
     -I "$project_root" -I "$project_root/src" \
-    "$project_root/tests/theme-settings-test.c" "$project_root/src/util.c" "$project_root/src/fileutil.c" "$project_root/src/nanoprintf.c" \
+    "$project_root/tests/theme-settings-test.c" "$project_root/src/launcher_profile.c" "$project_root/src/util.c" "$project_root/src/fileutil.c" "$project_root/src/nanoprintf.c" \
     -Wl,--gc-sections -o "$test_dir/theme-test"
   "$test_dir/theme-test"
 done

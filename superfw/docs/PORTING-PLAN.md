@@ -103,3 +103,11 @@ The first browser branding, selected-row treatment, artwork panel, theme/accent 
 ## 2026-11-13 artwork matching correction
 
 Owner reports no artwork displayed. The filename-only reader did not support the native EZ-FLASH GBA thumbnail key. The official OMEGA kernel reads the four-byte game code at header offset 0xAC and opens `/IMGS/<code[0]>/<code[1]>/<code>.bmp`; with DSSMM's SYSTEM layout the corresponding path is `/SYSTEM/IMGS/<code[0]>/<code[1]>/<code>.bmp`. Keep Title precedence as CUSTOM ROM filename, mirrored ROM filename, then this game-code path. Box remains DSSCC ROM-filename based in IMGS2, CUSTOM first. Existing DSSCC DST1 transparency decoding and tests remain supported. Source read for the native lookup: `ez-flash/omega-kernel/source/ezkernel.c` Load_Thumbnail (offset 0xAC and nested path). Physical rendering and SD performance still need owner validation.
+
+## Owner follow-up: requested menu clock
+
+The owner now explicitly requests an editable Start-bar time. Implement an
+independent manually set software menu clock, advancing at the GBA frame rate.
+Powered-off/game timekeeping is unsupported without a hardware RTC. Display
+unset state honestly, preserve game RTC configuration and keep Auto themes
+omitted. This supersedes the earlier omission of software clock UI.

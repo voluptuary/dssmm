@@ -36,7 +36,12 @@
 .balign 4
 
 // In-game menu assets
-DEF_ASSET(ingame_menu_payload, "ingamemenu.payload")
+DEF_ASSET(ingame_menu_packed, "ingamemenu.payload.comp")
+// Native t_igmenu.menu_rsize at byte64; paired offsetof assertion in ingame.h.
+.global ingame_menu_runtime_size
+.balign 4
+ingame_menu_runtime_size:
+  .incbin "ingamemenu.payload",64,4
 
 // Direct save payload
 DEF_ASSET(directsave_payload, "directsave.payload")

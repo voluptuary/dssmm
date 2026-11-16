@@ -24,6 +24,7 @@
 
 #include "common.h"
 #include "fonts/font_render.h"
+#include "launcher_profile.h"
 
 typedef struct {
   const char * const cname;
@@ -49,7 +50,10 @@ extern const t_theme_colors themes[THEME_COUNT];
 #define ACCENT_COUNT 5
 extern const char * const accent_names[ACCENT_COUNT];
 extern uint8_t menu_accent;
+extern char menu_username[LAUNCHER_NAME_BYTES];
+extern uint32_t menu_clock_seed;
 extern uint8_t menu_font; /* Native or optional DSSMM printable ASCII font. */
+extern uint8_t clean_list,hide_system_files,menu_clock_24;
 extern uint8_t artwork_mode; /* 0=list, 1=title, 2=box; Start in SD browser */
 extern uint8_t browser_view;  /* 0=list, 1=horizontal carousel, 2=vertical carousel */
 t_theme_colors menu_theme_colors(unsigned theme, unsigned accent);
@@ -60,12 +64,7 @@ extern const t_combo_key hotkey_list[13];
 extern const uint8_t animspd_lut[5];
 #define animspd_cnt (sizeof(animspd_lut)/sizeof(animspd_lut[0]))
 
-enum { SaveSavegameDir = 0, SaveSavesDir = 1, SaveRomName = 2, SaveDirNORCNT = 2, SaveDirCNT = 3 };
-enum { StateSavestateDir = 0, StateSuperFWSavestateDir = 1, StateDirCNT = 2 };
 
-extern const char *save_paths[2];
-extern const char *savestates_paths[2];
-extern const char *savestates_paths_display[2];
 
 // ROM loading and launching config settings
 typedef struct {
@@ -93,9 +92,6 @@ extern uint8_t boot_bios_splash;
 extern uint8_t use_slowld;
 extern uint8_t use_fastew;
 extern uint8_t use_verify_nor;
-extern uint8_t save_path_default;
-extern uint8_t save_path_nor_default;
-extern uint8_t state_path_default;
 extern uint8_t backup_sram_default;
 extern uint8_t hotkey_combo;
 extern uint8_t enable_cheats;

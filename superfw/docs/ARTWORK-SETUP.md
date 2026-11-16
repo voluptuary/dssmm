@@ -49,3 +49,10 @@ sizes/format. Keep the complete directory name, including dots; a folder named
 matching picture; missing/invalid pictures retain the normal folder icon.
 Parent-directory entries do not have artwork. No mirrored or ROM-header fallback
 is used for directory pictures.
+
+## Letter folders
+
+The optional [letter-folder pack](LETTER-FOLDER-ART.md) provides transparent closed
+folders for # and A–Z in Title120×80 and Box80×80. Merge its SYSTEM folder onto
+the card. CUSTOM folder names match globally: E.bmp applies to every directory
+named E, regardless of parent. Keep your own matching CUSTOM files if preferred.
