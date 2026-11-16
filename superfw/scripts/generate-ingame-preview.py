@@ -15,7 +15,7 @@ static unsigned copt,selbarpos;
 static int num_mem_savestates=2,num_dsk_savestates=2;
 static unsigned has_rtc_support=1,ingame_menu_lang;
 static volatile uintptr_t cheat_base_addr=1;
-static t_dec_date rtc_date={26,11,15,12,0};
+static t_dec_date rtc_date={26,11,15,12,0,0};
 static unsigned rtc_speed=1;
 static const char savefile_pattern[]="preview.sav";
 static struct {const char *msg;} igm_popup;

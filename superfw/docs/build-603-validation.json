@@ -1,0 +1,80 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 603,
+  "boards": [
+    {
+      "source_tree_sha256": "988b260f305efde875e0f0a194d7bbfec84559bb0161b3dc67e0bff731061082",
+      "board": "sd",
+      "dssmm_build": 603,
+      "source_commit": "f28de96b7c205cb148adf7b470fab22048d20c9e",
+      "source_dirty": false,
+      "firmware_sha256": "ebb715c500d25243a499ef76b0a7ca0c17a609306918cce1f514db107a0ea417",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 518656,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 5632
+    },
+    {
+      "source_tree_sha256": "988b260f305efde875e0f0a194d7bbfec84559bb0161b3dc67e0bff731061082",
+      "board": "lite",
+      "dssmm_build": 603,
+      "source_commit": "f28de96b7c205cb148adf7b470fab22048d20c9e",
+      "source_dirty": false,
+      "firmware_sha256": "3a6c0f130be5d7c4f65bd10214bab713b42a6d2493f6f77b9a1e545a39deadad",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 485888,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 22016
+    },
+    {
+      "source_tree_sha256": "988b260f305efde875e0f0a194d7bbfec84559bb0161b3dc67e0bff731061082",
+      "board": "chis",
+      "dssmm_build": 603,
+      "source_commit": "f28de96b7c205cb148adf7b470fab22048d20c9e",
+      "source_dirty": false,
+      "firmware_sha256": "1faff426c05aea8c60964e1e9e11fc3a263f7107ffadf26d2b703db786463e04",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43780888958",
+    "conclusion": "success",
+    "source_commit": "f28de96b7c205cb148adf7b470fab22048d20c9e"
+  },
+  "checks": [
+    "Standard full local verifier passes all3 boards and existing upstream host suites; focused settings/recents/name/plugin tests pass",
+    "All3 native IGM streams verified against raw payload via host roundtrip, embedded ELF bytes/metadata and actual ARM halfword decoder with guards",
+    "Actual ARM backgrounds match DE Start/SET pixels, retain read-only font resources and halfword video writes, including missing-tag fallback",
+    "Actual ARM carousel metadata/cache replay and plugin reset replay pass; BIOS reset/decompression calls are modeled in plugin replay",
+    "mGBA0.10.1 with DSSMM font/Light theme: actual Start/title thumbnail and settings hub screenshots inspected; preview uses synthetic games/art, not card storage",
+    "Original native font prefixes retained; appended background stream5676bytes; rounded extended resource copy has516096bytes headroom"
+  ],
+  "limits": "No physical Build603 or plugin/game/save validation. Full DE menu parity remains unfinished. Normal source-selected software clock lacks powered-off/game wall time. SD image has5632bytes flash headroom; never raise board limits.",
+  "memory_log": [
+    "IWRAM:        2504 B         4 KB     61.13%",
+    "EWRAM:       50564 B        60 KB     82.30%",
+    "IWRAM:       14312 B        32 KB     43.68%",
+    "EWRAM:      235720 B       251 KB     91.71%",
+    "IWRAM:        2672 B         4 KB     65.23%",
+    "EWRAM:       50732 B        60 KB     82.57%",
+    "IWRAM:       14480 B        32 KB     44.19%",
+    "EWRAM:      235924 B       251 KB     91.79%",
+    "IWRAM:        2264 B         4 KB     55.27%",
+    "EWRAM:       50356 B        60 KB     81.96%",
+    "IWRAM:       14072 B        32 KB     42.94%",
+    "EWRAM:      249396 B       251 KB     97.03%"
+  ],
+  "host_coverage": {
+    "lines": "1097/1224 (89.6%)",
+    "functions": "69/74 (93.2%)",
+    "scope": "upstream host coverage; separate focused sanitizer/ARM/mGBA checks are additional evidence"
+  },
+  "local_release_artwork": {
+    "path": ".release-assets/folder-art.zip",
+    "sha256": "b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5",
+    "attach_to": "all future kernel releases; preserve owner system icons"
+  }
+}

@@ -22,6 +22,8 @@
 
 #include "emu.h"
 #include "util.h"
+#include "config.h"
+#include "fatfs/ff.h"
 
 #pragma GCC optimize ("Os")
 
@@ -236,6 +238,8 @@ const t_emu_loader gbc_loaders[] = {
   { NULL, NULL },
 };
 
+const t_emu_loader pogo_plugin_loader = { "pogo:", NULL };
+
 // Emulator loader table. Add entries here!
 
 const t_emu_platform emu_platforms[] = {
@@ -260,3 +264,17 @@ const t_emu_loader * get_emu_info(const char *ext) {
 }
 
 
+
+/* The basename is the ROM extension, matching the DE plugin convention. */
+bool find_pogo_plugin(const char *filename,char path[64]) {
+  const char *ext=find_extension(filename);
+  if(!ext || !*ext || strlen(ext)>16)return false;
+  const char *suffixes[]={".bin",".gba",".mb",".mbz"};
+  for(unsigned i=0;i<4;i++) {
+    strcpy(path,EMULATORS_PATH);char *p=path+strlen(path);
+    for(const char *e=ext;*e;e++)*p++=(*e>='A'&&*e<='Z')?*e+32:*e;
+    strcpy(p,suffixes[i]);FILINFO info;
+    if(f_stat(path,&info)==FR_OK && !(info.fattrib&AM_DIR))return true;
+  }
+  return false;
+}

@@ -31,7 +31,7 @@
 
 
 // Calculate save game name based on config.
-void sram_filename_calc(const char *rom, char *savefn, unsigned save_path);
+void sram_filename_calc(const char *rom, char *savefn);
 void savestate_filename_calc(const char *rom, char *statefn);
 
 // Reads/Writes data to SRAM

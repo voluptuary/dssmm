@@ -2066,3 +2066,32 @@ The SuperFW project now has `scripts/test-browser-preview-mgba.sh`, which report
 ## 2026-11-14 — SuperFW carousel/fast-mode integration checkpoint
 
 Merged SuperFW lane normally into dssmm as e3821b4. Hardware changes are confined to superfw/; root isolation, five project-policy tests and three merge tests pass. Clean three-board Build553/source3ce7d917 evidence is superfw/docs/build-553-validation.json; later commits only improve preview/testing/docs until this merge. User hardware Build534/hash126ae458 reports edge crash/missing carousel art/sluggishness; newer edge fix, AnimationOff native path/placeholders and page reuse require physical retest. mGBA validates isolated rendering only. No new release, physical qualification or full style parity. Push shared checkpoint, sync lanes via normal ancestry and collect all-project/lane CI; preserve user lock/BIOS limits and remaining project goal.
+
+## 2026-11-15 — Shared owner folder-art release asset
+
+Preserved owner upload8b466cb. Replaced only27 #/A–Z Title BMPs with centered
+unchanged80x80 Box data on120x80 transparent DST1 canvases. All other ZIP entries
+are byte-identical, including system icons and Box art. Canonical Folder-Art.zip
+plus reproducible prepare/check script are shared infrastructure. Owner requires
+this archive attached to every future kernel release. Check passes; no kernel
+code changed here. SuperFW work remains on its hardware lane.
+
+## 2026-11-16 — Local folder-art release input
+
+Owner removed public root Folder-Art.zip (f47afa6), requests using the hardware-test
+copy for future releases, and authorizes relocating it. Moved that exact corrected
+archive to /workspaces/dssmm/.release-assets/folder-art.zip; ignored locally and
+by root policy. Preserve during cleanup; attach it on all future kernel releases,
+including owner system icons. SHA256 b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5.
+prepare-folder-art.py --check passes. Do not re-add the binary to the repository.
+
+## 2026-11-16 — SuperFW Build603 integration
+
+Merged the SuperFW lane normally after clean SD/Lite/Chis Build603 and full
+local verifier plus hosted43780888958 passed. Candidate sourcef28de96b and
+project validation report retain hardware/runtime limits; owner Chis image is
+in hardware-test. Portable plugin ABI, shared settings/recents and presentation
+work remain confined to superfw/. No other card driver changed. Full DE parity
+is ongoing. Owner folder artwork stays ignored in .release-assets/folder-art.zip;
+preserve and attach on future releases. Sync hardware lanes normally after this
+integration; do not reset/force-push.

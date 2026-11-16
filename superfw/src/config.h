@@ -32,7 +32,8 @@
 #define MAX_BACKUP_CNT             16
 
 #define SYSTEM_DIR                "/SYSTEM"
-#define SAVEGAME_DIR              "/SYSTEM/SAVEGAME/"
+#define SAVER_DIR                 "/SYSTEM/SAVER/"
+#define LEGACY_SYSTEM_SAVEGAME_DIR "/SYSTEM/SAVEGAME/"
 #define SAVES_DIR                 "/SYSTEM/SAVES/"
 #define SAVESTATE_DIR             "/SYSTEM/SAVESTATE/"
 #define LEGACY_SAVEGAME_DIR       "/SAVEGAME/"
@@ -41,20 +42,21 @@
 #define SUPERFW_LOG_FILEPATH      "/SYSTEM/superfwlog.txt"
 #define DISK_SAVESTATE_SLOTS      5
 
-#define SUPERFW_DIR               "/.superfw"
-#define ROMCONFIG_PATH            "/.superfw/config/"
-#define PATCHDB_PATH              "/.superfw/patches/"
-#define CHEATS_PATH               "/.superfw/cheats/"
-#define EMULATORS_PATH            "/.superfw/emulators/"
-#define GBC_EMULATOR_PATH         "/.superfw/emulators/gbc-emu.gba"
-#define SETTINGS_FILEPATH         "/.superfw/settings.txt"
-#define RECENT_FILEPATH           "/.superfw/recent.txt"
-#define UISETTINGS_FILEPATH       "/.superfw/ui-settings.txt"
-#define FLASHBACKUPTMP_FILEPATH   "/.superfw/flash_backup.tmp"
-#define FLASHBACKUP_FILEPTRN      "/.superfw/flash_backup-%02x%02x%02x%02x.bin"
+#define SUPERFW_DIR               "/SYSTEM"
+#define ROMCONFIG_PATH            "/SYSTEM/config/"
+#define PATCHDB_PATH              "/SYSTEM/patches/"
+#define CHEATS_PATH               "/SYSTEM/cheats/"
+#define EMULATORS_PATH            "/SYSTEM/PLUG/"
+#define GBC_EMULATOR_PATH         "/SYSTEM/PLUG/gbc-emu.gba"
+#define SETTINGS_FILEPATH         "/SYSTEM/SETTINGS.TXT"
+#define PRIVATE_RECENT_FILEPATH   "/SYSTEM/SUPERFW-RECENT.TXT"
+#define RECENT_FILEPATH           "/SYSTEM/RECENT.TXT"
+#define UISETTINGS_FILEPATH       "/SYSTEM/UI-SETTINGS.TXT"
+#define FLASHBACKUPTMP_FILEPATH   "/SYSTEM/flash_backup.tmp"
+#define FLASHBACKUP_FILEPTRN      "/SYSTEM/flash_backup-%02x%02x%02x%02x.bin"
 
-#define PENDING_SAVE_FILEPATH     "/.superfw/pending-save.txt"
-#define PENDING_SRAM_TEST         "/.superfw/pending-sram-test.txt"
+#define PENDING_SAVE_FILEPATH     "/SYSTEM/pending-save.txt"
+#define PENDING_SRAM_TEST         "/SYSTEM/pending-sram-test.txt"
 
 #endif
 

@@ -1,0 +1,87 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 594,
+  "boards": [
+    {
+      "source_tree_sha256": "00b62f15023ed12974a56aa25f23db6b0320044990b290c952a137592ce61f25",
+      "board": "sd",
+      "dssmm_build": 594,
+      "source_commit": "26526437b192b1e26a706379a1ffdf3f9a110b4c",
+      "source_dirty": false,
+      "firmware_sha256": "2e70bdfc5b554996f659c475077303f8ddd987bfee95a24bd6f09e02fb02bec3",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "00b62f15023ed12974a56aa25f23db6b0320044990b290c952a137592ce61f25",
+      "board": "lite",
+      "dssmm_build": 594,
+      "source_commit": "26526437b192b1e26a706379a1ffdf3f9a110b4c",
+      "source_dirty": false,
+      "firmware_sha256": "46db0acf5012e6d50f4f9af7a49ee9770e62f4b25d42c9a201fc8153e70a280a",
+      "validation": "built; runtime and hardware validation not implied"
+    },
+    {
+      "source_tree_sha256": "00b62f15023ed12974a56aa25f23db6b0320044990b290c952a137592ce61f25",
+      "board": "chis",
+      "dssmm_build": 594,
+      "source_commit": "26526437b192b1e26a706379a1ffdf3f9a110b4c",
+      "source_dirty": false,
+      "firmware_sha256": "ceba35d748e92140271df09507c8e86174f327083b6a73f6b5dc10ed2fcdaa9d",
+      "validation": "built; runtime and hardware validation not implied"
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43722736343",
+    "conclusion": "success"
+  },
+  "checks": [
+    "standard local full verifier passes including non-PIE ASAN host suite",
+    "exact source-pixel background and ARM video bus checks",
+    "production launcher all-board input routing",
+    "artwork/cache and ARM cartridge bus regressions",
+    "mGBA Light/Dark Start and settings category renderers inspected",
+    "three clean matching board packages and seal/memory gates"
+  ],
+  "limits": "No physical594 migration/launch/font-menu qualification; source588 font and585 header/cache are owner-confirmed on Chis. Category children retain native flat pages; parity incomplete.",
+  "local_host_coverage": {
+    "lines": "90.8%",
+    "functions": "94.5%"
+  },
+  "memory_log": [
+    "IWRAM:        2504 B         4 KB     61.13%",
+    "EWRAM:       50564 B        60 KB     82.30%",
+    "IWRAM:       13640 B        32 KB     41.63%",
+    "EWRAM:      242144 B       251 KB     94.21%",
+    "IWRAM:        2672 B         4 KB     65.23%",
+    "EWRAM:       50732 B        60 KB     82.57%",
+    "IWRAM:       13808 B        32 KB     42.14%",
+    "EWRAM:      242588 B       251 KB     94.38%",
+    "IWRAM:        2264 B         4 KB     55.27%",
+    "EWRAM:       50356 B        60 KB     81.96%",
+    "IWRAM:       13400 B        32 KB     40.89%",
+    "EWRAM:      255656 B       251 KB     99.47%"
+  ],
+  "board_flash_budgets": [
+    {
+      "board": "sd",
+      "firmware_bytes": 504320,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 19968
+    },
+    {
+      "board": "lite",
+      "firmware_bytes": 472064,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 35840
+    },
+    {
+      "board": "chis",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "chis_main_ewram_bytes": 255656,
+  "main_ewram_limit_bytes": 257024,
+  "main_ewram_headroom_bytes": 1368
+}

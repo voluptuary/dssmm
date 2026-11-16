@@ -20,3 +20,6 @@ desktop.ini
 
 # SuperFW ships required emulator payloads as upstream source assets.
 !superfw/emu/*.gba.bin
+
+# Local release inputs supplied by the owner; never commit binaries here.
+.release-assets/

@@ -14,6 +14,7 @@ d=source.index('\n  }',c)+4
 Path(sys.argv[2]).write_text('''#include <stdbool.h>
 #include <assert.h>
 #define MENUTAB_ROMBROWSE 1
+static bool launcher;
 static bool browser_fast_reuse,browser_fast_valid[2];
 static int browser_fast_selection[2];
 static unsigned browser_fast_view[2],browser_fast_mode[2];

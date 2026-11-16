@@ -25,6 +25,9 @@
 // Bounded strcpy (like strlcpy or similar, but size must be 1+)
 void strbcpy(char *dst, const char *src, unsigned size);
 
+// Strip NoIntro tags and extension for display; never use the result as a path.
+void clean_display_name(char *out,unsigned capacity,const char *name);
+
 // Performs a heap sort of a word-aligned array, with elements being exactly
 // `size` words in size.
 void heapsort4(

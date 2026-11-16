@@ -119,21 +119,21 @@ an option for direct-saving (this is the default choice in Auto mode).
 Files and configuration on the SD card
 --------------------------------------
 
-SuperFW keeps its private configuration and generated data under `/.superfw`.
+SuperFW keeps its configuration and generated data under `/SYSTEM`.
 The following files are usually created:
 
- - .superfw/settings.txt: User settings, loaded on startup.
- - .superfw/ui-settings.txt: UI settings, loaded on startup.
- - .superfw/recent.txt: Recently played ROMs, in order.
- - .superfw/pending-save.txt: SRAM save information (temp file).
- - .superfw/pending-sram-test.txt: SRAM test flag (temp file).
+ - SYSTEM/settings.txt: User settings, loaded on startup.
+ - SYSTEM/ui-settings.txt: UI settings, loaded on startup.
+ - SYSTEM/recent.txt: Recently played ROMs, in order.
+ - SYSTEM/pending-save.txt: SRAM save information (temp file).
+ - SYSTEM/pending-sram-test.txt: SRAM test flag (temp file).
 
 Other noteworthy paths:
 
- - .superfw/config/: Per-ROM load configuration.
- - .superfw/patches/: Patch cache (created by PatchEngine).
- - .superfw/cheats/: Cheat database, contains .cht files.
- - .superfw/emulators/: Emulator ROMs, used to play other device's ROMs.
+ - SYSTEM/config/: Per-ROM load configuration.
+ - SYSTEM/patches/: Patch cache (created by PatchEngine).
+ - SYSTEM/cheats/: Cheat database, contains .cht files.
+ - SYSTEM/emulators/: Emulator ROMs, used to play other device's ROMs.
 
 Game saves and savestates use `/SYSTEM/SAVEGAME/`, `/SYSTEM/SAVES/` and
 `/SYSTEM/SAVESTATE/`; artwork uses `/SYSTEM/IMGS/` and `/SYSTEM/IMGS2/`.

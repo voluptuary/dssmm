@@ -34,6 +34,7 @@
 #include "util.h"
 #include "flash_mgr.h"
 #include "flash.h"
+#include "pogo_plugin.h"
 
 // Here we have the ROM loading routines.
 
@@ -119,7 +120,7 @@ void load_ingame_menu(
   const char* savefn, const char* statefn,
   bool rtc_patches, unsigned cheats
 ) {
-  const unsigned menu_size = ingame_menu_payload.menu_rsize;
+  const unsigned menu_size = ingame_menu_runtime_size;
   const unsigned fontsz = font_block_size();
 
   set_supercard_mode(MAPPED_SDRAM, true, false);
@@ -131,9 +132,9 @@ void load_ingame_menu(
   // Copy fonts, and cheats (appended right after the cheat buffer)
   memmove32(&ptr[menu_size], font_ptr, fontsz + cheats);
 
-  // Copy the in-game-menu payload from rodata
+  // Decode the fixed built-in payload into the same native install allocation.
   t_igmenu *igm = (t_igmenu*)base_addr;
-  memcpy32(ptr, &ingame_menu_payload, ingame_menu_payload_size);
+  upkr_unpack16(ptr,ingame_menu_packed);
 
   // Decode the start instruction, calculate branch target.
   uint16_t hotk = hotkey_list[hotkey_combo].mask;
@@ -224,7 +225,7 @@ unsigned load_gba_rom(
   bool use_rtc_patches = rtcinfo != NULL;
 
   // Determine how much ROM space we need for the IGM and DirSav payloads
-  const unsigned igm_reqsz = ingame_menu_payload.menu_rsize + font_block_size();
+  const unsigned igm_reqsz = ingame_menu_runtime_size + font_block_size();
   // Round it up, reserve ~1KB after the ROM for patches.
   // 32MiB games cannot generate patches beyond the end.
   const unsigned romrsize = ROUND_UP2(fs, 1024) + (fs < MAX_GBA_ROM_SIZE ? 1024 : 0);
@@ -516,9 +517,65 @@ unsigned launch_gba_nor(
   return 0;
 }
 
+/* Extension-named portable Pogoshell plugins, with ROM or RAM entry. */
+extern void launch_pogo_reset(bool ewram_overclock,unsigned mode,unsigned size);
+static void pogo_copy16(void *dst,const void *src,unsigned size) {
+  unsigned bulk=size&~31u;
+  if(bulk)rom_copy_write16(dst,src,bulk);
+  volatile uint16_t *d=(volatile uint16_t*)((uint8_t*)dst+bulk);
+  const uint16_t *s=(const uint16_t*)((const uint8_t*)src+bulk);
+  for(unsigned n=bulk;n<size;n+=2)*d++=*s++;
+}
+static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progress) {
+  const char *ext=find_extension(fn);
+  if(!ext || strlen(ext)>16)return ERR_LOAD_NOEMU;
+  char path[64];FIL file;bool found=false;unsigned mode=0;
+  const char *suffixes[]={".bin",".gba",".mb",".mbz"};
+  for(unsigned i=0;i<4;i++) {
+    strcpy(path,EMULATORS_PATH);char *p=path+strlen(path);
+    for(const char *e=ext;*e;e++)*p++=(*e>='A'&&*e<='Z')?*e+32:*e;
+    strcpy(p,suffixes[i]);
+    FRESULT r=f_open(&file,path,FA_READ);
+    if(r==FR_OK){found=true;mode=i<2?0:i-1;break;}
+    if(r!=FR_NO_FILE && r!=FR_NO_PATH)return ERR_LOAD_BADROM;
+  }
+  if(!found)return ERR_LOAD_NOEMU;
+  uint32_t ps=f_size(&file),fo,to;
+  if(!pogo_layout(ps,fs,&fo,&to)){f_close(&file);return ERR_LOAD_BADROM;}
+  /* Internal buffers only: cartridge SDRAM rejects byte stores. Padding is
+   * deterministic and all writes use aligned halfwords, including short tails. */
+  for(unsigned part=0;part<2;part++) {
+    uint32_t size=part?fs:ps,base=part?fo:0;
+    if(part && f_open(&file,fn,FA_READ)!=FR_OK)return ERR_LOAD_BADROM;
+    if(f_size(&file)!=size){f_close(&file);return ERR_LOAD_BADROM;}
+    for(uint32_t off=0;off<size;) {
+      uint32_t tmp[LOAD_BS/4];UINT got=0;
+      unsigned count=size-off>LOAD_BS?LOAD_BS:size-off;
+      if(f_read(&file,tmp,count,&got)!=FR_OK || got!=count){f_close(&file);return ERR_LOAD_BADROM;}
+      memset((uint8_t*)tmp+count,0,((count+3)&~3u)-count);
+      set_supercard_mode(MAPPED_SDRAM,true,false);
+      pogo_copy16(GBA_ROM_ADDR+base+off,tmp,(count+3)&~3u);
+      set_supercard_mode(MAPPED_SDRAM,true,true);
+      off+=count;if(progress)progress(part?ps+off:off,ps+fs);
+    }
+    if(f_close(&file)!=FR_OK)return ERR_LOAD_BADROM;
+  }
+  if(!pogo_ram_valid(GBA_ROM_ADDR,ps,mode))return ERR_LOAD_BADROM;
+  uint32_t ram[24],table[22];pogo_arguments(ram,table,path,fn,fo,fs,to);
+  set_supercard_mode(MAPPED_SDRAM,true,false);
+  pogo_copy16(GBA_ROM_ADDR+to,table,sizeof(table));
+  set_supercard_mode(MAPPED_SDRAM,false,false);
+  REG_WAITCNT=0x4000;
+  /* No C calls after overwriting the fixed ABI block at the top of EWRAM. */
+  memcpy32((void*)0x0203fbf8,ram,sizeof(ram));
+  launch_pogo_reset(use_fastew,mode,ps);
+  return 0;
+}
+
 // Generic-emulator (ie. NES, SMS, ...) loader
 NOINLINE
 unsigned load_extemu_rom(const char *fn, uint32_t fs, const t_emu_loader *ldinfo, progress_fn progress) {
+  if(ldinfo==&pogo_plugin_loader)return load_pogo_plugin(fn,fs,progress);
   FIL fd;
   uint8_t *ptr = (uint8_t*)(GBA_ROM_ADDR);
   if (fs > 8*1024*1024)

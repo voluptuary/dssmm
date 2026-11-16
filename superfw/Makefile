@@ -12,7 +12,7 @@ OBJCOPY		:= $(PREFIX)objcopy
 
 COMPRESSION_RATIO ?= 4
 
-GLOBAL_DEFINES = -D__GBA__
+GLOBAL_DEFINES = -D__GBA__ -DDSSMM_EXTERNAL_BACKGROUNDS
 
 # BOARD can be "sd", "lite", "chis"
 BOARD ?= sd
@@ -39,7 +39,7 @@ else
   $(error No valid board specified in BOARD)
 endif
 
-FWBINFILES=firmware.ewram.gba res/patches.db res/fonts.pack
+FWBINFILES=firmware.ewram.gba res/patches.db res/fonts-dssmm.pack
 
 ifeq ($(ENABLE_DISK_LOGGING),1)
   PAYLOADFLAGS += -DENABLE_DISK_LOGGING
@@ -133,7 +133,7 @@ MENUFILES=src/ingame.S \
           ${FATFSFILES}
 
 INFILES=src/gba_ewram_crt0.S \
-        src/main.c \
+        src/main.c src/settings_io.c src/system_layout.c src/launcher_profile.c src/update_unlock.c \
         src/log.c \
         src/cimpl.c \
         src/settings.c \
@@ -143,7 +143,7 @@ INFILES=src/gba_ewram_crt0.S \
         src/patcher.c \
         src/patches.S \
         src/menu.c \
-        src/browser_carousel.c \
+        src/browser_carousel.c src/dssmm_background.c \
         src/artwork.c \
         src/artwork_file.c \
         src/recent.c \
@@ -153,7 +153,7 @@ INFILES=src/gba_ewram_crt0.S \
         src/misc.c \
         src/util.c \
         src/utf_util.c \
-        src/emu.c \
+        src/emu.c src/pogo_plugin.c \
         src/fileutil.c \
         src/asmutil.S \
         src/gbahw.c \
@@ -177,7 +177,7 @@ all:	$(FWBINFILES) $(BIEMUFILES) directsave.payload ingame_trampoline.payload
 	# Fix the header/checksum.
 	./tools/fw-fixer.py superfw.gba
 
-firmware.ewram.gba: $(INFILES) ingamemenu.payload superfw.dldi.payload directsave.payload ingame_trampoline.payload src/messages_data.h ldscripts/gba_ewram.ld.i
+firmware.ewram.gba: $(INFILES) ingamemenu.payload.comp superfw.dldi.payload directsave.payload ingame_trampoline.payload src/messages_data.h ldscripts/gba_ewram.ld.i
 	# Build the actual firmware image
 	$(CC) $(CFLAGS) -o firmware.ewram.elf $(INFILES) -T ldscripts/gba_ewram.ld.i -nostartfiles -Wl,-Map=firmware.ewram.map -Wl,--print-memory-usage -fno-builtin
 	$(OBJCOPY) --output-target=binary firmware.ewram.elf firmware.ewram.gba
@@ -209,6 +209,9 @@ src/messages_data.h:	res/messages.py
 src/menu_messages.h:	res/messages.py
 	./res/messages.py h menu > src/menu_messages.h
 
+ingamemenu.payload.comp: ingamemenu.payload ./upkr.elf
+	./upkr.elf -l $(COMPRESSION_RATIO) $< $@
+
 firmware.ewram.gba.comp:	firmware.ewram.gba ./upkr.elf
 	./upkr.elf -l $(COMPRESSION_RATIO) $< $@
 
@@ -236,3 +239,8 @@ clean:
 
 # Optional DSSMM bitmap/renderer metadata are shared by kernel and in-game payload.
 firmware.ewram.gba ingamemenu.payload: src/fonts/dssmm_ascii.h src/fonts/font_render.h
+
+firmware.ewram.gba: src/dssmm_background_data.h src/dssmm_background.h src/dssmm_background_offsets.h res/fonts-dssmm.pack res/fonts-ext-dssmm.pack
+
+res/fonts-dssmm.pack res/fonts-ext-dssmm.pack src/dssmm_background_offsets.h &: res/fonts.pack res/fonts-ext.pack src/dssmm_background_data.h tools/pack-dssmm-resources.py
+	python3 tools/pack-dssmm-resources.py

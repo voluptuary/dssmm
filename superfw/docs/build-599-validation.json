@@ -1,0 +1,68 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 599,
+  "boards": [
+    {
+      "source_tree_sha256": "baf81bf272bde74c59f2e2fa81da341d462ee5341edb88b87603bbea2a6289f5",
+      "board": "sd",
+      "dssmm_build": 599,
+      "source_commit": "18a8c56eae41a8a61e5338aac7b87590d3199763",
+      "source_dirty": false,
+      "firmware_sha256": "af91118205bf6c8ca22b7a59f0217a5ee565d62b32b3c1e6cd61ef0abb1ce296",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 505856,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 18432
+    },
+    {
+      "source_tree_sha256": "baf81bf272bde74c59f2e2fa81da341d462ee5341edb88b87603bbea2a6289f5",
+      "board": "lite",
+      "dssmm_build": 599,
+      "source_commit": "18a8c56eae41a8a61e5338aac7b87590d3199763",
+      "source_dirty": false,
+      "firmware_sha256": "d4b982eee12ebd4a3ccb5df4438fce8cb4158b26f691c64f4d249443c3071424",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 473600,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 34304
+    },
+    {
+      "source_tree_sha256": "baf81bf272bde74c59f2e2fa81da341d462ee5341edb88b87603bbea2a6289f5",
+      "board": "chis",
+      "dssmm_build": 599,
+      "source_commit": "18a8c56eae41a8a61e5338aac7b87590d3199763",
+      "source_dirty": false,
+      "firmware_sha256": "a648de01fa89d90bc4377067836b1ab1790dbb437025b528fac01c89c3b74735",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43726431002",
+    "conclusion": "success"
+  },
+  "checks": [
+    "Standard full verifier passes with all-board flash/resource/GBA-RAM gates",
+    "Original font prefixes/header sizes retained; rounded extended resource copy has516096bytes free",
+    "ARM embedded/normal/extended/missing-tag background pixels and write discipline pass",
+    "Production launcher/editor/profile sanitizers, time cancel/save and game-RTC isolation pass",
+    "mGBA clock edit/accept and Chis NOR A-B return inspected; name cap12 focused test passes"
+  ],
+  "limits": "No physical599 clock/resource/name qualification. Software clock does not keep off/game wall time. Full DE parity unfinished; no name editor.",
+  "memory_log": [
+    "IWRAM:        2504 B         4 KB     61.13%",
+    "EWRAM:       50564 B        60 KB     82.30%",
+    "IWRAM:       13704 B        32 KB     41.82%",
+    "EWRAM:      241404 B       251 KB     93.92%",
+    "IWRAM:        2672 B         4 KB     65.23%",
+    "EWRAM:       50732 B        60 KB     82.57%",
+    "IWRAM:       13872 B        32 KB     42.33%",
+    "EWRAM:      241832 B       251 KB     94.09%",
+    "IWRAM:        2264 B         4 KB     55.27%",
+    "EWRAM:       50356 B        60 KB     81.96%",
+    "IWRAM:       13480 B        32 KB     41.14%",
+    "EWRAM:      254824 B       251 KB     99.14%"
+  ]
+}
