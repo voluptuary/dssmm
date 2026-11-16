@@ -1009,3 +1009,24 @@ orphan/deprecated code, concise comments and logical maintainable structure.
 Keep release624 frozen. Prioritize reproducible bugs and measurable gains; retain
 history/licenses and do not weaken hardware budgets or tests. Continue porting
 after audit; no feedback/input pause expected. No full parity/physical claim.
+
+## 2026-11-16 — Postrelease adversarial audit first pass
+
+Read docs/SOURCE-AUDIT-2026-11-16.md. Fixed max-length parent-path overflow,
+streaming recent-line truncation/fault preservation, benchmark zero divisor,
+signed-char comparisons; removed split-save alias/duplicate precondition and
+orphan QR Help streams/assets. DBR2active10/33320B blob vsold58652; all10 host/ARM/
+actualmGBA source pixels/guards pass. Scaler exact remainder stepping replaces
+per-position divisions;132 fractional/source-size/transparency/edge cases match
+independent division oracle and guards. Art254317→147096/total532310→425089cycles
+in same mGBAfixture; not physicalFPS. All40-source forcedCppcheck complete; only
+volatile-SRAM full-byte-copy cache warning remains (explained, no suppression).
+New full-all3/CI gates still needed; released624/hardware-test stay frozen.
+
+Next native patchengine audit: CLI has malloc(BLK_SIZE+64)FIXME masking overreads;
+scanner lacks signature/table bounds and op-capacity checks, production chunk
+reader fails to close/check short reads. Fix bounds with explicit lookbehind/
+lookahead windows and preserve cross-chunk matches, fail safely on capacity or
+IO errors without caching partial patches. This is potentially substantial;
+checkpoint first-pass changes before proceeding. Owner wants audit then port,
+no input pause. Root release sync completed normally, baseline checks all4 pass.

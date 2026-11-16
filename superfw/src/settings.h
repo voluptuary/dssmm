@@ -104,7 +104,6 @@ extern uint8_t rtcspeed_default;
 extern uint32_t rtcvalue_default;
 
 // Setting load/store
-bool save_ui_settings();
 bool save_settings();
 void load_settings();
 

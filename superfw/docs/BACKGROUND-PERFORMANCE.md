@@ -60,3 +60,19 @@ cycles, compared with the previous run-fill fixture's 310810/502309/906856.
 This is about41% less total fixture time, not a measured physical firmware FPS.
 All12 actual mGBA background pixel/guard comparisons pass. Production linked
 IWRAM/stack and all3 flash limits must also pass before distributing a build.
+
+## Post-Test5 audit
+
+The unused QR Help background has been removed from the codec/API/assets and
+packs; Help is already drawn as an opaque plain panel. DBR2 contains the ten
+active Light/Dark backgrounds and a33320-byte blob (25332bytes less), retaining
+all native font-prefix bytes. All10 host/ARM/actual-mGBA source pixels/guards
+pass. Extended resource headroom is491520bytes; actual firmware gates remain
+required. Earlier12-scene/DBR1 measurements above describe released Build624.
+
+The clipped scaler now advances exact integer sample/remainder positions rather
+than dividing for every column and row. Fractional up/downscale, transparency and
+clipped-edge cases compare against the independent division formula. Same-scene
+mGBA art cost254317→147096cycles (~42% less); total532310→425089 (~20% less), with
+background184241 unchanged. These are synthetic fixture counters, not physical
+firmware FPS. No new cache/image buffer or relaxed hardware budget is involved.

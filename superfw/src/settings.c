@@ -204,7 +204,6 @@ bool save_settings(void) {
   if(n<0 || (unsigned)n>=sizeof(extra))return false;
   return settings_write_text(common,extra,settings_owned);
 }
-bool save_ui_settings(void) {return save_settings();}
 
 static void parse_settings(void *usr, const char *var, const char *value) {
   unsigned valu = parseuint(value);

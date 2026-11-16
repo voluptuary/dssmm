@@ -3658,7 +3658,7 @@ static void keypress_menu_tools(unsigned newkeys) {
       slowsd = use_slowld;
       int ret = sdbench_read(loadrom_progress_abort);
       slowsd = true;
-      if (ret < 0)
+      if (ret <= 0)
         spop.alert_msg = msgs[lang_id][MSG_ERR_GENERIC];
       else {
         unsigned speed = 8*1024*1024 / (unsigned)ret;
@@ -3710,7 +3710,7 @@ static void keypress_menu_info(unsigned newkeys) {
 static void accept_menu_clock(void) {
   menu_clock_seed=(unsigned)spop.rtcpop.val.hour*3600+(unsigned)spop.rtcpop.val.min*60;
   launcher_clock_set(menu_clock_seed);launcher_invalidate();
-  if(!save_ui_settings())spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];
+  if(!save_settings())spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];
 }
 static void open_menu_clock(void) {
   uint32_t seconds=launcher_clock_get();if(seconds==UINT32_MAX)seconds=12*3600;

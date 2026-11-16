@@ -380,7 +380,7 @@ unsigned flash_gba_nor(
   progress_fn progress,
   uint8_t *scratch, unsigned ssize
 ) {
-  if (!flashinfo.size || !flashinfo.blksize || !flashinfo.blkcount || !flashinfo.blkwrite || !flashinfo.blksize)
+  if (!flashinfo.size || !flashinfo.blksize || !flashinfo.blkcount || !flashinfo.blkwrite)
     return ERR_FLASH_OP;
 
   // Determine if the DirSav payload must be flashed in a ROM gap or not.

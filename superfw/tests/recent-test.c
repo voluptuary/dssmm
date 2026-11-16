@@ -10,21 +10,33 @@ int main(void){char tmp[]="/tmp/dssmm-recents-XXXXXX";assert(mkdtemp(tmp));strcp
  assert(count==20);count=insert_recent_fn(entries,count,"/NOR Game.gba",FLAG_RECENT_NOR);assert(count==21);
  assert(recent_flush(entries,count));
  char text[10000];read_file(RECENT_FILEPATH,text,sizeof(text));assert(!strncmp(text,"nor:/NOR Game.gba\n",17));
- assert(f_stat(PRIVATE_RECENT_FILEPATH,0)==FR_NO_FILE);
+ assert(f_stat(LEGACY_RECENT_FILEPATH,0)==FR_NO_FILE);
  unsigned n=recent_load_merged(loaded,scratch);assert(n==21&&!strcmp(loaded[0].fpath,"/NOR Game.gba")&&loaded[0].flags==FLAG_RECENT_NOR);
  /* A previous build's sidecar is merged behind canonical entries. */
- write_file(PRIVATE_RECENT_FILEPATH,text);
+ write_file(LEGACY_RECENT_FILEPATH,text);
  write_file(RECENT_FILEPATH,"/External (Europe).gba\r\n/Game Boy Advance/19/Game (USA) 19.gba\r\n");
  n=recent_load_merged(loaded,scratch);assert(n==22&&!strcmp(loaded[0].fpath,"/External (Europe).gba"));
  assert(!strcmp(loaded[1].fpath,"/Game Boy Advance/19/Game (USA) 19.gba"));
  char before[10000];read_file(RECENT_FILEPATH,before,sizeof(before));
  short_write=1;assert(!recent_flush(loaded,n));short_write=0;
- read_file(RECENT_FILEPATH,text,sizeof(text));assert(!strcmp(text,before));assert(f_stat(PRIVATE_RECENT_FILEPATH,0)==FR_OK);
- assert(recent_flush(loaded,n));assert(f_stat(PRIVATE_RECENT_FILEPATH,0)==FR_NO_FILE);
+ read_file(RECENT_FILEPATH,text,sizeof(text));assert(!strcmp(text,before));assert(f_stat(LEGACY_RECENT_FILEPATH,0)==FR_OK);
+ assert(recent_flush(loaded,n));assert(f_stat(LEGACY_RECENT_FILEPATH,0)==FR_NO_FILE);
  read_file(RECENT_FILEPATH,text,sizeof(text));assert(strstr(text,"nor:")&&!strchr(text,'\r'));
  unsigned same=insert_recent_fn(loaded,n,"/External (Europe).gba",FLAG_RECENT_SD);assert(same==n&&!strcmp(loaded[0].fpath,"/External (Europe).gba"));
  assert(f_rename(RECENT_FILEPATH,RECENT_FILEPATH ".bak")==FR_OK);
  assert(recent_load_merged(loaded,scratch)==n);
+ /* Overlong lines must be discarded whole, never parsed as chunk tails. */
+ char adversarial[3000];memset(adversarial,'x',sizeof(adversarial));
+ strcpy(adversarial+1500,"/Fake tail.gba\n/Real.gba\n");
+ write_file(RECENT_FILEPATH,adversarial);
+ assert(recent_load_merged(loaded,scratch)==1 && !strcmp(loaded[0].fpath,"/Real.gba"));
+ char longest[MAX_FN_LEN];longest[0]='/';memset(longest+1,'a',MAX_FN_LEN-2);longest[MAX_FN_LEN-1]=0;
+ snprintf(adversarial,sizeof(adversarial),"nor:%s\r\n%s\r\n",longest,longest);write_file(RECENT_FILEPATH,adversarial);
+ assert(recent_load_merged(loaded,scratch)==2 && loaded[0].flags==FLAG_RECENT_NOR && !strcmp(loaded[0].fpath,longest) && !strcmp(loaded[1].fpath,longest));
+ read_error=1;assert(recent_load_merged(loaded,scratch)==0);
+ assert(!recent_flush(entries,count));read_error=0;
+ read_file(RECENT_FILEPATH,text,sizeof(text));assert(!strcmp(text,adversarial));
+ assert(recent_load_merged(loaded,scratch)==2);assert(recent_flush(loaded,2));
  for(unsigned i=0;i<8;i++)assert(!handles[i]);
  assert(f_unlink(RECENT_FILEPATH)==FR_OK);
  char q[1024];path(q,"/SYSTEM");assert(!rmdir(q));assert(!rmdir(root));

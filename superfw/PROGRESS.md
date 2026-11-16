@@ -682,3 +682,11 @@ integrationCI pass. Chis/SD/Lite+full folder-art.zip downloaded and byte-verifie
 notes match. Test4 page/assets pruned after exact archive, tag retained; BLUE/
 OMEGA sole prereleases and stable DElatest unchanged. Evidence publicationJSON.
 Next requested adversarial source audit, then continued autonomous DE parity.
+
+Post-Test5 audit first pass corrects parent-path overflow, malformed/failed recent
+loads, benchmark zero divisor and byte-compare portability; removes old save alias,
+duplicate guard and orphan QR assets. Ten active DBR2 backgrounds match all pixels
+host/ARM/mGBA; blob25332Bsmaller. Scaler integer stepping matches division-oracle
+pixels and cuts synthetic art42%/total20%.40-source forcedCppcheck audited. Full
+all3 gates still pending; next patch scanner bounds/capacity/chunk/IO audit, then
+continued parity.624 release/hardware-test remain frozen; no physical claims.
