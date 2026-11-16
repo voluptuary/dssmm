@@ -763,3 +763,8 @@ No638 release yet; publish next validated correction per standing owner approval
 checks pass; Chis640 hardware-test delivered, replaces638 localcopy. Panel/settings/
 plugin regressions and real mGBA previews recorded in build-640-validation.json.
 Next normal integration/all4 gates and authorized Test6 publication, then porting.
+
+Test6/Build640 published after local/all3/nativeIGM and all4 integration gates.
+All4 downloaded assets/body match; folder pack attached. Archived/pruned Test5
+release while retaining tag; BLUE/OMEGA/DE untouched. PublicationJSON records
+source/CI/hashes/limits. Next universal release docs/sync/cleanup then porting.

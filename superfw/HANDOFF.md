@@ -1189,3 +1189,12 @@ Publication pending: normal integration/all4CI, publish Test6 from source640 wit
 retaintags/DE/other lanes; root release docs/baseline ontrunk and normal branchsync.
 After publication continue unresolved physical settings/PCE/Exit/NOR-carousel/
 full parity. BIOS/scratch/fullZIP/ownerdevcontainerlock retained.
+
+Test6 published: tag/source4a85efb8/Build640; all3 firmware + full folder-art.zip
+assets downloaded byte-identical, canonical notes exact. Local full/all3/nativeIGM,
+hardwareCI43978497350 and all4 integrationCI43979085712 passed. Test5 page/assets
+removed ONLY after exact root archive c55ba49 pushed; tag retained. BLUE/OMEGA/DE
+metadata/assets unchanged, DEv8.4.0latest. Publication evidence projectJSON. Chis640
+hardware-test remains current. Next root user docs/baseline/recovery milestone and
+normalall5sync, cleanownignoredcompiler outputs after retainedevidence; then
+continue unresolvedsettings/PCE/Exit/NORcarousel/fullparity withoutfeedbackpause.
