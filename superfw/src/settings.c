@@ -17,6 +17,8 @@
  */
 
 #include <string.h>
+#include <strings.h>
+#include "settings_io.h"
 #include <stdlib.h>
 
 #include "settings.h"
@@ -55,9 +57,13 @@ static const uint16_t accent_colors[ACCENT_COUNT - 1][2] = {
   { RGB2GBA(0xc0a0e0), RGB2GBA(0x9878b8) },
 };
 uint8_t menu_accent = 0;
+char menu_username[LAUNCHER_NAME_BYTES];
+uint32_t menu_clock_seed=UINT32_MAX;
 uint8_t menu_font = FONT_STYLE_NATIVE;
+uint8_t clean_list=0,hide_system_files=1,menu_clock_24=1;
+static uint8_t thumbnail_preference=1;
 uint8_t artwork_mode = 1;
-#define UI_SETTINGS_VERSION 7
+#define UI_SETTINGS_VERSION 9
 #define UI_SETTINGS_DSSMM_DEFAULTS_VERSION 2
 static uint8_t ui_settings_version = 0;
 
@@ -127,78 +133,75 @@ uint8_t rtcspeed_default = 3;
 
 uint32_t rtcvalue_default = 45568800U;
 
-// Setting loading/saving routines
-bool save_ui_settings() {
-  // Create the directory (just in case it doesn't exist)
-  f_mkdir(SUPERFW_DIR);
-
-  // Proceed to create the file
-  FIL fd;
-  if (FR_OK != f_open(&fd, UISETTINGS_FILEPATH, FA_WRITE | FA_CREATE_ALWAYS))
-    return false;
-
-  // Serialize the settings
-  uint16_t lc = lang_getcode();
-  char buf[512];
-  npf_snprintf(buf, sizeof(buf),
-    "ui_version=%u\n"
-    "theme=%u\n"
-    "font=%u\n"
-    "accent=%u\n"
-    "artwork=%u\n"
-    "browser_view=%u\n"
-    "langcode=%c%c\n"
-    "recent_menu=%u\n"
-    "anim_speed=%u\n"
-    "hide_hidden=%u\n",
-    UI_SETTINGS_VERSION, menu_theme, menu_font, menu_accent, artwork_mode, browser_view,
-    (lc & 0xFF), (lc >> 8), recent_menu, anim_speed, hide_hidden);
-
-  UINT wrbytes;
-  FRESULT res = f_write(&fd, buf, strlen(buf), &wrbytes);
-  f_close(&fd);
-
-  return FR_OK == res;
+/* DE-compatible keys precede kernel-specific values in one portable file. */
+enum {SharedTheme,SharedColour,SharedHidden,SharedClean,SharedView,SharedArt,SharedLanguage,SharedClock,SharedCount};
+static const char * const shared_keys[]={"Theme","Colour","Hide system files","Clean list","View mode","Thumbnails","Language","Clock format"};
+static struct {char value[64];unsigned baseline;bool long_value;} shared_values[SharedCount];
+static bool shared_seen,unified_seen;
+static int shared_view=-1;
+static unsigned shared_current(unsigned id) {
+  switch(id) {
+    case SharedTheme:return menu_theme==THEME_DSSMM_DARK || menu_theme==5;
+    case SharedColour:return menu_accent;
+    case SharedHidden:return hide_system_files;
+    case SharedClean:return clean_list;
+    case SharedView:return browser_view?browser_view:artwork_mode?3:0;
+    case SharedArt:return artwork_mode?artwork_mode:thumbnail_preference;
+    case SharedLanguage:return lang_getcode();
+    default:return menu_clock_24;
+  }
 }
-
-bool save_settings() {
-  // Create the directory (just in case it doesn't exist)
-  f_mkdir(SUPERFW_DIR);
-
-  // Proceed to create the file
-  FIL fd;
-  if (FR_OK != f_open(&fd, SETTINGS_FILEPATH, FA_WRITE | FA_CREATE_ALWAYS))
-    return false;
-
-  // Serialize the settings
-  char buf[512];
-  npf_snprintf(buf, sizeof(buf),
-    "hotkey_opt=%u\n"
-    "boot_to_bios=%u\n"
-    "sram_backup_count=%u\n"
-    "enable_cheats=%u\n"
-    "enable_slowld=%u\n"
-    "enable_fastewram=%u\n"
-    "enable_norwrcheck=%u\n"
-    "default_patcher=%u\n"
-    "default_igmenu=%u\n"
-    "default_rtcpatch=%u\n"
-    "default_rtctick=%u\n"
-    "default_loadgame=%u\n"
-    "default_savegame=%u\n"
-    "prefer_directsave=%u\n"
-    "default_rtcts=%lu\n",
-    hotkey_combo, boot_bios_splash, backup_sram_default, enable_cheats, use_slowld, use_fastew,
-    use_verify_nor, (unsigned int)patcher_default, ingamemenu_default, rtcpatch_default,
-    rtcspeed_default, autoload_default, autosave_default, autosave_prefer_ds,
-    rtcvalue_default);
-
-  UINT wrbytes;
-  FRESULT res = f_write(&fd, buf, strlen(buf), &wrbytes);
-  f_close(&fd);
-
-  return FR_OK == res;
+static const char *shared_value(unsigned id,const char *fallback) {
+  return shared_values[id].value[0] && shared_current(id)==shared_values[id].baseline?shared_values[id].value:fallback;
 }
+static const struct {const char *name,*code;} language_names[]={
+  {"English (US)","en"},{"English (UK)","en"},{"Français","fr"},{"Español","es"},{"Deutsch","de"},
+  {"Português","pt"},{"Italiano","it"},{"Nederlands","nl"},{"Svenska","sv"},{"Suomi","fi"},
+  {"Türkçe","tr"},{"Chinese","zh"},{"Japanese","ja"},{"Korean","ko"},{"Polski","pl"},{"Russian","ru"}
+};
+static const char *language_name(void) {
+  unsigned code=lang_getcode();
+  for(unsigned i=0;i<sizeof(language_names)/sizeof(*language_names);++i)
+    if(code==((uint8_t)language_names[i].code[0]|((uint8_t)language_names[i].code[1]<<8)))return language_names[i].name;
+  return "English (US)";
+}
+static const char * const native_keys[]={"ui_version","theme","native_theme","font","clock_seconds","accent","artwork","browser_view","langcode","recent_menu","anim_speed","hide_hidden","hotkey_opt","boot_to_bios","sram_backup_count","enable_cheats","enable_slowld","enable_fastewram","enable_norwrcheck","default_patcher","default_igmenu","default_rtcpatch","default_rtctick","default_loadgame","default_savegame","prefer_directsave","default_rtcts"};
+static bool settings_owned(const char *key) {
+  for(unsigned i=0;i<SharedCount;++i)if(!strcasecmp(key,shared_keys[i]))
+    return !(shared_values[i].long_value && shared_current(i)==shared_values[i].baseline);
+  if(!strncasecmp(key,"SuperFW.",8))key+=8;
+  for(unsigned i=0;i<sizeof(native_keys)/sizeof(*native_keys);++i)if(!strcmp(key,native_keys[i]))return true;
+  return false;
+}
+bool save_settings(void) {
+  menu_clock_seed=launcher_clock_get();
+  const char * const colors[]={"Pale Blue","Blue","Green","Orange","Purple"};
+  const char * const views[]={"List","Horizontal","Vertical","List + art"};
+  const char *values[]={menu_theme==THEME_DSSMM_DARK || menu_theme==5?"Dark":"Light",colors[menu_accent<5?menu_accent:0],
+    hide_system_files?"On":"Off",clean_list?"On":"Off",views[shared_current(SharedView)],
+    shared_current(SharedArt)==2?"Box":"Title",language_name(),menu_clock_24?"24 hour":"12 hour"};
+  char common[1536];unsigned used=0;
+  for(unsigned i=0;i<SharedCount;++i) {
+    if(shared_values[i].long_value && shared_current(i)==shared_values[i].baseline)continue;
+    int n=npf_snprintf(common+used,sizeof(common)-used,"%s = %s\n",shared_keys[i],shared_value(i,values[i]));
+    if(n<0 || (unsigned)n>=sizeof(common)-used)return false;
+    used+=n;
+  }
+  char extra[1536];
+  int n=npf_snprintf(extra,sizeof(extra),
+    "SuperFW.ui_version=%u\nSuperFW.native_theme=%u\nSuperFW.font=%u\nSuperFW.clock_seconds=%lu\n"
+    "SuperFW.recent_menu=%u\nSuperFW.anim_speed=%u\nSuperFW.hide_hidden=%u\n"
+    "SuperFW.hotkey_opt=%u\nSuperFW.boot_to_bios=%u\nSuperFW.sram_backup_count=%u\nSuperFW.enable_cheats=%u\n"
+    "SuperFW.enable_slowld=%u\nSuperFW.enable_fastewram=%u\nSuperFW.enable_norwrcheck=%u\n"
+    "SuperFW.default_patcher=%u\nSuperFW.default_igmenu=%u\nSuperFW.default_rtcpatch=%u\nSuperFW.default_rtctick=%u\n"
+    "SuperFW.default_loadgame=%u\nSuperFW.default_savegame=%u\nSuperFW.prefer_directsave=%u\nSuperFW.default_rtcts=%lu\n",
+    UI_SETTINGS_VERSION,menu_theme<6?menu_theme:255,menu_font,(unsigned long)menu_clock_seed,recent_menu,anim_speed,hide_hidden,
+    hotkey_combo,boot_bios_splash,backup_sram_default,enable_cheats,use_slowld,use_fastew,use_verify_nor,
+    (unsigned)patcher_default,ingamemenu_default,rtcpatch_default,rtcspeed_default,autoload_default,autosave_default,autosave_prefer_ds,(unsigned long)rtcvalue_default);
+  if(n<0 || (unsigned)n>=sizeof(extra))return false;
+  return settings_write_text(common,extra,settings_owned);
+}
+bool save_ui_settings(void) {return save_settings();}
 
 static void parse_settings(void *usr, const char *var, const char *value) {
   unsigned valu = parseuint(value);
@@ -245,7 +248,10 @@ static void parse_settings(void *usr, const char *var, const char *value) {
 }
 
 static void parse_ui_settings(void *usr, const char *var, const char *value) {
-  if (!strcmp(var, "ui_version")) {
+  if (!strcmp(var,"clock_seconds")) {
+    uint32_t seconds=parseuint(value);
+    menu_clock_seed=seconds<86400?seconds:UINT32_MAX;
+  } else if (!strcmp(var, "ui_version")) {
     ui_settings_version = parseuint(value);
   } else if (!strcmp(var, "langcode")) {
     uint16_t code = ((uint8_t)value[0]) | (((uint8_t)value[1]) << 8);
@@ -309,27 +315,49 @@ static void migrate_ui_settings() {
   }
 }
 
-void load_settings() {
-  FIL fd;
-  UINT rdbytes;
-  char buf[512];
-  ui_settings_version = 0;
-  if (FR_OK == f_open(&fd, SETTINGS_FILEPATH, FA_READ)) {
-    if (FR_OK == f_read(&fd, buf, sizeof(buf) - 1, &rdbytes)) {
-      buf[rdbytes] = 0;
-      parse_file(buf, parse_settings, NULL);
-    }
-    f_close(&fd);
+static bool setting_on(const char *value) {return !strcasecmp(value,"On") || !strcasecmp(value,"Yes") || !strcmp(value,"1");}
+static void read_setting(const char *key,const char *value) {
+  if(!strncasecmp(key,"SuperFW.",8)) {
+    key+=8;
+    if(!strcmp(key,"ui_version"))unified_seen=true;
+    if(!strcmp(key,"native_theme")) {unsigned n=parseuint(value);if(n<6)menu_theme=n;return;}
+    parse_settings(0,key,value);parse_ui_settings(0,key,value);return;
   }
-
-  if (FR_OK == f_open(&fd, UISETTINGS_FILEPATH, FA_READ)) {
-    if (FR_OK == f_read(&fd, buf, sizeof(buf) - 1, &rdbytes)) {
-      buf[rdbytes] = 0;
-      parse_file(buf, parse_ui_settings, NULL);
+  /* Old lowercase numeric theme is a legacy SuperFW preference. */
+  if(!strcmp(key,"theme") && *value>='0' && *value<='9'){parse_ui_settings(0,key,value);return;}
+  for(unsigned i=0;i<SharedCount;++i)if(!strcasecmp(key,shared_keys[i])) {
+    shared_seen=true;shared_values[i].long_value=strlen(value)>=sizeof(shared_values[i].value);
+    strbcpy(shared_values[i].value,value,sizeof(shared_values[i].value));
+    switch(i) {
+      case SharedTheme:menu_theme=!strcasecmp(value,"Dark")?THEME_DSSMM_DARK:THEME_DSSMM_LIGHT;break;
+      case SharedColour:{static const char *const names[]={"Pale Blue","Blue","Green","Orange","Purple"};menu_accent=0;for(unsigned c=0;c<5;++c)if(!strcasecmp(value,names[c]))menu_accent=c;break;}
+      case SharedHidden:hide_system_files=setting_on(value);break;
+      case SharedClean:clean_list=setting_on(value);break;
+      case SharedView:shared_view=!strcasecmp(value,"Horizontal")?1:!strcasecmp(value,"Vertical")?2:!strcasecmp(value,"List + art")||!strcasecmp(value,"List art")?3:0;break;
+      case SharedArt:thumbnail_preference=!strcasecmp(value,"Box")?2:1;break;
+      case SharedClock:menu_clock_24=strcasecmp(value,"12 hour") && strcasecmp(value,"12-hour") && strcasecmp(value,"12H");break;
+      case SharedLanguage:for(unsigned l=0;l<sizeof(language_names)/sizeof(*language_names);++l)if(!strcasecmp(value,language_names[l].name)){lang_id=lang_lookup((uint8_t)language_names[l].code[0]|((uint8_t)language_names[l].code[1]<<8));break;}break;
     }
-    f_close(&fd);
+    return;
   }
-  migrate_ui_settings();
+  parse_settings(0,key,value);parse_ui_settings(0,key,value);
+}
+static void probe_setting(const char *key,const char *value) {(void)value;if(!strcasecmp(key,"SuperFW.ui_version"))unified_seen=true;}
+void load_settings(void) {
+  ui_settings_version=0;
+  bool exists;unified_seen=shared_seen=false;shared_view=-1;memset(shared_values,0,sizeof(shared_values));
+  settings_read_text(SETTINGS_FILEPATH,probe_setting,&exists);
+  if(!unified_seen)settings_read_text(UISETTINGS_FILEPATH,read_setting,&exists);
+  settings_read_text(SETTINGS_FILEPATH,read_setting,&exists);
+  if(shared_view>=0){browser_view=shared_view==3?0:shared_view;artwork_mode=shared_view?thumbnail_preference:0;}
+  else if(artwork_mode)thumbnail_preference=artwork_mode;
+  if(shared_seen)ui_settings_version=UI_SETTINGS_VERSION;else migrate_ui_settings();
+  for(unsigned i=0;i<SharedCount;++i)shared_values[i].baseline=shared_current(i);
+  menu_username[0]=0;FIL fd;UINT size;char name[64];
+  if(f_open(&fd,"/SYSTEM/NAME.TXT",FA_READ)==FR_OK || f_open(&fd,"/SYSTEM/NAME",FA_READ)==FR_OK) {
+    FRESULT read=f_read(&fd,name,sizeof(name),&size),closed=f_close(&fd);
+    if(read==FR_OK && closed==FR_OK)launcher_name_parse(menu_username,name,size);
+  }
 }
 
 static bool save_pattern_has_files(const char *pattern) {
@@ -354,10 +382,10 @@ static bool make_file_pattern(char *pattern, unsigned size, const char *path, co
 
 void sram_filename_calc(const char *rom, char *savefn) {
   char pattern[MAX_FN_LEN];
-  if (!make_file_pattern(pattern,sizeof(pattern),SAVEGAME_DIR,rom)) {savefn[0]=0;return;}
+  if (!make_file_pattern(pattern,sizeof(pattern),SAVER_DIR,rom)) {savefn[0]=0;return;}
   if (!save_pattern_has_files(pattern)) {
-    static const char * const legacy_paths[]={LEGACY_SAVEGAME_DIR,SAVES_DIR,LEGACY_SAVES_DIR};
-    for(unsigned i=0;i<3;++i) {
+    static const char * const legacy_paths[]={LEGACY_SYSTEM_SAVEGAME_DIR,LEGACY_SAVEGAME_DIR,SAVES_DIR,LEGACY_SAVES_DIR};
+    for(unsigned i=0;i<4;++i) {
       char candidate[MAX_FN_LEN];
       if(make_file_pattern(candidate,sizeof(candidate),legacy_paths[i],rom) && save_pattern_has_files(candidate)) {strbcpy(pattern,candidate,sizeof(pattern));break;}
     }

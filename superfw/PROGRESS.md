@@ -511,3 +511,80 @@ basenames; no firmware/RAM cost. All54 production decoder sanitizer checks pass.
 Added hard packed-image gates matching native board budgets, boundary tests and
 594 byte margins in evidence. Source remains594 for current hardware image.
 Owner confirms588 font works well. Continue categories and remaining DE parity.
+
+## 2026-11-15 — Independent settings children
+
+Games and Hardware now filter actual options, with shared rendered-row/input
+mapping and bounded cursors. Native themes/general tab retain full settings.
+Save returns to the category's first option and its label is centered. Production
+routing/category/movement tests and mGBA Games/Hardware/scroll fixtures pass.
+Chis RAM remains tight; investigate read-only backgrounds in existing native
+font-resource area before expanding further. No new hardware image yet;594 frozen.
+
+## 2026-11-15 — Profile/time/navigation and background memory budget
+
+Added cached NAME.TXT UTF8 first line and independent software menu clock with
+selectable editor; stronger corners, NOR B→Start, wrapped navigation preserves
+SD/NOR choice. Game RTC unaffected; no powered-off wall time. Owner594 confirms
+progress, not new-source hardware validation. Background streams now use native
+reserved font-resource partition with unchanged original prefix/data_size and
+native loader algorithms. ARM source pixels/halfword discipline and readonly
+region checks pass, recovering GBA RAM for menu work. Next full same-source
+all3 build with flash/resource/RAM gates, CI and new Chis hardware-test image.
+
+Focused profile/editor/navigation sanitizers and actual ARM external/missing-tag
+replay pass. mGBA time edit/accept and Chis NOR-back fixtures pass and inspected.
+Begin clean same-source all3 packaging/hosted validation before replacing594.
+
+598 all-board/local/hosted43725948594 validation passes; retained tracked evidence
+but not distributed. Owner requests12-character name cap, then cancels name
+editing/keyboard. Apply12-character readonly display only; Time remains the
+selectable header item. Next clean numbered all3 set and hardware-test delivery.
+
+## 2026-11-15 — Build599 current hardware candidate
+
+All3 clean size/resource/RAM/integrity gates, standard local verifier and
+hosted43726431002 pass. Delivered Chis599 in root hardware-test, retaining art ZIP.
+Name editor canceled;12-character NAME.TXT display only. Time/editor/wrap/NOR-B,
+stronger corners, isolated settings children and readonly resource background
+storage included. Superseded own594 local files, evidence retained. No public
+release or physical599 claim. Continue DE category/body/layout parity autonomously.
+
+## 2026-11-16 — Crash recovery and portable plugin work
+
+Recovered saved sources/candidate/private session files; restored the sole empty
+interrupted test, confirmed no orphan compiler/emulator. Portable Pogoshell PLUG
+lookup adds BIN/GBA/MB/MBZ plus safe RAM-entry reset, complete LZ77 validation and
+bounded halfword transfers. Native/bundled SuperFW fallback preserved; no imported
+EZ-FLASH driver. Focused three-board host tests, actual ARM reset replay and20
+existing pack format checks pass, not physical gameplay/save validation. Safe
+emulators→PLUG migration and filesystem tests pass. IGM compressed install is
+byte-identical via host, ELF and ARM unpack replay. Unified settings IO tests now
+cover unknown/legacy retention, repeated saves, rollback and oversized files.
+Remaining user settings/recents/Clean list/background/parity work remains active;
+no new candidate/release yet. Keep599 frozen until clean full/all-board gates pass.
+
+2026-11-16 follow-up: automatic settings save on exit (failed save retains menu),
+no Save button, display-only Clean list across game titles, and minor Start art
+position/size correction. Recents record selection before launch regardless of
+visibility; separate DE-compatible10-SD history and private native/NOR history,
+merge external order, safe replacement/recovery and CRLF support. Fixed actual
+native word-copy filename overread uncovered by new sanitizer test. Focused
+settings/navigation/art/background/file-IO checks pass; preview builds. Freeze
+for complete all3/ARM/mGBA/hosted validation before new hardware candidate.
+Owner archive moved to ignored .release-assets/folder-art.zip; retain/attach on
+all future releases. Remaining menu parity work continues after this milestone.
+
+602 full verifier stopped before board builds: the extracted carousel cache
+fixture lacked the new Clean-list declaration. Production Chis linking and
+focused name tests had passed; fixed the fixture's default settings/prototype
+and rerun it. No failed full run is counted as a pass. Freeze new source for
+complete verification again before delivering a candidate.
+
+Build603/sourcef28de96b all3/full local verifier/hosted43780888958 passed. Exact
+IGM decompression/metadata replay all3, background/metadata/reset ARM checks,
+and mGBA Start/SET hub inspected. Delivered numbered Chis603 hardware-test image,
+manifest and guide; superseded own599 files after retaining historical evidence.
+No physical603/plugin/save qualification or full parity claim. SD flash headroom
+5632bytes; keep all3 budget gates. Owner full folder ZIP stays ignored in
+.release-assets. Next: remaining DS backgrounds/footer/dialog/settings parity.

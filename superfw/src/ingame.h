@@ -33,6 +33,7 @@
 #define FLASH_IGM_TRAMP_CHEATS_OFF      (32*4)
 
 #ifndef __ASSEMBLER__
+#include <stddef.h>
 
 // In-game menu patching structure
 // This is used to load and patch the menu with the required values.
@@ -64,8 +65,10 @@ typedef struct {
 } t_igmenu;
 
 // Built-in assets
-extern const t_igmenu ingame_menu_payload;
-extern const uint32_t ingame_menu_payload_size;
+_Static_assert(offsetof(t_igmenu,menu_rsize)==64,"Packed IGM metadata offset changed");
+extern const uint32_t ingame_menu_runtime_size;
+extern const uint8_t ingame_menu_packed[];
+extern const uint32_t ingame_menu_packed_size;
 
 // Savestate structure
 typedef struct {

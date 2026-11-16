@@ -123,3 +123,35 @@ used/limit/headroom and GBA RAM separately. Never raise hardware budgets to fit
 assets. Letter #/A–Z artwork is a generated SD-card CUSTOM pack (LETTER-FOLDER-ART.md),
 matching basenames globally and adding zero firmware/RAM cost. Preserve existing
 user CUSTOM overrides. Owner588 confirms the optional font works well on Chis.
+
+Owner594 feedback: Start needs NAME.TXT left/time right, stronger selection,
+NOR B→Start, and wrapping Up/Down through LastPlayed/SD-or-NOR/Settings/Time.
+Implementations are in development; see LAUNCHER-PORT.md. The selected time opens
+an HH/MM editor; software clock advances only while the menu runs, preserves
+game RTC defaults and uses unset markers until configured. Owner explicitly
+requested this clock after the initial hardware-RTC omission. No Auto themes.
+Username retains12 complete UTF8 characters from first line, optional BOM.
+Background streams now follow unchanged native font prefixes in the existing
+1.5MiB SDRAM resource area; keep prefixes, header data_size and native unpack
+paths intact. Enforce rounded resource budget, packed flash and GBA RAM separately.
+
+## Build603 continuation (2026-11-16)
+
+Read docs/build-603-validation.json and current HANDOFF. Build603/hashf28de96b is
+the current Chis hardware-test image; all3 packages/full local verifier and
+hosted43780888958 pass. No physical603/plugin/game/save qualification. Portable
+Pogoshell PLUG BIN/GBA/MB/MBZ now precedes native fallback; never import EZ-FLASH
+card drivers. Read PLUGIN-COMPATIBILITY.md. Shared SETTINGS.TXT retains unknown
+values/private namespaced extras, saves on exit and retires legacy UI sidecar
+only on success. RECENT.TXT holds10 portable SD paths; native/NOR history stays
+in SUPERFW-RECENT.TXT. Always record selection before launch independently of
+menu visibility. New saves use SYSTEM/SAVER with legacy auto-detection.
+
+Owner full artwork archive now lives at ignored root .release-assets/folder-art.zip.
+Preserve it during cleanup and attach it on all future kernel releases; do not
+re-add the public repository ZIP or substitute the generated letter-only pack.
+All3 builds enforce exact raw/packed/ELF IGM correspondence; DSSMM_ARM_IGM=1 adds
+actual native ARM halfword-unpacker replay. Remaining full DE background/menu/
+dialog/font alignment parity work is active. Continue autonomously with numbered
+hardware-test milestones. SD603 has only5632bytes flash headroom: optimize or move
+assets within existing budgets; never increase hardware limits.

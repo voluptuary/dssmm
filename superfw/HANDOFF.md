@@ -566,3 +566,182 @@ used/limit/headroom.594 margins SD19968/Lite35840/Chis425472bytes, Chis main EWR
 1368static bytes. User explicitly requires keeping hardware size limits. No
 limit increases. Next integrate evidence/scripts, then true settings categories
 and remaining menu/dialog/DS behavior. Keep594 hardware image frozen during work.
+
+## 2026-11-15 — True Games/Hardware settings category slice
+
+Replaced hub cursor shortcuts with filtered physical-option tables for Games and
+Hardware (board-specific NOR verification only on Chis). Renderer, keyboard
+movement and Save reset share the category mapping; native themes/LR general
+settings retain the full list. Save button recentered. Host production routing,
+category visibility/bounds and movement pass; mGBA actual hub A entry to both
+children and Games scrolling inspected. Chis diagnostic link256144/257024 before
+final helper/reset tweak.594 remains frozen. Next memory work: readonly background
+streams can be appended to native font-resource pack, whose reserved SDRAM area
+is14.5..16MiB (1.5MiB), with font prefixes unchanged. Existing fonts-ext1047800bytes
+leaves ample room for3076-byte appended stream blob. Preserve native byte-safe
+bootloader font unpack/copy, original font header/data_size, current heap/cache
+layout and hardware caps. Need prefix/region tests, actual ARM external-asset
+replay and clean all3 package/memory/CI gates before any candidate replacement.
+
+## 2026-11-15 — Owner594 Start refinement and read-only resource work
+
+Owner reports good594 progress. Implemented NAME.TXT/NAME first-line cache,
+UTF8/BOM/11-character bounds, right software time bar, A/Start HH/MM editor,
+stronger corners, NOR B→Start and wrapping0/remembered1or2/3/4. Clock runs only
+in menu using280896/16777216 frame duration, persists UI starting time (settings8),
+unknown until set; no off/game wall time or hardware RTC claim and no game-RTC
+changes. Native date modal field bounds reused with time-only presentation.
+Pure profile/clock tests pass; production editor callback/bounds/cancel/save
+checks and mGBA clock/NOR return fixtures in progress. Profile source Chis
+link254760EWRAM/13464IWRAM before final text refinements.
+
+Background streams appended as3076-byte DBG1 blob to original normal/extended
+font assets in native1.5MiB resource region; original prefixes/header sizes
+unchanged. Existing copy/apunpack algorithms/addresses retained. Build generates
+both packs; rounded ext copy still has516096bytes free. Actual ARM embedded,
+standard and extended background pixels pass and no read-only resource writes
+occur. Main RAM recovered~2.6KiB before new profile. Missing-tag fallback replay
+added; final tests/clean all3/hosted checks next.594 remains frozen. Preserve art
+ZIP/preview and session BIOS/scratch. Continue autonomously after next candidate.
+
+Final focused checks: username/clock parser and actual clock editor field bounds,
+cancel/accept/save/game-RTC isolation pass with sanitizers. All3 production
+launcher cycles, remembered SD/NOR row and NOR B-return pass. Actual ARM embedded,
+standard, extended and missing-tag fallback outputs pass, with no asset writes.
+mGBA time selection/editor/accept and Chis NOR A→B return pass; screenshots
+inspected (header name/time and bold corners). Editor arrows now use actual
+font metrics. Source checkpoint next; freeze source/HEAD for clean all3 candidate.
+
+## 2026-11-15 —598 gates passed; owner12-character follow-up
+
+Clean598/source3508d7328ccdb14f61b7cd9a35ab8d2f36b7d078 all3 packages,
+standard full verifier, flash/RAM/resource gates and hosted43725948594 pass.
+Evidence build-598-validation.json. Not distributed: owner changed displayed
+name limit to12 at this point. Proposed editable name/keyboard was explicitly
+canceled before implementation. Keep NAME.TXT editing manual and only Time
+selectable; wrap cycle remains Last/rememberedSDorNOR/Settings/Time. Updated
+parser/display storage to12 full UTF8 characters (49bytes). New clean candidate
+needed after this tiny follow-up;594 stays current until replacement.
+
+## 2026-11-15 — Build599 delivered
+
+Clean all3 Build599/source18a8c56eae41a8a61e5338aac7b87590d3199763
+passes identity/seals, board flash caps, GBA placement and resource budget.
+Standard local full verifier passes; hosted43726431002 passes. Evidence
+build-599-validation.json. Root hardware-test now Chis599/hash18a8c56e plus
+manifest/guide; own594 files superseded after tracked evidence. Letter art ZIP
+and preview retained. Name readonly12-character UTF8 first-line display; user
+canceled name keyboard/editing before implementation. Time remains selectable,
+wrapped Last/SD-or-NOR/Settings/Time, independent software clock and editor.
+No physical599 qualification; owner594 progress recorded. Continue DE settings
+layout/backgrounds, true View options grouping, System/Help/dialog presentation.
+Do not edit599 image while next work proceeds. Integrate/sync this milestone.
+
+## 2026-11-15 — Active owner follow-ups and RAM checkpoint
+
+Owner599 confirms clock/editing and prominent markers; asks Settings marker up/right
+and four distinct corners for Settings/Time. Implemented adaptive arms/masked
+halfword edges; host canary/gap test passes. Next default save folder is SYSTEM/SAVER,
+with SYSTEM/SAVEGAME and all earlier save-set fallbacks retained; settings tests
+pass. Owner asks DS backgrounds/no bottom bar on all menus except List and exact
+art/panel/settings alignment. SET Light/Dark assets and9-row DE-font/7-row native
+settings geometry now render in mGBA, value-column highlights/white text. Root/
+Games screenshots inspected. Remaining generic/carousel/background/clip alignment
+work is active; not complete. Update unlock now fresh Down-Up-Left-Right-A in5s;
+wrong keys/chords/timeouts reset. Basic order/boundary/wrap tests pass; native
+fresh-key/Info integration test pending. No update-write/confirm path changes.
+
+Latest Chis diagnostic256704/257024EWRAM leaves320bytes. Do not loosen limits.
+Before adding further UI, compress the fixed built-in IGM payload with the native
+UPKR codec already used by this kernel, retaining its runtime-size metadata and
+identical decoded install bytes/address/allocation. Keep compressed bytes in GBA
+RAM, not a cartridge region that game/font moves may overwrite. Require host
+round-trip, ELF embedded metadata/stream verification and actual ARM halfword
+unpacker byte-equivalence/guards for all3 variants. This affects install mechanics,
+so new hardware gameplay/restore validation remains necessary despite identical
+bytes.599 remains current/frozen while work proceeds; folder ZIP/BIOS/scratch kept.
+
+## 2026-11-16 — Codespace recovery and plugin loader checkpoint
+
+Owner reports Codespace crash. Rechecked git/files/processes: source edits, current
+hardware-test599 and manifests, canonical Folder-Art.zip, private BIOS and session
+scratch survive. No live compiler/mGBA process remained. One interrupted own file,
+scripts/test-pogo-reset-arm.py, was zero bytes; restored and reran successfully.
+Root dssmm fe2a427 (folder pack) and superfw dab4a81 are confirmed remotely before
+this checkpoint. User untracked devcontainer lock/audit/patch remain untouched.
+
+Owner additionally requests existing EZFODE emulator plugins. Portable Pogoshell
+extension lookup now supports PLUG/<extension>.bin/.gba/.mb/.mbz before native
+SuperFW fallback; no EZ-FLASH driver is imported. New reset preserves argument
+block, supports RAM/raw/LZ77 entry, validates bounds/complete streams; exact-read
+loader handles partial word tails without native32-byte copy overrun. PLUG
+migration safely merges SYSTEM/emulators, preserving conflicts. See
+PLUGIN-COMPATIBILITY.md. Focused all-board sanitized loader tests, ARM reset
+replay (BIOS calls modeled), SYSTEM migration and all20 existing pack RAM-format
+checks pass. No physical plugin/game/save qualification claimed.
+
+Recovered settings/background work remains IN DEVELOPMENT: unified shared
+SETTINGS.TXT + namespaced extras, unknown DE/private/legacy UI preservation and
+atomic replacement now have real-filesystem short-write/rollback/recovery/oversize
+checks. These pass; Save buttons/autosave, Clean list display, shared recents,
+remaining backgrounds/footer/alignment are unfinished. Do not claim completed
+SYSTEM portability or parity. New update/Start corner and theme tests pass.
+
+Current diagnostic Chis main links at248184/257024EWRAM and14088IWRAM (before
+last small settings fixes). Native IGM50356→28233 packed bytes, runtime216244:
+host roundtrip, actual ELF bytes/metadata and actual ARM halfword unpacker output
+and guards pass. scripts/build.sh now enforces host/ELF IGM package validation;
+DSSMM_ARM_IGM=1 adds optional Unicorn replay per board. Still rerun clean all3,
+full verifier, background ARM and hosted checks after source freeze before a new
+hardware-test image;599 remains frozen. Continue remaining owner goals autonomously.
+
+## 2026-11-16 — Settings/recents follow-up source freeze
+
+Save buttons are removed; exiting settings/submenus saves unified SETTINGS.TXT
+and blocks navigation on failure while retaining values. Production routing test
+now covers successful and failed autosave. Clean list option strips NoIntro tags
+and extensions only from displayed files in browser/carousels/Recents/NOR/Start;
+untouched names still drive IO/artwork/header matching. Sanitized name tests pass.
+Start Box art moves up2; Title is58x38 at even x28/y46, moving up/left slightly.
+Updated preview extractor after Save removal; production-renderer preview builds.
+
+Recents now record at successful selection before launch and independently of
+Recent-menu visibility. Shared RECENT.TXT contains10 newest SD paths; private
+SUPERFW-RECENT.TXT retains native/NOR history. Merge external shared ordering;
+identical first SD title retains private NOR ordering (external same-title
+reselection is inherently indistinguishable). Writers create SYSTEM, check closes,
+write replacement/backup before commit and recover backups. CRLF accepted.
+Sanitizers found a native rounded memcpy32 filename overread; staged bounded,
+aligned padded filename also prevents aliasing during reordering. Focused actual
+file-IO tests cover shared/private order, failures, rollback and recovery.
+
+Owner removes public Folder-Art.zip and authorizes relocating local copy. Exact
+archive now /workspaces/dssmm/.release-assets/folder-art.zip, SHA256
+b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5. Preserve this ignored
+input, attach on every future kernel release. Root policy0b5148f pushed after
+owner deletionf47afa6; never re-add public ZIP. Generated letter-only pack now
+also uses centered80x80 sprites on120x80 canvas; not a substitute for owner pack.
+
+Next: freeze checkpoint, clean full all3 verifier and optional ARM IGM/background/
+plugin reset replays, mGBA screenshots, hosted CI. Do not replace599 until gates
+pass. Full generic/H/V backgrounds, footer removal outside List, final DE-font
+alignment, System/Help/dialog parity remain unfinished. Keep goal active.
+
+## 2026-11-16 — Build603 verified and delivered
+
+Source f28de96b7c205cb148adf7b470fab22048d20c9e (603), clean same-source all3
+identity/integrity/flash/resource/RAM gates and standard full verifier pass.
+Hosted43780888958 succeeds at that exact source. All3 IGM host/ELF/ARM byte
+replays pass. ARM embedded/standard/extended/missing-tag backgrounds match source
+pixels and preserve readonly assets; current carousel bus replay and plugin reset
+ROM/MB/MBZ replay pass. mGBA0.10.1 Start/SET hub with actual Light palette and
+DSSMM font inspected; synthetic games/art, no physical card/BIOS qualification.
+Evidence docs/build-603-validation.json. Root hardware-test now Chis603 plus
+manifest/guide; own599 files superseded, tracked historical evidence preserved.
+
+Flash used/headroom: SD518656/5632, Lite485888/22016, Chis1671680/425472 bytes.
+Do not raise limits; next asset/code work must honor especially tight SD budget.
+Owner archive stays .release-assets/folder-art.zip, full contents preserved.
+No public release in this milestone. Full DE generic/H/V backgrounds, footer
+removal outside List, final font/art alignment, System/Help/dialog parity remain
+unfinished. Continue port autonomously;603 remains frozen during later work.

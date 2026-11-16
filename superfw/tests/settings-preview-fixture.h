@@ -10,9 +10,9 @@ static unsigned backup_sram_default=3;
 static unsigned enable_cheats=1, patcher_default, ingamemenu_default=1;
 static unsigned rtcpatch_default, rtcspeed_default, rtcvalue_default;
 static unsigned autoload_default=1, autosave_default=1, autosave_prefer_ds=1;
-typedef struct { int year,month,day,hour,min; } t_dec_date;
+typedef struct { int8_t year,month,day,hour,min,sec; } t_dec_date;
 static void timestamp2date(unsigned value,t_dec_date *out) {
-  (void)value; *out=(t_dec_date){26,11,15,12,0};
+  (void)value; *out=(t_dec_date){26,11,15,12,0,0};
 }
 
 /* Fields read by the production patch/loading presentation functions only. */

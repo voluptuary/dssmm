@@ -71,3 +71,14 @@ choices and safe resumable no-overwrite migration; see SYSTEM-LAYOUT.md.
 stalled and was canceled. Native host ASAN startup is intermittent; host test
 Makefile now uses non-PIE executables with sanitizers retained, matching the
 successful local reruns. Verify that standard local/hosted suite passes this fix.
+
+## Owner594 feedback and next candidate
+
+Owner reports good progress on594. Name/time bar, bold corners, wrapped
+Last Played/SD-or-NOR/Settings/Time navigation and NOR B→Start are implemented
+in development. Games/Hardware now have independent filtered children and
+shared physical-option/input mapping. Time is an explicitly requested software
+menu clock, not hardware wall time; see LAUNCHER-PORT.md. Read-only backgrounds
+move into the existing font resource partition to recover GBA RAM, retaining
+the five-image cache. These changes need clean all3/CI and hardware retest.
+System/Help, dialog composition and broader settings isolation remain unfinished.

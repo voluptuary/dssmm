@@ -20,6 +20,7 @@
 #define __EMU__H__
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef unsigned(*t_loader_handler)(uint8_t *buffer, const char *fn, unsigned fs);
 
@@ -32,6 +33,10 @@ typedef struct {
   const char *extension;               // File extension
   const t_emu_loader *loaders;         // List of loaders
 } t_emu_platform;
+
+/* Exact extension-named Pogoshell plugins; no native ROM wrapper. */
+extern const t_emu_loader pogo_plugin_loader;
+bool find_pogo_plugin(const char *filename, char path[64]);
 
 const t_emu_loader * get_emu_info(const char *ext);
 

@@ -37,10 +37,17 @@ static FRESULT merge_directory(const char *from, const char *to, unsigned depth)
 FRESULT system_layout_migrate(void) {
   FILINFO info;
   FRESULT ret=f_stat("/.superfw",&info);
+  if(ret!=FR_NO_FILE && ret!=FR_NO_PATH) {
+    if(ret!=FR_OK)return ret;
+    if(!(info.fattrib&AM_DIR))return FR_INVALID_NAME;
+    ret=f_mkdir(SYSTEM_DIR);
+    if(ret!=FR_OK && ret!=FR_EXIST)return ret;
+    ret=merge_directory("/.superfw",SYSTEM_DIR,0);
+    if(ret!=FR_OK)return ret;
+  }
+  ret=f_stat("/SYSTEM/emulators",&info);
   if(ret==FR_NO_FILE || ret==FR_NO_PATH)return FR_OK;
   if(ret!=FR_OK)return ret;
   if(!(info.fattrib&AM_DIR))return FR_INVALID_NAME;
-  ret=f_mkdir(SYSTEM_DIR);
-  if(ret!=FR_OK && ret!=FR_EXIST)return ret;
-  return merge_directory("/.superfw",SYSTEM_DIR,0);
+  return merge_directory("/SYSTEM/emulators","/SYSTEM/PLUG",0);
 }
