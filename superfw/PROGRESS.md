@@ -588,3 +588,13 @@ manifest and guide; superseded own599 files after retaining historical evidence.
 No physical603/plugin/save qualification or full parity claim. SD flash headroom
 5632bytes; keep all3 budget gates. Owner full folder ZIP stays ignored in
 .release-assets. Next: remaining DS backgrounds/footer/dialog/settings parity.
+
+Post603: lossless H/V/Help backgrounds and procedural-source DS grid now feed
+read-only DBG3 resource streams. DS menus use these backgrounds, carousel/footer
+bars removed outside List/native themes, vertical art can reach y159. Existing
+cache/page reuse and centered Info identity preserved. Full12-background host/
+ARM pixel/readonly checks, artwork/cache/page checks and Chis diagnostic link
+pass; mGBA H/V screenshots inspected. Resource growth2616compressed bytes only
+is a preliminary figure; clean all3/full budget checks still needed.603 frozen.
+Root shared-tool registry correction ba4c310 passes all4 CI43782162091; synced
+normally. Continue remaining caption/font/menu/dialog parity after next gates.

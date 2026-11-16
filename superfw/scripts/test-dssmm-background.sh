@@ -7,4 +7,10 @@ python3 "$root/tools/generate-dssmm-background.py" --check
 gcc -O2 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-pie -no-pie \
  -I "$root/src" "$root/tests/dssmm-background-test.c" \
  "$root/src/dssmm_background.c" -o "$tmp/test"
-"$tmp/test" "$root/assets/backgrounds/light-start.rgb555" "$root/assets/backgrounds/light-settings.rgb555" "$root/assets/backgrounds/dark-start.rgb555" "$root/assets/backgrounds/dark-settings.rgb555"
+assets=()
+for theme in light dark; do
+ for kind in start settings horizontal vertical grid help; do
+  assets+=("$root/assets/backgrounds/$theme-$kind.rgb555")
+ done
+done
+"$tmp/test" "${assets[@]}"

@@ -113,7 +113,7 @@ int main(void) {
       assert(artwork_blit_cropped(frame+1,(uint16_t *)(output+2),&info,x,y));
       for (int fy=0; fy<160; ++fy) for (int fx=0; fx<240; ++fx) {
         uint8_t expected=17;
-        if (fy>=16 && fy<144 && fx>=x && fx<x+120 && fy>=y && fy<y+80) {
+        if (fy>=16 && fy<160 && fx>=x && fx<x+120 && fy>=y && fy<y+80) {
           expected=output[2+(fy-y)*120+fx-x];
           if (!expected) expected=17;
         }
@@ -129,7 +129,7 @@ int main(void) {
       assert(artwork_blit_scaled_cropped(frame+1,(uint16_t *)(output+2),&info,x,y,60,40));
       for(int fy=0;fy<160;++fy) for(int fx=0;fx<240;++fx) {
         uint8_t expected=17;
-        if(fy>=16 && fy<144 && fx>=x && fx<x+60 && fy>=y && fy<y+40) {
+        if(fy>=16 && fy<160 && fx>=x && fx<x+60 && fy>=y && fy<y+40) {
           expected=output[2+((fy-y)*80/40)*120+(fx-x)*120/60];
           if(!expected)expected=17;
         }

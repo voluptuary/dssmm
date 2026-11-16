@@ -175,6 +175,11 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
     return;
   }
   if (PREVIEW_SCREEN == 1) { render_tools(frame); return; }
+  if(menu_theme>=THEME_DSSMM_LIGHT) {
+    dssmm_background_palette(PALETTE,menu_theme==THEME_DSSMM_DARK);
+    dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,vertical?DSSMM_BG_VERTICAL:DSSMM_BG_HORIZONTAL);
+    fill_rect(frame,0,0,240,16,FG_COLOR);
+  }
   browser_carousel_item items[3];
   unsigned n = browser_carousel_layout(vertical, selected, 3, offset, items);
   int focus = selected;

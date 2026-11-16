@@ -78,3 +78,26 @@ Host pixel comparisons and actual ARM embedded/normal/extended resource tests
 verify output and reject writes into the read-only font partition. Main Chis
 RAM recovers about2.6KiB before the new profile/clock code. Keep packed flash
 and GBA RAM gates independent; do not raise hardware limits to fit future UI.
+
+## Full-screen backgrounds after603
+
+Light/Dark horizontal and vertical browser backgrounds and Help panels are
+lossless copies of the corresponding DE assets. `assets/backgrounds/parity-sources.json`
+records their reference hashes. The generic DS grid repeats the untouched first
+48 scanlines of the horizontal asset. All background colors fit the reserved
+0–15 palette; UI/artwork palette roles remain separate. DBG3 adds these streams
+after the unchanged native font prefix; rounded extended-resource headroom is
+499712bytes. Native loader/allocation/unpack paths remain unchanged.
+
+The carousel uses the full screen below the top bar, including y144–159 for the
+lower vertical neighbor. The original footer stays in List/native themes; DS
+carousel/Info/NOR screens omit its solid bar. Stable carousel pages still reuse
+artwork and only restore the caption region. Hardware603 remains frozen while
+this later rendering work is validated.
+
+For representative mGBA colors use explicit `PREVIEW_THEME=6` (Light) or7 (Dark)
+and `PREVIEW_FONT=1`. Without an explicit theme the fixture intentionally starts
+with its schematic palette, which can hide white text on Light panels. Example:
+`PREVIEW_THEME=6 PREVIEW_FONT=1 PREVIEW_VERTICAL=1 bash scripts/test-browser-preview-mgba.sh`.
+The harness now draws the actual carousel backgrounds with the production layout,
+font and compositor, but synthetic games/art and no physical SuperCard storage.

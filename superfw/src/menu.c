@@ -1436,8 +1436,8 @@ void render_recent(volatile uint8_t *frame) {
 
 #ifdef SUPPORT_NORGAMES
 void render_flashbrowser(volatile uint8_t *frame) {
-  // Render bar below to show block info
-  dma_memset16(&frame[240*144], dup8(FG_COLOR), 240*16/2);
+  // Native themes retain their footer; DS screens keep the grid background.
+  if(menu_theme<THEME_DSSMM_LIGHT)dma_memset16(&frame[240*144],dup8(FG_COLOR),240*16/2);
 
   // Render the list from memory.
   if (!smenu.fbrowser.maxentries)
@@ -1559,16 +1559,17 @@ static unsigned browser_entry_icon(const t_centry *entry) {
 }
 
 static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
-  if (!browser_fast_reuse)
-    if(menu_theme>=THEME_DSSMM_LIGHT)dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,128);
-    else dma_memset16(&frame[240 * 16], dup8(BG_COLOR),240*(144-16)/2);
-  else {
+  if (!browser_fast_reuse) {
+    /* DS backgrounds were drawn once by menu_render before the header. */
+    if(menu_theme<THEME_DSSMM_LIGHT)
+      dma_memset16(&frame[240 * 16],dup8(BG_COLOR),240*(144-16)/2);
+  } else {
     unsigned tx = vertical ? 98 : 40, ty = vertical ? 85 : 122;
     unsigned tw = vertical ? 136 : 162;
     if(menu_theme>=THEME_DSSMM_LIGHT)dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,tx,ty,tw,16);
     else for (unsigned row = 0; row < 16; ++row)
       dma_memset16(frame + (ty+row)*240 + tx, dup8(BG_COLOR), tw/2);
-    dma_memset16(frame + 144*240, dup8(BG_COLOR), 240*16/2);
+    if(menu_theme<THEME_DSSMM_LIGHT)dma_memset16(frame+144*240,dup8(BG_COLOR),240*16/2);
   }
 
   if (!smenu.browser.dispentries) {
@@ -1638,7 +1639,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         x &= ~1u;
         width &= ~1u;
         if (browser_fast_reuse) drawn = true;
-        else if (width == info->width && height == info->height && x >= 0 && x+(int)width <= 240 && item->y >= 16 && item->y+(int)height <= 144)
+        else if (width == info->width && height == info->height && x >= 0 && x+(int)width <= 240 && item->y >= 16 && item->y+(int)height <= 160)
           drawn = artwork_blit_frame((volatile uint16_t *)frame,
               pixels, info, x,
               item->y);
@@ -1664,8 +1665,10 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       draw_text_ovf_rotate(shown, frame, 40, 122, 162, &smenu.anim_state);
   }
 
+  if(menu_theme<THEME_DSSMM_LIGHT) {
   draw_text_leftovf(smenu.browser.cpath, frame, 8, 144, SCREEN_WIDTH - 88);
   draw_rightj_text(menu_theme>=THEME_DSSMM_LIGHT?"Start: Home":"Start: Art", frame, SCREEN_WIDTH - 2, 144);
+  }
   char selinfo[16];
   npf_snprintf(selinfo, sizeof(selinfo), "%u/%d", smenu.browser.selector + 1, smenu.browser.dispentries);
   draw_rightj_text(selinfo, frame, SCREEN_WIDTH - 1, 1);
@@ -2246,8 +2249,10 @@ void render_info(volatile uint8_t *frame) {
   uint32_t vmin = VERSION_WORD & 0xFFFF;
   char tmp[64], tmp2[32];
 
-  init_logo_palette(&MEM_PALETTE[1]);
-  render_logo((uint16_t*)frame, SCREEN_WIDTH/2, 40, 4);
+  if(menu_theme<THEME_DSSMM_LIGHT) {
+    init_logo_palette(&MEM_PALETTE[1]);
+    render_logo((uint16_t*)frame,SCREEN_WIDTH/2,40,4);
+  } else draw_central_text("SuperFW",frame,120,40);
 
   switch (smenu.info.selector) {
   case 0:
@@ -2295,7 +2300,7 @@ void render_info(volatile uint8_t *frame) {
   }
 
   // Flashing info
-  dma_memset16(&frame[138*SCREEN_WIDTH], dup8(FG_COLOR), SCREEN_WIDTH*22/2);
+  if(menu_theme<THEME_DSSMM_LIGHT)dma_memset16(&frame[138*SCREEN_WIDTH],dup8(FG_COLOR),SCREEN_WIDTH*22/2);
   draw_text_ovf_rotate(enable_flashing ? msgs[lang_id][MSG_FWUP_ENABLED] : msgs[lang_id][MSG_FWUP_HOTKEY], frame,
                        4, 141, SCREEN_WIDTH - 8, &smenu.anim_state);
 }
@@ -2472,10 +2477,31 @@ void menu_render(unsigned fcnt) {
   bool ds_style=menu_theme>=THEME_DSSMM_LIGHT;
   bool launcher=ds_style && launcher_page && !spop.pop_num &&
       !spop.qpop.message && !spop.rtcpop.callback && !spop.alert_msg;
-  if(ds_style && (launcher || smenu.menu_tab!=MENUTAB_INFO))
+  if(ds_style)
     dssmm_background_palette(MEM_PALETTE,menu_theme==THEME_DSSMM_DARK);
   if(!(launcher && launcher_page==1 && launcher_valid[framen]))
     dma_memset16(&frame[0],dup8(FG_COLOR),SCREEN_WIDTH*16/2);
+
+  bool fast_carousel = !launcher && smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view &&
+      browser_motion_offset == 0 && !spop.qpop.message && !spop.rtcpop.callback &&
+      !spop.pop_num && !spop.alert_msg;
+  if (!fast_carousel) browser_fast_valid[0] = browser_fast_valid[1] = false;
+  browser_fast_reuse = fast_carousel && browser_fast_valid[framen] &&
+      browser_fast_selection[framen] == smenu.browser.selector &&
+      browser_fast_view[framen] == browser_view && browser_fast_mode[framen] == artwork_mode;
+  // Preserve stable artwork in each Mode 4 page; text is refreshed separately.
+  if (!browser_fast_reuse && !(launcher && launcher_valid[framen])) {
+    if(ds_style && !launcher) {
+      if(smenu.menu_tab==MENUTAB_ROMBROWSE && !browser_view)
+        dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,144);
+      else {
+        unsigned kind=smenu.menu_tab==MENUTAB_ROMBROWSE?(browser_view==2?DSSMM_BG_VERTICAL:DSSMM_BG_HORIZONTAL):
+                      smenu.menu_tab==MENUTAB_INFO?DSSMM_BG_HELP:DSSMM_BG_GRID;
+        dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,kind);
+        dma_memset16(frame,dup8(FG_COLOR),240*16/2);
+      }
+    } else dma_memset16(&frame[16*SCREEN_WIDTH],dup8(BG_COLOR),SCREEN_WIDTH*(SCREEN_HEIGHT-16)/2);
+  }
   if(!ds_style) {
     int mintab=(recent_menu && smenu.recent.maxentries)?MENUTAB_RECENT:MENUTAB_ROMBROWSE;
     for(unsigned i=mintab;i<MENUTAB_MAX;++i)
@@ -2493,19 +2519,6 @@ void menu_render(unsigned fcnt) {
     draw_text_ovf(heading,frame,8,0,160);
   }
 
-  bool fast_carousel = !launcher && smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view &&
-      browser_motion_offset == 0 && !spop.qpop.message && !spop.rtcpop.callback &&
-      !spop.pop_num && !spop.alert_msg;
-  if (!fast_carousel) browser_fast_valid[0] = browser_fast_valid[1] = false;
-  browser_fast_reuse = fast_carousel && browser_fast_valid[framen] &&
-      browser_fast_selection[framen] == smenu.browser.selector &&
-      browser_fast_view[framen] == browser_view && browser_fast_mode[framen] == artwork_mode;
-  // Preserve stable artwork in each Mode 4 page; text is refreshed separately.
-  if (!browser_fast_reuse && !(launcher && launcher_valid[framen])) {
-    if(ds_style && !launcher && smenu.menu_tab!=MENUTAB_INFO)
-      dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,144);
-    else dma_memset16(&frame[16*SCREEN_WIDTH],dup8(BG_COLOR),SCREEN_WIDTH*(SCREEN_HEIGHT-16)/2);
-  }
   if(launcher) {
     if(!launcher_valid[framen]) {
       if(launcher_page==1)render_start(frame);

@@ -745,3 +745,32 @@ Owner archive stays .release-assets/folder-art.zip, full contents preserved.
 No public release in this milestone. Full DE generic/H/V backgrounds, footer
 removal outside List, final font/art alignment, System/Help/dialog parity remain
 unfinished. Continue port autonomously;603 remains frozen during later work.
+
+## 2026-11-16 — Post603 background parity slice
+
+603 remains frozen. Added credited lossless Light/Dark H/V/Help assets plus
+48-row repeating DS grid, with reference hashes. DBG3 read-only resource blob
+18436bytes (old6035676), rounded extended headroom499712; all native prefixes
+remain byte-identical. SD compressed standard resource grows2616bytes in an
+isolated pack comparison; complete board image limit still must pass. Never
+infer the complete image fits from this partial measurement.
+
+Main renderer now draws DS H/V, grid and Help backgrounds before headers;
+carousels preserve existing page/cache reuse. DS carousel and Info/NOR footer
+bars removed, List/native retained. Artwork clipped at screen160 rather than
+old144, retaining full lower vertical neighbors. Info native logo palette is
+isolated to native themes; DS Help uses ordinary SuperFW text without palette
+collision. Existing version/hash stays centered. Caption wrapping/alignment and
+remaining settings/dialog visual parity remain next.
+
+Focused host all12-background pixel checks, actual ARM embedded/standard/extended/
+missing-tag checks, artwork clip/guard tests, cache/page tests and Chis diagnostic
+link pass. mGBA Light+DSSMM-font horizontal/vertical screenshots inspected:
+actual panels/grid and art, no bottom bar. Diagnostic EWRAM249060/IWRAM14072;
+no new candidate yet. Freeze, clean all3/full verifier/CI before replacing603.
+
+Root integration CI43781689758 caught unregistered universal folder-art tool;
+root ba4c310 registers that exact universal tool with regression test, preserving
+unknown hardware-tool rejection. All4 jobs now pass in43782162091. Policy fix
+is normally synchronized to all5 branches. Root edits stayed on dssmm. Current
+SuperFW source work remains under superfw/. Owner archive remains ignored local.
