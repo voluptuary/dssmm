@@ -825,3 +825,21 @@ Current613 remains frozen. New feedback/GG/save changes need clean same-source
 all3/full verifier/CI before next hardware-test image. Keep all3 synchronized;
 SD613 had3072bytes headroom, so added icon/code must pass real image gates. Broader
 performance profiling, caption/font/settings/dialog parity still active.
+
+615/source580906ddf6fdda5e08ac19a0b81fdc8fbc145b8e passes clean all3/full local
+verifier and hosted43785459391. Evidence build-615-validation.json; not distributed
+because existing dotted-name save compatibility needs a follow-up. New complete
+basenames stay canonical, but when no correctly named save exists, detect exact
+historical shortened names in current/legacy locations and preserve prior access
+without moving/renaming files. Correctly named saves always win. This retains
+old behavior/data; it cannot undo old prefix collisions. All3 focused name tests
+pass including correct-vs-shortened priority and legacy temporary saves.613
+remains frozen until complete new gates. Start expanded-marker screenshot also
+inspected. Root owner folder artwork still preserved in ignored .release-assets.
+
+Private timing prototype /tmp/dssmm-render-profile/profile.c (uncommitted) splits
+synthetic full-redraw costs: BG790922, art502309, total1296968cycles as screenshot
+profile-0.png. Values vary slightly and use ROM code/art, not actual firmware
+hot/page caches. Background is worth optimizing; compare a run-fill codec and
+DMA spans against all source pixels, actual mGBA hardware path and SD budget.
+Do not call these physical firmware FPS or remove the existing page/cache path.

@@ -613,3 +613,10 @@ icon; appends no-changes native sprite/palette entries. All3 plugin/header/icon
 checks pass. GB/GG save regression tests uncovered a separate dotted-stem double
 strip; fixed bounded .sav append and verified all3 legacy/backup/state names.
 613 remains current until clean all3/full/CI gates on this source. Continue parity.
+
+615 all3/full/hosted43785459391 passed but not distributed: added exact historical
+dotted-name save fallback to preserve existing data before next candidate. Full
+names remain preferred/new default; no old files moved. Focused all3 filename
+priority/legacy-temp tests pass.613 current. Private mGBA component timing points
+to background decode as a worthwhile next optimization; ROM-fixture timing is
+not physical firmware FPS. Continue autonomous parity/performance work.

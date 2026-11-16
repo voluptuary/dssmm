@@ -22,10 +22,12 @@ ROM extension, code replaced an extension again, cutting real dots from the
 stem. Save names now append `.sav` once and refuse overflow. For example,
 `Sonic.v1.2 (USA).gg` uses `SYSTEM/SAVER/Sonic.v1.2 (USA).sav`.
 
-Older builds may have created shortened saves for dotted basenames. This change
-leaves those files untouched; back up and rename an affected save to the complete
-basename when transferring it. It does not guess which shortened save belongs
-to a game, since multiple names can share that prefix. This is filename-helper
+Older builds may have created shortened saves for dotted basenames. When no correctly named save exists, the loader recognizes the exact historical
+shortened-name rule in current/legacy locations, preserving prior save access.
+It does not move or rename those files. A correctly named save always takes
+priority. Back up and rename a legacy save to the complete basename when
+transferring it; this fallback cannot repair old collisions between names sharing
+a prefix. This is filename-helper
 validation, not physical emulator/save-cycle qualification or interchangeability
 of differing emulator state formats.
 
