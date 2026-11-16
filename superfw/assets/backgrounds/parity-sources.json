@@ -1,0 +1,42 @@
+{
+  "credit": "DS Style / DSSMM DE artwork, Apache-2.0; retained component license in docs/licenses",
+  "assets": [
+    {
+      "asset": "light-horizontal.rgb555",
+      "reference": "ezfomegade/images/blank/SD_HORIZONTAL.h",
+      "reference_sha256": "33f53645222dc6b9c529391b6b4a07130b13abd59537cc30187176180d95eecb",
+      "pixels_sha256": "2e4c1994e2d2915c7b62eb1604b7fc276b09f64a88b34990e5031461697ec345"
+    },
+    {
+      "asset": "light-vertical.rgb555",
+      "reference": "ezfomegade/images/blank/SD_VERTICAL.h",
+      "reference_sha256": "264294f1e59c807acaa4226461587e2b07b56d885ae917360d7955b4d05fdc7a",
+      "pixels_sha256": "cc6b09cc76a7088d9ebb37b50ced497c468437f1d14c7c17a32da5837dc0f83f"
+    },
+    {
+      "asset": "light-help.rgb555",
+      "reference": "ezfomegade/images/blank/HELP.h",
+      "reference_sha256": "99872e2c679354bb0f525b5d7fe2eb20a9e575001c79046a45f1df9e7719a57c",
+      "pixels_sha256": "29c0e74c2ba1753d1d419cb8e558f42c08268405752f592a40e573d5739d545d"
+    },
+    {
+      "asset": "dark-horizontal.rgb555",
+      "reference": "ezfomegade/images/dark/SD_HORIZONTAL.h",
+      "reference_sha256": "adc4c591b6f768dacb001117eec941dd60f605c3931c244ca1981036c543affb",
+      "pixels_sha256": "bcd41014c5233ffd7b2b2ea9075eef4900205b77725eab10c35d3b975723c290"
+    },
+    {
+      "asset": "dark-vertical.rgb555",
+      "reference": "ezfomegade/images/dark/SD_VERTICAL.h",
+      "reference_sha256": "beb160fef34af7eff49b2d41d3517233d948bf44d1ca901a1e1160bace5ec567",
+      "pixels_sha256": "ab5381ec414879912ec137bd31100308769d6fa3fba56c13770636e686fa4cac"
+    },
+    {
+      "asset": "dark-help.rgb555",
+      "reference": "ezfomegade/images/dark/HELP.h",
+      "reference_sha256": "60d1e091782bae2f97da8ce7f3b2df595ce47432946431507e2bdef3b7dbdd6c",
+      "pixels_sha256": "ffaedb672350d6c603311d7cdb5b27a8d7e6028ca84fe7d1410abd3d0c189a27"
+    }
+  ],
+  "grid": "Repeat the untouched first48rows of horizontal background; native DS grid period48."
+}

@@ -1,0 +1,86 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 618,
+  "boards": [
+    {
+      "source_tree_sha256": "5207cfe400a2ad402809b39eebd36672fdf8a0f4c6bcc85696fb740784c6bd91",
+      "board": "sd",
+      "dssmm_build": 618,
+      "source_commit": "4fc627ac724a1a337b43419f9ebcc86013738b3d",
+      "source_dirty": false,
+      "firmware_sha256": "5eaaaf08302c045b6eca0808fe126a687504260ed4aad7d3da81a5ea183e625e",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 522752,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 1536
+    },
+    {
+      "source_tree_sha256": "5207cfe400a2ad402809b39eebd36672fdf8a0f4c6bcc85696fb740784c6bd91",
+      "board": "lite",
+      "dssmm_build": 618,
+      "source_commit": "4fc627ac724a1a337b43419f9ebcc86013738b3d",
+      "source_dirty": false,
+      "firmware_sha256": "5ad5ff995b54d9b7b04bf471be553ebaaa029f48054a9705f7ffaf380905c45e",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 489984,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 17920
+    },
+    {
+      "source_tree_sha256": "5207cfe400a2ad402809b39eebd36672fdf8a0f4c6bcc85696fb740784c6bd91",
+      "board": "chis",
+      "dssmm_build": 618,
+      "source_commit": "4fc627ac724a1a337b43419f9ebcc86013738b3d",
+      "source_dirty": false,
+      "firmware_sha256": "e6823fc05f181f39b73c1ae76de3469847fc558e90c28e8fc0ea28cc7886c340",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "url": "https://github.com/voluptuary/dssmm/actions/runs/43790527480",
+    "conclusion": "success",
+    "source_commit": "4fc627ac724a1a337b43419f9ebcc86013738b3d"
+  },
+  "checks": [
+    "Standard clean full verifier passes all3 board images, resource/RAM/flash limits, seals and native host suites",
+    "All3 portable GG/SMS resolution, native GG flags, exact Game Gear sprite/colors and icon lookup pass",
+    "GB/GG/mixed-case/NoIntro/dotted/legacy/backup/temp save-name helpers pass, including historical-short-name fallback and full-name priority",
+    "Production error handlers rebuild overwritten SDRAM tables after failed plugin/native loads; early save/recent failures abort before loading",
+    "Start marker spacing and submenu highlight frame/gap guards pass; mGBA Interface and Start previews inspected",
+    "All12 host/ARM background source pixel comparisons pass; stock mGBA actual __GBA__ DMA path matches all38400 pixels per scene and frame-padding guards",
+    "All3 native IGM host/ELF/ARM exact unpack and current carousel cartridge-bus checks pass",
+    "Shared PNG reader covers all5 filters; artwork proof rejects gray-only backgrounds and validates chromatic synthetic-art pixels"
+  ],
+  "background_resource": {
+    "format": "DBR1",
+    "bytes_after_unchanged_native_prefix": 58652,
+    "rounded_extended_partition_free_bytes": 458752,
+    "new_gba_buffers": 0
+  },
+  "profile": {
+    "environment": "mGBA0.10.1 synthetic ROM fixture; not physical firmware FPS",
+    "old_background_cycles": 790922,
+    "new_background_cycles": 310810,
+    "unchanged_artwork_cycles": 502309,
+    "old_total_cycles": 1296968,
+    "new_total_cycles": 906856
+  },
+  "limits": "Owner603 feedback covers UI only. No physical618/plugin/game/save/NOR-write qualification. Full DE visual/interaction parity remains incomplete. SD has1536bytes flash headroom; limits unchanged.",
+  "memory_log": [
+    "IWRAM:        2504 B         4 KB     61.13%",
+    "EWRAM:       50564 B        60 KB     82.30%",
+    "IWRAM:       14312 B        32 KB     43.68%",
+    "EWRAM:      235884 B       251 KB     91.78%",
+    "IWRAM:        2672 B         4 KB     65.23%",
+    "EWRAM:       50732 B        60 KB     82.57%",
+    "IWRAM:       14480 B        32 KB     44.19%",
+    "EWRAM:      236056 B       251 KB     91.84%",
+    "IWRAM:        2264 B         4 KB     55.27%",
+    "EWRAM:       50356 B        60 KB     81.96%",
+    "IWRAM:       14072 B        32 KB     42.94%",
+    "EWRAM:      249668 B       251 KB     97.14%"
+  ]
+}

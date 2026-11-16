@@ -44,72 +44,26 @@ SDL_AUDIODRIVER=dummy xvfb-run -a bash -c '
   xdotool key F12
   sleep 1
 ' _ "$out" "$emulator"
-python3 - "$out" <<'PY'
+python3 - "$out" "$project_root/tests" <<'PY'
 import os
 from collections import Counter
 from pathlib import Path
-import struct
 import sys
-import zlib
 
 out = Path(sys.argv[1])
 screenshots = sorted(out.glob("browser-preview*.png"), key=lambda p: p.stat().st_mtime)
 if not screenshots:
     raise SystemExit("mGBA did not save a browser-preview screenshot")
 path = screenshots[-1]
-data = path.read_bytes()
-if data[:8] != b"\x89PNG\r\n\x1a\n":
-    raise SystemExit("mGBA screenshot is not a PNG")
-offset, chunks, header = 8, [], None
-while offset < len(data):
-    size = struct.unpack_from(">I", data, offset)[0]
-    kind = data[offset + 4:offset + 8]
-    payload = data[offset + 8:offset + 8 + size]
-    offset += size + 12
-    if kind == b"IHDR":
-        header = struct.unpack(">IIBBBBB", payload)
-    elif kind == b"IDAT":
-        chunks.append(payload)
-    elif kind == b"IEND":
-        break
-if not header:
-    raise SystemExit("PNG has no IHDR")
-width, height, depth, color_type, compression, filtering, interlace = header
-if (width, height, depth, color_type, interlace) != (240, 160, 8, 2, 0):
-    raise SystemExit(f"Unexpected screenshot format: {header}; expected 240x160, 8-bit RGB, non-interlaced")
-raw = zlib.decompress(b"".join(chunks))
-stride, bpp = width * 3, 3
-if len(raw) != height * (stride + 1):
-    raise SystemExit("PNG pixel data has an unexpected length")
-rows, previous = [], bytearray(stride)
-pos = 0
-for _ in range(height):
-    method = raw[pos]
-    row = bytearray(raw[pos + 1:pos + 1 + stride])
-    pos += stride + 1
-    for i in range(stride):
-        left = row[i - bpp] if i >= bpp else 0
-        above = previous[i]
-        upper_left = previous[i - bpp] if i >= bpp else 0
-        if method == 1:
-            row[i] = (row[i] + left) & 255
-        elif method == 2:
-            row[i] = (row[i] + above) & 255
-        elif method == 3:
-            row[i] = (row[i] + ((left + above) // 2)) & 255
-        elif method == 4:
-            estimate = left + above - upper_left
-            distances = (abs(estimate - left), abs(estimate - above), abs(estimate - upper_left))
-            predictor = (left, above, upper_left)[distances.index(min(distances))]
-            row[i] = (row[i] + predictor) & 255
-        elif method != 0:
-            raise SystemExit(f"Unsupported PNG filter {method}")
-    rows.append(row)
-    previous = row
+sys.path.insert(0,sys.argv[2])
+from png_reader import read_rgb_png,artwork_pixel_count
+width,height,rows=read_rgb_png(path)
+if (width,height)!=(240,160):raise SystemExit("Expected240x160 mGBA screenshot")
+stride=width*3
 pixels = Counter(tuple(row[i:i + 3]) for row in rows for i in range(0, stride, 3))
-# Exclude schematic UI colors; other colors originate in decoded BMPs.
-ui_colors = {(24, 57, 49), (255, 255, 255), (255, 165, 123), (173, 173, 173)}
-art_pixels = sum(count for color, count in pixels.items() if color not in ui_colors)
+# Actual BMP quantization uses the six-level RGB cube. Neutral DS backgrounds
+# must never count as artwork merely because they contain many gray shades.
+art_pixels=artwork_pixel_count(rows)
 if os.environ.get("PREVIEW_SCREEN") in ("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"):
     background=tuple(rows[80][-3:])
     text_pixels = sum(tuple(row[i:i+3]) != background for row in rows[20:140] for i in range(0,stride,3))
@@ -118,5 +72,5 @@ if os.environ.get("PREVIEW_SCREEN") in ("1", "2", "3", "4", "5", "6", "7", "8", 
     sys.exit(0)
 if len(pixels) < 8 or art_pixels < 500:
     raise SystemExit(f"Preview lacks decoded BMP pixels: {len(pixels)} colors, {art_pixels} artwork pixels")
-print(f"mGBA preview rendered {width}x{height}; {len(pixels)} colors; decoded BMP pixels: {art_pixels}")
+print(f"mGBA preview rendered {width}x{height}; {len(pixels)} colors; chromatic synthetic-art pixels: {art_pixels}")
 PY

@@ -527,7 +527,7 @@ static void pogo_copy16(void *dst,const void *src,unsigned size) {
   for(unsigned n=bulk;n<size;n+=2)*d++=*s++;
 }
 static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progress) {
-  const char *ext=find_extension(fn);
+  const char *ext=pogo_plugin_extension(fn);
   if(!ext || strlen(ext)>16)return ERR_LOAD_NOEMU;
   char path[64];FIL file;bool found=false;unsigned mode=0;
   const char *suffixes[]={".bin",".gba",".mb",".mbz"};
