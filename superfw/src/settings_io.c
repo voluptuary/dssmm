@@ -51,8 +51,29 @@ bool settings_read_text(const char *path,settings_line_fn callback,bool *exists)
   }
   return true;
 }
+static uint32_t output_hash, output_size;
+static uint32_t text_hash(uint32_t hash, const void *data, unsigned size) {
+  const unsigned char *p = data;
+  while (size--) hash = (hash ^ *p++) * 16777619u;
+  return hash;
+}
 static bool write_bytes(FIL *file,const void *data,unsigned size) {
-  UINT written=0;return f_write(file,data,size,&written)==FR_OK && written==size;
+  UINT written=0;
+  if(f_write(file,data,size,&written)!=FR_OK || written!=size)return false;
+  output_hash=text_hash(output_hash,data,size);output_size+=size;
+  return true;
+}
+static bool verify_saved_text(void) {
+  FIL file;
+  if(f_open(&file,SETTINGS_FILEPATH,FA_READ)!=FR_OK)return false;
+  uint32_t hash=2166136261u,size=0;bool ok=true;
+  char buffer[256];UINT count;
+  do {
+    if(f_read(&file,buffer,sizeof(buffer),&count)!=FR_OK){ok=false;break;}
+    hash=text_hash(hash,buffer,count);size+=count;
+  }while(count);
+  if(f_close(&file)!=FR_OK)ok=false;
+  return ok && size==output_size && hash==output_hash;
 }
 static bool preserve(FIL *out,settings_owned_fn owned,bool private_lines) {
   unsigned position=0;
@@ -75,35 +96,24 @@ bool settings_write_text(const char *shared,const char *private_text,settings_ow
   if(f_stat(SETTINGS_FILEPATH,0)==FR_NO_FILE && f_stat(CONFIG_BACKUP,0)==FR_OK)
     if(f_rename(CONFIG_BACKUP,SETTINGS_FILEPATH)!=FR_OK)return false;
   if(!read_original(SETTINGS_FILEPATH,&exists))return false; /* Refuse oversize/error; never truncate. */
-  /* Preserve unknown legacy UI entries/comments before retiring the sidecar. */
-  FIL legacy;
-  FRESULT legacy_result=f_open(&legacy,UISETTINGS_FILEPATH,FA_READ);
-  if(legacy_result==FR_OK) {
-    unsigned separator=original_size && original[original_size-1]!='\n';
-    if(original_size+separator>=sizeof(original)){f_close(&legacy);return false;}
-    unsigned available=sizeof(original)-1-original_size-separator;
-    if(f_size(&legacy)>available){f_close(&legacy);return false;}
-    if(separator)original[original_size++]='\n';
-    UINT count=0;FSIZE_t expected=f_size(&legacy);
-    legacy_result=f_read(&legacy,original+original_size,available,&count);
-    FRESULT close=f_close(&legacy);
-    if(legacy_result!=FR_OK || close!=FR_OK || count!=expected)return false;
-    original_size+=count;original[original_size]=0;
-  }else if(legacy_result!=FR_NO_FILE && legacy_result!=FR_NO_PATH)return false;
   f_mkdir(SYSTEM_DIR);
   FIL out;if(f_open(&out,CONFIG_TEMP,FA_WRITE|FA_CREATE_ALWAYS)!=FR_OK)return false;
+  output_hash=2166136261u;output_size=0;
   bool ok=write_bytes(&out,"# DSSMM shared settings\n",strlen("# DSSMM shared settings\n")) && write_bytes(&out,shared,strlen(shared)) &&
       preserve(&out,owned,false) && write_bytes(&out,"# SuperFW-specific settings\n",strlen("# SuperFW-specific settings\n")) &&
       write_bytes(&out,private_text,strlen(private_text)) && preserve(&out,owned,true);
   if(f_close(&out)!=FR_OK)ok=false;
-  if(!ok){f_unlink(CONFIG_TEMP);return false;}
+  if(!ok || output_size>=CONFIG_CAPACITY){f_unlink(CONFIG_TEMP);return false;}
   if(f_stat(CONFIG_BACKUP,0)==FR_OK && f_unlink(CONFIG_BACKUP)!=FR_OK)return false;
   if(exists && f_rename(SETTINGS_FILEPATH,CONFIG_BACKUP)!=FR_OK)return false;
   if(f_rename(CONFIG_TEMP,SETTINGS_FILEPATH)!=FR_OK) {
     if(exists)f_rename(CONFIG_BACKUP,SETTINGS_FILEPATH);
     return false;
   }
+  if(!verify_saved_text()) {
+    if(f_unlink(SETTINGS_FILEPATH)==FR_OK && exists)f_rename(CONFIG_BACKUP,SETTINGS_FILEPATH);
+    return false;
+  }
   if(exists)f_unlink(CONFIG_BACKUP);
-  f_unlink(UISETTINGS_FILEPATH); /* Retire the legacy sidecar only after success. */
   return true;
 }

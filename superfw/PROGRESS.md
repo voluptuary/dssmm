@@ -749,3 +749,12 @@ and integration/publication still pending; preserve Test5/624 until replaced.
 43886442413 passed. Chis638 delivered hardware-test; report build-638-validation.
 Native flash limits unchanged: SD3584B/Lite19968B/Chis425472B headroom. Next integrate
 normally, all4 CI, publish authorized Test6 and archive/prune Test5, then porting.
+
+638 hardware notes incorporated: lined shared panels/header-safe modal clearing,
+Help logo, System centering, NOR List/footer, bracketed plain launch selector,
+Start corners, narrower horizontal text and revised blank GG cartridge. Host
+source-pixel/guard and mGBA Help/ROM/System previews pass. Canonical-only settings
+ignore UI/US sidecars, save changes/exits, read back and roll back failed commits;
+corruption/roundtrip/FAT16/FAT32 checks pass. Raw MB odd tails accepted with padded
+reset size; all3 plugin tests pass. Physical settings/PCE/plugin Exit remain open.
+No638 release yet; publish next validated correction per standing owner approval.

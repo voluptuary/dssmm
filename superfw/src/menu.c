@@ -48,6 +48,7 @@
 #include "res/icons.h"
 #include "res/icon-gamegear.h"
 #include "res/logo.h"
+#include "res/dssmm-panel.h"
 
 extern t_card_info sd_info;
 extern bool fastew;
@@ -1382,6 +1383,20 @@ static void draw_box_full(
     dma_memset16(&frame[SCREEN_WIDTH * i + left + 2], dup8(bgcolor), (right - left - 4) / 2);
 }
 
+/* Extend the Settings right-hand panel while retaining its original bevel. */
+static void draw_lined_panel(volatile uint8_t *frame) {
+  bool dark = menu_theme == THEME_DSSMM_DARK;
+  dssmm_background_clear(frame, dark, 0, 16, 240, 144);
+  for (unsigned y = 21; y < 152; ++y) {
+    const uint8_t *p = dssmm_panel_profile[dark][y - 21];
+    volatile uint16_t *row = (volatile uint16_t *)(frame + y * 240);
+    dma_memset16(row + 1, dup8(p[1]), 118);
+    row[1] = (p[0] & 15) | ((p[0] >> 4) << 8);
+    row[117] = (p[2] & 15) | ((p[2] >> 4) << 8);
+    row[118] = (p[3] & 15) | ((p[3] >> 4) << 8);
+  }
+}
+
 static void draw_button_box(
   volatile uint8_t *frame, unsigned left, unsigned right, unsigned top, unsigned bottom, bool selected
 ) {
@@ -1463,8 +1478,8 @@ void render_recent(volatile uint8_t *frame) {
 
 #ifdef SUPPORT_NORGAMES
 void render_flashbrowser(volatile uint8_t *frame) {
-  // Native themes retain their footer; DS screens keep the grid background.
-  if(menu_theme<THEME_DSSMM_LIGHT)dma_memset16(&frame[240*144],dup8(FG_COLOR),240*16/2);
+  // NOR currently uses the list browser layout on every theme.
+  dma_memset16(&frame[240*144],dup8(FG_COLOR),240*16/2);
 
   // Render the list from memory.
   if (!smenu.fbrowser.maxentries)
@@ -1591,8 +1606,8 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
     if(menu_theme<THEME_DSSMM_LIGHT)
       dma_memset16(&frame[240 * 16],dup8(BG_COLOR),240*(144-16)/2);
   } else {
-    unsigned tx = vertical ? 98 : 40, ty = vertical ? 85 : 122;
-    unsigned tw = vertical ? 136 : 160;
+    unsigned tx = vertical ? 98 : 42, ty = vertical ? 85 : 122;
+    unsigned tw = vertical ? 136 : 156;
     if(menu_theme>=THEME_DSSMM_LIGHT)dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,tx,ty,tw,16);
     else for (unsigned row = 0; row < 16; ++row)
       dma_memset16(frame + (ty+row)*240 + tx, dup8(BG_COLOR), tw/2);
@@ -1689,7 +1704,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       draw_text_ovf_rotate(shown, frame, 98, 85,
                            136, &smenu.anim_state);
     else
-      draw_text_ovf_rotate(shown, frame, 40, 122, 160, &smenu.anim_state);
+      draw_text_ovf_rotate(shown, frame, 43, 122, 154, &smenu.anim_state);
   }
 
   if(menu_theme<THEME_DSSMM_LIGHT) {
@@ -1725,7 +1740,8 @@ static void render_restart_required(volatile uint8_t *frame) {
 
 void render_fw_flash_popup(volatile uint8_t *frame) {
   // Opaque notification panel hides the browser underneath.
-  draw_box_full(frame, 2, 240-2, 18, 158, FT_COLOR, BG_COLOR);
+  if(menu_theme>=THEME_DSSMM_LIGHT)draw_lined_panel(frame);
+  else draw_box_full(frame, 2, 240-2, 18, 158, FT_COLOR, BG_COLOR);
 
   draw_central_text(msgs[lang_id][MSG_FWUPD_MENU], frame, 120, 30);
 
@@ -1753,7 +1769,7 @@ void render_fw_flash_popup(volatile uint8_t *frame) {
 
 void render_sav_menu_popup(volatile uint8_t *frame) {
   // Render a box to give a pop-up feeling
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   for (unsigned i = 0; i < 3; i++) {
     draw_button_box(frame, 20, 220, 32 + 28 * i, 32 + 28 * i + 20, spop.selector == i);
@@ -1808,7 +1824,7 @@ static void render_gbarom_info(volatile uint8_t *frame, const char *dispname,
     draw_text_ovf(tmp, frame, 12, 102, SCREEN_WIDTH - 24);
   }
 
-  draw_box_full(frame, 20, 220, 132, 152, FG_COLOR, HI_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_full(frame, 20, 220, 132, 152, FG_COLOR, HI_COLOR);
 }
 
 static const char *render_gbarom_patching(volatile uint8_t *frame, const t_load_gba_info *info, int selector) {
@@ -1868,8 +1884,16 @@ static const char *render_gbarom_loading(volatile uint8_t *frame, const t_load_g
          (selector == GBALdRemember) ? msgs[lang_id][MSG_REMEMB_I] : NULL;
 }
 
+static void render_gba_action(volatile uint8_t *frame, const char *label, bool selectable) {
+  draw_central_text_ovf(label, frame, 120, 134, 192);
+  if (selectable) {
+    draw_text_ovf("<", frame, 12, 134, 16);
+    draw_rightj_text(">", frame, 228, 134);
+  }
+}
+
 void render_gba_load_popup(volatile uint8_t *frame) {
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
   draw_text_ovf("⯇", frame, 10, 23, 64);
   draw_rightj_text("⯈", frame, SCREEN_WIDTH - 10, 23);
 
@@ -1880,13 +1904,10 @@ void render_gba_load_popup(volatile uint8_t *frame) {
   case GbaLoadPopInfo:
     render_gbarom_info(frame, info->romfn, is_superfw(&info->romh), info->gcode,
                        info->romh.version, p ? p->save_mode : -1);
-    draw_menu_selection(frame, 134, 8, 232);
     #ifdef SUPPORT_NORGAMES
-    draw_central_text(gba_write_nor ? "Write GBA ROM to NOR" : msgs[lang_id][MSG_LOAD_GBA], frame, 120, 134);
-    draw_text_ovf("⯇", frame, 12, 134, 16);
-    draw_rightj_text("⯈", frame, 228, 134);
+    render_gba_action(frame, gba_write_nor ? "Write GBA ROM to NOR" : msgs[lang_id][MSG_LOAD_GBA], true);
     #else
-    draw_central_text(msgs[lang_id][MSG_LOAD_GBA], frame, 120, 134);
+    render_gba_action(frame, msgs[lang_id][MSG_LOAD_GBA], false);
     #endif
     break;
   case GbaLoadPopLoadS:
@@ -1918,7 +1939,7 @@ void render_gba_load_popup(volatile uint8_t *frame) {
 
 void render_filemgr(volatile uint8_t *frame) {
   // Draw the file name and the options available
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   t_centry *e = sdr_state->filefilter[smenu.browser.selector];
   const char *bn = file_basename(e->fname);
@@ -1943,7 +1964,7 @@ void render_filemgr(volatile uint8_t *frame) {
 
 #ifdef SUPPORT_NORGAMES
 void render_gba_norwrite(volatile uint8_t *frame) {
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   draw_text_ovf("⯇", frame, 10, 23, 64);
   draw_rightj_text("⯈", frame, SCREEN_WIDTH - 10, 23);
@@ -1973,7 +1994,7 @@ void render_gba_norwrite(volatile uint8_t *frame) {
 }
 
 void render_gba_norload(volatile uint8_t *frame) {
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   draw_text_ovf("⯇", frame, 10, 23, 64);
   draw_rightj_text("⯈", frame, SCREEN_WIDTH - 10, 23);
@@ -2007,7 +2028,7 @@ void render_gba_norload(volatile uint8_t *frame) {
 #endif
 
 void render_popupq(volatile uint8_t *frame, unsigned fcnt) {
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   // Draw question and two buttons
   draw_central_text_wrapped(spop.qpop.message, frame, SCREEN_WIDTH/2, 32, SCREEN_WIDTH - 20);
@@ -2036,7 +2057,7 @@ void render_rtcpop(volatile uint8_t *frame) {
     draw_central_text("Clock runs while menu is open",frame,120,138);
     return;
   }
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   draw_central_text(msgs[lang_id][MSG_DEF_RTCVAL], frame, SCREEN_WIDTH/2, 32);
 
@@ -2292,7 +2313,7 @@ void render_ui_settings(volatile uint8_t *frame) {
 }
 
 void render_info(volatile uint8_t *frame) {
-  if(menu_theme>=THEME_DSSMM_LIGHT)draw_box_full(frame,2,238,18,158,FT_COLOR,BG_COLOR);
+  if(menu_theme>=THEME_DSSMM_LIGHT)draw_lined_panel(frame);
   uint32_t vmaj = VERSION_WORD >> 16;
   uint32_t vmin = VERSION_WORD & 0xFFFF;
   char tmp[64], tmp2[32];
@@ -2300,7 +2321,10 @@ void render_info(volatile uint8_t *frame) {
   if(menu_theme<THEME_DSSMM_LIGHT) {
     init_logo_palette(&MEM_PALETTE[1]);
     render_logo((uint16_t*)frame,SCREEN_WIDTH/2,40,4);
-  } else draw_central_text("SuperFW",frame,120,40);
+  } else {
+    init_logo_palette(&MEM_PALETTE[236]);
+    render_logo_indexed((uint16_t*)frame,120,40,4,236);
+  }
 
   switch (smenu.info.selector) {
   case 0:
@@ -2350,20 +2374,21 @@ void render_info(volatile uint8_t *frame) {
   // Flashing info
   if(menu_theme<THEME_DSSMM_LIGHT)dma_memset16(&frame[138*SCREEN_WIDTH],dup8(FG_COLOR),SCREEN_WIDTH*22/2);
   draw_text_ovf_rotate(enable_flashing ? msgs[lang_id][MSG_FWUP_ENABLED] : msgs[lang_id][MSG_FWUP_HOTKEY], frame,
-                       4, 141, SCREEN_WIDTH - 8, &smenu.anim_state);
+                       5, 135, SCREEN_WIDTH - 10, &smenu.anim_state);
 }
 
 void render_tools(volatile uint8_t *frame) {
   unsigned pitch=menu_theme<THEME_DSSMM_LIGHT?22:menu_font==FONT_STYLE_DSSMM?14:18;
   if (menu_theme >= THEME_DSSMM_LIGHT) {
-    draw_box_full(frame,2,238,18,158,FT_COLOR,BG_COLOR);
-    draw_menu_selection(frame, 26 + pitch*smenu.tools.selector, 18, 236);
+    draw_lined_panel(frame);
+    draw_menu_selection(frame, 86 - (pitch*(ToolsMAX-1)+16)/2 + pitch*smenu.tools.selector, 18, 232);
   }
+  unsigned top = menu_theme>=THEME_DSSMM_LIGHT ? 86 - (pitch*(ToolsMAX-1)+16)/2 : 26;
   for (unsigned i = 0; i < ToolsMAX; i++)
-    draw_text_ovf(msgs[lang_id][MSG_TOOLS0_SDRAM + i], frame, 22, 26 + pitch * i, 206);
+    draw_text_ovf(msgs[lang_id][MSG_TOOLS0_SDRAM + i], frame, 22, top + pitch * i, 206);
 
   smenu.anim_state = (smenu.anim_state + 1) & 255;
-  draw_central_text("▸", frame, 11 + (smenu.anim_state >> 6), 26 + pitch * smenu.tools.selector);
+  draw_central_text("▸", frame, menu_theme>=THEME_DSSMM_LIGHT?10:11 + (smenu.anim_state >> 6), top + pitch * smenu.tools.selector);
 
   if (menu_theme < THEME_DSSMM_LIGHT)
     for (unsigned i = 0; i < 240; i += 16)
@@ -2457,7 +2482,7 @@ static void render_start(volatile uint8_t *frame) {
 #endif
   const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{109,142,23,16}};
   const unsigned *box=boxes[launcher_selected<4?launcher_selected:0];
-  if(launcher_selected<4)launcher_corners(frame,box[0],box[1],box[2],box[3]);
+  if(launcher_selected<4)launcher_corners(frame,box[0],box[1]+(launcher_selected==0),box[2],box[3]-(launcher_selected==0));
 }
 
 static void render_start_bar(volatile uint8_t *frame) {
@@ -2467,7 +2492,7 @@ static void render_start_bar(volatile uint8_t *frame) {
   if(seconds==UINT32_MAX)strcpy(text,"--:--:--");
   else npf_snprintf(text,sizeof(text),"%02u:%02u:%02u",(unsigned)(seconds/3600%24),(unsigned)(seconds/60%60),(unsigned)(seconds%60));
   draw_rightj_text(text,frame,232,1);
-  if(launcher_selected==4)launcher_corners(frame,176,0,64,16);
+  if(launcher_selected==4)launcher_corners(frame,178,0,62,16);
 }
 
 static void render_dssmm_settings_header(volatile uint8_t *frame,const char *title) {
@@ -2549,7 +2574,11 @@ void menu_render(unsigned fcnt) {
   // Preserve stable artwork in each Mode 4 page; text is refreshed separately.
   if (!browser_fast_reuse && !(launcher && launcher_valid[framen])) {
     if(ds_style && !launcher) {
-      if(smenu.menu_tab==MENUTAB_ROMBROWSE && !browser_view)
+      if((smenu.menu_tab==MENUTAB_ROMBROWSE && !browser_view)
+#ifdef SUPPORT_NORGAMES
+          || smenu.menu_tab==MENUTAB_NORBROWSE
+#endif
+        )
         dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,144);
       else {
         unsigned kind=smenu.menu_tab==MENUTAB_ROMBROWSE?(browser_view==2?DSSMM_BG_VERTICAL:DSSMM_BG_HORIZONTAL):
@@ -2589,6 +2618,8 @@ void menu_render(unsigned fcnt) {
   }
   launcher_invalidate();
 
+  if(ds_style && (spop.pop_num || spop.qpop.message || spop.rtcpop.callback))
+    draw_lined_panel(frame);
   if (spop.qpop.message)
     render_popupq(frame, fcnt);
   else if (spop.rtcpop.callback)
@@ -3985,6 +4016,10 @@ void menu_keypress(unsigned newkeys) {
       keypress_menu_info,
     };
     keyfns[smenu.menu_tab](newkeys);
+    if ((newkeys & (KEY_BUTTLEFT | KEY_BUTTRIGHT)) &&
+        (smenu.menu_tab == MENUTAB_UILANG || smenu.menu_tab == MENUTAB_SETTINGS) &&
+        !save_settings())
+      spop.alert_msg = msgs[lang_id][MSG_ERR_SETSAVE];
   }
 }
 

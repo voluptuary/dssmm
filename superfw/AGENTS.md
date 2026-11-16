@@ -195,3 +195,15 @@ NOR testing. test-nor-launch.sh uses simulated flash. Settings read failures mus
 not overwrite the original config. Real FatFs RAMdisk remount tests are not card
 power-cycle validation. Public Test5 stays624; local632 remains until clean gates
 validate its replacement. Continue owner624 UI/plugin/performance parity queue.
+
+Owner638 hardware follow-up supersedes previous sidecar migration: runtime must
+read/write settings ONLY at SYSTEM/SETTINGS.TXT; UI-SETTINGS/US-SETTINGS are ignored,
+not removed. Save UI/hardware changes immediately and on exit, verify written
+contents and preserve the prior file on failure. Do not call hardware persistence
+fixed from host/remount checks alone. DS modal panels use the shared original
+Settings right-panel bevel/stripes with header preserved; no carousel beneath a
+launch dialog and no filled Load/Write button. NOR currently uses List chrome;
+full NOR carousel remains a goal. Help logo uses palette236..238, preserving BG0..15
+and artwork20..235. Continue unresolved plugin Exit/PCE/physical settings/parity.
+Owner authorized Test6 release after the newest corrections pass all gates;638
+publication was not completed, so publish the next validated correction, not638.

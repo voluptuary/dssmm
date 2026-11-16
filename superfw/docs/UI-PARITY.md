@@ -82,3 +82,15 @@ menu clock, not hardware wall time; see LAUNCHER-PORT.md. Read-only backgrounds
 move into the existing font resource partition to recover GBA RAM, retaining
 the five-image cache. These changes need clean all3/CI and hardware retest.
 System/Help, dialog composition and broader settings isolation remain unfinished.
+
+
+Build638 follow-up (candidate, physical retest pending): reusable lined/beveled
+panels derive from the original Settings right-panel pixels, preserve the header
+and clear the carousel for ROM/NOR launch, questions and firmware update. Help
+restores the graphical logo at separate palette236..238. System rows are centered
+vertically/left-aligned. NOR currently explicitly uses List chrome/footer;
+carousel support remains a parity target. Horizontal caption text is inset3px
+at each side with an even-aligned156px clear region. Start recent top corners+1y,
+clock left corners+2x; GG cartridge13px tall/full16px wide, blank label/flat bottom.
+Settings now derive only from canonical SETTINGS.TXT and save on changes/exits
+with readback/rollback; physical powercycle persistence is not yet confirmed.

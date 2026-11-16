@@ -4,6 +4,9 @@
 
 ## New fixes
 
+- Help, System, ROM launch and confirmation screens now share the DS Style lined panel; launch screens clear the carousel beneath them. Restored the graphical SuperFW logo and NOR list footer, centered System options vertically, and adjusted Start markers and horizontal title bounds. The Game Gear cartridge is shorter, wider and has a blank label.
+- Only `SYSTEM/SETTINGS.TXT` supplies settings; obsolete UI/US sidecars are ignored. Changes save immediately and on exit, with read-back verification and preservation of the previous file if verification fails. Shared EZ-FLASH text settings remain supported.
+- Raw `.mb` plugins accept correctly padded final words, matching their RAM-copy requirements. PCE compatibility still needs hardware confirmation.
 - Faster artwork scaling with the same image placement and transparency; removed unused background data to free firmware space.
 - Safer native ROM loading and NOR writes: checked memory allocation, complete reads, odd-size tails and cleanup. A failed load that has overwritten menu resources now requests a restart.
 - Fixed maximum-length save paths, patch-scanner boundaries and ordering, and failed NDS-load cleanup. Recent-history read errors preserve the existing file; settings read failures now show an error and prevent overwriting the original settings.

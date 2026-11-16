@@ -18,7 +18,7 @@ static void init_logo_palette(volatile uint16_t *pal) {
 }
 
 // Scale must be multiple of 2
-static void render_logo(volatile uint16_t *frame, unsigned x, unsigned y, unsigned scale) {
+static void render_logo_indexed(volatile uint16_t *frame, unsigned x, unsigned y, unsigned scale, unsigned base) {
   // Render logo in the center, serves as loading screen
   const unsigned logow = sizeof(logo_img[0])/sizeof(logo_img[0][0]);
   const unsigned logoh = sizeof(logo_img)/sizeof(logo_img[0]);
@@ -28,8 +28,12 @@ static void render_logo(volatile uint16_t *frame, unsigned x, unsigned y, unsign
     for (unsigned j = 0; j < logow; j++) {
       for (unsigned m = 0; m < scale; m++)
       for (unsigned n = 0; n < scale; n+=2)
-        frame[((logoy + i*scale + m) * SCREEN_WIDTH + logox + j*scale + n)/2] = dup8(logo_img[i][j] + 1);
+        frame[((logoy + i*scale + m) * SCREEN_WIDTH + logox + j*scale + n)/2] = dup8(logo_img[i][j] + base);
     }
   }
 }
 
+
+static void render_logo(volatile uint16_t *frame, unsigned x, unsigned y, unsigned scale) {
+  render_logo_indexed(frame, x, y, scale, 1);
+}

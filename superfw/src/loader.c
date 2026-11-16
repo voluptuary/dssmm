@@ -559,7 +559,8 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
     }
     if(f_close(&file)!=FR_OK)return ERR_LOAD_BADROM;
   }
-  if(!pogo_ram_valid(GBA_ROM_ADDR,ps,mode))return ERR_LOAD_BADROM;
+  unsigned launch_size = mode == 1 ? (ps + 3) & ~3u : ps;
+  if(!pogo_ram_valid(GBA_ROM_ADDR,launch_size,mode))return ERR_LOAD_BADROM;
   uint32_t ram[24],table[22];pogo_arguments(ram,table,path,fn,fo,fs,to);
   set_supercard_mode(MAPPED_SDRAM,true,false);
   rom_write16_exact(GBA_ROM_ADDR+to,table,sizeof(table));
@@ -567,7 +568,7 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
   REG_WAITCNT=0x4000;
   /* No C calls after overwriting the fixed ABI block at the top of EWRAM. */
   memcpy32((void*)0x0203fbf8,ram,sizeof(ram));
-  launch_pogo_reset(use_fastew,mode,ps);
+  launch_pogo_reset(use_fastew,mode,launch_size);
   return 0;
 }
 

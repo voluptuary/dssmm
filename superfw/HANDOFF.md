@@ -1159,3 +1159,23 @@ our632 copy after evidence retained. docs/build-638-validation.json records exac
 checks/limits. Next normal integration+all4 CI, Test6 publication using this source
 and staged /tmp/dssmm-release-test6 assets, then archive/prune Test5 page retaining
 tag. Owner authorized publication; no approval pause. Continue624 parity queue.
+
+Owner physically tested638: panels/logo/corners/GG/title bounds/persistence and
+plugin Exit still deficient. No638/Test6 publication occurred; authorized release
+now targets next corrected validated source. Dirty follow-up implements original
+Settings-right-panel bevel/stripes via compact generated profile (no new bitmap),
+full modal background replacement preserving header, System vertical centering,
+Help graphical logo at palette236..238, NOR List background+footer, plain bracketed
+Load/Write action, recent topcorners+1y/clockleft+2x, horizontal caption inset3px
+per side with even aligned clear rectangle,13px-high/fullwidth blank GG cartridge.
+Original panel pixel+guard host test and actual Help/ROM/System mGBA previews pass.
+Canonical-only settings: removed all production UISETTINGS refs and duplicate
+boot probe; UI/US legacy files ignored/untouched. Immediate changes and exit saves
+read back hash+size after commit; corruption restores backup. Host fault/all3
+roundtrip and actual FatFs FAT16/32 remount tests pass; hardware persistence still
+not claimed. Odd raw MB plugin validation/reset uses already-zero-padded word
+size (compressed sizes unchanged); all3 plugin regression passes, PCE hardware
+cause unresolved. GG/SMS Exit remains unresolved; no blind reset patch. ARM syntax
+check passed with native -fno-builtin; first ad hoc check omitted it and flagged
+pre-existing isascii name, not a firmware build failure. Freeze next source and
+run all3/full/package/CI before replacing hardware-test and publishing Test6.
