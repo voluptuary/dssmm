@@ -128,7 +128,7 @@ bool artwork_blit_cropped(volatile uint16_t *frame, const uint16_t *pixels,
   int left = x < 0 ? -x : 0;
   int right = x + info->width > 240 ? 240-x : info->width;
   int top = y < 16 ? 16-y : 0;
-  int bottom = y+80 > 144 ? 144-y : 80;
+  int bottom = y+80 > 160 ? 160-y : 80;
   if (left >= right || top >= bottom) return false;
   for (int row=top; row<bottom; ++row) {
     volatile uint16_t *dst=frame+(y+row)*120+(x+left)/2;
@@ -161,7 +161,7 @@ bool artwork_blit_scaled_cropped(volatile uint16_t *frame, const uint16_t *pixel
       !width || width>240 || (width&1) || !height || height>160 ||
       (info->width!=80 && info->width!=120) || info->height!=80) return false;
   int left=x<0 ? -x : 0, right=x+(int)width>240 ? 240-x : (int)width;
-  int top=y<16 ? 16-y : 0, bottom=y+(int)height>144 ? 144-y : (int)height;
+  int top=y<16 ? 16-y : 0, bottom=y+(int)height>160 ? 160-y : (int)height;
   if (left>=right || top>=bottom) return false;
   uint8_t sample[240];
   for (int col=left;col<right;++col) sample[col]=col*info->width/width;

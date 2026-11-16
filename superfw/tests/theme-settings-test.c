@@ -94,6 +94,29 @@ int main(void) {
   parse_settings(0,"state_path_policy","1");
   savestate_filename_calc("/Games/Game.gba", path);
   assert(!strcmp(path, "/SYSTEM/SAVESTATE/Game"));
+  const char *rom_names[]={"/Games/Adventure (USA).gb","/Game Gear/Sonic (USA).gg",
+    "/Sega.v2/Sonic.v1.2 (USA).gg","/Game.Boy/Game.v2.GB"};
+  const char *save_names[]={"/SYSTEM/SAVER/Adventure (USA).sav","/SYSTEM/SAVER/Sonic (USA).sav",
+    "/SYSTEM/SAVER/Sonic.v1.2 (USA).sav","/SYSTEM/SAVER/Game.v2.sav"};
+  for(unsigned i=0;i<4;++i){sram_filename_calc(rom_names[i],path);assert(!strcmp(path,save_names[i]));}
+  existing_path="/SYSTEM/SAVER/Adventure (USA).tmp.sav";
+  sram_filename_calc("/Games/Adventure (USA).gb",path);
+  assert(!strcmp(path,"/SYSTEM/SAVER/Adventure (USA).sav"));
+  existing_path="/SAVEGAME/Sonic (USA).2.sav";
+  sram_filename_calc("/Game Gear/Sonic (USA).gg",path);
+  assert(!strcmp(path,"/SAVEGAME/Sonic (USA).sav"));existing_path=0;
+  savestate_filename_calc("/Game.Boy/Game.v2.GB",path);
+  assert(!strcmp(path,"/SYSTEM/SAVESTATE/Game.v2"));
+  existing_path="/SYSTEM/SAVER/Dr.sav";
+  sram_filename_calc("/Game Boy/Dr. Mario (USA).gb",path);assert(!strcmp(path,existing_path));
+  second_existing=existing_path;existing_path="/SYSTEM/SAVER/Dr. Mario (USA).sav";
+  sram_filename_calc("/Game Boy/Dr. Mario (USA).gb",path);assert(!strcmp(path,existing_path));second_existing=0;
+  existing_path="/SYSTEM/SAVEGAME/Sonic.v1.tmp.sav";
+  sram_filename_calc("/Game Gear/Sonic.v1.2 (USA).gg",path);
+  assert(!strcmp(path,"/SYSTEM/SAVEGAME/Sonic.v1.sav"));
+  existing_path=0;
+  char longrom[256];longrom[0]='/';memset(longrom+1,'a',238);strcpy(longrom+239,".gb");
+  sram_filename_calc(longrom,path);assert(!path[0]); /* Reject rather than overrun/truncate. */
   read_setting("Theme","Dark");assert(menu_theme==THEME_DSSMM_DARK);
   read_setting("Clean list","On");assert(clean_list==1);
   read_setting("View mode","Horizontal");assert(shared_view==1);

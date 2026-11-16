@@ -41,7 +41,7 @@ unsigned pocket_nes_header(uint8_t *buffer, const char *fn, unsigned fs) {
   const char *bname = file_basename(fn);
 
   memset(&hdr, 0, sizeof(hdr));
-  memcpy(hdr.title, bname, sizeof(hdr.title) - 1);
+  strbcpy(hdr.title,bname,sizeof(hdr.title));
   hdr.romsize = fs;
   memcpy32(buffer, &hdr, sizeof(hdr));
 
@@ -70,7 +70,7 @@ unsigned smsadvance_header(uint8_t *buffer, const char *fn, unsigned fs) {
   const char *ext = find_extension(fn);
 
   memset(&hdr, 0, sizeof(hdr));
-  memcpy(hdr.title, bname, sizeof(hdr.title) - 1);
+  strbcpy(hdr.title,bname,sizeof(hdr.title));
   hdr.romsize = fs;
   hdr.ident = 0x1A534D53;   // SMS + 0x1A (little endian)
   hdr.flags1 = (ext && !strcasecmp(ext, "gg")) ? 0x04 : 0;
@@ -101,7 +101,7 @@ static unsigned drsms_header(uint8_t *buffer, const char *fn, unsigned fs, uint8
   // Copy the base filename into the name buffer
   const char *bname = file_basename(fn);
 
-  memcpy(hdr.title, bname, sizeof(hdr.title) - 1);
+  strbcpy(hdr.title,bname,sizeof(hdr.title));
   memcpy32(buffer, &hdr, sizeof(hdr));
 
   return sizeof(hdr);
@@ -151,7 +151,7 @@ unsigned wasabigba_header(uint8_t *buffer, const char *fn, unsigned fs) {
   const char *bname = file_basename(fn);
 
   memset(&hdr, 0, sizeof(hdr));
-  memcpy(hdr.title, bname, sizeof(hdr.title) - 1);
+  strbcpy(hdr.title,bname,sizeof(hdr.title));
   hdr.romsize = fs;
   hdr.ident = 0x1A565357;   // WSV + 0x1A (little endian)
   memcpy32(buffer, &hdr, sizeof(hdr));
@@ -181,7 +181,7 @@ unsigned ngpgba_header(uint8_t *buffer, const char *fn, unsigned fs) {
   const char *bname = file_basename(fn);
 
   memset(&hdr, 0, sizeof(hdr));
-  memcpy(hdr.title, bname, sizeof(hdr.title) - 1);
+  strbcpy(hdr.title,bname,sizeof(hdr.title));
   hdr.romsize = fs;
   hdr.ident = 0x1A50474E;   // PGN + 0x1A (little endian)
   memcpy32(buffer, &hdr, sizeof(hdr));
@@ -220,7 +220,7 @@ unsigned pceadvance_header(uint8_t *buffer, const char *fn, unsigned fs) {
   };
   // Copy the base filename into the name buffer
   const char *bname = file_basename(fn);
-  memcpy(hdr.title, bname, sizeof(hdr.title) - 1);
+  strbcpy(hdr.title,bname,sizeof(hdr.title));
 
   memcpy32(buffer, &hdr, sizeof(hdr));
   return sizeof(hdr);
@@ -265,9 +265,14 @@ const t_emu_loader * get_emu_info(const char *ext) {
 
 
 
+const char *pogo_plugin_extension(const char *filename) {
+  const char *ext=find_extension(filename);
+  return ext && !strcasecmp(ext,"gg")?"sms":ext;
+}
+
 /* The basename is the ROM extension, matching the DE plugin convention. */
 bool find_pogo_plugin(const char *filename,char path[64]) {
-  const char *ext=find_extension(filename);
+  const char *ext=pogo_plugin_extension(filename);
   if(!ext || !*ext || strlen(ext)>16)return false;
   const char *suffixes[]={".bin",".gba",".mb",".mbz"};
   for(unsigned i=0;i<4;i++) {

@@ -16,7 +16,7 @@ Path(sys.argv[2]).write_text('''#include <stdint.h>
 '''+s[a:b]+'''
 static uint16_t image[19216];
 int main(void) {
- const unsigned boxes[][4]={{112,143,18,14},{176,0,64,16},{24,42,192,48},{111,143,19,14}};
+ const unsigned boxes[][4]={{111,142,20,16},{176,0,64,16},{24,42,192,48},{111,143,19,14}};
  for(unsigned box=0;box<4;++box) {
   for(unsigned i=0;i<19216;++i)image[i]=0xeeee;
   uint8_t *frame=(uint8_t *)&image[8];
