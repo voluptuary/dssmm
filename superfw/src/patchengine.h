@@ -48,6 +48,7 @@ typedef struct struct_t_patch t_patch;
 typedef struct {
   unsigned filesize;
   unsigned rom_offset;
+  unsigned skip_until; // Absolute end of an already recognized setup table.
   // Save type related info
   unsigned save_type_guess;
   unsigned flash64cnt, flash128cnt;
@@ -71,6 +72,13 @@ void payload_apply_rom(uint8_t *buffer, unsigned bufsize, uint32_t baseaddr,
 
 void patchengine_init(t_patch_builder *patch, unsigned filesize);
 void patchengine_finalize(t_patch_builder *patch);
+/* Windows retain literal-load lookbehind and complete signature lookahead.
+ * Only [scan_begin, scan_end) generates operations; rom_offset is window base. */
+#define PATCH_SCAN_LOOKBEHIND 4096u
+#define PATCH_SCAN_LOOKAHEAD 64u
+bool patchengine_process_window(const uint32_t *rom, unsigned available,
+                                unsigned scan_begin, unsigned scan_end,
+                                t_patch_builder *builder, void(*progress)(unsigned));
 // Generates a patch set from a given ROM.
 bool patchengine_process_rom(const uint32_t *rom, unsigned romsize, t_patch_builder *patch, void(*progresscb)(unsigned));
 

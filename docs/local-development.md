@@ -243,3 +243,14 @@ after `PREVIEW_THEME=6 PREVIEW_FONT=1 PREVIEW_VERTICAL=1 PREVIEW_TIMING=1`.
 The reader matches DSSMM glyphs with the shared standard-library PNG decoder;
 no OCR package, mGBA change or private BIOS is needed. Dark counters require
 `--dark`. These fixture cycle counts are not physical firmware FPS.
+
+
+The SuperFW preview harness now includes Help (`PREVIEW_SCREEN=16`), with the
+actual graphical logo and shared DS Style lined panel. Screens1/4 exercise System
+and ROM launch panels. Use `PREVIEW_THEME=6 PREVIEW_FONT=1` for the Light DSSMM
+font view (7 selects Dark). `test-dssmm-panel.sh` compares every panel bevel/stripe
+pixel to the original Settings assets and checks preserved headers. The existing
+mGBA0.10.1 SDL/Xvfb setup and launch flags are unchanged; no BIOS is required for
+these fixtures. Canonical-settings host tests additionally verify corrupt-write
+rollback and actual FatFs FAT16/FAT32 save/unmount/remount; these are not physical
+power-cycle or SuperCard protocol tests.

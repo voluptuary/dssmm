@@ -15,3 +15,11 @@ for board in sd lite chis; do
   -Wl,--gc-sections -o "$tmp/roundtrip"
  "$tmp/roundtrip"
 done
+
+gcc -O1 -g -fshort-enums -ffunction-sections -fdata-sections -fsanitize=address,undefined -fno-pie -no-pie \
+ -I "$root" -I "$root/src" "$root/tests/settings-fatfs-test.c" \
+ "$root/src/settings.c" "$root/src/settings_io.c" "$root/src/launcher_profile.c" \
+ "$root/src/util.c" "$root/src/fileutil.c" "$root/src/nanoprintf.c" \
+ "$root/fatfs/ff.c" "$root/fatfs/ffunicode.c" "$root/fatfs/ffsystem.c" \
+ -Wl,--gc-sections -o "$tmp/fatfs"
+"$tmp/fatfs"

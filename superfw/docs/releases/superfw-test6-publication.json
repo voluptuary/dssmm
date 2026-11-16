@@ -1,0 +1,60 @@
+{
+  "tag": "superfw-test6",
+  "source_commit": "4a85efb8d8e35e66259d89be133890fb458d4e36",
+  "dssmm_build_number": 640,
+  "release_id": 447746684,
+  "url": "https://github.com/voluptuary/dssmm/releases/tag/superfw-test6",
+  "published_at": "2026-11-16T23:28:12Z",
+  "prerelease": true,
+  "local_full_verifier": "passed including all3 clean builds and native IGM ARM replay",
+  "hardware_ci": {
+    "run": 43978497350,
+    "conclusion": "success"
+  },
+  "integration_ci": {
+    "source_commit": "2ca37827571d487eac510c195f36d1a5f2c47c41",
+    "run": 43979085712,
+    "conclusion": "success",
+    "projects": [
+      "ezfomegade",
+      "ezfomega",
+      "ezfblue",
+      "superfw"
+    ]
+  },
+  "validation_report": "superfw/docs/build-640-validation.json",
+  "assets": [
+    {
+      "name": "folder-art.zip",
+      "sha256": "b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5",
+      "download_matches": true
+    },
+    {
+      "name": "superfw-chis.fw",
+      "sha256": "3a8ffcd5baf1661462631ce21912660db0a3d04cada14d0e6b8f4bd42916c405",
+      "download_matches": true
+    },
+    {
+      "name": "superfw-lite.fw",
+      "sha256": "4e1cd13c734a02152bd01ce1900aa60640ba5a76b3807fdac996e030556f623e",
+      "download_matches": true
+    },
+    {
+      "name": "superfw-sd.fw",
+      "sha256": "3f6394d81c03901e88760b9abe3d84a1a59bd47665b4a2838049ff5dd3be0d35",
+      "download_matches": true
+    }
+  ],
+  "body_sha256": "41fc8d34ad1064652c21a05bfb57cd00035c8a721b2f7145dd3e1f73f4107863",
+  "folder_art_setup": "Extract at SD root; merge SYSTEM; preserve preferred existing CUSTOM pictures.",
+  "superseded_release_removed": "superfw-test5",
+  "superseded_git_tag_retained": true,
+  "retention_archive": "docs/history/releases/prerelease-retention-test6.json",
+  "retained_lanes": {
+    "superfw": "superfw-test6",
+    "blue": "v8.4.1-blue-test4",
+    "omega": "v8.4.0-omega-test4",
+    "stable_latest_de": "v8.4.0"
+  },
+  "hardware_validation": "No new physical validation. Owner638 observations retained;640 settings persistence/PCE/plugin Exit/NOR/full parity still require hardware checks."
+}

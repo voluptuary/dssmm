@@ -9,7 +9,7 @@ gcc -O2 -Wall -Wextra -Werror -fsanitize=address,undefined -fno-pie -no-pie \
  "$root/src/dssmm_background.c" -o "$tmp/test"
 assets=()
 for theme in light dark; do
- for kind in start settings horizontal vertical grid help; do
+ for kind in start settings horizontal vertical grid; do
   assets+=("$root/assets/backgrounds/$theme-$kind.rgb555")
  done
 done

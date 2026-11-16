@@ -11,11 +11,13 @@ int main(void){char tmp[]="/tmp/dssmm-settings-XXXXXX";assert(mkdtemp(tmp));strc
  char text[10000],before[10000];unsigned n=read_file(SETTINGS_FILEPATH,text,sizeof(text));
  assert(!strncmp(text,"# DSSMM shared settings\nTheme = Light\n",37));
  assert(!strstr(text,"Dark"));
- assert(strstr(text,"# keep my notes")&&strstr(text,"Unknown DE = keep")&&strstr(text,"LegacyFuture=yes")&&strstr(text,"# legacy notes"));
+ assert(strstr(text,"# keep my notes")&&strstr(text,"Unknown DE = keep")&&!strstr(text,"LegacyFuture=yes")&&!strstr(text,"# legacy notes"));
  assert(strstr(text,"SuperFW.future=retain")&&strstr(text,"SuperFW.font=1"));
- assert(f_stat(UISETTINGS_FILEPATH,0)==FR_NO_FILE);
+ assert(f_stat(UISETTINGS_FILEPATH,0)==FR_OK);
  strcpy(before,text);assert(settings_write_text("Theme = Light\n","SuperFW.font=1\n",owned));
  assert(read_file(SETTINGS_FILEPATH,text,sizeof(text))==n&&!strcmp(text,before));
+ corrupt_commit=1;assert(!settings_write_text("Theme = Dark\n","SuperFW.font=0\n",owned));corrupt_commit=0;
+ read_file(SETTINGS_FILEPATH,text,sizeof(text));assert(!strcmp(text,before));
  short_write=1;assert(!settings_write_text("Theme = Dark\n","SuperFW.font=0\n",owned));short_write=0;
  read_file(SETTINGS_FILEPATH,text,sizeof(text));assert(!strcmp(text,before));
  fail_commit=1;assert(!settings_write_text("Theme = Dark\n","SuperFW.font=0\n",owned));fail_commit=0;
@@ -25,7 +27,11 @@ int main(void){char tmp[]="/tmp/dssmm-settings-XXXXXX";assert(mkdtemp(tmp));strc
  read_file(SETTINGS_FILEPATH,text,sizeof(text));assert(!strcmp(text,before));
  memset(text,'x',9000);text[9000]=0;write_file(SETTINGS_FILEPATH,text);
  assert(!settings_write_text("Theme = Light\n","",owned));assert(read_file(SETTINGS_FILEPATH,before,sizeof(before))==9000&&!strcmp(text,before));
+ char filename[1024];path(filename,SETTINGS_FILEPATH);FILE *binary=fopen(filename,"wb");assert(binary);
+ assert(fwrite("Theme=Dark\0Colour=Blue\n",1,23,binary)==23);assert(!fclose(binary));
+ assert(!settings_read_text(SETTINGS_FILEPATH,parse,&exists));
+ assert(!settings_write_text("Theme = Light\n","",owned));
  for(unsigned i=0;i<8;i++)assert(!handles[i]);
- assert(f_unlink(SETTINGS_FILEPATH)==FR_OK);f_unlink("/SYSTEM/.sf-settings.tmp");
+ assert(f_unlink(SETTINGS_FILEPATH)==FR_OK);f_unlink("/SYSTEM/.sf-settings.tmp");f_unlink(UISETTINGS_FILEPATH);
  char q[1024];path(q,"/SYSTEM");assert(!rmdir(q));assert(!rmdir(root));
- puts("Unified settings preserve unknown and sidecar values; repeat saves, short-write, rollback, recovery and oversize checks passed.");}
+ puts("Canonical settings ignore legacy sidecars and preserve unknown keys; repeat saves, short-write, rollback, recovery and oversize checks passed.");}

@@ -38,7 +38,7 @@ int FNAME(strcmp)(const char *a, const char *b) {
     a++;
     b++;
   }
-  return *a - *b;
+  return (unsigned char)*a - (unsigned char)*b;
 }
 
 NOINLINE
@@ -48,7 +48,7 @@ int FNAME(strncmp)(const char *a, const char *b, unsigned n) {
   }
   if (!n)
     return 0;
-  return *a - *b;
+  return (unsigned char)*a - (unsigned char)*b;
 }
 
 NOINLINE
