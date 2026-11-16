@@ -2143,3 +2143,11 @@ Help preview screen16 and panel/FatFs fixtures documented local-development; no
 mGBA package/flags/BIOS setup change. Finish normal five-lane sync and verifyremote
 refs. Project-only continuation: unresolved physical settings/PCE/Exit/NORcarousel/
 DE parity. Preserve privateBIOS/session scratch/fullZIP/ownerdevcontainerlock.
+
+Owner withdrew/deleted SuperFW Test6: Build640 changing Interface settings
+(Artwork/Theme/Accent/etc.) hard-freezes until powercycle. Root README removes
+invalid downloads and warns of withdrawal; preserve Test6 tag/publication history.
+SuperFW lane is investigating new immediate-save path/actual ARM stack/SD buffer
+constraints; no corrected build yet. Avoid broad porting changes until resolved.
+All5 previously synchronized7eeeada; no driver/emulator setup change. Local
+hardware-test640 withdrawn; project journals carry continuation details.

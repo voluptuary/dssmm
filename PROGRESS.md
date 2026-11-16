@@ -3241,3 +3241,7 @@ all4 CI43979085712; four downloads/notes exact. Archived Test5 metadata inroot
 before deleting its page/assets; tag and otherlanes/DE stable retained. Root user
 downloads/baseline/harness recovery docs refreshed. Normal five-lane sync follows;
 no physical qualification or full SuperFW DE parity claim. See project journals.
+
+Owner reports Build640 Interface-setting hard-freeze and deleted Test6 release.
+Public downloads withdrawn; README/journals updated without retagging/recreating
+release. Project investigation prioritized; CI/host checks were not hardwareproof.

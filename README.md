@@ -44,8 +44,10 @@ and follow that release's installation instructions.
 
 ## SuperCard and SuperChis
 
-[DSSMM SuperFW Test 6](https://github.com/voluptuary/dssmm/releases/tag/superfw-test6)
-is a developing DS Style menu port for SuperCard-family flashcards, built on
+**SuperFW Test 6 (Build 640) has been withdrawn:** changing Interface settings
+can crash the system. Downloads are temporarily unavailable while this is fixed.
+
+DSSMM SuperFW is a developing DS Style menu port for SuperCard-family flashcards, built on
 [David Guillen Fandos’s SuperFW](https://github.com/davidgfnet/superfw). It adds
 Light/Dark themes, accents, horizontal/vertical artwork carousels, an optional
 DSSMM font, and a Start screen with last-played artwork and a configurable clock.
@@ -55,11 +57,7 @@ and writing to NOR with the D-pad; writes and replacing existing games require
 confirmation. Chis-only hardware features,
 such as its NOR library, remain specific to that card.
 
-| Your cartridge | Test 6 download |
-| --- | --- |
-| **SuperChis / SuperChis Prime** (including Prime v1.0) | [superfw-chis.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test6/superfw-chis.fw) |
-| **SuperCard SD** | [superfw-sd.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test6/superfw-sd.fw) |
-| **SuperCard Lite** | [superfw-lite.fw](https://github.com/voluptuary/dssmm/releases/download/superfw-test6/superfw-lite.fw) |
+
 
 **Hardware testing:** earlier builds display filename and ROM-header artwork on
 one SuperChis Prime v1.0, and the browser-edge crash is fixed. This release still
@@ -84,7 +82,7 @@ upstream versions; MiGoomba is currently an OMEGA-family update.
 4. Open **Start → Settings → Interface → Artwork** to choose List, Title or
    Box, then leave the submenu to save. Title artwork is the default. **Start**
    opens the Start screen while browsing games.
-5. For folder pictures, extract the release’s [folder-art.zip](https://github.com/voluptuary/dssmm/releases/download/superfw-test6/folder-art.zip)
+5. For folder pictures, extract the release’s `folder-art.zip` (included with releases)
    at the SD-card root and merge its `SYSTEM` folder. Keep your own same-named
    CUSTOM pictures if preferred.
 
