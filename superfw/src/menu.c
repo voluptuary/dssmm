@@ -28,6 +28,7 @@
 #include "browser_carousel.h"
 #include "browser_motion.h"
 #include "dssmm_background.h"
+#include "update_unlock.h"
 #include "util.h"
 #include "utf_util.h"
 #include "fonts/font_render.h"
@@ -91,6 +92,7 @@ enum {
 #define BG_COLOR         17
 #define FT_COLOR         18
 #define HI_COLOR         19
+#define SELECTED_TEXT   236
 #define IGM_PAL_FG      240
 #define IGM_PAL_BG      241
 #define IGM_PAL_HI      242
@@ -99,7 +101,6 @@ enum {
 #define IGM_PAL_FONT    (240+IGM_FONT_PALETTE_SLOT)
 #define SEL_COLOR       255
 
-#define FLASH_UNLOCK_KEYS      (KEY_BUTTDOWN|KEY_BUTTB|KEY_BUTTSTA)
 #define FLASH_GO_KEYS          (KEY_BUTTUP|KEY_BUTTL|KEY_BUTTR)
 
 enum {
@@ -417,6 +418,8 @@ typedef struct {
 } t_oamobj;
 
 static bool enable_flashing = false;
+static update_unlock_state update_unlock;
+static uint16_t fresh_keys;
 static unsigned framen = 0;
 static unsigned objnum = 0;
 static t_oamobj fobjs[64];
@@ -624,7 +627,7 @@ static const t_patch * get_game_patch(const t_load_gba_info *info) {
 bool ingame_menu_avail_sdram(const t_load_gba_info *info) {
   const t_patch *p = get_game_patch(info);
   // Necessary size to load the IGM (+fonts +cheats)
-  const unsigned igm_reqsz = ROUND_UP2(ingame_menu_payload.menu_rsize + font_block_size() + spop.p.load.l.cheats_size, 1024);
+  const unsigned igm_reqsz = ROUND_UP2(ingame_menu_runtime_size + font_block_size() + spop.p.load.l.cheats_size, 1024);
 
   // If the ROM is too big, must use some hole to load the menu.
   if (info->romfs > MAX_GBA_ROM_SIZE - igm_reqsz) {
@@ -988,6 +991,8 @@ static void recent_reload() {
 }
 
 void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
+  char stable_filename[MAX_FN_LEN];
+  strbcpy(stable_filename,fn,sizeof(stable_filename));fn=stable_filename;
   // Load: Sav/Reset Save: Reboot/Disable
   sram_filename_calc(fn, spop.p.load.l.savefn);
   t_sram_load_policy lp = check_file_exists(spop.p.load.l.savefn) ? SaveLoadSav : SaveLoadReset;
@@ -998,6 +1003,10 @@ void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
     spop.alert_msg = msgs[lang_id][errmsg];
   }
   else {
+    unsigned plugin_error=load_extemu_rom(fn,fs,&pogo_plugin_loader,loadrom_progress);
+    if(plugin_error!=ERR_LOAD_NOEMU) {
+      spop.alert_msg=msgs[lang_id][MSG_ERR_READ];return;
+    }
     // Try to load the emu and ROM, keep trying if there's more than one emulatior option.
     unsigned errcode = ERR_LOAD_NOEMU;
     while (ldinfo->emu_name) {
@@ -1063,6 +1072,15 @@ NOINLINE static void browser_open(const char *fn, uint32_t fs) {
         start_emu_game(ldinfo, fn, fs);
         return;
       }
+    }
+
+    /* Other extension-named plugins can handle formats outside the built-ins. */
+    char plugin_path[64];
+    if(ext && find_pogo_plugin(fn,plugin_path)) {
+      static const t_emu_loader empty_loaders[]={{NULL,NULL}};
+      start_emu_game(empty_loaders,fn,fs);
+      if(spop.alert_msg!=msgs[lang_id][MSG_ERR_NOEMU])return;
+      spop.alert_msg=NULL;
     }
 
     // Attempt to load the file magic and detect what kind of file this is.
@@ -1256,19 +1274,25 @@ static unsigned guessicon(const char *path) {
 
 // Draws text adding some support for overflow.
 #define THREEDOTS_WIDTH  9
-static void draw_text_ovf(const char *t, volatile uint8_t *frame, unsigned x, unsigned y, unsigned maxw) {
+#pragma GCC optimize ("Os")
+
+static void draw_text_ovf_color(const char *t, volatile uint8_t *frame, unsigned x, unsigned y, unsigned maxw, uint8_t color) {
   uint8_t *basept = (uint8_t*)&frame[y * SCREEN_WIDTH + x];
   unsigned twidth = font_width(t);
   if (twidth <= maxw)
-    draw_text_idx8_bus16(t, basept, SCREEN_WIDTH, FT_COLOR);
+    draw_text_idx8_bus16(t, basept, SCREEN_WIDTH, color);
   else {
     char tmpbuf[256];
     unsigned numchars = font_width_cap(t, maxw - THREEDOTS_WIDTH);
     memcpy(tmpbuf, t, numchars);
     memcpy(&tmpbuf[numchars], "...", 4);
-    draw_text_idx8_bus16(tmpbuf, basept, SCREEN_WIDTH, FT_COLOR);
+    draw_text_idx8_bus16(tmpbuf, basept, SCREEN_WIDTH, color);
   }
 }
+static void draw_text_ovf(const char *t,volatile uint8_t *frame,unsigned x,unsigned y,unsigned maxw) {
+  draw_text_ovf_color(t,frame,x,y,maxw,FT_COLOR);
+}
+
 
 static void draw_text_leftovf(const char *t, volatile uint8_t *frame, unsigned x, unsigned y, unsigned maxw) {
   uint8_t *basept = (uint8_t*)&frame[y * SCREEN_WIDTH + x];
@@ -1376,6 +1400,8 @@ static void draw_central_text_wrapped(const char *t, volatile uint8_t *frame, un
     y += 16;           // Move down in the buffer
   }
 }
+
+#pragma GCC optimize ("O2")
 
 void render_recent(volatile uint8_t *frame) {
   // Render the list from memory.
@@ -1973,6 +1999,14 @@ void render_rtcpop(volatile uint8_t *frame) {
   draw_central_text("⯆", frame, cox[spop.rtcpop.selector], 84);
 }
 
+static void render_dssmm_settings_background(volatile uint8_t *frame,const char *title);
+static unsigned settings_visible_rows(void) {
+  return menu_theme<THEME_DSSMM_LIGHT?5:menu_font==FONT_STYLE_DSSMM?9:7;
+}
+static unsigned ui_visible_rows(void) {
+  return menu_theme<THEME_DSSMM_LIGHT?6:menu_font==FONT_STYLE_DSSMM?9:7;
+}
+
 /* Filter settings by category while retaining original enum/action identities. */
 static const uint8_t settings_games[]={SettHotkey,SettSaveBkp,SettCheatEn,DefsPatchEng,DefsGamMenu,DefsRTCEnb,DefsRTCVal,DefsRTCSpeed,DefsLoadPol,DefsSavePol,DefsPrefDS,SettSave};
 static const uint8_t settings_hardware[]={SettBootType,SettFastSD,
@@ -1994,7 +2028,7 @@ static unsigned settings_position(unsigned option) {
 }
 static bool settings_row_visible(unsigned option,unsigned base) {
   unsigned position=settings_position(option);
-  return position<settings_group_total() && position>=base && position<base+5;
+  return position<settings_group_total() && position>=base && position<base+settings_visible_rows();
 }
 
 static void settings_move(unsigned newkeys) {
@@ -2008,81 +2042,82 @@ static void settings_move(unsigned newkeys) {
 
 void render_settings(volatile uint8_t *frame) {
   char tmp[128];
+  bool ds_style=menu_theme>=THEME_DSSMM_LIGHT;
+  if(ds_style)render_dssmm_settings_background(frame,launcher_settings_group==1?"Games":launcher_settings_group==2?"Hardware":"Settings");
   unsigned position=settings_position(smenu.set.selector),total=settings_group_total();
   if(position>=total)position=0;
-  unsigned baseopt=total<=5 || position<=2?0:position>=total-3?total-5:position-2;
+  unsigned visible=settings_visible_rows(),half=visible/2;
+  unsigned baseopt=total<=visible || position<=half?0:position>=total-half?total-visible:position-half;
 
-  if (position > 2)
-    draw_central_text("⯅", frame, 120, 15);
-  if (position + 3 < total)
-    draw_central_text("⯆", frame, 120, 125);
+  if(position>half)draw_central_text("⯅",frame,ds_style?230:120,ds_style?20:15);
+  if(position+half+1<total)draw_central_text("⯆",frame,ds_style?230:120,ds_style?136:125);
 
-  const unsigned maxrows = 5;
+  const unsigned maxrows = visible;
   unsigned optnum = 0, optcnt = 0;
-  const unsigned value_x = 128;
-  const unsigned offy = 29;
-  const unsigned rowh = 20;
-  if (menu_theme >= THEME_DSSMM_LIGHT && smenu.set.selector != SettSave)
-    draw_menu_selection(frame, offy + (position-baseopt)*rowh, 4, 236);
+  const unsigned value_x = ds_style?119:128;
+  const unsigned offy = ds_style?24:29;
+  const unsigned rowh = ds_style?(menu_font==FONT_STYLE_DSSMM?14:18):20;
+  if (menu_theme >= THEME_DSSMM_LIGHT)
+    draw_menu_selection(frame,offy+(position-baseopt)*rowh,112,224);
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows)
-    draw_text_ovf(msgs[lang_id][MSG_SET_TITL1], frame, 8, offy + rowh*optcnt++, 224);
+    draw_text_ovf(msgs[lang_id][MSG_SET_TITL1], frame, ds_style?23:8, offy + rowh*optcnt++, ds_style?88:224);
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     npf_snprintf(tmp, sizeof(tmp), "< %s >", hotkey_list[hotkey_combo].cname);
-    draw_text_ovf(msgs[lang_id][MSG_SETT_HOTK], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_SETT_HOTK], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(tmp, frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_SETT_BOOT], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][MSG_BOOT_TYPE0 + boot_bios_splash], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_SETT_BOOT], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][MSG_BOOT_TYPE0 + boot_bios_splash], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_SETT_FASTSD], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][use_slowld ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_SETT_FASTSD], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][use_slowld ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   #ifdef SUPPORT_NORGAMES
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_SETT_VERNOR], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][use_verify_nor ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_SETT_VERNOR], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][use_verify_nor ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
   #endif
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_SETT_FASTEW], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][use_fastew ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_SETT_FASTEW], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][use_fastew ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     npf_snprintf(tmp, sizeof(tmp), "< %u >", backup_sram_default);
-    draw_text_ovf(msgs[lang_id][MSG_SETT_SAVEBK], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_SETT_SAVEBK], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(tmp, frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_SETT_CHTEN], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][enable_cheats ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_SETT_CHTEN], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][enable_cheats ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows)
-    draw_text_ovf(msgs[lang_id][MSG_SET_TITL2], frame, 8, offy + rowh*optcnt++, 224);
+    draw_text_ovf(msgs[lang_id][MSG_SET_TITL2], frame, ds_style?23:8, offy + rowh*optcnt++, ds_style?88:224);
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_DEFS_PATCH], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][MSG_PATCH_TYPE0 + patcher_default], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_DEFS_PATCH], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][MSG_PATCH_TYPE0 + patcher_default], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_LOADER_MENU], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][MSG_KNOB_DISABLED + ingamemenu_default], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_LOADER_MENU], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][MSG_KNOB_DISABLED + ingamemenu_default], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_LOADER_RTCE], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][MSG_KNOB_DISABLED + rtcpatch_default], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_LOADER_RTCE], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][MSG_KNOB_DISABLED + rtcpatch_default], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
@@ -2090,38 +2125,45 @@ void render_settings(volatile uint8_t *frame) {
     timestamp2date(rtcvalue_default, &d);
     npf_snprintf(tmp, sizeof(tmp), "%02d/%02d/%02d %02d:%02d",
       d.year, d.month, d.day, d.hour, d.min);
-    draw_text_ovf(msgs[lang_id][MSG_DEF_RTCVAL], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(tmp, frame, 112, offy + rowh*optcnt++, 120);
+    draw_text_ovf(msgs[lang_id][MSG_DEF_RTCVAL], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(tmp, frame, ds_style?119:112, offy + rowh*optcnt, ds_style?104:120, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
     unsigned spdmsg = rtcspeed_default ? (MSG_UIS_SPD0 + rtcspeed_default - 1) :
                                           MSG_STILLRTC;
     npf_snprintf(tmp, sizeof(tmp), "< %s >", msgs[lang_id][spdmsg]);
-    draw_text_ovf(msgs[lang_id][MSG_DEF_SPEED], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(tmp, frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_DEF_SPEED], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(tmp, frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_LOADER_LOADP], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][MSG_DEF_LOADP0 + (autoload_default ^ 1)], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_LOADER_LOADP], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][MSG_DEF_LOADP0 + (autoload_default ^ 1)], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_LOADER_SAVEP], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][autosave_default ? MSG_DEF_SAVEP0 : MSG_DEF_SAVEP1], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_LOADER_SAVEP], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][autosave_default ? MSG_DEF_SAVEP0 : MSG_DEF_SAVEP1], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_text_ovf(msgs[lang_id][MSG_LOADER_PREFDS], frame, 8, offy + rowh*optcnt, 116);
-    draw_text_ovf(msgs[lang_id][autosave_prefer_ds ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt++, 104);
+    draw_text_ovf(msgs[lang_id][MSG_LOADER_PREFDS], frame, ds_style?23:8, offy + rowh*optcnt, ds_style?88:116);
+    draw_text_ovf_color(msgs[lang_id][autosave_prefer_ds ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED], frame, value_x, offy + rowh*optcnt, 104, ds_style && baseopt+optcnt==position?SELECTED_TEXT:FT_COLOR); ++optcnt;
   }
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows) {
-    draw_button_box(frame, 20, 220, 112, 132, smenu.set.selector == SettSave);
-    draw_central_text(msgs[lang_id][MSG_UIS_SAVE], frame, 120, 114);
+    if(ds_style) {
+      unsigned y=offy+rowh*optcnt;
+      draw_text_ovf("Save settings",frame,23,y,88);
+      draw_text_ovf_color("< Save >",frame,value_x,y,104,smenu.set.selector==SettSave?SELECTED_TEXT:FT_COLOR);
+    } else {
+      draw_button_box(frame,20,220,112,132,smenu.set.selector==SettSave);
+      draw_central_text(msgs[lang_id][MSG_UIS_SAVE],frame,120,114);
+    }
   }
 
+  if(!ds_style) {
   // Render bar below for help messge
   dma_memset16(&frame[240*140], dup8(FG_COLOR), 240*20/2);
 
@@ -2141,6 +2183,7 @@ void render_settings(volatile uint8_t *frame) {
     draw_text_ovf_rotate(msgs[lang_id][help_msg], frame, 4, SCREEN_HEIGHT - 18, 232, &smenu.anim_state);
   }
 
+  }
   if (menu_theme < THEME_DSSMM_LIGHT && smenu.set.selector != SettSave)
     for (unsigned i = 0; i < 240; i += 16)
       render_icon_trans(i, offy + (position - baseopt) * 20, 63);
@@ -2154,16 +2197,19 @@ void render_ui_settings(volatile uint8_t *frame) {
   static const char * const font_names[] = {"SuperFW", "DSSMM"};
   static const char * const artwork_names[] = { "List", "Title", "Box" };
   static const char * const view_names[] = { "List", "Horizontal", "Vertical" };
-  const unsigned value_x = 128;
-  const unsigned row_y[] = { 20, 38, 56, 74, 92, 110 };
+  bool ds_style=menu_theme>=THEME_DSSMM_LIGHT;
+  if(ds_style)render_dssmm_settings_background(frame,"Interface");
+  const unsigned value_x=ds_style?119:128;
+  const unsigned rows=ui_visible_rows(),line_h=ds_style?(menu_font==FONT_STYLE_DSSMM?14:18):18;
   char tmpbuf[64];
   const char * const labels[UiSetSave] = {
     msgs[lang_id][MSG_UIS_THEME], "Font", "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
     msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent"
   };
-  for (unsigned row = 0; row < sizeof(row_y) / sizeof(row_y[0]); ++row) {
+  for (unsigned row = 0; row < rows; ++row) {
     unsigned option = smenu.uiset.seloff + row;
-    if (option >= UiSetSave) break;
+    if(option>UiSetSave || (!ds_style && option==UiSetSave))break;
+    unsigned y=(ds_style?24:20)+row*line_h;
     const char *value = "";
     switch (option) {
     case UiSetTheme: value = theme_names[menu_theme < THEME_COUNT ? menu_theme : 0]; break;
@@ -2174,22 +2220,25 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetRect: value = msgs[lang_id][recent_menu ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED]; break;
     case UiSetASpd: value = msgs[lang_id][MSG_UIS_SPD0 + anim_speed]; break;
     case UiSetHid: value = msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED]; break;
+    case UiSetSave: value="Save";break;
     case UiSetAccent: value = accent_names[menu_accent < ACCENT_COUNT ? menu_accent : 0]; break;
     }
-    if (menu_theme >= THEME_DSSMM_LIGHT && (int)option == smenu.uiset.selector)
-      draw_menu_selection(frame, row_y[row], 4, 236);
-    draw_text_ovf(labels[option], frame, 8, row_y[row], 116);
+    if (ds_style && (int)option == smenu.uiset.selector)
+      draw_menu_selection(frame,y,112,224);
+    draw_text_ovf(option==UiSetSave?"Save settings":labels[option],frame,ds_style?23:8,y,ds_style?88:116);
     /* Localized native knob labels may already include their arrows. */
     npf_snprintf(tmpbuf, sizeof(tmpbuf), value[0] == '<' ? "%s" : "< %s >", value);
-    draw_text_ovf(tmpbuf, frame, value_x, row_y[row], 104);
+    draw_text_ovf_color(tmpbuf,frame,value_x,y,104,ds_style && (int)option==smenu.uiset.selector?SELECTED_TEXT:FT_COLOR);
   }
 
   if (menu_theme < THEME_DSSMM_LIGHT && smenu.uiset.selector != UiSetSave)
     for (unsigned i = 0; i < 240; i += 16)
-      render_icon_trans(i, row_y[smenu.uiset.selector - smenu.uiset.seloff], 63);
+      render_icon_trans(i, 20+(smenu.uiset.selector-smenu.uiset.seloff)*18, 63);
 
+  if(!ds_style) {
   draw_button_box(frame, 20, 220, 132, 152, smenu.uiset.selector == UiSetSave);
   draw_central_text(msgs[lang_id][MSG_UIS_SAVE], frame, 120, 134);
+  }
 }
 
 void render_info(volatile uint8_t *frame) {
@@ -2276,6 +2325,7 @@ void reload_theme(unsigned thnum) {
   MEM_PALETTE[BG_COLOR] = colors.bg_color;
   MEM_PALETTE[FT_COLOR] = colors.ft_color;
   MEM_PALETTE[HI_COLOR] = colors.hi_color;
+  MEM_PALETTE[SELECTED_TEXT]=0x7fff;
   // In-game menu palette
   MEM_PALETTE[IGM_PAL_FG] = colors.fg_color;
   MEM_PALETTE[IGM_PAL_BG] = colors.bg_color;
@@ -2290,12 +2340,22 @@ void reload_theme(unsigned thnum) {
 
 /* DS Style Start layout matches the DE default geometry. Hardware actions stay
  * in SuperFW; SD/Lite substitute Recents for the unsupported NOR browser. */
+/* Mask partial Mode4 pairs so odd-width strokes never byte-write VRAM. */
+static void launcher_corner_span(volatile uint8_t *frame,unsigned x,unsigned y,unsigned width) {
+  for(unsigned px=x&~1u;px<x+width;px+=2) {
+    volatile uint16_t *dest=(volatile uint16_t *)(frame+y*240+px);
+    unsigned mask=(px>=x?255:0)|((px+1<x+width)?0xff00:0);
+    *dest=(*dest&~mask)|(dup8(HI_COLOR)&mask);
+  }
+}
 static void launcher_corners(volatile uint8_t *frame,unsigned x,unsigned y,unsigned w,unsigned h) {
+  if(w<8 || h<8 || x+w>240 || y+h>160)return;
+  unsigned arm=MIN(8,MIN((w-4)/2,(h-4)/2)),stroke=h<20?3:4;
   for(unsigned row=0;row<h;++row) {
-    unsigned width=(row<3 || row>=h-3)?8:4;
-    if(row<8 || row>=h-8) {
-      dma_memset16(frame+(y+row)*240+x,dup8(HI_COLOR),width/2);
-      dma_memset16(frame+(y+row)*240+x+w-width,dup8(HI_COLOR),width/2);
+    unsigned width=(row<3 || row>=h-3)?arm:stroke;
+    if(row<arm || row>=h-arm) {
+      launcher_corner_span(frame,x,y+row,width);
+      launcher_corner_span(frame,x+w-width,y+row,width);
     }
   }
 }
@@ -2338,7 +2398,7 @@ static void render_start(volatile uint8_t *frame) {
 #else
   draw_central_text("Recents",frame,168,106);
 #endif
-  const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{110,144,20,14}};
+  const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{112,143,18,14}};
   const unsigned *box=boxes[launcher_selected<4?launcher_selected:0];
   if(launcher_selected<4)launcher_corners(frame,box[0],box[1],box[2],box[3]);
 }
@@ -2353,15 +2413,33 @@ static void render_start_bar(volatile uint8_t *frame) {
   if(launcher_selected==4)launcher_corners(frame,176,0,64,16);
 }
 
+static void render_dssmm_settings_header(volatile uint8_t *frame,const char *title) {
+  dma_memset16(frame,dup8(FG_COLOR),240*16/2);
+  draw_text_ovf(menu_username,frame,3,1,84);
+  draw_central_text_ovf(title,frame,120,1,96);
+  uint32_t seconds=launcher_clock_get();char time[12];
+  if(seconds==UINT32_MAX)strcpy(time,"--:--:--");
+  else npf_snprintf(time,sizeof(time),"%02u:%02u:%02u",(unsigned)(seconds/3600%24),(unsigned)(seconds/60%60),(unsigned)(seconds%60));
+  draw_rightj_text(time,frame,237,1);
+}
+
+static void render_dssmm_settings_background(volatile uint8_t *frame,const char *title) {
+  dssmm_background_palette(MEM_PALETTE,menu_theme==THEME_DSSMM_DARK);
+  dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,DSSMM_BG_SETTINGS);
+  render_dssmm_settings_header(frame,title);
+}
+
 static void render_settings_home(volatile uint8_t *frame) {
   static const char * const labels[]={"Interface","Games","Hardware","System","Help"};
+  render_dssmm_settings_background(frame,"Settings");
+  unsigned line_h=menu_font==FONT_STYLE_DSSMM?14:18;
   for(unsigned i=0;i<5;++i) {
-    unsigned y=35+i*19;
-    if(i==launcher_category)draw_menu_selection(frame,y,24,216);
-    draw_text_ovf(labels[i],frame,32,y,158);
-    draw_text_ovf(">",frame,198,y,12);
+    unsigned y=24+i*line_h;
+    if(i==launcher_category)draw_menu_selection(frame,y,112,224);
+    draw_text_ovf(labels[i],frame,23,y,88);
+    draw_text_ovf_color(">",frame,119,y,104,i==launcher_category?SELECTED_TEXT:FT_COLOR);
   }
-  draw_central_text("B: Back",frame,120,144);
+
 }
 
 static const struct {
@@ -2434,6 +2512,7 @@ void menu_render(unsigned fcnt) {
       launcher_valid[framen]=true;
     }
     if(launcher_page==1)render_start_bar(frame);
+    else render_dssmm_settings_header(frame,"Settings");
     REG_WIN0H=REG_WIN0V=0;
     return;
   }
@@ -2498,6 +2577,7 @@ void menu_flip() {
 #pragma GCC optimize ("Os")
 
 void menu_init(int sram_testres) {
+  update_unlock.position=0;
   browser_invalidate_artwork();
   // Reset to ROM browser and SD card root.
   memset(&smenu, 0, sizeof(smenu));
@@ -3507,12 +3587,13 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       spop.alert_msg = msgs[lang_id][MSG_ERR_SETSAVE];
   }
 
+  unsigned rows=ui_visible_rows();
   if (smenu.uiset.selector == UiSetSave)
-    smenu.uiset.seloff = UiSetSave - 6;
+    smenu.uiset.seloff=menu_theme<THEME_DSSMM_LIGHT?UiSetSave-6:MAX(0,UiSetSave+1-(int)rows);
   else if (smenu.uiset.selector < smenu.uiset.seloff)
     smenu.uiset.seloff = smenu.uiset.selector;
-  else if (smenu.uiset.selector >= smenu.uiset.seloff + 6)
-    smenu.uiset.seloff = smenu.uiset.selector - 5;
+  else if (smenu.uiset.selector >= smenu.uiset.seloff + (int)rows)
+    smenu.uiset.seloff = smenu.uiset.selector-(int)rows+1;
 
   // Apply settings immediately
   reload_theme(menu_theme);
@@ -3602,10 +3683,9 @@ static void keypress_menu_tools(unsigned newkeys) {
 }
 
 static void keypress_menu_info(unsigned newkeys) {
+  if(update_unlock_feed(&update_unlock,newkeys&fresh_keys,frame_count)){enable_flashing=true;return;}
   if (newkeys & KEY_BUTTA)
     smenu.info.selector = (smenu.info.selector + 1) % 4;
-  if ((curr_pressed_keys() & FLASH_UNLOCK_KEYS) == FLASH_UNLOCK_KEYS)
-    enable_flashing = true;
 }
 
 
@@ -3629,6 +3709,7 @@ static void launcher_move(unsigned newkeys) {
 }
 
 void menu_keypress(unsigned newkeys) {
+  if(smenu.menu_tab!=MENUTAB_INFO || launcher_page || spop.pop_num || spop.alert_msg || spop.qpop.message || spop.rtcpop.callback || (newkeys&(KEY_BUTTB|KEY_BUTTSEL|KEY_BUTTSTA|KEY_BUTTL|KEY_BUTTR)))update_unlock.position=0;
   /* Actions/tools may reuse cartridge RAM; never reuse the preview afterward. */
   if (newkeys & (KEY_BUTTA | KEY_BUTTSEL | KEY_BUTTL | KEY_BUTTR))
     browser_invalidate_artwork();
@@ -3779,6 +3860,7 @@ static uint32_t prev_keys = 0;
 // This key repeat pattern can be tuned for speed and what not.
 uint16_t get_keypress() {
   uint32_t ckeys = curr_pressed_keys();
+  fresh_keys=ckeys&~prev_keys;
   uint32_t mkeys = 0;
   for (unsigned i = 0; i < 10; i++) {
     if (ckeys & (1 << i)) {

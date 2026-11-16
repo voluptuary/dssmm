@@ -39,6 +39,18 @@ int main(void){char tmp[]="/tmp/dssmm-system-layout-XXXXXX";assert(mkdtemp(tmp))
  assert(f_mkdir("/.superfw/config")==FR_OK);file("/.superfw/config/Other.txt","other");fail_at=rename_count+1;
  assert(system_layout_migrate()==FR_DISK_ERR);expect("/.superfw/config/Other.txt","other");fail_at=0;
  assert(system_layout_migrate()==FR_OK);expect("/SYSTEM/config/Other.txt","other");expect("/SYSTEM/config/Game.gba.txt","game config");
+ assert(f_mkdir("/SYSTEM/emulators")==FR_OK);
+ file("/SYSTEM/emulators/pocketnes.gba","native emulator");
+ assert(system_layout_migrate()==FR_OK);expect("/SYSTEM/PLUG/pocketnes.gba","native emulator");
+ assert(f_stat("/SYSTEM/emulators",0)==FR_NO_FILE);
+ assert(f_mkdir("/SYSTEM/emulators")==FR_OK);
+ file("/SYSTEM/emulators/pocketnes.gba","different emulator");
+ assert(system_layout_migrate()==FR_EXIST);expect("/SYSTEM/PLUG/pocketnes.gba","native emulator");
+ expect("/SYSTEM/emulators/pocketnes.gba","different emulator");
+ char cleanup[1024];path(cleanup,"/SYSTEM/emulators/pocketnes.gba");assert(!unlink(cleanup));
+ assert(f_unlink("/SYSTEM/emulators")==FR_OK);
+ path(cleanup,"/SYSTEM/PLUG/pocketnes.gba");assert(!unlink(cleanup));
+ assert(f_unlink("/SYSTEM/PLUG")==FR_OK);
  for(unsigned i=0;i<16;i++)assert(!handles[i].key);
  /* Remove only the fixture's known files and directories. */
  const char *files[]={"/SYSTEM/settings.txt","/SYSTEM/pending-save.txt","/SYSTEM/config/Game.gba.txt","/SYSTEM/config/Other.txt","/SYSTEM/IMGS/keep.bmp"};for(unsigned i=0;i<5;i++){path(q,files[i]);assert(!unlink(q));}

@@ -549,3 +549,17 @@ Name editor canceled;12-character NAME.TXT display only. Time/editor/wrap/NOR-B,
 stronger corners, isolated settings children and readonly resource background
 storage included. Superseded own594 local files, evidence retained. No public
 release or physical599 claim. Continue DE category/body/layout parity autonomously.
+
+## 2026-11-16 — Crash recovery and portable plugin work
+
+Recovered saved sources/candidate/private session files; restored the sole empty
+interrupted test, confirmed no orphan compiler/emulator. Portable Pogoshell PLUG
+lookup adds BIN/GBA/MB/MBZ plus safe RAM-entry reset, complete LZ77 validation and
+bounded halfword transfers. Native/bundled SuperFW fallback preserved; no imported
+EZ-FLASH driver. Focused three-board host tests, actual ARM reset replay and20
+existing pack format checks pass, not physical gameplay/save validation. Safe
+emulators→PLUG migration and filesystem tests pass. IGM compressed install is
+byte-identical via host, ELF and ARM unpack replay. Unified settings IO tests now
+cover unknown/legacy retention, repeated saves, rollback and oversized files.
+Remaining user settings/recents/Clean list/background/parity work remains active;
+no new candidate/release yet. Keep599 frozen until clean full/all-board gates pass.

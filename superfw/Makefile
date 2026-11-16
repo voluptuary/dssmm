@@ -133,7 +133,7 @@ MENUFILES=src/ingame.S \
           ${FATFSFILES}
 
 INFILES=src/gba_ewram_crt0.S \
-        src/main.c src/system_layout.c src/launcher_profile.c \
+        src/main.c src/settings_io.c src/system_layout.c src/launcher_profile.c src/update_unlock.c \
         src/log.c \
         src/cimpl.c \
         src/settings.c \
@@ -153,7 +153,7 @@ INFILES=src/gba_ewram_crt0.S \
         src/misc.c \
         src/util.c \
         src/utf_util.c \
-        src/emu.c \
+        src/emu.c src/pogo_plugin.c \
         src/fileutil.c \
         src/asmutil.S \
         src/gbahw.c \
@@ -177,7 +177,7 @@ all:	$(FWBINFILES) $(BIEMUFILES) directsave.payload ingame_trampoline.payload
 	# Fix the header/checksum.
 	./tools/fw-fixer.py superfw.gba
 
-firmware.ewram.gba: $(INFILES) ingamemenu.payload superfw.dldi.payload directsave.payload ingame_trampoline.payload src/messages_data.h ldscripts/gba_ewram.ld.i
+firmware.ewram.gba: $(INFILES) ingamemenu.payload.comp superfw.dldi.payload directsave.payload ingame_trampoline.payload src/messages_data.h ldscripts/gba_ewram.ld.i
 	# Build the actual firmware image
 	$(CC) $(CFLAGS) -o firmware.ewram.elf $(INFILES) -T ldscripts/gba_ewram.ld.i -nostartfiles -Wl,-Map=firmware.ewram.map -Wl,--print-memory-usage -fno-builtin
 	$(OBJCOPY) --output-target=binary firmware.ewram.elf firmware.ewram.gba
@@ -208,6 +208,9 @@ src/messages_data.h:	res/messages.py
 
 src/menu_messages.h:	res/messages.py
 	./res/messages.py h menu > src/menu_messages.h
+
+ingamemenu.payload.comp: ingamemenu.payload ./upkr.elf
+	./upkr.elf -l $(COMPRESSION_RATIO) $< $@
 
 firmware.ewram.gba.comp:	firmware.ewram.gba ./upkr.elf
 	./upkr.elf -l $(COMPRESSION_RATIO) $< $@

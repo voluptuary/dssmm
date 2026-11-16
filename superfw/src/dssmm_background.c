@@ -28,8 +28,8 @@ void dssmm_background_clear(volatile uint8_t *frame,bool dark,unsigned x,unsigne
     for(unsigned col=0;col<width/2;++col)dest[col]=color|(color<<8);
   }
 }
-void dssmm_background_draw(volatile uint8_t *frame,bool dark,bool start) {
-  if(!start){dssmm_background_clear(frame,dark,0,0,240,160);return;}
+void dssmm_background_draw(volatile uint8_t *frame,bool dark,unsigned kind) {
+  if(kind==DSSMM_BG_GRID || kind>DSSMM_BG_SETTINGS){dssmm_background_clear(frame,dark,0,0,240,160);return;}
 #ifdef DSSMM_EXTERNAL_BACKGROUNDS
 #ifdef FONTS_EXT
   const unsigned base=DSSMM_BG_BASE_EXTENDED;
@@ -37,20 +37,25 @@ void dssmm_background_draw(volatile uint8_t *frame,bool dark,bool start) {
   const unsigned base=DSSMM_BG_BASE_STANDARD;
 #endif
   const uint8_t *asset=(const uint8_t *)font_base_addr+base;
-  if(*(const uint32_t *)asset!=0x31474244u) {
+  if(*(const uint32_t *)asset!=DSSMM_BG_MAGIC) {
     dssmm_background_clear(frame,dark,0,0,240,160);return;
   }
-  const uint16_t *source=(const uint16_t *)(asset+(dark?DSSMM_BG_DARK_OFFSET:4));
+  const uint16_t *source=(const uint16_t *)(asset+dssmm_stream_offsets[dark][kind-1]);
+  unsigned words=dssmm_stream_lengths[dark][kind-1];
 #else
-  const uint16_t *source=dark?dssmm_dark_start:dssmm_light_start;
+  const uint16_t *source=kind==DSSMM_BG_SETTINGS?(dark?dssmm_dark_settings:dssmm_light_settings):(dark?dssmm_dark_start:dssmm_light_start);
+  unsigned words=kind==DSSMM_BG_SETTINGS?(dark?sizeof(dssmm_dark_settings):sizeof(dssmm_light_settings)):(dark?sizeof(dssmm_dark_start):sizeof(dssmm_light_start));
+  words/=2;
 #endif
   volatile uint16_t *out=(volatile uint16_t *)frame;
   unsigned pos=0;
   while(pos<19200) {
+    if(!words--){dssmm_background_clear(frame,dark,0,0,240,160);return;}
     unsigned token=*source++;
     if(token<256)out[pos++]=(token&15)|((token>>4)<<8);
     else {
       unsigned length=(token>>11)+3,dist=(token&2047)+1;
+      if(token<2048 || dist>pos || length>19200-pos){dssmm_background_clear(frame,dark,0,0,240,160);return;}
       while(length--){out[pos]=out[pos-dist];++pos;}
     }
   }

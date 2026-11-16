@@ -17,13 +17,17 @@ import sys
 source=Path(sys.argv[1]).read_text()
 start=source.index("static void draw_text_ovf_rotate(")
 end=source.index("\n}",start)+2
-text="#define KEY_BUTTUP 64\n#define KEY_BUTTDOWN 128\n#define MIN(a,b) ((a)<(b)?(a):(b))\n#define SCREEN_WIDTH 240\n#define FT_COLOR 18\n#define FG_COLOR 16\n#define HI_COLOR 19\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
-for signature in ("static void draw_text_ovf(", "static void draw_central_text(", "static void draw_central_text_ovf(", "static void draw_rightj_text("):
+text="#define MAX(a,b) ((a)>(b)?(a):(b))\n#define KEY_BUTTUP 64\n#define KEY_BUTTDOWN 128\n#define MIN(a,b) ((a)<(b)?(a):(b))\n#define SCREEN_WIDTH 240\n#define FT_COLOR 18\n#define FG_COLOR 16\n#define HI_COLOR 19\n#define SELECTED_TEXT 236\n#define MEM_PALETTE ((volatile uint16_t *)0x05000000)\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
+for signature in ("static void draw_text_ovf_color(", "static void draw_text_ovf(", "static void draw_central_text(", "static void draw_central_text_ovf(", "static void draw_rightj_text("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
 text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} tools; struct {unsigned selector;} set; unsigned menu_tab; struct {int selector,seloff,maxentries;} recent; struct {int selector,seloff;} uiset; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
 text+="extern void dma_memset16(volatile void *, uint16_t, uint16_t);\n#define dup8(x) ((x)|((x)<<8))\n#define npf_snprintf snprintf\n#define THEME_COUNT 8\n#define ACCENT_COUNT 5\n#define THEME_DSSMM_LIGHT 6\n#define THEME_DSSMM_DARK 7\n"
 text+="static uint8_t menu_theme=6,artwork_mode=1,browser_view=1,recent_menu=1,anim_speed=1,hide_hidden=1,menu_accent,menu_font;\n"
+text+='static void render_dssmm_settings_background(volatile uint8_t *,const char *);\n'
+for signature in ('static unsigned settings_visible_rows(', 'static unsigned ui_visible_rows('):
+ a=source.index(signature);b=source.index('\n}',a)+2
+ text+=source[a:b]+'\n'
 text+='static const char * const accent_names[5]={"Default","Blue","Green","Orange","Purple"};\n'
 a=source.index("enum {\n  UiSetTheme");b=source.index("\n};",a)+3
 text+=source[a:b]+"\n"
@@ -32,7 +36,7 @@ for signature in ("static void draw_box_outline(","static void draw_box_full(","
  text+=source[start:end]+"\n"
 a=source.index("  if (smenu.uiset.selector == UiSetSave)",source.index("static void keypress_menu_uisettings("))
 b=source.index("  // Apply settings immediately",a)
-text+="static void preview_select_ui(unsigned option) {\nsmenu.uiset.selector=option>UiSetSave?UiSetSave:option;\n"+source[a:b]+"}\n"
+text+="static void preview_select_ui(unsigned option) {\nunsigned rows=ui_visible_rows();\nsmenu.uiset.selector=option>UiSetSave?UiSetSave:option;\n"+source[a:b]+"}\n"
 settings=Path(sys.argv[1]).with_name("settings.c").read_text()
 header=Path(sys.argv[1]).with_name("settings.h").read_text()
 a=header.index("typedef struct {\n  uint16_t fg_color");b=header.index("} t_theme_colors;",a)+len("} t_theme_colors;")
@@ -56,7 +60,9 @@ text+=source[a:b]+"\n"
 a=source.index("enum {\n  GBAInfoCNT");b=source.index("\n};",a)+3
 text+=source[a:b]+"\n"
 for signature in ("static const char *render_gbarom_patching(","static const char *render_gbarom_loading("):
- a=source.index(signature);b=source.index("\n}",a)+2
+ a=source.index(signature)
+ while ';' in source[a:source.index('{',a)]:a=source.index(signature,a+len(signature))
+ b=source.index("\n}",a)+2
  text+=source[a:b]+"\n"
 text+="\n#define KEY_BUTTA 1\n#define KEY_BUTTUP 64\n#define KEY_BUTTDOWN 128\n#define KEY_BUTTLEFT 32\n#define KEY_BUTTRIGHT 16\n#define animspd_cnt 5\n#define MAX(a,b) ((a)>(b)?(a):(b))\n#define MIN(a,b) ((a)<(b)?(a):(b))\n"
 text+="static int browser_motion_offset;\nstatic void browser_invalidate_artwork(void) {}\nstatic void browser_reload_filter(void) {}\nstatic bool save_ui_settings(void) {return false;} /* No SD persistence in fixture. */\nstatic void reload_theme(unsigned theme);\n"
@@ -73,8 +79,10 @@ text+=source[a:b]+"\n"
 text+='#define KEY_BUTTB 2\n#define KEY_BUTTSTA 8\n'
 text+='static struct {t_rentry rentries[1];uint16_t artwork_pixels[ARTWORK_MAX_PIXELS/2];uint8_t artwork_bmp_buffer[ARTWORK_BMP_MAX_SIZE];} preview_sdram __attribute__((section(".ewram"),aligned(4)));\n#define sdr_state (&preview_sdram)\nstatic bool artwork_cached,artwork_valid;\nstatic unsigned artwork_cached_mode;\nstatic char artwork_rom[256];\nstatic artwork_info preview_info;\n'
 text+='static bool preview_load_art(const char *,unsigned,uint8_t *,size_t,uint8_t *,size_t,artwork_info *);\n#define artwork_load preview_load_art\n'
-for signature in ("static void launcher_corners(","static void render_start(","static void render_start_bar(","static void render_settings_home(","void render_rtcpop("):
- a=source.index(signature);b=source.index("\n}",a)+2
+for signature in ("static void launcher_corner_span(","static void launcher_corners(","static void render_start(","static void render_start_bar(","static void render_dssmm_settings_header(","static void render_dssmm_settings_background(","static void render_settings_home(","void render_rtcpop("):
+ a=source.index(signature)
+ while ';' in source[a:source.index('{',a)]:a=source.index(signature,a+len(signature))
+ b=source.index("\n}",a)+2
  text+=source[a:b]+"\n"
 text+='static void accept_menu_clock(void) {launcher_clock_set((unsigned)spop.rtcpop.val.hour*3600+(unsigned)spop.rtcpop.val.min*60);}\n'
 for signature in ('static void open_menu_clock(', 'static void launcher_move('):

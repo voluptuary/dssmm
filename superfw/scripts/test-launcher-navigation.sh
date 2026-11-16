@@ -12,6 +12,8 @@ out='''#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 #define THEME_DSSMM_LIGHT 6
+#define FONT_STYLE_DSSMM 1
+static unsigned menu_font=1;
 #define KEY_BUTTA 1
 #define KEY_BUTTB 2
 #define KEY_BUTTSTA 8
@@ -30,7 +32,7 @@ static void keypress_menu_recent(unsigned keys){assert(keys==KEY_BUTTA);++recent
 '''+s[a:b]+'\nstatic void press(unsigned newkeys) {\n'
 a=s.index('enum {\n  SettTitle1');b=s.index('\n};',a)+3
 nav=s[s.index('static void launcher_move('):s.index('\n}',s.index('static void launcher_move('))+2]
-out=out.replace('static void press(unsigned newkeys) {\n',s[a:b]+'\n'+s[s.index('/* Filter settings by category'):s.index('void render_settings(')]+'\n'+nav+'\nstatic void press(unsigned newkeys) {\n')
+out=out.replace('static void press(unsigned newkeys) {\n',s[a:b]+'\n'+s[s.index('static unsigned settings_visible_rows('):s.index('void render_settings(')]+'\n'+nav+'\nstatic void press(unsigned newkeys) {\n')
 a=s.index('    if(menu_theme>=THEME_DSSMM_LIGHT) {',s.index('void menu_keypress('));b=s.index('    // Menu change via trigger buttons',a)
 out+=s[a:b]+'''}
 int main(void) {
@@ -65,6 +67,7 @@ int main(void) {
  press(KEY_BUTTB);press(KEY_BUTTB);assert(launcher_page==1);
  press(KEY_BUTTB);assert(!launcher_page && smenu.menu_tab==MENUTAB_ROMBROWSE);
  launcher_settings_group=1;
+ assert(ui_visible_rows()==9);
  assert(settings_option_at(0)==SettHotkey);
  assert(settings_position(SettFastSD)==settings_group_total());
  assert(settings_row_visible(SettHotkey,0) && !settings_row_visible(SettFastSD,0));

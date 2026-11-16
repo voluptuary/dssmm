@@ -636,3 +636,61 @@ wrapped Last/SD-or-NOR/Settings/Time, independent software clock and editor.
 No physical599 qualification; owner594 progress recorded. Continue DE settings
 layout/backgrounds, true View options grouping, System/Help/dialog presentation.
 Do not edit599 image while next work proceeds. Integrate/sync this milestone.
+
+## 2026-11-15 — Active owner follow-ups and RAM checkpoint
+
+Owner599 confirms clock/editing and prominent markers; asks Settings marker up/right
+and four distinct corners for Settings/Time. Implemented adaptive arms/masked
+halfword edges; host canary/gap test passes. Next default save folder is SYSTEM/SAVER,
+with SYSTEM/SAVEGAME and all earlier save-set fallbacks retained; settings tests
+pass. Owner asks DS backgrounds/no bottom bar on all menus except List and exact
+art/panel/settings alignment. SET Light/Dark assets and9-row DE-font/7-row native
+settings geometry now render in mGBA, value-column highlights/white text. Root/
+Games screenshots inspected. Remaining generic/carousel/background/clip alignment
+work is active; not complete. Update unlock now fresh Down-Up-Left-Right-A in5s;
+wrong keys/chords/timeouts reset. Basic order/boundary/wrap tests pass; native
+fresh-key/Info integration test pending. No update-write/confirm path changes.
+
+Latest Chis diagnostic256704/257024EWRAM leaves320bytes. Do not loosen limits.
+Before adding further UI, compress the fixed built-in IGM payload with the native
+UPKR codec already used by this kernel, retaining its runtime-size metadata and
+identical decoded install bytes/address/allocation. Keep compressed bytes in GBA
+RAM, not a cartridge region that game/font moves may overwrite. Require host
+round-trip, ELF embedded metadata/stream verification and actual ARM halfword
+unpacker byte-equivalence/guards for all3 variants. This affects install mechanics,
+so new hardware gameplay/restore validation remains necessary despite identical
+bytes.599 remains current/frozen while work proceeds; folder ZIP/BIOS/scratch kept.
+
+## 2026-11-16 — Codespace recovery and plugin loader checkpoint
+
+Owner reports Codespace crash. Rechecked git/files/processes: source edits, current
+hardware-test599 and manifests, canonical Folder-Art.zip, private BIOS and session
+scratch survive. No live compiler/mGBA process remained. One interrupted own file,
+scripts/test-pogo-reset-arm.py, was zero bytes; restored and reran successfully.
+Root dssmm fe2a427 (folder pack) and superfw dab4a81 are confirmed remotely before
+this checkpoint. User untracked devcontainer lock/audit/patch remain untouched.
+
+Owner additionally requests existing EZFODE emulator plugins. Portable Pogoshell
+extension lookup now supports PLUG/<extension>.bin/.gba/.mb/.mbz before native
+SuperFW fallback; no EZ-FLASH driver is imported. New reset preserves argument
+block, supports RAM/raw/LZ77 entry, validates bounds/complete streams; exact-read
+loader handles partial word tails without native32-byte copy overrun. PLUG
+migration safely merges SYSTEM/emulators, preserving conflicts. See
+PLUGIN-COMPATIBILITY.md. Focused all-board sanitized loader tests, ARM reset
+replay (BIOS calls modeled), SYSTEM migration and all20 existing pack RAM-format
+checks pass. No physical plugin/game/save qualification claimed.
+
+Recovered settings/background work remains IN DEVELOPMENT: unified shared
+SETTINGS.TXT + namespaced extras, unknown DE/private/legacy UI preservation and
+atomic replacement now have real-filesystem short-write/rollback/recovery/oversize
+checks. These pass; Save buttons/autosave, Clean list display, shared recents,
+remaining backgrounds/footer/alignment are unfinished. Do not claim completed
+SYSTEM portability or parity. New update/Start corner and theme tests pass.
+
+Current diagnostic Chis main links at248184/257024EWRAM and14088IWRAM (before
+last small settings fixes). Native IGM50356→28233 packed bytes, runtime216244:
+host roundtrip, actual ELF bytes/metadata and actual ARM halfword unpacker output
+and guards pass. scripts/build.sh now enforces host/ELF IGM package validation;
+DSSMM_ARM_IGM=1 adds optional Unicorn replay per board. Still rerun clean all3,
+full verifier, background ARM and hosted checks after source freeze before a new
+hardware-test image;599 remains frozen. Continue remaining owner goals autonomously.

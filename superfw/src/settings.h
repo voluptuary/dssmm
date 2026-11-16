@@ -53,6 +53,7 @@ extern uint8_t menu_accent;
 extern char menu_username[LAUNCHER_NAME_BYTES];
 extern uint32_t menu_clock_seed;
 extern uint8_t menu_font; /* Native or optional DSSMM printable ASCII font. */
+extern uint8_t clean_list,hide_system_files,menu_clock_24;
 extern uint8_t artwork_mode; /* 0=list, 1=title, 2=box; Start in SD browser */
 extern uint8_t browser_view;  /* 0=list, 1=horizontal carousel, 2=vertical carousel */
 t_theme_colors menu_theme_colors(unsigned theme, unsigned accent);

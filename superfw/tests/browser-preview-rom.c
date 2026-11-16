@@ -194,6 +194,7 @@ int main(void) {
   PALETTE[1] = 0x7FFF;  /* light top/footer */
   PALETTE[2] = 0x3E9F;  /* selected blue */
   PALETTE[3] = 0x56B5;  /* side card */
+  PALETTE[236]=0x7fff;
   PALETTE[16]=PALETTE[3];PALETTE[17]=PALETTE[0];PALETTE[18]=PALETTE[1];PALETTE[19]=PALETTE[2];
   for (unsigned i = 0; i < ARTWORK_PALETTE_SIZE; ++i)
     PALETTE[ARTWORK_PALETTE_BASE + i] = artwork_palette_color(i);

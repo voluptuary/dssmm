@@ -6,6 +6,10 @@ for tool in arm-none-eabi-gcc arm-none-eabi-g++ gcc g++ lcov; do
   command -v "$tool" >/dev/null || { echo "Missing required validation tool: $tool" >&2; exit 2; }
 done
 bash "$project_root/scripts/test-theme-settings.sh"
+bash "$project_root/scripts/test-settings-io.sh"
+bash "$project_root/scripts/test-pogo-plugins.sh"
+bash "$project_root/scripts/test-start-corners.sh"
+bash "$project_root/scripts/test-update-unlock.sh"
 bash "$project_root/scripts/test-system-layout.sh"
 python3 "$project_root/tests/test-firmware-limits.py"
 bash "$project_root/scripts/test-letter-folder-pack.sh"
