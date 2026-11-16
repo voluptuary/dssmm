@@ -1050,3 +1050,23 @@ performance guide consolidated; new gates on clean frozen source next. Test5/
 Chis624 remain frozen. After audit checkpoint and all3 gates, deliver next numbered
 Chis hardware test then continue menu parity; do not republish624 or claim new
 physical qualification. User's devcontainer-lock/private retained files intact.
+
+632/sourcec22ac3a83fed6cc4b764ea2f36afee8669c7ceaf passes clean full local verifier
+with nativeIGM ARM replay/all3 and hosted43874378364. Chis632/manifest/guide now
+in hardware-test, superseding our624 test copy; public Test5 stays frozen624.
+Report docs/build-632-validation.json. SD519680/524288 leaves4608; Lite487424/507904
+leaves20480; Chis1671680/2097152 leaves425472. Active10 backgrounds and new code
+fault/oracle/budget checks passed. No new physical qualification.
+
+Audit follow-up still needed before declaring it finished: load_gba_rom allocation
+omits cheat bytes (menu availability includes them); load_ingame_menu subtracts
+unchecked totals and can underflow scratch_size. GBA transfer loops ignore short
+read counts, may read/copy past EOF padding and native slow-copy rounds32bytes.
+Need exact aligned tail helper reused with plugins, bounded sharedIGM size helper,
+hole bounds/cheat allocation/read/close validation. Full-ROM load failure can
+also overwrite font/VFS resources at14.5/31MiB, so emulator-only cache recovery
+cannot simply be reused for every GBA error; document this limitation and do not
+claim generic recovery without safe asset restoration. Chis NOR caller has an
+unused 'err' TODO (backend currentlyalwaysreturns0); honor new early IGM guards.
+After corrections/new gates, continue DE alignment/grouping parity. No owner input
+required. Root Test5integration/all4CI43869704338 passed; all5branches synced normally.

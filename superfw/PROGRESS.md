@@ -698,3 +698,9 @@ synthetic tests. LateCppcheck diagnostics corrected earlier incomplete warning
 summary; third-party byte-casts/cache-copy explained. Extra scanner code needed
 256B cold filename relocation to EWRAM; preliminaryLite stack16592>=16384.
 Freeze clean source for full-all3 gates/new hardware test, then resume DE parity.
+
+632 clean full/all3/nativeIGM-ARM and hosted43874378364 pass; source/package/budget
+checks pass. Delivered Chis632 hardware-test, retained release624. SD4608Bflashfree,
+Lite20480B, Chis425472B. Audit next: IGM cheat-size omission/unchecked subtraction,
+GBA short reads/slow-copy tails and failure asset-loss limits. Do not claim audit
+complete or generic GBA recovery yet. Then continue porting without input pause.
