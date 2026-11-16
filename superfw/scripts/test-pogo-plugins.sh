@@ -6,9 +6,11 @@ trap 'rm -rf "$test_dir"' EXIT
 python3 - "$project_root" "$test_dir" <<'PY'
 import pathlib,sys
 root,out=map(pathlib.Path,sys.argv[1:])
-s=(root/'src/loader.c').read_text();start=s.index('static void pogo_copy16(')
-end=s.index('// Generic-emulator',start)
-(out/'pogo-loader-under-test.h').write_text(s[start:end])
+s=(root/'src/loader.c').read_text();start=s.index('static void rom_write16_exact(')
+end=s.index('\n}',start)+2
+helper=s[start:end]
+start=s.index('static unsigned load_pogo_plugin(');end=s.index('// Generic-emulator',start)
+(out/'pogo-loader-under-test.h').write_text(helper+'\n'+s[start:end])
 PY
 for board in sd lite chis; do
   flags=()

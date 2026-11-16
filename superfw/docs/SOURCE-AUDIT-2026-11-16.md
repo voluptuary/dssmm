@@ -71,3 +71,30 @@ After those gates, continue porting the remaining DE menu grouping/navigation,
 shared preference behavior and artwork alignment. Physical plugin Exit and the
 owner's broader preference-loss report remain open; no hardware input is required
 to continue other porting work.
+
+### Third pass: bounded native transfers and persisted-setting diagnostics
+
+Shared loader_layout helpers account for IGM fonts/cheats and validate the ROM
+hole before allocation or cartridge writes. Native GBA transfers check size,
+exact reads, seeks, close and aligned tails. After destructive cartridge writes,
+a failed load presents an internal-ASCII restart-only screen instead of accessing
+potentially overwritten font/VFS assets (VFS resides at30MiB). Progress is bounded.
+The loader tests exercise a32MiB ROM/internal hole, odd tails and injected I/O
+errors; mGBA screen15 covers the asset-independent error screen.
+
+Settings read failures now block overwriting the original file and show a boot
+error; embedded NUL input is rejected. Actual production FatFs RAM-disk tests
+save/unmount/remount90 UI combinations on both FAT16 and FAT32. This does not
+resolve the owner's physical power-cycle persistence report by itself.
+
+The requested GBA Load/Write-NOR selector reuses the Chis backend, default-No
+confirmation and capacity recheck. Insufficient occupied capacity offers replacing
+all existing games; impossible per-game sizes are rejected before confirmation.
+Source size/open/close are checked before removing metadata. Removal uses the
+native metadata wipe; reused game blocks are erased by the writer. A subsequent
+write failure can leave the confirmed removed games unavailable. SD/Lite retain
+only Load. Native NOR writes now guard payload holes/32MiB null-patch cases,
+check exact reads/size/close, and preserve odd tails with erased-byte padding.
+Mock-flash tests cover cancellation, full/occupied capacity, replacement failure,
+source failures,32MiB no-patch writes and odd-byte data. No physical flash writes
+were performed during these tests. Full clean candidate gates are still pending.

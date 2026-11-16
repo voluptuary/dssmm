@@ -31,7 +31,7 @@ for signature in ('static unsigned settings_visible_rows(', 'static unsigned ui_
 text+='static const char * const accent_names[5]={"Default","Blue","Green","Orange","Purple"};\n'
 a=source.index("enum {\n  UiSetTheme");b=source.index("\n};",a)+3
 text+=source[a:b]+"\n"
-for signature in ("static void draw_box_outline(","static void draw_box_full(","static void draw_menu_selection(","void render_ui_settings("):
+for signature in ("static void draw_box_outline(","static void draw_box_full(","static void draw_menu_selection(","void render_ui_settings(","static void render_restart_required("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
 a=source.index("  if (smenu.uiset.selector < smenu.uiset.seloff)",source.index("static void keypress_menu_uisettings("))

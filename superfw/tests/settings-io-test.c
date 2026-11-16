@@ -25,6 +25,10 @@ int main(void){char tmp[]="/tmp/dssmm-settings-XXXXXX";assert(mkdtemp(tmp));strc
  read_file(SETTINGS_FILEPATH,text,sizeof(text));assert(!strcmp(text,before));
  memset(text,'x',9000);text[9000]=0;write_file(SETTINGS_FILEPATH,text);
  assert(!settings_write_text("Theme = Light\n","",owned));assert(read_file(SETTINGS_FILEPATH,before,sizeof(before))==9000&&!strcmp(text,before));
+ char filename[1024];path(filename,SETTINGS_FILEPATH);FILE *binary=fopen(filename,"wb");assert(binary);
+ assert(fwrite("Theme=Dark\0Colour=Blue\n",1,23,binary)==23);assert(!fclose(binary));
+ assert(!settings_read_text(SETTINGS_FILEPATH,parse,&exists));
+ assert(!settings_write_text("Theme = Light\n","",owned));
  for(unsigned i=0;i<8;i++)assert(!handles[i]);
  assert(f_unlink(SETTINGS_FILEPATH)==FR_OK);f_unlink("/SYSTEM/.sf-settings.tmp");
  char q[1024];path(q,"/SYSTEM");assert(!rmdir(q));assert(!rmdir(root));

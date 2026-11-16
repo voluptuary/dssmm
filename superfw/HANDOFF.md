@@ -1070,3 +1070,59 @@ claim generic recovery without safe asset restoration. Chis NOR caller has an
 unused 'err' TODO (backend currentlyalwaysreturns0); honor new early IGM guards.
 After corrections/new gates, continue DE alignment/grouping parity. No owner input
 required. Root Test5integration/all4CI43869704338 passed; all5branches synced normally.
+
+## Owner624 follow-up queue (2026-11-16, not yet implemented)
+
+- Help/System/firmware-update panels should match the first Settings screen's
+  right panel frame and subtle horizontal lines, not plain white. Center System
+  rows vertically while retaining left justification. Restore graphical SuperFW
+  logo in Help if budgets allow. Restore NOR browser bottom bar.
+- GG cartridge: one pixel shorter, as wide as permitted, flat bottom, blank label
+  like GB/GBC. Add bespoke PCE/NGC/A26/CRT cartridge icons. Owner now confirms GG
+  loads on624, but SMS/GG Exit resets/crashes to black and requires powercycle.
+  PCE produces exact kernel MSG_ERR_READ ('Error: could not load ROM!'), not a
+  plugin runtime message. A26/CRT showUnknownfiletype. Current canonical DE pack
+  contains pce.mb, ngc.mb, no a26 orcrt named plugin; do not inventalias mapping.
+  Genericextensionpluginroutingalreadyexists butknownplatform recognition/icon
+  table lacks these. Investigate non-word-sized MB: ours rejectsrawsize whileDE
+  validates/copies paddedrom_start_address. Proposed loaderpad MBreset/validation
+  count to4 (alreadyzero-padded; preserve ROMstart), test oddMB. Not implemented.
+- Start last-game top corners down1px, clock left corners right2px. Horizontal
+  previews STILLcross caption frame; clip art to the actual artwork panel region
+  rather than entire display. Full title/name caption inner bounds remain needed.
+- Interface UI prefs still not retained across powercycle; do NOT claim fixed.
+  POSIX360/board and a PRIVATE realFatFs FAT16 save/unmount/remount probe bothpass
+  (/tmp/dssmm-real-fatfs-settings.c). Consider actual ARM/FAT32 + diagnostic reads,
+  sourcecode paths/persistence actualdevice; no userfeedbackpause.
+- New requested Chis launch selector: D-pad cycles bottom LoadGBA / WriteGBAtoNOR.
+  Check existing games and capacity. If fits confirmwrite. If occupiedgames stop
+  fit buterasewouldfit, offereraseexistinggames+write confirmation. If too big
+  evenemptyNOR explaincannotfit. HideunsupportedNORaction SD/Lite. Reuse existing
+  Chis allocator/erase/write backend and explicit firmware user confirmations;
+  no physical NOR operations are authorized/executed by agent tools.
+
+Current dirty audit3 (after clean checkpoint5833e05): added loader_layout.c/h pure
+bounded menu/font/cheat size+cartridge allocation plan, reused byUI/SDloader; menu
+installer boolguard beforewrites, SD/NOR honorfailure. Shared exact16bit-tailhelper
+hoisted/reusedwithplugins, nativeGBA fast/slow copies bounded/exactreads, FFpadding,
+short/seek/close errors handlecorrectly. Full-ROMerroraftercartchanged returns
+ERR_LOAD_RESTART; embeddedASCII-only frameblocksnormalmenus untilrestart, avoiding
+clobbered font/VFS/browser assets. Missing/sizeerrorbeforewritesnormaldialog.
+Progressbarclamped/zero-safe. Newscalar and actual32MiBinternal-hole/odd-tail/IO
+fault tests pass; plugin testsall3 and mGBArestartscreen15 pass. No full-all3 on
+thisdirtysourceyet. Public624/localChis632frozen. Continuevalidation, commit audit3,
+then ownerfollowupfeature/prefs/plugin work. New .devcontainer lock untouched.
+
+Audit3 and requested NOR selector implemented; freeze/checkpoint before clean
+all3 gates. Chis GBA Info bottom action cycles with any D-pad direction between
+Load and WriteNOR; shoulders still select tabs. A confirms default-No write or
+replace-all question after fresh capacity/per-game checks; source preflight before
+metadata wipe; native backend erases reused blocks. SD/Lite hide unsupported NOR.
+New test-nor-launch.sh covers real production control flow with mocked flash and
+NOR backend data/cleanup including32MiB null-patch/odd tails. No physical NOR test.
+Settings read-error preservation + actual FAT16/FAT32 RAMdisk remount90 UI combos
+passed; physical persistence remains unresolved. Audit3 loader/restart tests pass.
+First exploratory full verifier was intentionally stopped before board builds to
+correct newly exposed NOR backend bounds/tail/close issues; do not record it as
+passed. Next: commit, clean full/nativeIGM/all3, package/CI, numbered Chis delivery.
+Then continue owner624 panel/plugin/icon/alignment/persistence queue autonomously.

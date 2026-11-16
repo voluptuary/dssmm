@@ -186,3 +186,12 @@ Owner requests an adversarial correctness/performance/debt audit after this
 publication, including orphan cleanup and concise useful comments/organization,
 then continued autonomous porting and numbered hardware-test builds. Broader
 settings loss/plugin Exit/SD-Lite physical validation/parity remain unresolved.
+
+Latest continuation: read final audit3 entries in HANDOFF and SOURCE-AUDIT-2026-11-16.
+Chis GBA Info has Load/WriteNOR action selector; retain default-No confirmation,
+capacity/per-game/source guards and all3 gates. Native metadata wipe removes
+existing games only after explicit firmware confirmation; no agent-side physical
+NOR testing. test-nor-launch.sh uses simulated flash. Settings read failures must
+not overwrite the original config. Real FatFs RAMdisk remount tests are not card
+power-cycle validation. Public Test5 stays624; local632 remains until clean gates
+validate its replacement. Continue owner624 UI/plugin/performance parity queue.

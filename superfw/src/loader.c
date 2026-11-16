@@ -24,6 +24,7 @@
 #include "compiler.h"
 #include "save.h"
 #include "patchengine.h"
+#include "loader_layout.h"
 #include "settings.h"
 #include "ingame.h"
 #include "fonts/font_render.h"
@@ -51,6 +52,14 @@
 #define ING_PALETTE_BASE    240
 
 extern bool slowsd;
+
+static void rom_write16_exact(void *dst,const void *src,unsigned size) {
+  unsigned bulk=size&~31u;
+  if(bulk)rom_copy_write16(dst,src,bulk);
+  volatile uint16_t *d=(volatile uint16_t*)((uint8_t*)dst+bulk);
+  const uint16_t *s=(const uint16_t*)((const uint8_t*)src+bulk);
+  for(unsigned n=bulk;n<size;n+=2)*d++=*s++;
+}
 
 bool validate_gba_header(const uint8_t *header) {
   const t_rom_header *gbah = (t_rom_header*)header;
@@ -113,15 +122,20 @@ void fix_gba_header(volatile uint16_t *header) {
   header[0xBC / 2] = (-(0x19+crc)) << 8 | header[0xBC / 2];
 }
 
-// Loads the in-game menu at the desired address and size (returns success).
+// Installs the menu only when its rounded runtime/font/cheat allocation fits.
 // addr must be 4 byte aligned.
-void load_ingame_menu(
+bool load_ingame_menu(
   uint32_t base_addr, uint32_t total_size, bool useds,
   const char* savefn, const char* statefn,
   bool rtc_patches, unsigned cheats
 ) {
   const unsigned menu_size = ingame_menu_runtime_size;
   const unsigned fontsz = font_block_size();
+  unsigned required;
+  if ((base_addr&3) || base_addr<GBA_ROM_BASE || base_addr>GBA_ROM_BASE+MAX_GBA_ROM_SIZE ||
+      total_size>GBA_ROM_BASE+MAX_GBA_ROM_SIZE-base_addr ||
+      !loader_menu_size(menu_size,fontsz,cheats,&required) || required>total_size)
+    return false;
 
   set_supercard_mode(MAPPED_SDRAM, true, false);
 
@@ -170,6 +184,7 @@ void load_ingame_menu(
   memcpy32(igm->statefile_pattern, statefn, sizeof(igm->statefile_pattern));
 
   set_supercard_mode(MAPPED_SDRAM, true, true);
+  return true;
 }
 
 void load_directsave_config(const t_dirsave_info *dsinfo) {
@@ -222,57 +237,33 @@ unsigned load_gba_rom(
   progress_fn progress
 ) {
 
+  if (fs<sizeof(t_rom_header) || fs>MAX_GBA_ROM_SIZE) return ERR_LOAD_BADROM;
   bool use_rtc_patches = rtcinfo != NULL;
 
-  // Determine how much ROM space we need for the IGM and DirSav payloads
-  const unsigned igm_reqsz = ingame_menu_runtime_size + font_block_size();
-  // Round it up, reserve ~1KB after the ROM for patches.
-  // 32MiB games cannot generate patches beyond the end.
-  const unsigned romrsize = ROUND_UP2(fs, 1024) + (fs < MAX_GBA_ROM_SIZE ? 1024 : 0);
-  // Required size for these payloads. We should always have enough, since menu checks it.
-  const unsigned req_size = (ingame_menu ? igm_reqsz : 0) + (dsinfo ? DIRSAVE_REQ_SPACE : 0);
+  unsigned menu_bytes=0;
+  if (ingame_menu && !loader_menu_size(ingame_menu_runtime_size,font_block_size(),cheats,&menu_bytes))
+    return ERR_LOAD_MENU;
+  t_loader_layout layout;
+  if (!loader_plan(fs,menu_bytes,dsinfo?DIRSAVE_REQ_SPACE:0,
+                   ptch?ptch->hole_addr:0,ptch?ptch->hole_size:0,&layout))
+    return ERR_NO_PAYLOAD_SPACE;
+  uint32_t ds_addr=GBA_ROM_BASE+layout.directsave;
+  uint32_t igm_addr=GBA_ROM_BASE+layout.menu,igm_space=layout.menu_space;
+  uint32_t gap_start=layout.gap_start,gap_end=layout.gap_end;
 
-  uint32_t igm_addr, igm_space, ds_addr;
-  if (romrsize + req_size <= MAX_GBA_ROM_SIZE) {
-    // Allocate the DirSav payload first
-    ds_addr = romrsize;
-    // Now the IGM
-    igm_addr = ds_addr + (dsinfo ? DIRSAVE_REQ_SPACE : 0);
-    // Calculate the total space for the IGM to use
-    igm_space = MAX_GBA_ROM_SIZE - igm_addr;
-  }
-  else {
-    // Cannot append it at the end, it's too big. Check if we have a hole.
-    if (!ptch || ptch->hole_size < req_size)
-      return ERR_NO_PAYLOAD_SPACE;
-
-    ds_addr = ptch->hole_addr;
-    igm_addr = ds_addr + (dsinfo ? DIRSAVE_REQ_SPACE : 0);
-    igm_space = ptch->hole_size - (dsinfo ? DIRSAVE_REQ_SPACE : 0);
-  }
-  // Round it down to a KB boundary
-  igm_space &= ~1023;
-
-  // Calculate the "hole" limits
-  uint32_t gap_start = ds_addr;
-  uint32_t gap_end = igm_addr + igm_space;
-
-  // Get aboslute addresses
-  ds_addr += GBA_ROM_BASE;
-  igm_addr += GBA_ROM_BASE;
-
-  // Install the menu before loading the ROM, otherwise we overwrite relevant assets.
+  FIL fd;
+  if (f_open(&fd,fn,FA_READ)!=FR_OK) return ERR_LOAD_BADROM;
+  if (f_size(&fd)!=fs) {f_close(&fd);return ERR_LOAD_BADROM;}
+  bool changed=false;
   if (ingame_menu) {
     char sfn[MAX_FN_LEN];
-    savestate_filename_calc(fn, sfn);
-    load_ingame_menu(igm_addr, igm_space, dsinfo, savefn, sfn, use_rtc_patches, cheats);
+    savestate_filename_calc(fn,sfn);
+    if (!load_ingame_menu(igm_addr,igm_space,dsinfo,savefn,sfn,use_rtc_patches,cheats)) {
+      f_close(&fd);
+      return ERR_LOAD_MENU;
+    }
+    changed=true;
   }
-
-  // Proceed to load the ROM
-  FIL fd;
-  FRESULT res = f_open(&fd, fn, FA_READ);
-  if (res != FR_OK)
-    return ERR_LOAD_BADROM;
 
   // Calculate progress bar steps, carefully consider the gap (if any).
   const uint32_t load_steps = (gap_end <= fs  ? (fs - (gap_end - gap_start)) :
@@ -283,58 +274,36 @@ unsigned load_gba_rom(
   slowsd = use_slowld;
 
   uint8_t *ptr = (uint8_t*)(GBA_ROM_ADDR);
-  for (uint32_t offset = 0; offset < gap_start; offset += LOAD_BS, steps++) {
-    if (progress && (steps & (31)) == 0)
-      progress(steps, load_steps);
-
-    unsigned toread = MIN(LOAD_BS, gap_start - offset);
-    UINT rdbytes;
-    uint32_t tmp[LOAD_BS/4];
-    if (FR_OK != f_read(&fd, tmp, toread, &rdbytes)) {
-      slowsd = true;
-      f_close(&fd);
-      return ERR_LOAD_BADROM;
+  /* Load only the file spans outside an internal payload hole. */
+  for (unsigned span=0;span<2;++span) {
+    unsigned start=span?gap_end:0, end=span?fs:MIN(fs,gap_start);
+    if (start>=end) continue;
+    if (start && f_lseek(&fd,start)!=FR_OK) goto read_failed;
+    for (unsigned offset=start;offset<end;offset+=LOAD_BS,++steps) {
+      if (progress && !(steps&31)) progress(steps,MAX(1,load_steps));
+      unsigned count=MIN(LOAD_BS,end-offset),padded=(count+3)&~3u;
+      uint32_t tmp[LOAD_BS/4];UINT got;
+      if (f_read(&fd,tmp,count,&got)!=FR_OK || got!=count) goto read_failed;
+      memset((uint8_t*)tmp+count,0xff,padded-count);
+      set_supercard_mode(MAPPED_SDRAM,true,false);
+      if (use_slowld) rom_write16_exact(ptr+offset,tmp,padded);
+      else dma_memcpy32(ptr+offset,tmp,padded/4);
+      set_supercard_mode(MAPPED_SDRAM,true,true);
+      changed=true;
     }
-
-    set_supercard_mode(MAPPED_SDRAM, true, false);
-    if (use_slowld)
-      rom_copy_write16(&ptr[offset], tmp, toread);
-    else
-      dma_memcpy32(&ptr[offset], tmp, toread/4);
-    set_supercard_mode(MAPPED_SDRAM, true, true);
   }
-  // Skip over the gap
-  if (FR_OK != f_lseek(&fd, gap_end)) {
-    slowsd = true;
-    f_close(&fd);
-    return ERR_LOAD_BADROM;
+  /* Padding is outside file data and never overlaps installed menu payloads. */
+  if (gap_start>fs) {
+    unsigned padded=(fs+3)&~3u;
+    set_supercard_mode(MAPPED_SDRAM,true,false);
+    dma_memset16(ptr+padded,0xffff,(gap_start-padded)/2);
+    set_supercard_mode(MAPPED_SDRAM,true,true);
   }
-  for (uint32_t offset = gap_end; offset < fs; offset += LOAD_BS, steps++) {
-    if (progress && (steps & (31)) == 0)
-      progress(steps, load_steps);
-
-    unsigned toread = MIN(LOAD_BS, fs - offset);
-    UINT rdbytes;
-    uint32_t tmp[LOAD_BS/4];
-    if (FR_OK != f_read(&fd, tmp, toread, &rdbytes)) {
-      slowsd = true;
-      f_close(&fd);
-      return ERR_LOAD_BADROM;
-    }
-
-    set_supercard_mode(MAPPED_SDRAM, true, false);
-    if (use_slowld)
-      rom_copy_write16(&ptr[offset], tmp, toread);
-    else
-      dma_memcpy32(&ptr[offset], tmp, toread/4);
-    set_supercard_mode(MAPPED_SDRAM, true, true);
-  }
-  progress(1, 1);  // Mark as complete
+  if (progress) progress(1, 1);  // Mark as complete
 
   slowsd = true;
 
-  // Close the file, not super necessary really :P
-  f_close(&fd);
+  if (f_close(&fd) != FR_OK) return changed?ERR_LOAD_RESTART:ERR_LOAD_BADROM;
 
   // Proceed to patch the ROM
   set_supercard_mode(MAPPED_SDRAM, true, false);
@@ -364,7 +333,12 @@ unsigned load_gba_rom(
   REG_WAITCNT = 0x4000;
   launch_reset(boot_bios_splash, use_fastew);
 
-  return 0;
+  return ERR_LOAD_RESTART;
+
+read_failed:
+  slowsd=true;
+  f_close(&fd);
+  return changed?ERR_LOAD_RESTART:ERR_LOAD_BADROM;
 }
 
 // Flashes a game to NOR patching it as necessary. This includes DirSav as well as IGM.
@@ -383,10 +357,20 @@ unsigned flash_gba_nor(
   if (!flashinfo.size || !flashinfo.blksize || !flashinfo.blkcount || !flashinfo.blkwrite)
     return ERR_FLASH_OP;
 
+  if (fs < sizeof(t_rom_header) || fs > MAX_GBA_ROM_SIZE ||
+      !scratch || ssize < LOAD_BS || ssize % flashinfo.blksize || ssize % LOAD_BS)
+    return ERR_LOAD_BADROM;
+
   // Determine if the DirSav payload must be flashed in a ROM gap or not.
   const bool flashmap0 = fs <= MAX_GBA_ROM_SIZE - NOR_BLOCK_SIZE;
-  uint32_t ds_flashoffset  = flashmap0 ? 0 : ptch->hole_addr;
-  uint32_t igm_flashoffset = flashmap0 ? 0 : ptch->hole_addr + DIRSAVE_REQ_SPACE;
+  unsigned gap_required = ingame_menu ? DIRSAVE_REQ_SPACE + ingame_trampoline_payload_size :
+                          dirsaving ? directsave_payload_size : 0;
+  if (!flashmap0 && gap_required && (!ptch || (ptch->hole_addr & 3) ||
+      ptch->hole_addr > fs || ptch->hole_size > fs - ptch->hole_addr ||
+      ptch->hole_size < gap_required))
+    return ERR_LOAD_BADROM;
+  uint32_t ds_flashoffset = !flashmap0 && dirsaving ? ptch->hole_addr : 0;
+  uint32_t igm_flashoffset = !flashmap0 && ingame_menu ? ptch->hole_addr + DIRSAVE_REQ_SPACE : 0;
 
   // Calculate where the DirSav / IGM is (flash mapped block0 or flashed on top of the game).
   uint32_t dsaddr  =  ds_flashoffset ? 0x08000000 +  ds_flashoffset : FLASH_DIRSAV_PAYLOAD_W0;
@@ -397,11 +381,17 @@ unsigned flash_gba_nor(
   if (res != FR_OK)
     return ERR_LOAD_BADROM;
 
+  if (f_size(&fd) != fs) {
+    f_close(&fd);
+    return ERR_LOAD_BADROM;
+  }
+
   // Map the game to the base 32MiB address space.
   set_superchis_normap(blkmap);
 
   t_flash_erase_state erst;
   for (uint32_t bigoff = 0; bigoff < fs; bigoff += ssize) {
+    dma_memset16(scratch, 0xffff, ssize / 2);
     // Start clearing the flash block we will be writing to!
     flash_erase_fsm_start(&erst, GBA_ROM_BASE_WS1 + bigoff, flashinfo.blksize, ssize / flashinfo.blksize);
 
@@ -418,13 +408,15 @@ unsigned flash_gba_nor(
       unsigned toread = MIN(LOAD_BS, fs - absoff);
       UINT rdbytes;
       uint32_t tmp[LOAD_BS/4];
-      if (FR_OK != f_read(&fd, tmp, toread, &rdbytes)) {
+      if (FR_OK != f_read(&fd, tmp, toread, &rdbytes) || rdbytes != toread) {
         f_close(&fd);
         reset_superchis_normap();
         return ERR_LOAD_BADROM;
       }
 
-      dma_memcpy32(&scratch[offset], tmp, toread/4);
+      unsigned padded = (toread + 3) & ~3u;
+      for (unsigned i = toread; i < padded; ++i) ((uint8_t*)tmp)[i] = 0xff;
+      dma_memcpy32(&scratch[offset], tmp, padded/4);
     }
 
     // Patch ROM, don't need WAITCNT patches
@@ -456,7 +448,7 @@ unsigned flash_gba_nor(
       if (progress && (absoff & (128*1024-1)) == 0)
         progress((bigoff + ssize / 4 + offset * 3/4) >> 8, fs >> 8);
 
-      unsigned toflash = MIN(flashinfo.blksize, fs - absoff);
+      unsigned toflash = (MIN(flashinfo.blksize, fs - absoff) + 3) & ~3u;
       bool wr_ok = flash_program_buffered(flashaddr, &scratch[offset], toflash, flashinfo.blkwrite);
 
       // Check the written block if so configured
@@ -471,8 +463,9 @@ unsigned flash_gba_nor(
     }
   }
 
+  bool closed = f_close(&fd) == FR_OK;
   reset_superchis_normap();
-  return 0;
+  return closed ? 0 : ERR_LOAD_BADROM;
 }
 
 NOINLINE
@@ -496,7 +489,8 @@ unsigned launch_gba_nor(
   if (ingame_menu) {
     char sfn[MAX_FN_LEN];
     savestate_filename_calc(romfn, sfn);
-    load_ingame_menu(igm_addr, igm_space, dsinfo, savefn, sfn, use_rtc_patches, cheats);
+    if (!load_ingame_menu(igm_addr, igm_space, dsinfo, savefn, sfn, use_rtc_patches, cheats))
+      return ERR_LOAD_MENU;
   }
 
   if (dsinfo)
@@ -519,13 +513,6 @@ unsigned launch_gba_nor(
 
 /* Extension-named portable Pogoshell plugins, with ROM or RAM entry. */
 extern void launch_pogo_reset(bool ewram_overclock,unsigned mode,unsigned size);
-static void pogo_copy16(void *dst,const void *src,unsigned size) {
-  unsigned bulk=size&~31u;
-  if(bulk)rom_copy_write16(dst,src,bulk);
-  volatile uint16_t *d=(volatile uint16_t*)((uint8_t*)dst+bulk);
-  const uint16_t *s=(const uint16_t*)((const uint8_t*)src+bulk);
-  for(unsigned n=bulk;n<size;n+=2)*d++=*s++;
-}
 static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progress) {
   const char *ext=pogo_plugin_extension(fn);
   if(!ext || strlen(ext)>16)return ERR_LOAD_NOEMU;
@@ -555,7 +542,7 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
       memset((uint8_t*)tmp+count,0,((count+3)&~3u)-count);
       if(!part && !off && mode!=2)pogo_fix_waitcnt(tmp,count);
       set_supercard_mode(MAPPED_SDRAM,true,false);
-      pogo_copy16(GBA_ROM_ADDR+base+off,tmp,(count+3)&~3u);
+      rom_write16_exact(GBA_ROM_ADDR+base+off,tmp,(count+3)&~3u);
       set_supercard_mode(MAPPED_SDRAM,true,true);
       off+=count;if(progress)progress(part?ps+off:off,ps+fs);
     }
@@ -564,7 +551,7 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
   if(!pogo_ram_valid(GBA_ROM_ADDR,ps,mode))return ERR_LOAD_BADROM;
   uint32_t ram[24],table[22];pogo_arguments(ram,table,path,fn,fo,fs,to);
   set_supercard_mode(MAPPED_SDRAM,true,false);
-  pogo_copy16(GBA_ROM_ADDR+to,table,sizeof(table));
+  rom_write16_exact(GBA_ROM_ADDR+to,table,sizeof(table));
   set_supercard_mode(MAPPED_SDRAM,false,false);
   REG_WAITCNT=0x4000;
   /* No C calls after overwriting the fixed ABI block at the top of EWRAM. */

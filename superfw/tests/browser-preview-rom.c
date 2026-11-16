@@ -129,6 +129,7 @@ static void reload_theme(unsigned theme) {
 
 static void render(volatile uint8_t *frame, int vertical, int selected, int offset, int box_mode) {
   fill_rect(frame, 0, 0, 240, 160, 0);
+  if(PREVIEW_SCREEN==15){render_restart_required(frame);return;}
   if(PREVIEW_SCREEN==13 || PREVIEW_SCREEN==14) {
     dssmm_background_palette(PALETTE,menu_theme==THEME_DSSMM_DARK);
     if(spop.rtcpop.callback){dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,false);render_rtcpop(frame);}

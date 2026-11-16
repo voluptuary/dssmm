@@ -20,7 +20,7 @@ static bool read_original(const char *path,bool *exists) {
   result=f_read(&file,original,sizeof(original)-1,&size);
   if(result==FR_OK)result=f_read(&file,&end,1,&extra);
   FRESULT closed=f_close(&file);
-  if(result!=FR_OK || closed!=FR_OK || extra)return false;
+  if(result!=FR_OK || closed!=FR_OK || extra || memchr(original,0,size))return false;
   if(size>=3 && !memcmp(original,"\xef\xbb\xbf",3)) {
     memmove(original,original+3,size-3);size-=3;
   }

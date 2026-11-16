@@ -704,3 +704,19 @@ checks pass. Delivered Chis632 hardware-test, retained release624. SD4608Bflashf
 Lite20480B, Chis425472B. Audit next: IGM cheat-size omission/unchecked subtraction,
 GBA short reads/slow-copy tails and failure asset-loss limits. Do not claim audit
 complete or generic GBA recovery yet. Then continue porting without input pause.
+
+Audit3 in progress: bounded shared IGM/cheat planning, exact native fast/slow ROM
+transfers and explicit restart-only screen after destructive load failures.
+Host32MiB hole/tail/fault tests, all3plugin tests and mGBArestart preview pass;
+full gates pending. Owner624 queue now includes lined/framed Help/System/update,
+vertical System centering, SuperFWlogo, shorter/wider/blankGG and missingicons,
+NORfooter, Start/time corners, true horizontal art clipping, unresolvedpowercycle
+prefs, PCEloadfailure, A26/CRTrecognition and Chis bottom Load/WriteNOR selector
+with capacity/erase confirmation flow. Details/currentstate inHANDOFF; no inputpause.
+
+Added requested Chis GBA Load/WriteNOR bottom selector, capacity/per-game checks,
+default-No write/replace-all confirmations and source preflight. Existing backend
+now handles32MiB/no-patch, exact reads, odd-byte padding and close cleanup. Mock
+NOR control/backend tests pass without physical writes. Audit3 common loader and
+settings read diagnostics/FatFs FAT16/FAT32 remount gates added. Exploratory full
+verifier stopped before builds to include NOR fixes; clean full gates pending.

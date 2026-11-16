@@ -18,6 +18,8 @@ int main(void) {
   assert(menu_theme==theme && menu_accent==accent && browser_view==view && artwork_mode==art);
  }
  char text[8192];read_file(SETTINGS_FILEPATH,text,sizeof(text));assert(strstr(text,"Unknown DE = retain"));assert(f_stat(UISETTINGS_FILEPATH,0)==FR_NO_FILE);
+ read_error=1;load_settings();assert(!settings_loaded_ok());assert(!save_settings());read_error=0;
+ load_settings();assert(settings_loaded_ok());
  assert(f_unlink(SETTINGS_FILEPATH)==FR_OK);char q[1024];path(q,"/SYSTEM");assert(!rmdir(q));assert(!rmdir(root));
  puts("Unified settings: all theme/accent/view/artwork combinations survive real saves and reloads; legacy sidecar retired safely.");
 }
