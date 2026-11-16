@@ -23,7 +23,7 @@ SDL_AUDIODRIVER=dummy xvfb-run -a bash -c '
  finish(){ kill "$emulator_pid" 2>/dev/null || true; wait "$emulator_pid" 2>/dev/null || true; }
  trap finish EXIT
  sleep 5
- for scene in $(seq 0 11); do
+ for scene in $(seq 0 9); do
   xdotool key F12
   sleep 0.2
   xdotool keydown Right; sleep 0.08; xdotool keyup Right
@@ -36,9 +36,9 @@ import struct,sys
 root,out=map(Path,sys.argv[1:]);sys.path.insert(0,str(root/'tests'))
 from png_reader import read_rgb_png
 shots=sorted(out.glob('background-preview-*.png'),key=lambda p:p.stat().st_mtime_ns)
-assert len(shots)==12,f'Expected12 frames, got{len(shots)}'
+assert len(shots)==10,f'Expected10 frames, got{len(shots)}'
 for scene,image in enumerate(shots):
- theme='dark' if scene>=6 else 'light';kind=('start','settings','horizontal','vertical','grid','help')[scene%6]
+ theme='dark' if scene>=5 else 'light';kind=('start','settings','horizontal','vertical','grid')[scene%5]
  w,h,rows=read_rgb_png(image);assert (w,h)==(240,160)
  expected=struct.unpack('<38400H',(root/'assets/backgrounds'/f'{theme}-{kind}.rgb555').read_bytes())
  for i,pixel in enumerate(expected):

@@ -17,11 +17,11 @@ import sys
 source=Path(sys.argv[1]).read_text()
 start=source.index("static void draw_text_ovf_rotate(")
 end=source.index("\n}",start)+2
-text="#define MAX(a,b) ((a)>(b)?(a):(b))\n#define KEY_BUTTUP 64\n#define KEY_BUTTDOWN 128\n#define MIN(a,b) ((a)<(b)?(a):(b))\n#define SCREEN_WIDTH 240\n#define FT_COLOR 18\n#define FG_COLOR 16\n#define BG_COLOR 17\n#define HI_COLOR 19\n#define SELECTED_TEXT 236\n#define MEM_PALETTE ((volatile uint16_t *)0x05000000)\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
+text='#include "dssmm_background.h"\n#include "res/dssmm-panel.h"\n'+"#define MAX(a,b) ((a)>(b)?(a):(b))\n#define KEY_BUTTUP 64\n#define KEY_BUTTDOWN 128\n#define MIN(a,b) ((a)<(b)?(a):(b))\n#define SCREEN_WIDTH 240\n#define FT_COLOR 18\n#define FG_COLOR 16\n#define BG_COLOR 17\n#define HI_COLOR 19\n#define SELECTED_TEXT 236\n#define MEM_PALETTE ((volatile uint16_t *)0x05000000)\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
 for signature in ("static void draw_text_ovf_color(", "static void draw_text_ovf(", "static void draw_central_text(", "static void draw_central_text_ovf(", "static void draw_rightj_text("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
-text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} tools; struct {unsigned selector;} set; unsigned menu_tab; struct {int selector,seloff,maxentries;} recent; struct {int selector,seloff;} uiset; struct {char cpath[256];} browser; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
+text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} info; struct {unsigned selector;} tools; struct {unsigned selector;} set; unsigned menu_tab; struct {int selector,seloff,maxentries;} recent; struct {int selector,seloff;} uiset; struct {char cpath[256];} browser; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
 text+="extern void dma_memset16(volatile void *, uint16_t, uint16_t);\n#define dup8(x) ((x)|((x)<<8))\n#define npf_snprintf snprintf\n#define THEME_COUNT 8\n#define ACCENT_COUNT 5\n#define THEME_DSSMM_LIGHT 6\n#define THEME_DSSMM_DARK 7\n"
 text+="static uint8_t menu_theme=6,artwork_mode=1,browser_view=1,recent_menu=1,anim_speed=1,hide_hidden=1,menu_accent,menu_font,clean_list;\n"
 text+='static void render_dssmm_settings_background(volatile uint8_t *,const char *);\n'
@@ -31,7 +31,7 @@ for signature in ('static unsigned settings_visible_rows(', 'static unsigned ui_
 text+='static const char * const accent_names[5]={"Default","Blue","Green","Orange","Purple"};\n'
 a=source.index("enum {\n  UiSetTheme");b=source.index("\n};",a)+3
 text+=source[a:b]+"\n"
-for signature in ("static void draw_box_outline(","static void draw_box_full(","static void draw_menu_selection(","void render_ui_settings("):
+for signature in ("static void draw_box_outline(","static void draw_box_full(","static void draw_lined_panel(","static void draw_menu_selection(","void render_ui_settings(","static void render_restart_required("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
 a=source.index("  if (smenu.uiset.selector < smenu.uiset.seloff)",source.index("static void keypress_menu_uisettings("))
@@ -46,6 +46,12 @@ a=settings.index("const t_theme_colors themes[");b=settings.index("\n};",a)+3
 text+=settings[a:b]+"\n"
 start=source.index("void render_tools(");end=source.index("\n}",start)+2
 text+=source[start:end]+"\n"
+text+='#include "res/logo.h"\n#define VERSION_WORD 22\n#define VERSION_SLUG_WORD 0x12345678UL\n#define DSSMM_BUILD_NUMBER 640UL\n#define FW_FLAVOUR "preview"\n#define FW_MAX_SIZE_KB 2048\nstatic bool enable_flashing;\n'
+text+='static struct {unsigned long deviceid,size,blksize,blkcount,regioncnt;} flashinfo;\nstatic struct {char version[16],date[16];unsigned long patch_count;} pdbinfo;\nstatic struct {unsigned manufacturer,oemid,sdhc,block_cnt,year,month;char prodname[5];} sd_info;\n'
+text+='static void human_size_kb(char *out,unsigned size,unsigned value) {snprintf(out,size,"%uKiB",value); }\n'
+for signature in ('void render_info(', 'static void render_gba_action('):
+ a=source.index(signature);b=source.index('\n}',a)+2
+ text+=source[a:b]+'\n'
 a=source.index("enum {\n  SettTitle1");b=source.index("\n};",a)+3
 text+=source[a:b]+"\n"
 text+='static uint8_t launcher_settings_group;\n'

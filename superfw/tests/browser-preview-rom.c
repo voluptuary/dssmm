@@ -129,6 +129,10 @@ static void reload_theme(unsigned theme) {
 
 static void render(volatile uint8_t *frame, int vertical, int selected, int offset, int box_mode) {
   fill_rect(frame, 0, 0, 240, 160, 0);
+  if(menu_theme>=THEME_DSSMM_LIGHT && (PREVIEW_SCREEN<7 || PREVIEW_SCREEN>12))
+    dssmm_background_palette(PALETTE,menu_theme==THEME_DSSMM_DARK);
+  if(PREVIEW_SCREEN==16){render_info(frame);return;}
+  if(PREVIEW_SCREEN==15){render_restart_required(frame);return;}
   if(PREVIEW_SCREEN==13 || PREVIEW_SCREEN==14) {
     dssmm_background_palette(PALETTE,menu_theme==THEME_DSSMM_DARK);
     if(spop.rtcpop.callback){dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,false);render_rtcpop(frame);}
@@ -157,7 +161,8 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
     return;
   }
   if (PREVIEW_SCREEN >= 4 && PREVIEW_SCREEN <= 6) {
-    draw_box_outline(frame,2,238,18,158,FG_COLOR);
+    if(menu_theme>=THEME_DSSMM_LIGHT)draw_lined_panel(frame);
+    else draw_box_outline(frame,2,238,18,158,FG_COLOR);
     draw_text_ovf("⯇",frame,10,23,8);
     draw_text_ovf("⯈",frame,222,23,8);
   }
@@ -173,7 +178,7 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   }
   if (PREVIEW_SCREEN == 4) {
     render_gbarom_info(frame, PREVIEW_OPTION==6 ? "/Game Boy Advance/P/A very long synthetic title for scrolling checks (USA).gba" : browser_fixture_names[1], false, "FAKE", 0, PREVIEW_OPTION<6 ? PREVIEW_OPTION : -1);
-    draw_central_text(msgs[lang_id][MSG_LOAD_GBA],frame,120,134);
+    render_gba_action(frame,PREVIEW_OPTION==7 ? "Write GBA ROM to NOR" : msgs[lang_id][MSG_LOAD_GBA],true);
     return;
   }
   if (PREVIEW_SCREEN == 3) { render_settings(frame); return; }
@@ -200,7 +205,7 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   }
   if(PREVIEW_TIMING)profile_art=profile_now()-began_art;
   draw_text_ovf_rotate(browser_fixture_names[focus], frame,
-      vertical ? 98 : 40, vertical ? 85 : 122, vertical ? 136 : 160, &text_animation);
+      vertical ? 98 : 43, vertical ? 85 : 122, vertical ? 136 : 154, &text_animation);
 }
 
 int main(void) {

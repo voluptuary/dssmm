@@ -1,7 +1,7 @@
-#include "compiler.h"
 /* DSSMM artwork reader. SPDX-License-Identifier: GPL-3.0-or-later
  * Input format: voluptuary/dsscc, documented in docs/DSSCC-FORMAT-AUDIT.md.
  * Original decoder implementation; no generator source is incorporated. */
+#include "compiler.h"
 #include "artwork.h"
 #include <string.h>
 #ifdef __GBA__
@@ -165,9 +165,21 @@ IWRAM_CODE NOINLINE bool artwork_blit_scaled_cropped(volatile uint16_t *frame, c
   int top=y<16 ? 16-y : 0, bottom=y+(int)height>160 ? 160-y : (int)height;
   if (left>=right || top>=bottom) return false;
   uint8_t sample[240];
-  for (int col=left;col<right;++col) sample[col]=col*info->width/width;
-  for (int row=top;row<bottom;++row) {
-    unsigned sy=row*80/height;
+  /* Exact floor(position * source / destination), without ARM7 divisions.
+   * Walk clipped prefixes too so edge cropping keeps the original sampling. */
+  unsigned sx=0,xerror=0;
+  for (int col=0;col<right;++col) {
+    sample[col]=sx;
+    xerror+=info->width;
+    while(xerror>=width){xerror-=width;++sx;}
+  }
+  unsigned sy=0,yerror=0;
+  for (int row=0;row<bottom;++row) {
+    if(row<top) {
+      yerror+=80;
+      while(yerror>=height){yerror-=height;++sy;}
+      continue;
+    }
     const uint8_t *src=(const uint8_t *)pixels+sy*info->width;
     volatile uint16_t *dst=frame+(y+row)*120+(x+left)/2;
     for (int col=left;col<right;col+=2) {
@@ -180,6 +192,8 @@ IWRAM_CODE NOINLINE bool artwork_blit_scaled_cropped(volatile uint16_t *frame, c
       }
       *dst++=pair;
     }
+    yerror+=80;
+    while(yerror>=height){yerror-=height;++sy;}
   }
   return true;
 }

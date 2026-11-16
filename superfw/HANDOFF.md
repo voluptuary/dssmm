@@ -1009,3 +1009,192 @@ orphan/deprecated code, concise comments and logical maintainable structure.
 Keep release624 frozen. Prioritize reproducible bugs and measurable gains; retain
 history/licenses and do not weaken hardware budgets or tests. Continue porting
 after audit; no feedback/input pause expected. No full parity/physical claim.
+
+## 2026-11-16 — Postrelease adversarial audit first pass
+
+Read docs/SOURCE-AUDIT-2026-11-16.md. Fixed max-length parent-path overflow,
+streaming recent-line truncation/fault preservation, benchmark zero divisor,
+signed-char comparisons; removed split-save alias/duplicate precondition and
+orphan QR Help streams/assets. DBR2active10/33320B blob vsold58652; all10 host/ARM/
+actualmGBA source pixels/guards pass. Scaler exact remainder stepping replaces
+per-position divisions;132 fractional/source-size/transparency/edge cases match
+independent division oracle and guards. Art254317→147096/total532310→425089cycles
+in same mGBAfixture; not physicalFPS. All40-source forcedCppcheck complete; only
+volatile-SRAM full-byte-copy cache warning remains (explained, no suppression).
+New full-all3/CI gates still needed; released624/hardware-test stay frozen.
+
+Next native patchengine audit: CLI has malloc(BLK_SIZE+64)FIXME masking overreads;
+scanner lacks signature/table bounds and op-capacity checks, production chunk
+reader fails to close/check short reads. Fix bounds with explicit lookbehind/
+lookahead windows and preserve cross-chunk matches, fail safely on capacity or
+IO errors without caching partial patches. This is potentially substantial;
+checkpoint first-pass changes before proceeding. Owner wants audit then port,
+no input pause. Root release sync completed normally, baseline checks all4 pass.
+
+Audit second pass: bounded patch scanner signatures/setup tables and128operation
+capacity, fixed IRQ insertion clobbering RTC group, and added scan windows with
+4096Blookbehind/64Blookahead so cross-boundary matches and table skips are retained.
+Production read/seek/size/short-read failures now close/restoreSD and nevercache
+partial patches. CLI padding workaround removed. Exact allocations/capacity/
+whole-vs-window regression and actual9MiB+3 reader fault tests pass. NDS optional
+DLDI-null/invalidshift and early-return handle leaks fixed; synthetic-RAM tests
+pass (not DS hardware). Whole-programCppcheck late diagnostics also contained
+NDSnull and third-party nanoprintf byte-casts: earlier journal's 'onlywarning'
+statement was premature. Cache-byte-copy/float-byte-casts explained; NDSfixed.
+
+Scanner expansion hit Lite stack limit48Bover during a dirty preliminary build;
+existing256B artwork filename cache moved to EWRAM (hotmetadata stays IWRAM).
+PreliminaryLite nowstack16592>=16384; no limits changed, no dirty build delivered.
+New native ELF checker verifies cold caches and reserve. Audit report and current
+performance guide consolidated; new gates on clean frozen source next. Test5/
+Chis624 remain frozen. After audit checkpoint and all3 gates, deliver next numbered
+Chis hardware test then continue menu parity; do not republish624 or claim new
+physical qualification. User's devcontainer-lock/private retained files intact.
+
+632/sourcec22ac3a83fed6cc4b764ea2f36afee8669c7ceaf passes clean full local verifier
+with nativeIGM ARM replay/all3 and hosted43874378364. Chis632/manifest/guide now
+in hardware-test, superseding our624 test copy; public Test5 stays frozen624.
+Report docs/build-632-validation.json. SD519680/524288 leaves4608; Lite487424/507904
+leaves20480; Chis1671680/2097152 leaves425472. Active10 backgrounds and new code
+fault/oracle/budget checks passed. No new physical qualification.
+
+Audit follow-up still needed before declaring it finished: load_gba_rom allocation
+omits cheat bytes (menu availability includes them); load_ingame_menu subtracts
+unchecked totals and can underflow scratch_size. GBA transfer loops ignore short
+read counts, may read/copy past EOF padding and native slow-copy rounds32bytes.
+Need exact aligned tail helper reused with plugins, bounded sharedIGM size helper,
+hole bounds/cheat allocation/read/close validation. Full-ROM load failure can
+also overwrite font/VFS resources at14.5/31MiB, so emulator-only cache recovery
+cannot simply be reused for every GBA error; document this limitation and do not
+claim generic recovery without safe asset restoration. Chis NOR caller has an
+unused 'err' TODO (backend currentlyalwaysreturns0); honor new early IGM guards.
+After corrections/new gates, continue DE alignment/grouping parity. No owner input
+required. Root Test5integration/all4CI43869704338 passed; all5branches synced normally.
+
+## Owner624 follow-up queue (2026-11-16, not yet implemented)
+
+- Help/System/firmware-update panels should match the first Settings screen's
+  right panel frame and subtle horizontal lines, not plain white. Center System
+  rows vertically while retaining left justification. Restore graphical SuperFW
+  logo in Help if budgets allow. Restore NOR browser bottom bar.
+- GG cartridge: one pixel shorter, as wide as permitted, flat bottom, blank label
+  like GB/GBC. Add bespoke PCE/NGC/A26/CRT cartridge icons. Owner now confirms GG
+  loads on624, but SMS/GG Exit resets/crashes to black and requires powercycle.
+  PCE produces exact kernel MSG_ERR_READ ('Error: could not load ROM!'), not a
+  plugin runtime message. A26/CRT showUnknownfiletype. Current canonical DE pack
+  contains pce.mb, ngc.mb, no a26 orcrt named plugin; do not inventalias mapping.
+  Genericextensionpluginroutingalreadyexists butknownplatform recognition/icon
+  table lacks these. Investigate non-word-sized MB: ours rejectsrawsize whileDE
+  validates/copies paddedrom_start_address. Proposed loaderpad MBreset/validation
+  count to4 (alreadyzero-padded; preserve ROMstart), test oddMB. Not implemented.
+- Start last-game top corners down1px, clock left corners right2px. Horizontal
+  previews STILLcross caption frame; clip art to the actual artwork panel region
+  rather than entire display. Full title/name caption inner bounds remain needed.
+- Interface UI prefs still not retained across powercycle; do NOT claim fixed.
+  POSIX360/board and a PRIVATE realFatFs FAT16 save/unmount/remount probe bothpass
+  (/tmp/dssmm-real-fatfs-settings.c). Consider actual ARM/FAT32 + diagnostic reads,
+  sourcecode paths/persistence actualdevice; no userfeedbackpause.
+- New requested Chis launch selector: D-pad cycles bottom LoadGBA / WriteGBAtoNOR.
+  Check existing games and capacity. If fits confirmwrite. If occupiedgames stop
+  fit buterasewouldfit, offereraseexistinggames+write confirmation. If too big
+  evenemptyNOR explaincannotfit. HideunsupportedNORaction SD/Lite. Reuse existing
+  Chis allocator/erase/write backend and explicit firmware user confirmations;
+  no physical NOR operations are authorized/executed by agent tools.
+
+Current dirty audit3 (after clean checkpoint5833e05): added loader_layout.c/h pure
+bounded menu/font/cheat size+cartridge allocation plan, reused byUI/SDloader; menu
+installer boolguard beforewrites, SD/NOR honorfailure. Shared exact16bit-tailhelper
+hoisted/reusedwithplugins, nativeGBA fast/slow copies bounded/exactreads, FFpadding,
+short/seek/close errors handlecorrectly. Full-ROMerroraftercartchanged returns
+ERR_LOAD_RESTART; embeddedASCII-only frameblocksnormalmenus untilrestart, avoiding
+clobbered font/VFS/browser assets. Missing/sizeerrorbeforewritesnormaldialog.
+Progressbarclamped/zero-safe. Newscalar and actual32MiBinternal-hole/odd-tail/IO
+fault tests pass; plugin testsall3 and mGBArestartscreen15 pass. No full-all3 on
+thisdirtysourceyet. Public624/localChis632frozen. Continuevalidation, commit audit3,
+then ownerfollowupfeature/prefs/plugin work. New .devcontainer lock untouched.
+
+Audit3 and requested NOR selector implemented; freeze/checkpoint before clean
+all3 gates. Chis GBA Info bottom action cycles with any D-pad direction between
+Load and WriteNOR; shoulders still select tabs. A confirms default-No write or
+replace-all question after fresh capacity/per-game checks; source preflight before
+metadata wipe; native backend erases reused blocks. SD/Lite hide unsupported NOR.
+New test-nor-launch.sh covers real production control flow with mocked flash and
+NOR backend data/cleanup including32MiB null-patch/odd tails. No physical NOR test.
+Settings read-error preservation + actual FAT16/FAT32 RAMdisk remount90 UI combos
+passed; physical persistence remains unresolved. Audit3 loader/restart tests pass.
+First exploratory full verifier was intentionally stopped before board builds to
+correct newly exposed NOR backend bounds/tail/close issues; do not record it as
+passed. Next: commit, clean full/nativeIGM/all3, package/CI, numbered Chis delivery.
+Then continue owner624 panel/plugin/icon/alignment/persistence queue autonomously.
+
+634 failed ARM fixed-width-pointer compile (corrected);635 exploratory run stopped
+in SD packaging to strengthen final NOR preflight. NOR availability now includes
+trampoline bytes, aligned hole bounds and overflow-safe arithmetic; allocation
+failure aborts before writer. Native control/backend/payload regression tests pass.
+Final frozen source636 full gates next; no634/635 candidate distributed.
+
+636/e894d25 passed clean full/nativeIGM/all3 verifier, integrity and hosted
+43885295944. Evidence docs/build-636-validation.json; no hardware delivery yet.
+Final retry review isolates NOR-only DS/IGM choices in local variables instead of
+mutating the shared normal-load settings after a failed write. Regression asserts
+launch options remain unchanged. Freeze637 for final full gates/delivery, then
+continue624 UI/plugin/persistence queue. Public Test5 stays624.
+
+Owner explicitly authorizes publishing the newest validated correction as next
+release (Test6), all3 assets + retained full folder-art.zip, four-section notes.
+637 local run stopped during host checks after native DMA signature review found
+new NOR2MiB padding passed1MiB halfword count into uint16_t helper (truncates).
+Chunk fills at8KiB now match hardware DMA bounds; mocks use native uint16_t and
+NOR test uses actual2MiB scratch. All targeted tests pass. Canonical Test6 notes
+prepared;638 full/nativeIGM/all3/hosted/package gates required before delivery and
+publication. Integrate normally, verify integration checks, archive Test5 metadata
+BEFORE pruning its release page/assets; retain tag/stableDE/other lanes. Continue
+port after publication; do not conflate physical validation with mocks.
+
+638/source6d02c1915dfece4bb90b9c0353c5215b0228a1a8 passes full clean local verifier,
+all3/nativeIGM ARM replay and hosted43886442413. Package source/hash/header/seals
+pass; SD520704/524288 (3584free), Lite487936/507904 (19968free), Chis1671680/2097152
+(425472free). Chis638 image/manifest/guide delivered hardware-test, superseding
+our632 copy after evidence retained. docs/build-638-validation.json records exact
+checks/limits. Next normal integration+all4 CI, Test6 publication using this source
+and staged /tmp/dssmm-release-test6 assets, then archive/prune Test5 page retaining
+tag. Owner authorized publication; no approval pause. Continue624 parity queue.
+
+Owner physically tested638: panels/logo/corners/GG/title bounds/persistence and
+plugin Exit still deficient. No638/Test6 publication occurred; authorized release
+now targets next corrected validated source. Dirty follow-up implements original
+Settings-right-panel bevel/stripes via compact generated profile (no new bitmap),
+full modal background replacement preserving header, System vertical centering,
+Help graphical logo at palette236..238, NOR List background+footer, plain bracketed
+Load/Write action, recent topcorners+1y/clockleft+2x, horizontal caption inset3px
+per side with even aligned clear rectangle,13px-high/fullwidth blank GG cartridge.
+Original panel pixel+guard host test and actual Help/ROM/System mGBA previews pass.
+Canonical-only settings: removed all production UISETTINGS refs and duplicate
+boot probe; UI/US legacy files ignored/untouched. Immediate changes and exit saves
+read back hash+size after commit; corruption restores backup. Host fault/all3
+roundtrip and actual FatFs FAT16/32 remount tests pass; hardware persistence still
+not claimed. Odd raw MB plugin validation/reset uses already-zero-padded word
+size (compressed sizes unchanged); all3 plugin regression passes, PCE hardware
+cause unresolved. GG/SMS Exit remains unresolved; no blind reset patch. ARM syntax
+check passed with native -fno-builtin; first ad hoc check omitted it and flagged
+pre-existing isascii name, not a firmware build failure. Freeze next source and
+run all3/full/package/CI before replacing hardware-test and publishing Test6.
+
+640/source4a85efb8d8e35e66259d89be133890fb458d4e36 passes clean full local/all3/
+nativeIGM ARM and hosted43978497350. All identities/header/seals/limits pass;
+report docs/build-640-validation.json. Chis640 now hardware-test with manifest/
+guide, superseding own638 after retained evidence. No640 hardware qualification.
+Publication pending: normal integration/all4CI, publish Test6 from source640 with
+/tmp/dssmm-release-test6 three images/full ZIP, then exact archive/pruneTest5,
+retaintags/DE/other lanes; root release docs/baseline ontrunk and normal branchsync.
+After publication continue unresolved physical settings/PCE/Exit/NOR-carousel/
+full parity. BIOS/scratch/fullZIP/ownerdevcontainerlock retained.
+
+Test6 published: tag/source4a85efb8/Build640; all3 firmware + full folder-art.zip
+assets downloaded byte-identical, canonical notes exact. Local full/all3/nativeIGM,
+hardwareCI43978497350 and all4 integrationCI43979085712 passed. Test5 page/assets
+removed ONLY after exact root archive c55ba49 pushed; tag retained. BLUE/OMEGA/DE
+metadata/assets unchanged, DEv8.4.0latest. Publication evidence projectJSON. Chis640
+hardware-test remains current. Next root user docs/baseline/recovery milestone and
+normalall5sync, cleanownignoredcompiler outputs after retainedevidence; then
+continue unresolvedsettings/PCE/Exit/NORcarousel/fullparity withoutfeedbackpause.

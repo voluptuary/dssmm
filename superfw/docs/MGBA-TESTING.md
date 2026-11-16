@@ -108,7 +108,7 @@ The test header initializes fake cheat entries in RAM and does not execute codes
 
 Screen2 now calls the extracted production keypress_menu_uisettings handler.
 Settings/theme resolver are actual functions; artwork invalidation/filter and
-SD persistence are fixture boundaries. save_ui_settings returns false (no SD
+SD persistence are fixture boundaries. save_settings is not exercised by the clock fixture (no SD
 write); parent alert dialog is omitted. UI selector/offset use the real signed
 types, preventing an unsigned mock from concealing top-bound behavior.
 

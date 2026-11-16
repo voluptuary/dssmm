@@ -24,6 +24,7 @@
 #include "fatfs/ff.h"
 #include "common.h"
 #include "settings.h"
+#include "loader_layout.h"
 #include "artwork_file.h"
 #include "browser_carousel.h"
 #include "browser_motion.h"
@@ -47,6 +48,7 @@
 #include "res/icons.h"
 #include "res/icon-gamegear.h"
 #include "res/logo.h"
+#include "res/dssmm-panel.h"
 
 extern t_card_info sd_info;
 extern bool fastew;
@@ -310,6 +312,7 @@ static struct {
 /* Start/settings navigation is independent of native tab numbering. */
 static uint8_t launcher_page,launcher_selected=1,launcher_category,launcher_settings_group,launcher_browser_panel=1;
 static bool launcher_valid[2];
+static bool restart_required;
 static void launcher_invalidate(void) {launcher_valid[0]=launcher_valid[1]=false;}
 
 // Same but for popups.
@@ -493,7 +496,7 @@ static void loadrom_progress(unsigned done, unsigned total) {
   dma_memset16(&frame[0], dup8(BG_COLOR), SCREEN_WIDTH*SCREEN_HEIGHT/2);
 
   // Render a simple progress bar
-  unsigned prog = done * 200 / total;
+  unsigned prog=total?(unsigned)((uint64_t)MIN(done,total)*200/total):0;
   for (unsigned i = 76; i < 84; i++)
     dma_memset16(&frame[SCREEN_WIDTH * i + 20], dup8(FG_COLOR), prog/2);
 
@@ -512,45 +515,43 @@ static bool loadrom_progress_abort(unsigned done, unsigned total) {
 
 
 bool generate_patches_progress(const char *fn, unsigned fs) {
-  // Open ROM and load it in the SDRAM. We load it in 4MB chunks. Not ideal but
-  // we want to preserve the data loaded in the SDRAM (ie. fonts).
   FIL fd;
-  FRESULT res = f_open(&fd, fn, FA_READ);
-  if (res != FR_OK)
-    return false;
+  if (f_open(&fd, fn, FA_READ) != FR_OK) return false;
+  if (f_size(&fd) != fs) {f_close(&fd);return false;}
 
   t_patch_builder pb;
   patchengine_init(&pb, fs);
-  const unsigned max_hiscratch = 8*1024*1024;
+  const unsigned capacity = 8*1024*1024;
+  const unsigned step = capacity - PATCH_SCAN_LOOKBEHIND - PATCH_SCAN_LOOKAHEAD;
 
-  for (unsigned i = 0; i < fs; i += max_hiscratch) {
-    for (unsigned j = 0; j < max_hiscratch && i + j < fs; j += 4096) {
-      UINT rdbytes;
+  for (unsigned scan = 0; scan < fs; scan += step) {
+    unsigned start = scan > PATCH_SCAN_LOOKBEHIND ? scan-PATCH_SCAN_LOOKBEHIND : 0;
+    unsigned available = MIN(capacity, fs-start);
+    unsigned begin = scan-start, count = MIN(step, fs-scan);
+    if (f_lseek(&fd, start) != FR_OK) goto read_failed;
+    for (unsigned j = 0; j < available; j += 4096) {
+      UINT got;
       uint32_t tmp[4096/4];
-      if (FR_OK != f_read(&fd, tmp, sizeof(tmp), &rdbytes))
-        return false;
-
+      unsigned expected = MIN(sizeof(tmp), available-j);
+      if (f_read(&fd, tmp, expected, &got) != FR_OK || got != expected) goto read_failed;
+      unsigned padded = (expected+3)&~3u;
+      memset((uint8_t*)tmp+expected, 0, padded-expected);
       set_supercard_mode(MAPPED_SDRAM, true, false);
-      dma_memcpy32(&hiscratch[j], tmp, sizeof(tmp)/4);
+      dma_memcpy32(&hiscratch[j], tmp, padded/4);
       set_supercard_mode(MAPPED_SDRAM, true, true);
-      if (j & ~0xFFFF)
-        loadrom_progress((i*2 + j) >> 8, fs >> 7);
+      if (!(j & 0xffff)) loadrom_progress((scan*2+j)>>8, MAX(1,fs>>7));
     }
-    // Amount to process.
-    unsigned blksize = MIN(max_hiscratch, fs - i);
-
-    void upd_pe_prog(unsigned prog) {
-      unsigned p = i*2 + blksize + prog*4;
-      loadrom_progress(p >> 8, fs >> 7);
+    void upd_pe_prog(unsigned progress) {
+      loadrom_progress((scan*2+count+progress*4)>>8, MAX(1,fs>>7));
     }
-
-    // Process patches. Adds them to the existing patchset.
+    pb.rom_offset = start;
     set_supercard_mode(MAPPED_SDRAM, true, false);
-    patchengine_process_rom((uint32_t*)hiscratch, blksize, &pb, upd_pe_prog);
+    bool ok = patchengine_process_window((uint32_t*)hiscratch, available,
+                                         begin, begin+count, &pb, upd_pe_prog);
     set_supercard_mode(MAPPED_SDRAM, true, true);
+    if (!ok) goto read_failed;
   }
-
-  f_close(&fd);
+  if (f_close(&fd) != FR_OK) return false;
   patchengine_finalize(&pb);
 
   WRITE_LOG("Patch engine done. Found wcnt: %d save: %d (save mode: %d) irqh: %d rtc: %d",
@@ -558,6 +559,10 @@ bool generate_patches_progress(const char *fn, unsigned fs) {
 
   // Proceed to write patches to their cache.
   return write_patches_cache(fn, &pb.p);
+
+read_failed:
+  f_close(&fd);
+  return false;
 }
 
 bool dump_flashmem_backup() {
@@ -607,6 +612,12 @@ bool dump_flashmem_backup() {
   return true;
 }
 
+#ifdef SUPPORT_NORGAMES
+static bool gba_write_nor;
+static bool nor_replace_games;
+static void request_nor_write(void);
+#endif
+
 void patch_gen_callback(bool confirm);
 
 void sram_battery_test_callback(bool confirm) {
@@ -628,15 +639,11 @@ static const t_patch * get_game_patch(const t_load_gba_info *info) {
 
 bool ingame_menu_avail_sdram(const t_load_gba_info *info) {
   const t_patch *p = get_game_patch(info);
-  // Necessary size to load the IGM (+fonts +cheats)
-  const unsigned igm_reqsz = ROUND_UP2(ingame_menu_runtime_size + font_block_size() + spop.p.load.l.cheats_size, 1024);
-
-  // If the ROM is too big, must use some hole to load the menu.
-  if (info->romfs > MAX_GBA_ROM_SIZE - igm_reqsz) {
-    // Discard holes that are too small, or not well formed.
-    if (!p || p->hole_size < igm_reqsz || p->hole_addr + p->hole_size > info->romfs)
-      return false;   // Too big to fit the menu!
-  }
+  uint32_t required;
+  t_loader_layout layout;
+  if (!loader_menu_size(ingame_menu_runtime_size,font_block_size(),spop.p.load.l.cheats_size,&required) ||
+      !loader_plan(info->romfs,required,0,p?p->hole_addr:0,p?p->hole_size:0,&layout))
+    return false;
 
   // Check if the patches exist and have proper IRQ support.
   return p && p->irqh_ops > 0;
@@ -648,7 +655,8 @@ bool ingame_menu_avail_flash(const t_load_gba_info *info) {
   // Checks if the ROM is small enough so the last 4MiB block can be remapped.
   if (info->romfs > MAX_GBA_ROM_SIZE - NOR_BLOCK_SIZE) {
     // Otherwise find a gap to flash on NOR our tiny payload
-    if (!p || p->hole_size < DIRSAVE_REQ_SPACE || p->hole_addr + p->hole_size > info->romfs)
+    if (!p || (p->hole_addr & 3) || p->hole_addr > info->romfs ||
+        p->hole_size > info->romfs - p->hole_addr || p->hole_size < DIRSAVE_REQ_SPACE + ingame_trampoline_payload_size)
       return false;   // Too big to fit!
   }
 
@@ -675,7 +683,8 @@ bool dirsav_avail_flash(const t_load_gba_info *info) {
   // Checks if the ROM is small enough so the last 4MiB block can be remapped.
   if (info->romfs > MAX_GBA_ROM_SIZE - NOR_BLOCK_SIZE) {
     // Otherwise find a gap to flash on NOR our tiny payload
-    if (!p || p->hole_size < DIRSAVE_REQ_SPACE || p->hole_addr + p->hole_size > info->romfs)
+    if (!p || (p->hole_addr & 3) || p->hole_addr > info->romfs ||
+        p->hole_size > info->romfs - p->hole_addr || p->hole_size < DIRSAVE_REQ_SPACE)
       return false;   // Too big to fit!
   }
 
@@ -883,6 +892,9 @@ static void browser_open_gba(const char *fn, uint32_t fs, bool prompt_patchgen) 
       spop.anim = 0;
       spop.submenu = GbaLoadPopInfo;
       spop.selector = GBALoadButt;
+      #ifdef SUPPORT_NORGAMES
+      gba_write_nor = false;
+      #endif
     }
   }
 }
@@ -1171,7 +1183,8 @@ static void browser_reload_filter() {
 // Loads a new directory list in the ROM browser.
 // TODO: Implement filtering (.gba/.rom/.bin... etc) using settings
 static bool artwork_cached, artwork_valid;
-static char artwork_rom[MAX_FN_LEN];
+/* Cold filename storage leaves IWRAM for pixel loops and the native stack. */
+static char artwork_rom[MAX_FN_LEN] __attribute__((section(".sbss"),aligned(4)));
 static unsigned artwork_cached_mode;
 static artwork_info preview_info;
 /* Byte flags and path strings must live in GBA RAM, not the 16-bit cart bus. */
@@ -1370,6 +1383,20 @@ static void draw_box_full(
     dma_memset16(&frame[SCREEN_WIDTH * i + left + 2], dup8(bgcolor), (right - left - 4) / 2);
 }
 
+/* Extend the Settings right-hand panel while retaining its original bevel. */
+static void draw_lined_panel(volatile uint8_t *frame) {
+  bool dark = menu_theme == THEME_DSSMM_DARK;
+  dssmm_background_clear(frame, dark, 0, 16, 240, 144);
+  for (unsigned y = 21; y < 152; ++y) {
+    const uint8_t *p = dssmm_panel_profile[dark][y - 21];
+    volatile uint16_t *row = (volatile uint16_t *)(frame + y * 240);
+    dma_memset16(row + 1, dup8(p[1]), 118);
+    row[1] = (p[0] & 15) | ((p[0] >> 4) << 8);
+    row[117] = (p[2] & 15) | ((p[2] >> 4) << 8);
+    row[118] = (p[3] & 15) | ((p[3] >> 4) << 8);
+  }
+}
+
 static void draw_button_box(
   volatile uint8_t *frame, unsigned left, unsigned right, unsigned top, unsigned bottom, bool selected
 ) {
@@ -1451,8 +1478,8 @@ void render_recent(volatile uint8_t *frame) {
 
 #ifdef SUPPORT_NORGAMES
 void render_flashbrowser(volatile uint8_t *frame) {
-  // Native themes retain their footer; DS screens keep the grid background.
-  if(menu_theme<THEME_DSSMM_LIGHT)dma_memset16(&frame[240*144],dup8(FG_COLOR),240*16/2);
+  // NOR currently uses the list browser layout on every theme.
+  dma_memset16(&frame[240*144],dup8(FG_COLOR),240*16/2);
 
   // Render the list from memory.
   if (!smenu.fbrowser.maxentries)
@@ -1579,8 +1606,8 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
     if(menu_theme<THEME_DSSMM_LIGHT)
       dma_memset16(&frame[240 * 16],dup8(BG_COLOR),240*(144-16)/2);
   } else {
-    unsigned tx = vertical ? 98 : 40, ty = vertical ? 85 : 122;
-    unsigned tw = vertical ? 136 : 160;
+    unsigned tx = vertical ? 98 : 42, ty = vertical ? 85 : 122;
+    unsigned tw = vertical ? 136 : 156;
     if(menu_theme>=THEME_DSSMM_LIGHT)dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,tx,ty,tw,16);
     else for (unsigned row = 0; row < 16; ++row)
       dma_memset16(frame + (ty+row)*240 + tx, dup8(BG_COLOR), tw/2);
@@ -1677,7 +1704,7 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
       draw_text_ovf_rotate(shown, frame, 98, 85,
                            136, &smenu.anim_state);
     else
-      draw_text_ovf_rotate(shown, frame, 40, 122, 160, &smenu.anim_state);
+      draw_text_ovf_rotate(shown, frame, 43, 122, 154, &smenu.anim_state);
   }
 
   if(menu_theme<THEME_DSSMM_LIGHT) {
@@ -1699,9 +1726,22 @@ void render_browser(volatile uint8_t *frame) {
 /* Text-heavy dialogs favor size; browser/font pixel loops keep O2. */
 #pragma GCC optimize ("Os")
 
+/* No cartridge assets are safe after a failed full-ROM transfer. */
+static void render_restart_required(volatile uint8_t *frame) {
+  font_set_style(FONT_STYLE_DSSMM);
+  MEM_PALETTE[BG_COLOR]=0x7fff;
+  MEM_PALETTE[FT_COLOR]=0;
+  dma_memset16(frame,dup8(BG_COLOR),240*160/2);
+  draw_box_outline(frame,8,232,32,128,FT_COLOR);
+  draw_central_text("Game loading failed",frame,120,46);
+  draw_central_text("Restart the console",frame,120,76);
+  draw_central_text("before continuing.",frame,120,92);
+}
+
 void render_fw_flash_popup(volatile uint8_t *frame) {
   // Opaque notification panel hides the browser underneath.
-  draw_box_full(frame, 2, 240-2, 18, 158, FT_COLOR, BG_COLOR);
+  if(menu_theme>=THEME_DSSMM_LIGHT)draw_lined_panel(frame);
+  else draw_box_full(frame, 2, 240-2, 18, 158, FT_COLOR, BG_COLOR);
 
   draw_central_text(msgs[lang_id][MSG_FWUPD_MENU], frame, 120, 30);
 
@@ -1729,7 +1769,7 @@ void render_fw_flash_popup(volatile uint8_t *frame) {
 
 void render_sav_menu_popup(volatile uint8_t *frame) {
   // Render a box to give a pop-up feeling
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   for (unsigned i = 0; i < 3; i++) {
     draw_button_box(frame, 20, 220, 32 + 28 * i, 32 + 28 * i + 20, spop.selector == i);
@@ -1784,7 +1824,7 @@ static void render_gbarom_info(volatile uint8_t *frame, const char *dispname,
     draw_text_ovf(tmp, frame, 12, 102, SCREEN_WIDTH - 24);
   }
 
-  draw_box_full(frame, 20, 220, 132, 152, FG_COLOR, HI_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_full(frame, 20, 220, 132, 152, FG_COLOR, HI_COLOR);
 }
 
 static const char *render_gbarom_patching(volatile uint8_t *frame, const t_load_gba_info *info, int selector) {
@@ -1844,8 +1884,16 @@ static const char *render_gbarom_loading(volatile uint8_t *frame, const t_load_g
          (selector == GBALdRemember) ? msgs[lang_id][MSG_REMEMB_I] : NULL;
 }
 
+static void render_gba_action(volatile uint8_t *frame, const char *label, bool selectable) {
+  draw_central_text_ovf(label, frame, 120, 134, 192);
+  if (selectable) {
+    draw_text_ovf("<", frame, 12, 134, 16);
+    draw_rightj_text(">", frame, 228, 134);
+  }
+}
+
 void render_gba_load_popup(volatile uint8_t *frame) {
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
   draw_text_ovf("⯇", frame, 10, 23, 64);
   draw_rightj_text("⯈", frame, SCREEN_WIDTH - 10, 23);
 
@@ -1856,7 +1904,11 @@ void render_gba_load_popup(volatile uint8_t *frame) {
   case GbaLoadPopInfo:
     render_gbarom_info(frame, info->romfn, is_superfw(&info->romh), info->gcode,
                        info->romh.version, p ? p->save_mode : -1);
-    draw_central_text(msgs[lang_id][MSG_LOAD_GBA], frame, 120, 134);
+    #ifdef SUPPORT_NORGAMES
+    render_gba_action(frame, gba_write_nor ? "Write GBA ROM to NOR" : msgs[lang_id][MSG_LOAD_GBA], true);
+    #else
+    render_gba_action(frame, msgs[lang_id][MSG_LOAD_GBA], false);
+    #endif
     break;
   case GbaLoadPopLoadS:
     ht = render_gbarom_loading(frame, &spop.p.load.l, info->rtc_patch_enabled, spop.selector);
@@ -1887,7 +1939,7 @@ void render_gba_load_popup(volatile uint8_t *frame) {
 
 void render_filemgr(volatile uint8_t *frame) {
   // Draw the file name and the options available
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   t_centry *e = sdr_state->filefilter[smenu.browser.selector];
   const char *bn = file_basename(e->fname);
@@ -1912,7 +1964,7 @@ void render_filemgr(volatile uint8_t *frame) {
 
 #ifdef SUPPORT_NORGAMES
 void render_gba_norwrite(volatile uint8_t *frame) {
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   draw_text_ovf("⯇", frame, 10, 23, 64);
   draw_rightj_text("⯈", frame, SCREEN_WIDTH - 10, 23);
@@ -1942,7 +1994,7 @@ void render_gba_norwrite(volatile uint8_t *frame) {
 }
 
 void render_gba_norload(volatile uint8_t *frame) {
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   draw_text_ovf("⯇", frame, 10, 23, 64);
   draw_rightj_text("⯈", frame, SCREEN_WIDTH - 10, 23);
@@ -1976,7 +2028,7 @@ void render_gba_norload(volatile uint8_t *frame) {
 #endif
 
 void render_popupq(volatile uint8_t *frame, unsigned fcnt) {
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   // Draw question and two buttons
   draw_central_text_wrapped(spop.qpop.message, frame, SCREEN_WIDTH/2, 32, SCREEN_WIDTH - 20);
@@ -2005,7 +2057,7 @@ void render_rtcpop(volatile uint8_t *frame) {
     draw_central_text("Clock runs while menu is open",frame,120,138);
     return;
   }
-  draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
+  if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
   draw_central_text(msgs[lang_id][MSG_DEF_RTCVAL], frame, SCREEN_WIDTH/2, 32);
 
@@ -2261,7 +2313,7 @@ void render_ui_settings(volatile uint8_t *frame) {
 }
 
 void render_info(volatile uint8_t *frame) {
-  if(menu_theme>=THEME_DSSMM_LIGHT)draw_box_full(frame,2,238,18,158,FT_COLOR,BG_COLOR);
+  if(menu_theme>=THEME_DSSMM_LIGHT)draw_lined_panel(frame);
   uint32_t vmaj = VERSION_WORD >> 16;
   uint32_t vmin = VERSION_WORD & 0xFFFF;
   char tmp[64], tmp2[32];
@@ -2269,7 +2321,10 @@ void render_info(volatile uint8_t *frame) {
   if(menu_theme<THEME_DSSMM_LIGHT) {
     init_logo_palette(&MEM_PALETTE[1]);
     render_logo((uint16_t*)frame,SCREEN_WIDTH/2,40,4);
-  } else draw_central_text("SuperFW",frame,120,40);
+  } else {
+    init_logo_palette(&MEM_PALETTE[236]);
+    render_logo_indexed((uint16_t*)frame,120,40,4,236);
+  }
 
   switch (smenu.info.selector) {
   case 0:
@@ -2319,20 +2374,21 @@ void render_info(volatile uint8_t *frame) {
   // Flashing info
   if(menu_theme<THEME_DSSMM_LIGHT)dma_memset16(&frame[138*SCREEN_WIDTH],dup8(FG_COLOR),SCREEN_WIDTH*22/2);
   draw_text_ovf_rotate(enable_flashing ? msgs[lang_id][MSG_FWUP_ENABLED] : msgs[lang_id][MSG_FWUP_HOTKEY], frame,
-                       4, 141, SCREEN_WIDTH - 8, &smenu.anim_state);
+                       5, 135, SCREEN_WIDTH - 10, &smenu.anim_state);
 }
 
 void render_tools(volatile uint8_t *frame) {
   unsigned pitch=menu_theme<THEME_DSSMM_LIGHT?22:menu_font==FONT_STYLE_DSSMM?14:18;
   if (menu_theme >= THEME_DSSMM_LIGHT) {
-    draw_box_full(frame,2,238,18,158,FT_COLOR,BG_COLOR);
-    draw_menu_selection(frame, 26 + pitch*smenu.tools.selector, 18, 236);
+    draw_lined_panel(frame);
+    draw_menu_selection(frame, 86 - (pitch*(ToolsMAX-1)+16)/2 + pitch*smenu.tools.selector, 18, 232);
   }
+  unsigned top = menu_theme>=THEME_DSSMM_LIGHT ? 86 - (pitch*(ToolsMAX-1)+16)/2 : 26;
   for (unsigned i = 0; i < ToolsMAX; i++)
-    draw_text_ovf(msgs[lang_id][MSG_TOOLS0_SDRAM + i], frame, 22, 26 + pitch * i, 206);
+    draw_text_ovf(msgs[lang_id][MSG_TOOLS0_SDRAM + i], frame, 22, top + pitch * i, 206);
 
   smenu.anim_state = (smenu.anim_state + 1) & 255;
-  draw_central_text("▸", frame, 11 + (smenu.anim_state >> 6), 26 + pitch * smenu.tools.selector);
+  draw_central_text("▸", frame, menu_theme>=THEME_DSSMM_LIGHT?10:11 + (smenu.anim_state >> 6), top + pitch * smenu.tools.selector);
 
   if (menu_theme < THEME_DSSMM_LIGHT)
     for (unsigned i = 0; i < 240; i += 16)
@@ -2426,7 +2482,7 @@ static void render_start(volatile uint8_t *frame) {
 #endif
   const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{109,142,23,16}};
   const unsigned *box=boxes[launcher_selected<4?launcher_selected:0];
-  if(launcher_selected<4)launcher_corners(frame,box[0],box[1],box[2],box[3]);
+  if(launcher_selected<4)launcher_corners(frame,box[0],box[1]+(launcher_selected==0),box[2],box[3]-(launcher_selected==0));
 }
 
 static void render_start_bar(volatile uint8_t *frame) {
@@ -2436,7 +2492,7 @@ static void render_start_bar(volatile uint8_t *frame) {
   if(seconds==UINT32_MAX)strcpy(text,"--:--:--");
   else npf_snprintf(text,sizeof(text),"%02u:%02u:%02u",(unsigned)(seconds/3600%24),(unsigned)(seconds/60%60),(unsigned)(seconds%60));
   draw_rightj_text(text,frame,232,1);
-  if(launcher_selected==4)launcher_corners(frame,176,0,64,16);
+  if(launcher_selected==4)launcher_corners(frame,178,0,62,16);
 }
 
 static void render_dssmm_settings_header(volatile uint8_t *frame,const char *title) {
@@ -2489,6 +2545,12 @@ static const struct {
 void menu_render(unsigned fcnt) {
   objnum = 0;
   volatile uint8_t *frame = &MEM_VRAM_U8[0xA000*framen];
+  if (restart_required) {
+    REG_DISPCNT=(REG_DISPCNT&0x10)|0x0404;
+    REG_WIN0H=REG_WIN0V=0;
+    render_restart_required(frame);
+    return;
+  }
   if (smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view)
     browser_motion_offset = browser_motion_advance(browser_motion_offset, fcnt);
   else
@@ -2512,7 +2574,11 @@ void menu_render(unsigned fcnt) {
   // Preserve stable artwork in each Mode 4 page; text is refreshed separately.
   if (!browser_fast_reuse && !(launcher && launcher_valid[framen])) {
     if(ds_style && !launcher) {
-      if(smenu.menu_tab==MENUTAB_ROMBROWSE && !browser_view)
+      if((smenu.menu_tab==MENUTAB_ROMBROWSE && !browser_view)
+#ifdef SUPPORT_NORGAMES
+          || smenu.menu_tab==MENUTAB_NORBROWSE
+#endif
+        )
         dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,144);
       else {
         unsigned kind=smenu.menu_tab==MENUTAB_ROMBROWSE?(browser_view==2?DSSMM_BG_VERTICAL:DSSMM_BG_HORIZONTAL):
@@ -2552,6 +2618,8 @@ void menu_render(unsigned fcnt) {
   }
   launcher_invalidate();
 
+  if(ds_style && (spop.pop_num || spop.qpop.message || spop.rtcpop.callback))
+    draw_lined_panel(frame);
   if (spop.qpop.message)
     render_popupq(frame, fcnt);
   else if (spop.rtcpop.callback)
@@ -2611,6 +2679,7 @@ void menu_flip() {
 #pragma GCC optimize ("Os")
 
 void menu_init(int sram_testres) {
+  restart_required=false;
   update_unlock.position=0;
   browser_invalidate_artwork();
   // Reset to ROM browser and SD card root.
@@ -2654,6 +2723,8 @@ void menu_init(int sram_testres) {
   if (sram_testres >= 0)
     spop.alert_msg = sram_testres ? msgs[lang_id][MSG_SRAMTST_FAIL] :
                                     msgs[lang_id][MSG_SRAMTST_OK];
+  else if (!settings_loaded_ok())
+    spop.alert_msg="Could not read SETTINGS.TXT.";
 }
 
 int movedir_up() {
@@ -2746,6 +2817,13 @@ void start_flash_update(const char *fn, unsigned fwsize, bool validate_superfw) 
 }
 
 static void keypress_popup_loadgba(unsigned newkeys) {
+  #ifdef SUPPORT_NORGAMES
+  if (spop.submenu == GbaLoadPopInfo &&
+      (newkeys & (KEY_BUTTUP | KEY_BUTTDOWN | KEY_BUTTLEFT | KEY_BUTTRIGHT))) {
+    gba_write_nor = !gba_write_nor;
+    return;
+  }
+  #endif
   const unsigned maxm[] = {
     GBAInfoCNT,
     GBALdSetCNT,
@@ -2903,6 +2981,12 @@ static void keypress_popup_loadgba(unsigned newkeys) {
       spop.alert_msg = msgs[lang_id][MSG_REMEMB_CFG_OK];
     }
     else if (GbaLoadPopInfo == spop.submenu) {
+      #ifdef SUPPORT_NORGAMES
+      if (gba_write_nor) {
+        request_nor_write();
+        return;
+      }
+      #endif
 
       // Honor load.patch_type.
       const t_patch *p = get_game_patch(&spop.p.load.i);
@@ -2936,9 +3020,8 @@ static void keypress_popup_loadgba(unsigned newkeys) {
         spop.p.load.l.use_cheats ? spop.p.load.l.cheats_size : 0,
         loadrom_progress);
       if (err) {
-        // Show any errors that might have happened!
-        spop.alert_msg = msgs[lang_id][MSG_ERR_READ];
-        // TODO: We cannot (in many cases) continue since we trash the SDRAM!
+        if (err==ERR_LOAD_RESTART) restart_required=true;
+        else spop.alert_msg=msgs[lang_id][MSG_ERR_READ];
       }
     }
   }
@@ -2986,6 +3069,111 @@ static void keypress_popup_flash(unsigned newkeys) {
 }
 
 #ifdef SUPPORT_NORGAMES
+/* The load and NOR-write popups share their leading t_load_gba_info. */
+static unsigned nor_write_blocks(void) {
+  return spop.p.norwr.i.romfs / NOR_BLOCK_SIZE + (spop.p.norwr.i.romfs % NOR_BLOCK_SIZE != 0);
+}
+
+static void confirm_nor_write(bool confirm) {
+  if (!confirm) return;
+  unsigned blkcnt = nor_write_blocks();
+  if (spop.p.norwr.i.romfs < 192 || spop.p.norwr.i.romfs > MAX_GBA_ROM_SIZE ||
+      blkcnt > NOR_GAMEBLOCK_COUNT) {
+    spop.alert_msg = "GBA ROM is too large to fit in NOR.";
+    return;
+  }
+  /* Validate the source before discarding any existing NOR entries. */
+  FIL fd;
+  if (f_open(&fd, spop.p.norwr.i.romfn, FA_READ) != FR_OK) {
+    spop.alert_msg = msgs[lang_id][MSG_ERR_READ];
+    return;
+  }
+  bool source_ok = f_size(&fd) == spop.p.norwr.i.romfs;
+  if (f_close(&fd) != FR_OK) source_ok = false;
+  if (!source_ok) {
+    spop.alert_msg = msgs[lang_id][MSG_ERR_READ];
+    return;
+  }
+  if (nor_replace_games) {
+    if (!flashmgr_wipe(ROM_FLASHMETA_ADDR, FLASH_METADATA_SIZE)) {
+      spop.alert_msg = msgs[lang_id][MSG_ERR_NORUPD];
+      return;
+    }
+  }
+  flashbrowser_reload();
+  if (smenu.fbrowser.freeblks < blkcnt || smenu.fbrowser.maxentries >= FLASHG_MAXFN_CNT) {
+    spop.alert_msg = msgs[lang_id][MSG_ERR_NORSPC];
+    return;
+  }
+  const t_load_gba_info *info = &spop.p.norwr.i;
+  const t_patch *p = get_game_patch(info);
+  const bool dirsaving = info->use_dsaving && dirsav_avail_flash(info);
+  const bool ingame_menu = info->ingame_menu_enabled && ingame_menu_avail_flash(info);
+
+  // Allocate the last entry for the new game.
+  t_flash_game_entry ne = {
+    .gamecode = *(uint32_t*)info->romh.gcode,
+    .gamever = info->romh.version,
+    .numblks = blkcnt,
+    .gattrs = (dirsaving                 ? GATTR_SAVEDS : 0) |
+              (ingame_menu               ? GATTR_IGM    : 0) |
+              (info->rtc_patch_enabled   ? GATTR_RTC    : 0) |
+              GATTR_SAVEM(p),
+    .bnoffset = (uint8_t)(file_basename(info->romfn) - info->romfn),
+    .entry_addr = ROM_ENTRYPOINT(info->romh)
+  };
+  memset(&ne.blkmap, 0, sizeof(ne.blkmap));
+  strbcpy(ne.game_name, info->romfn, sizeof(ne.game_name));
+
+  if (!flashmgr_allocate_blocks(ne.blkmap, blkcnt, (t_reg_entry*)&sdr_state->nordata)) {
+    flashbrowser_reload();
+    spop.alert_msg = msgs[lang_id][MSG_ERR_NORSPC];
+    return;
+  }
+
+  // Go ahead and start the flasher-loader with patching support.
+  unsigned errc = flash_gba_nor(info->romfn, info->romfs, &info->romh, p,
+                                dirsaving, ingame_menu,
+                                info->rtc_patch_enabled,
+                                ne.blkmap, loadrom_progress,
+                                sdr_state->scratch, scratch_mem_size);
+  if (errc)
+    spop.alert_msg = msgs[lang_id][errc == ERR_LOAD_BADROM ? MSG_ERR_READ : MSG_ERR_NORUPD];
+  else {
+    // Now we can just write the metadata entry!
+    memcpy32(&sdr_state->nordata.games[smenu.fbrowser.maxentries], &ne, sizeof(ne));
+    sdr_state->nordata.gamecnt++;
+    if (!flashmgr_store(ROM_FLASHMETA_ADDR, FLASH_METADATA_SIZE, (t_reg_entry*)&sdr_state->nordata))
+      spop.alert_msg = msgs[lang_id][MSG_ERR_NORUPD];
+    else {
+      spop.alert_msg = msgs[lang_id][MSG_NOR_WROK];
+      spop.pop_num = POPUP_NONE;
+    }
+  }
+
+  flashbrowser_reload();
+}
+
+static void request_nor_write(void) {
+  flashbrowser_reload();
+  unsigned blkcnt = nor_write_blocks();
+  if (spop.p.norwr.i.romfs < 192 || spop.p.norwr.i.romfs > MAX_GBA_ROM_SIZE ||
+      blkcnt > NOR_GAMEBLOCK_COUNT) {
+    spop.alert_msg = "GBA ROM is too large to fit in NOR.";
+    return;
+  }
+  nor_replace_games = smenu.fbrowser.freeblks < blkcnt ||
+                      smenu.fbrowser.maxentries >= FLASHG_MAXFN_CNT;
+  spop.qpop.message = nor_replace_games
+    ? "Erase existing NOR games and write this ROM?"
+    : "Write this GBA ROM to NOR?";
+  spop.qpop.default_button = msgs[lang_id][MSG_Q_NO];
+  spop.qpop.confirm_button = msgs[lang_id][MSG_Q_YES];
+  spop.qpop.option = 0;
+  spop.qpop.callback = confirm_nor_write;
+  spop.qpop.clear_popup_ok = false;
+}
+
 static void keypress_popup_norwrite(unsigned newkeys) {
   if (newkeys & KEY_BUTTUP)
     spop.selector = MAX(0, spop.selector - 1);
@@ -3036,53 +3224,7 @@ static void keypress_popup_norwrite(unsigned newkeys) {
     }
   } else {
     if (newkeys & KEY_BUTTA) {
-      // Check whether we have enough space.
-      unsigned blkcnt = (spop.p.norwr.i.romfs + NOR_BLOCK_SIZE - 1) / NOR_BLOCK_SIZE;
-      if (smenu.fbrowser.freeblks < blkcnt || smenu.fbrowser.maxentries + 1 >= FLASHG_MAXFN_CNT)
-        spop.alert_msg = msgs[lang_id][MSG_ERR_NORSPC];
-      else {
-        const t_load_gba_info *info = &spop.p.norwr.i;
-        const t_patch *p = get_game_patch(info);
-
-        // Allocate the last entry for the new game.
-        t_flash_game_entry ne = {
-          .gamecode = *(uint32_t*)info->romh.gcode,
-          .gamever = info->romh.version,
-          .numblks = blkcnt,
-          .gattrs = (info->use_dsaving         ? GATTR_SAVEDS : 0) |
-                    (info->ingame_menu_enabled ? GATTR_IGM    : 0) |
-                    (info->rtc_patch_enabled   ? GATTR_RTC    : 0) |
-                    GATTR_SAVEM(p),
-          .bnoffset = (uint8_t)(file_basename(info->romfn) - info->romfn),
-          .entry_addr = ROM_ENTRYPOINT(info->romh)
-        };
-        memset(&ne.blkmap, 0, sizeof(ne.blkmap));
-        strbcpy(ne.game_name, info->romfn, sizeof(ne.game_name));
-
-        flashmgr_allocate_blocks(ne.blkmap, blkcnt, (t_reg_entry*)&sdr_state->nordata);
-
-        // Go ahead and start the flasher-loader with patching support.
-        unsigned errc = flash_gba_nor(info->romfn, info->romfs, &info->romh, p,
-                                      info->use_dsaving, info->ingame_menu_enabled,
-                                      info->rtc_patch_enabled,
-                                      ne.blkmap, loadrom_progress,
-                                      sdr_state->scratch, scratch_mem_size);
-        if (errc)
-          spop.alert_msg = msgs[lang_id][errc == ERR_LOAD_BADROM ? MSG_ERR_READ : MSG_ERR_NORUPD];
-        else {
-          // Now we can just write the metadata entry!
-          memcpy32(&sdr_state->nordata.games[smenu.fbrowser.maxentries], &ne, sizeof(ne));
-          sdr_state->nordata.gamecnt++;
-          if (!flashmgr_store(ROM_FLASHMETA_ADDR, FLASH_METADATA_SIZE, (t_reg_entry*)&sdr_state->nordata))
-            spop.alert_msg = msgs[lang_id][MSG_ERR_NORUPD];
-          else {
-            spop.alert_msg = msgs[lang_id][MSG_NOR_WROK];
-            spop.pop_num = POPUP_NONE;
-          }
-        }
-
-        flashbrowser_reload();
-      }
+      request_nor_write();
     }
   }
 }
@@ -3185,7 +3327,6 @@ static void keypress_popup_norload(unsigned newkeys) {
       };
 
 
-      // TODO Handle errors, finish missing stuff.
       unsigned err = launch_gba_nor(
         e->game_name,
         spop.p.norld.l.sram_save_type == SaveDisable ? NULL : spop.p.norld.l.savefn,
@@ -3194,6 +3335,7 @@ static void keypress_popup_norload(unsigned newkeys) {
         uses_rtc ? &rtci : NULL,
         uses_igm,
         spop.p.norld.l.use_cheats ? spop.p.norld.l.cheats_size : 0);
+      if (err) spop.alert_msg=msgs[lang_id][MSG_ERR_READ];
     }
     else if (spop.selector == GBALdRemember) {
       // Save settings to disk now!
@@ -3658,7 +3800,7 @@ static void keypress_menu_tools(unsigned newkeys) {
       slowsd = use_slowld;
       int ret = sdbench_read(loadrom_progress_abort);
       slowsd = true;
-      if (ret < 0)
+      if (ret <= 0)
         spop.alert_msg = msgs[lang_id][MSG_ERR_GENERIC];
       else {
         unsigned speed = 8*1024*1024 / (unsigned)ret;
@@ -3710,7 +3852,7 @@ static void keypress_menu_info(unsigned newkeys) {
 static void accept_menu_clock(void) {
   menu_clock_seed=(unsigned)spop.rtcpop.val.hour*3600+(unsigned)spop.rtcpop.val.min*60;
   launcher_clock_set(menu_clock_seed);launcher_invalidate();
-  if(!save_ui_settings())spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];
+  if(!save_settings())spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];
 }
 static void open_menu_clock(void) {
   uint32_t seconds=launcher_clock_get();if(seconds==UINT32_MAX)seconds=12*3600;
@@ -3727,6 +3869,7 @@ static void launcher_move(unsigned newkeys) {
 }
 
 void menu_keypress(unsigned newkeys) {
+  if (restart_required) return;
   if(smenu.menu_tab!=MENUTAB_INFO || launcher_page || spop.pop_num || spop.alert_msg || spop.qpop.message || spop.rtcpop.callback || (newkeys&(KEY_BUTTB|KEY_BUTTSEL|KEY_BUTTSTA|KEY_BUTTL|KEY_BUTTR)))update_unlock.position=0;
   /* Actions/tools may reuse cartridge RAM; never reuse the preview afterward. */
   if (newkeys & (KEY_BUTTA | KEY_BUTTSEL | KEY_BUTTL | KEY_BUTTR))
@@ -3873,6 +4016,10 @@ void menu_keypress(unsigned newkeys) {
       keypress_menu_info,
     };
     keyfns[smenu.menu_tab](newkeys);
+    if ((newkeys & (KEY_BUTTLEFT | KEY_BUTTRIGHT)) &&
+        (smenu.menu_tab == MENUTAB_UILANG || smenu.menu_tab == MENUTAB_SETTINGS) &&
+        !save_settings())
+      spop.alert_msg = msgs[lang_id][MSG_ERR_SETSAVE];
   }
 }
 

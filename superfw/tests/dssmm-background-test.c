@@ -5,13 +5,13 @@
 #include "dssmm_background.h"
 static uint16_t buffer[19200+16],palette[16];
 int main(int argc,char **argv) {
- assert(argc==13);
- for(unsigned dark=0;dark<2;++dark)for(unsigned kind=1;kind<=6;++kind) {
+ assert(argc==11);
+ for(unsigned dark=0;dark<2;++dark)for(unsigned kind=1;kind<=5;++kind) {
   for(unsigned i=0;i<19216;++i)buffer[i]=0x55aa;
   uint8_t *frame=(uint8_t *)&buffer[8];
   dssmm_background_palette(palette,dark);
   dssmm_background_draw(frame,dark,kind);
-  FILE *f=fopen(argv[1+dark*6+kind-1],"rb");assert(f);
+  FILE *f=fopen(argv[1+dark*5+kind-1],"rb");assert(f);
   for(unsigned i=0;i<38400;++i) {
     unsigned lo=fgetc(f),hi=fgetc(f);assert(lo<256 && hi<256);
     assert(frame[i]<16);assert(palette[frame[i]]==(lo|(hi<<8)));
@@ -25,5 +25,5 @@ int main(int argc,char **argv) {
   dssmm_background_clear(frame,dark,238,158,240,160); /* Bounds clipped. */
   for(unsigned i=0;i<8;++i)assert(buffer[i]==0x55aa && buffer[19208+i]==0x55aa);
  }
- puts("DSSMM Start/SET/carousel/grid/Help backgrounds match every stored source pixel; stripes and guards pass.");
+ puts("DSSMM Start/SET/carousel/grid backgrounds match every stored source pixel; stripes and guards pass.");
 }

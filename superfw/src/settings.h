@@ -104,9 +104,9 @@ extern uint8_t rtcspeed_default;
 extern uint32_t rtcvalue_default;
 
 // Setting load/store
-bool save_ui_settings();
 bool save_settings();
 void load_settings();
+bool settings_loaded_ok(void);
 
 // ROM-specific setting load/store
 bool load_rom_settings(const char *fn, t_rom_load_settings *rld, t_rom_launch_settings *rlh);
