@@ -11,7 +11,8 @@ UNIVERSAL = {'.devcontainer', '.editorconfig', '.git-blame-ignore-revs', '.gitat
              '.github', '.gitignore', 'AGENTS.md', 'CREDITS.md', 'HANDOFF.md', 'LICENSE',
              'Makefile', 'PROGRESS.md', 'README.md', 'docs', 'projects.json', 'scripts', 'tests'}
 SHARED_TOOLS = {'scripts/project.py', 'scripts/project_policy.py',
-                'scripts/build-site.py', 'scripts/check-snapshots.py'}
+                'scripts/build-site.py', 'scripts/check-snapshots.py',
+                'scripts/prepare-folder-art.py'}
 
 
 def validate_pr(base, head, changed_paths=None):
