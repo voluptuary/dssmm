@@ -12,12 +12,12 @@ int main(void) {
   DISPCNT=4|0x0400;
   for(;;) {
     unsigned keys=(~KEYS)&0x3ff,fresh=keys&~old_keys;old_keys=keys;
-    if(fresh&16){scene=(scene+1)%12;redraw=true;}
+    if(fresh&16){scene=(scene+1)%10;redraw=true;}
     if(redraw) {
       volatile uint16_t *guard=(volatile uint16_t*)(SCREEN+38400);
       for(unsigned i=0;i<1280;++i)guard[i]=0xa55a;
-      dssmm_background_palette(PALETTE,scene>=6);
-      dssmm_background_draw(SCREEN,scene>=6,scene%6+1);
+      dssmm_background_palette(PALETTE,scene>=5);
+      dssmm_background_draw(SCREEN,scene>=5,scene%5+1);
       for(unsigned i=0;i<1280;++i)if(guard[i]!=0xa55a) {
         PALETTE[15]=0x001f;
         for(unsigned j=0;j<19200;++j)((volatile uint16_t*)SCREEN)[j]=0x0f0f;

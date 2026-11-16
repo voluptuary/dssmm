@@ -28,6 +28,9 @@
 
 #pragma GCC optimize ("Os")
 
+/* A failed read must not turn a partial history into a successful replacement. */
+static bool history_read_ok = true;
+
 static bool recent_flush_file(const char *path,const t_rentry *rentries,unsigned rcount) {
   WRITE_LOG("Flushing recently played games (%d entries)", rcount);
 
@@ -91,12 +94,13 @@ static bool recent_flush_file(const char *path,const t_rentry *rentries,unsigned
 }
 
 NOINLINE bool recent_flush(const t_rentry *entries,unsigned count) {
+  if (!history_read_ok) return false;
   FRESULT result=f_mkdir(SYSTEM_DIR);
   if(result!=FR_OK && result!=FR_EXIST)return false;
   if(!recent_flush_file(RECENT_FILEPATH,entries,count))return false;
   /* Retire the old sidecar only after the canonical replacement commits. */
-  f_unlink(PRIVATE_RECENT_FILEPATH);
-  f_unlink(PRIVATE_RECENT_FILEPATH ".bak");
+  f_unlink(LEGACY_RECENT_FILEPATH);
+  f_unlink(LEGACY_RECENT_FILEPATH ".bak");
   return true;
 }
 
@@ -146,76 +150,82 @@ NOINLINE unsigned delete_recent(t_rentry *rentries, unsigned rcount, unsigned en
   return rcount - 1;
 }
 
-NOINLINE unsigned recent_load(const char *fpath, t_rentry *rentries) {
-  char backup[64];
-  if(strlen(fpath)+5<=sizeof(backup)) {
-    strcpy(backup,fpath);strcat(backup,".bak");
-    if(f_stat(fpath,0)==FR_NO_FILE && f_stat(backup,0)==FR_OK)
-      if(f_rename(backup,fpath)!=FR_OK)return 0;
-  }
-  FIL fi;
-  if (FR_OK != f_open(&fi, fpath, FA_READ))
-    return 0;
-
-  // Read data block by block.
-  char tmp[1024 + 4];
-  unsigned bcount = 0, nentries = 0;
-  while (nentries < RECENT_MAXFN_CNT) {
-    if (bcount <= 512) {
-      UINT rdbytes;
-      if (FR_OK != f_read(&fi, &tmp[bcount], 512, &rdbytes)) {
-        f_close(&fi);return nentries;
-      }
-      bcount += rdbytes;
-      tmp[bcount] = 0;
-    }
-
-    if (!bcount)
-      break;
-
-    // Attempt to parse the next path.
-    char *p = strchr(tmp, '\n');
-    if (!p)
-      p = strchr(tmp, '\0');
-    *p = 0;        // Add the string end char.
-
-    unsigned cnt = p - tmp + 1;
-    if(p>tmp && p[-1]=='\r')p[-1]=0;
-    if (cnt > 1 && cnt < sizeof(rentries[nentries].fpath)) {
-      rentries[nentries].flags = 0;
-      if (!memcmp(tmp, "nor:", 4)) {
-        rentries[nentries].flags |= FLAG_RECENT_NOR;
-        dma_memcpy16(rentries[nentries].fpath, &tmp[4], (cnt - 4 + 1) / 2);
-      }
-      else
-        dma_memcpy16(rentries[nentries].fpath, tmp, (cnt + 1) / 2);
-
-      rentries[nentries].fname_offset = file_basename(rentries[nentries].fpath) - rentries[nentries].fpath;
-      nentries++;
-    }
-
-    // Consume the bytes
-    if (bcount < cnt)
-      bcount = 0;      // Consumed the full buffer (ie. last line or too long).
-    else {
-      memmove(&tmp[0], &tmp[cnt], bcount - cnt + 1);
-      bcount -= cnt;
-    }
-  }
-
-  WRITE_LOG("Loaded recently played games. %d entries found", nentries);
-
-  f_close(&fi);
-  return nentries;
+/* The line buffer lives in GBA RAM; only halfwords reach cartridge history. */
+static unsigned append_recent_line(t_rentry *entries, unsigned count,
+                                   char *line, unsigned length) {
+  if (length && line[length-1] == '\r') --length;
+  line[length] = 0;
+  if (length+1 < MAX_FN_LEN+6) line[length+1] = 0;
+  bool nor = length >= 4 && !memcmp(line, "nor:", 4);
+  char *path = line + (nor ? 4 : 0);
+  unsigned path_length = length - (nor ? 4 : 0);
+  if (!path_length || path_length >= MAX_FN_LEN || (!nor && path[0] != '/'))
+    return count;
+  entries[count].flags = nor ? FLAG_RECENT_NOR : FLAG_RECENT_SD;
+  entries[count].fname_offset = file_basename(path) - path;
+  dma_memcpy16(entries[count].fpath, path, (path_length+2)/2);
+  return count+1;
 }
 
+static unsigned read_recent(const char *path, t_rentry *entries, bool *ok) {
+  *ok = true;
+  char backup[64];
+  if (strlen(path)+5 <= sizeof(backup)) {
+    strcpy(backup, path);
+    strcat(backup, ".bak");
+    if (f_stat(path, 0) == FR_NO_FILE && f_stat(backup, 0) == FR_OK &&
+        f_rename(backup, path) != FR_OK) {
+      *ok = false;
+      return 0;
+    }
+  }
+  FIL file;
+  FRESULT result = f_open(&file, path, FA_READ);
+  if (result != FR_OK) {
+    *ok = result == FR_NO_FILE || result == FR_NO_PATH;
+    return 0;
+  }
 
+  char block[512], line[MAX_FN_LEN+6] __attribute__((aligned(4)));
+  unsigned count = 0, used = 0;
+  bool discard = false;
+  while (count < RECENT_MAXFN_CNT) {
+    UINT got;
+    if (f_read(&file, block, sizeof(block), &got) != FR_OK) {
+      *ok = false;
+      break;
+    }
+    if (!got) {
+      if (used && !discard) count = append_recent_line(entries, count, line, used);
+      break;
+    }
+    for (unsigned i = 0; i < got && count < RECENT_MAXFN_CNT; ++i) {
+      if (block[i] == '\n') {
+        if (!discard) count = append_recent_line(entries, count, line, used);
+        used = 0;
+        discard = false;
+      } else if (!discard) {
+        if (!block[i] || used == sizeof(line)-1) discard = true;
+        else line[used++] = block[i];
+      }
+    }
+  }
+  if (f_close(&file) != FR_OK) *ok = false;
+  return count;
+}
+
+NOINLINE unsigned recent_load(const char *path, t_rentry *entries) {
+  bool ok;
+  return read_recent(path, entries, &ok);
+}
 
 /* Import the old sidecar once, keeping canonical RECENT.TXT newest-first.
  * NOR records retain their existing nor: encoding in the single history file. */
 unsigned recent_load_merged(t_rentry *entries,t_rentry *scratch) {
-  unsigned count=recent_load(PRIVATE_RECENT_FILEPATH,entries);
-  unsigned shared=recent_load(RECENT_FILEPATH,scratch);
+  bool legacy_ok, canonical_ok;
+  unsigned count=read_recent(LEGACY_RECENT_FILEPATH,entries,&legacy_ok);
+  unsigned shared=read_recent(RECENT_FILEPATH,scratch,&canonical_ok);
+  history_read_ok=legacy_ok && canonical_ok;
   if(!count){memcpy32(entries,scratch,shared*sizeof(*entries));return shared;}
   if(!shared)return count;
   /* Reverse insertion keeps the shared newest-first order. */

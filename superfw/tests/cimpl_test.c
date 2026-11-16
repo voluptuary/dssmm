@@ -57,6 +57,13 @@ int main() {
   assert(3 == superfw_strlen("foo"));
   assert(4 == superfw_strlen("fooo"));
 
+  for (unsigned a=1;a<256;++a) for (unsigned b=1;b<256;++b) {
+    char lhs[]={(char)a,0},rhs[]={(char)b,0};
+    int expected=a>b?1:a<b?-1:0;
+    int whole=superfw_strcmp(lhs,rhs),part=superfw_strncmp(lhs,rhs,1);
+    assert((whole>0)-(whole<0)==expected);
+    assert((part>0)-(part<0)==expected);
+  }
   assert(superfw_strcmp("", "") == 0);
   assert(superfw_strcmp("a", "") > 0);
   assert(superfw_strcmp("", "a") < 0);

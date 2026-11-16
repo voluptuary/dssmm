@@ -43,7 +43,7 @@ unsigned insert_recent_fn(t_rentry *rentries, unsigned rcount, const char *fn, u
 // Deletes a recent entry
 unsigned delete_recent(t_rentry *rentries, unsigned rcount, unsigned entry_num);
 
-// Merge portable SD history with private SuperFW/NOR history using bus-safe scratch.
+// Import legacy history behind canonical RECENT.TXT using bus-safe scratch.
 unsigned recent_load_merged(t_rentry *entries,t_rentry *scratch);
 
 // Loads entries from disk

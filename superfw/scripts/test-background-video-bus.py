@@ -19,7 +19,7 @@ int main(unsigned dark,unsigned start) {
   subprocess.run(['arm-none-eabi-gcc','-O2','-mthumb','-mcpu=arm7tdmi','-I',str(root/'src'),str(p/'main.c'),str(root/'src/dssmm_background.c'),*flags,'-nostartfiles','-Wl,-Ttext=0x02000000','-Wl,-e,main','-specs=nosys.specs','-o',str(elf)],check=True)
   data=elf.read_bytes();entry,phoff=struct.unpack_from('<II',data,24);phsize,phnum=struct.unpack_from('<HH',data,42)
   for dark in (0,1):
-   for start in range(7):
+   for start in range(6):
     cpu=Uc(UC_ARCH_ARM,UC_MODE_THUMB)
     for address,size in ((0x02000000,0x40000),(0x03000000,0x8000),(0x05000000,0x1000),(0x06000000,0x18000),(0x08e80000,0x180000)):cpu.mem_map(address,size)
     for i in range(phnum):
@@ -35,7 +35,7 @@ int main(unsigned dark,unsigned start) {
     cpu.emu_start(entry|1,stop,count=2000000);assert cpu.reg_read(UC_ARM_REG_PC)==stop,'Renderer instruction limit'
     pal=struct.unpack('<16H',cpu.mem_read(0x05000000,32));frame=cpu.mem_read(0x06000000,38400)
     actual=struct.pack('<38400H',*(pal[x] for x in frame))
-    if start and variant!='missing':expected=(root/'assets/backgrounds'/f"{'dark' if dark else 'light'}-{('start','settings','horizontal','vertical','grid','help')[start-1]}.rgb555").read_bytes()
+    if start and variant!='missing':expected=(root/'assets/backgrounds'/f"{'dark' if dark else 'light'}-{('start','settings','horizontal','vertical','grid')[start-1]}.rgb555").read_bytes()
     else:expected=b''.join(struct.pack('<H',((0 if y&1 else 0x0c63) if dark else (0x7fff if y&1 else 0x739c)))*240 for y in range(160))
     assert actual==expected,'ARM output differs from native DE background'
  print('ARM embedded/SD/Lite/Chis asset renderers match DE pixels with read-only font assets and halfword video writes.')

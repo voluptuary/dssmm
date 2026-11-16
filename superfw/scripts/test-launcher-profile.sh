@@ -31,7 +31,7 @@ static unsigned lang_id,writes;
 static uint32_t menu_clock_seed,rtcvalue_default=12345;
 static struct {const char *alert_msg;struct {t_dec_date val;int selector;bool menu_clock;void (*callback)(void);} rtcpop;} spop;
 static void launcher_invalidate(void){}
-static bool save_ui_settings(void){++writes;return true;}
+static bool save_settings(void){++writes;return true;}
 '''
 for name in ('accept_menu_clock','open_menu_clock'):
  a=s.index('static void '+name+'(');b=s.index('\n}',a)+2;out+=s[a:b]+'\n'

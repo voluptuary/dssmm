@@ -122,15 +122,23 @@ int main(void) {
       assert(frame[0]==0x1111 && frame[240*160/2+1]==0x1111);
     }
   }
+  /* Fractional up/downscales and all clipped edges use the division oracle. */
+  const unsigned sizes[][2]={{2,1},{34,19},{48,32},{60,40},{80,80},{84,56},
+                             {118,79},{120,80},{126,81},{238,159},{240,160}};
+  for (unsigned source=80;source<=120;source+=40)
   for (unsigned marked=0; marked<2; ++marked) {
-    fixture(120,marked); assert(decode(120,ARTWORK_MAX_PIXELS,&info));
-    for (int y=-12;y<=124;y+=68) for(int x=-6;x<=186;x+=96) {
+    fixture(source,marked); assert(decode(source,ARTWORK_MAX_PIXELS,&info));
+    for(unsigned size=0;size<sizeof(sizes)/sizeof(*sizes);++size)
+    for(unsigned edge=0;edge<3;++edge) {
+      unsigned w=sizes[size][0],h=sizes[size][1];
+      int x=edge==0?2-(int)w:edge==1?18:238;
+      int y=edge==0?17-(int)h:edge==1?48:159;
       memset(frame,17,sizeof(frame));
-      assert(artwork_blit_scaled_cropped(frame+1,(uint16_t *)(output+2),&info,x,y,60,40));
+      assert(artwork_blit_scaled_cropped(frame+1,(uint16_t *)(output+2),&info,x,y,w,h));
       for(int fy=0;fy<160;++fy) for(int fx=0;fx<240;++fx) {
         uint8_t expected=17;
-        if(fy>=16 && fy<160 && fx>=x && fx<x+60 && fy>=y && fy<y+40) {
-          expected=output[2+((fy-y)*80/40)*120+(fx-x)*120/60];
+        if(fy>=16 && fx>=x && fx<x+(int)w && fy>=y && fy<y+(int)h) {
+          expected=output[2+((fy-y)*80/h)*source+(fx-x)*source/w];
           if(!expected)expected=17;
         }
         assert(((uint8_t *)(frame+1))[fy*240+fx]==expected);
