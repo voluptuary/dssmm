@@ -654,7 +654,8 @@ bool ingame_menu_avail_flash(const t_load_gba_info *info) {
   // Checks if the ROM is small enough so the last 4MiB block can be remapped.
   if (info->romfs > MAX_GBA_ROM_SIZE - NOR_BLOCK_SIZE) {
     // Otherwise find a gap to flash on NOR our tiny payload
-    if (!p || p->hole_size < DIRSAVE_REQ_SPACE || p->hole_addr + p->hole_size > info->romfs)
+    if (!p || (p->hole_addr & 3) || p->hole_addr > info->romfs ||
+        p->hole_size > info->romfs - p->hole_addr || p->hole_size < DIRSAVE_REQ_SPACE + ingame_trampoline_payload_size)
       return false;   // Too big to fit!
   }
 
@@ -681,7 +682,8 @@ bool dirsav_avail_flash(const t_load_gba_info *info) {
   // Checks if the ROM is small enough so the last 4MiB block can be remapped.
   if (info->romfs > MAX_GBA_ROM_SIZE - NOR_BLOCK_SIZE) {
     // Otherwise find a gap to flash on NOR our tiny payload
-    if (!p || p->hole_size < DIRSAVE_REQ_SPACE || p->hole_addr + p->hole_size > info->romfs)
+    if (!p || (p->hole_addr & 3) || p->hole_addr > info->romfs ||
+        p->hole_size > info->romfs - p->hole_addr || p->hole_size < DIRSAVE_REQ_SPACE)
       return false;   // Too big to fit!
   }
 
@@ -3092,7 +3094,11 @@ static void confirm_nor_write(bool confirm) {
   memset(&ne.blkmap, 0, sizeof(ne.blkmap));
   strbcpy(ne.game_name, info->romfn, sizeof(ne.game_name));
 
-  flashmgr_allocate_blocks(ne.blkmap, blkcnt, (t_reg_entry*)&sdr_state->nordata);
+  if (!flashmgr_allocate_blocks(ne.blkmap, blkcnt, (t_reg_entry*)&sdr_state->nordata)) {
+    flashbrowser_reload();
+    spop.alert_msg = msgs[lang_id][MSG_ERR_NORSPC];
+    return;
+  }
 
   // Go ahead and start the flasher-loader with patching support.
   unsigned errc = flash_gba_nor(info->romfn, info->romfs, &info->romh, p,

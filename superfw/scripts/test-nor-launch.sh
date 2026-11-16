@@ -26,3 +26,13 @@ Path(sys.argv[2]).write_text(s[start:end])
 PY
 gcc -Wall -Wextra -Werror -Wno-unused-parameter -fsanitize=address,undefined -fno-pie -no-pie -I "$tmp" "$root/tests/nor-loader-test.c" -o "$tmp/loader"
 "$tmp/loader"
+python3 - "$root/src/menu.c" "$tmp/nor-payload.h" <<'PY'
+from pathlib import Path
+import sys
+s=Path(sys.argv[1]).read_text();parts=[]
+for name in ['bool ingame_menu_avail_flash(', 'bool dirsav_avail_flash(']:
+ start=s.index(name);end=s.index('\n}',start)+2;parts.append(s[start:end])
+Path(sys.argv[2]).write_text('\n'.join(parts))
+PY
+gcc -Wall -Wextra -Werror -fsanitize=address,undefined -fno-pie -no-pie -I "$tmp" "$root/tests/nor-payload-test.c" -o "$tmp/payload"
+"$tmp/payload"

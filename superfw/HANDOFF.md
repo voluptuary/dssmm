@@ -1126,3 +1126,9 @@ First exploratory full verifier was intentionally stopped before board builds to
 correct newly exposed NOR backend bounds/tail/close issues; do not record it as
 passed. Next: commit, clean full/nativeIGM/all3, package/CI, numbered Chis delivery.
 Then continue owner624 panel/plugin/icon/alignment/persistence queue autonomously.
+
+634 failed ARM fixed-width-pointer compile (corrected);635 exploratory run stopped
+in SD packaging to strengthen final NOR preflight. NOR availability now includes
+trampoline bytes, aligned hole bounds and overflow-safe arithmetic; allocation
+failure aborts before writer. Native control/backend/payload regression tests pass.
+Final frozen source636 full gates next; no634/635 candidate distributed.

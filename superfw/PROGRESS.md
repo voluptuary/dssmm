@@ -725,3 +725,11 @@ First clean audit3/selector gate failed the SD compile: devkitARM uint32_t is
 unsigned long, while three helper output locals were unsigned int (host typedefs
 masked mismatch). Corrected locals to uint32_t; no firmware delivered from634.
 Rerun full clean gates on next committed source; preserve this failed result.
+
+635 corrected SD compilation and passed host/restart-preview checks; local full
+run intentionally stopped during SD packaging after review found another NOR
+preflight issue. Tighten payload availability to include trampoline space and
+checked/aligned hole bounds before replacement confirmation. Honor allocator
+failure before calling writer (avoids using an incomplete block map). Added real
+availability-function regression tests; final clean gates on636 next. No635 image
+distributed; hosted635 result tracked separately from final636 gates.
