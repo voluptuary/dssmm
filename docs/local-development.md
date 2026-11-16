@@ -97,6 +97,21 @@ public artifact; BIOS-dependent testing must use a user-provided local file and
 must document only its external/local status, not publish it. Keep generated
 ROMs, artwork and screenshots disposable and do not call a blank screen a pass.
 
+2026-11-16 harness update: stock Debian `mgba-sdl`0.10.1, SDL `-1`,
+`xvfb-run -a`, dummy audio and xdotool remain unchanged; no emulator patches,
+Docker/package change or BIOS input is required. SuperFW now adds
+`bash superfw/scripts/test-background-mgba.sh`: the actual `__GBA__` DMA renderer
+captures12 Light/Dark backgrounds and checks every38400 pixels plus framebuffer
+padding guards. All12 passed. PNG decoding is shared with the existing browser
+harness in `superfw/tests/png_reader.py`, using only Python's standard library;
+no Pillow/new package dependency was added. The browser artwork oracle now
+rejects gray-only DS backgrounds instead of counting them as artwork. Optional
+`PREVIEW_TIMING=1` shows background/art/total cycle counters; use explicit
+`PREVIEW_THEME=6 PREVIEW_FONT=1` for representative colors/font. ROM-fixture
+cycles are not physical SuperCard/kernel FPS. Read
+[the project performance/validation guide](../superfw/docs/BACKGROUND-PERFORMANCE.md).
+Keep all fake ROMs/screenshots/BIOS inputs out of releases.
+
 Current investigation (2026-11-14): this Debian 12 container has `mgba-sdl`
 0.10.1 installed at `/usr/games/mgba`; the executable is not on the default
 shell `PATH`. The Dockerfile includes the same package, though this container

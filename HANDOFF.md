@@ -2103,3 +2103,16 @@ unit tests; do not claim that policy invocation passed. Registered this exact
 universal artwork tool and added a regression assertion; unknown root hardware
 tools remain rejected. Rerun each gate with fail-fast shell status and all hosted
 checks. Build603 hardware-lane kernel validation is separate and remains recorded.
+
+## 2026-11-16 — Build618 integration and stock mGBA DMA replay
+
+Merged SuperFW618 normally after all3/full local and hosted43790527480 passed.
+Project report records owner603 UI evidence, unsupported physical-runtime claims
+and remaining parity work. Kernel changes remain confined to superfw/. Stock
+mgba-sdl0.10.1/SDL-1/Xvfb/xdotool/dummy-audio setup is unchanged; no patches, new
+packages or BIOS input. New project harness compares all12 __GBA__ DMA background
+frames pixel-for-pixel with source and padding guards; passed. Shared stdlib PNG
+reader/stronger artwork oracle and optional component counters documented in
+local-development.md. Synthetic ROM timing is not physical kernel FPS. Future
+changes to emulator setup/harness must update these records. Root integration
+policy tests next, then hosted all4 and normal branch synchronization.
