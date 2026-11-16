@@ -3235,3 +3235,9 @@ setup; no emulator/package/BIOS change. Project owner now requests adversarial
 correctness/optimization/cleanup audit before further parity work; keep it under
 superfw/. Keep Chis624 hardware-test and private BIOS/scratch/archive. Sync lanes
 normally after checkpoint; no reset/force. No full parity/physical qualification.
+
+Integrated/published SuperFW Test6 Build640 after full local/all3/nativeIGM and
+all4 CI43979085712; four downloads/notes exact. Archived Test5 metadata inroot
+before deleting its page/assets; tag and otherlanes/DE stable retained. Root user
+downloads/baseline/harness recovery docs refreshed. Normal five-lane sync follows;
+no physical qualification or full SuperFW DE parity claim. See project journals.
