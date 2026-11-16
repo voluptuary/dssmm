@@ -236,3 +236,10 @@ license/provenance. Read `superfw/AGENTS.md` and `superfw/docs/UPSTREAM.md`. The
 root dispatcher offers `make superfw BOARD=sd|lite|chis` and
 `make verify-superfw`; outputs live under `superfw/build/`. Its source has not
 been physically tested as part of this repository setup.
+
+For exact timing-counter transcription with the existing preview harness, use
+`python3 superfw/scripts/read-preview-timing.py superfw/build/mgba/browser-preview-0.png`
+after `PREVIEW_THEME=6 PREVIEW_FONT=1 PREVIEW_VERTICAL=1 PREVIEW_TIMING=1`.
+The reader matches DSSMM glyphs with the shared standard-library PNG decoder;
+no OCR package, mGBA change or private BIOS is needed. Dark counters require
+`--dark`. These fixture cycle counts are not physical firmware FPS.
