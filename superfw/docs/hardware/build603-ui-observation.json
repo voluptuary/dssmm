@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-16",
+  "reported_build": 603,
+  "board": "chis",
+  "source": "owner feedback in this session",
+  "observed": [
+    "Start Settings marker too tight; request one pixel outward",
+    "Show hidden files clipped; request Show hidden",
+    "Bottom submenu highlight overlaps frame",
+    "Hardware labels need shorter Fast ROM Load, Verify flash, EWRAM boost"
+  ],
+  "limits": "Menu observations only; no emulator/game/save/NOR write or timing qualification inferred.",
+  "response": "Spacing, labels and font-height-aware highlight implemented and focused-tested; clean next candidate validation required."
+}

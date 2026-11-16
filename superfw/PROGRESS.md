@@ -604,3 +604,12 @@ checks pass. New numbered Chis613 hardware-test image supplied;603 evidence kept
 SD flash has3072bytes remaining. Synthetic full-redraw mGBA timing warrants
 component profiling, not a physical-FPS conclusion. Continue performance and
 remaining caption/font/settings/dialog parity; no full completion/hardware claim.
+
+Owner603 feedback: gear corner spacing expands1px, labels shortened, exact comma/
+5-sec unlock hint, and14px DSSMM highlight preserving submenu bottom frame/gap.
+Focused geometry tests and Interface mGBA bottom-row inspection pass. GG now uses
+SMS plugin/native emulator list with original GG flags and exact credited DE GG
+icon; appends no-changes native sprite/palette entries. All3 plugin/header/icon
+checks pass. GB/GG save regression tests uncovered a separate dotted-stem double
+strip; fixed bounded .sav append and verified all3 legacy/backup/state names.
+613 remains current until clean all3/full/CI gates on this source. Continue parity.

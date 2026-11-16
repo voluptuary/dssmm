@@ -394,8 +394,10 @@ void sram_filename_calc(const char *rom, char *savefn) {
       if(save_pattern_has_files(candidate))strbcpy(pattern,candidate,sizeof(pattern));
     }
   }
-  strbcpy(savefn,pattern,MAX_FN_LEN);
-  replace_extension(savefn,".sav");
+  /* The ROM extension is already removed. Append once: replacing again
+   * would remove a real dot in names such as Game.v1.2 (USA).gg. */
+  int length=npf_snprintf(savefn,MAX_FN_LEN,"%s.sav",pattern);
+  if(length<0 || (unsigned)length>=MAX_FN_LEN)savefn[0]=0;
 }
 
 void savestate_filename_calc(const char *rom, char *statefn) {

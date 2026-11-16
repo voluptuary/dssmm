@@ -45,6 +45,7 @@
 #include "supercard_driver.h"
 
 #include "res/icons.h"
+#include "res/icon-gamegear.h"
 #include "res/logo.h"
 
 extern t_card_info sd_info;
@@ -1270,6 +1271,7 @@ static unsigned guessicon(const char *path) {
       {"gbc", ICON_GBCCART},
       {"nes", ICON_NESCART},
       {"sms", ICON_SMSCART},
+      {"gg", ICON_GGCART},
       {"fw",  ICON_UPDFILE},
     };
     for (unsigned i = 0; i < sizeof(exticon)/sizeof(exticon[0]); i++)
@@ -1727,8 +1729,9 @@ void render_sav_menu_popup(volatile uint8_t *frame) {
 /* Framebuffer selection leaves text crisp and avoids the native tiled OAM bar. */
 static void draw_menu_selection(volatile uint8_t *frame, unsigned y,
                                 unsigned left, unsigned right) {
-  for (unsigned row = 0; row < 16; ++row)
-    dma_memset16(frame + (y+row)*SCREEN_WIDTH + left, dup8(HI_COLOR), (right-left)/2);
+  unsigned height=menu_font==FONT_STYLE_DSSMM?14:16;
+  for(unsigned row=0;row<height && y+row<160;++row)
+    dma_memset16(frame+(y+row)*SCREEN_WIDTH+left,dup8(HI_COLOR),(right-left)/2);
 }
 
 static void render_gbarom_info(volatile uint8_t *frame, const char *dispname,
@@ -2404,7 +2407,7 @@ static void render_start(volatile uint8_t *frame) {
 #else
   draw_central_text("Recents",frame,168,106);
 #endif
-  const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{112,143,18,14}};
+  const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{111,142,20,16}};
   const unsigned *box=boxes[launcher_selected<4?launcher_selected:0];
   if(launcher_selected<4)launcher_corners(frame,box[0],box[1],box[2],box[3]);
 }
@@ -2614,6 +2617,8 @@ void menu_init(int sram_testres) {
   // Load icons into VRAM
   dma_memcpy16(MEM_VRAM_OBJS, icons_img, sizeof(icons_img) / 2);
   dma_memcpy16(&MEM_PALETTE[256], icons_pal, sizeof(icons_pal) / 2);
+  dma_memcpy16(MEM_VRAM_OBJS+sizeof(icons_img),gamegear_pixels,sizeof(gamegear_pixels)/2);
+  dma_memcpy16(&MEM_PALETTE[256+sizeof(icons_pal)/2],gamegear_palette,sizeof(gamegear_palette)/2);
   // Generate some icons (selector)
   dma_memset16(&MEM_VRAM_OBJS[63 * 256], dup8(SEL_COLOR), 256 / 2);
 

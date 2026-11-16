@@ -36,6 +36,7 @@ typedef struct {
 
 /* Exact extension-named Pogoshell plugins; no native ROM wrapper. */
 extern const t_emu_loader pogo_plugin_loader;
+const char *pogo_plugin_extension(const char *filename);
 bool find_pogo_plugin(const char *filename, char path[64]);
 
 const t_emu_loader * get_emu_info(const char *ext);

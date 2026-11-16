@@ -794,3 +794,34 @@ actual GBA DMA for long spans if measured/equivalent. Do not allocate large new
 GBA buffers or weaken SD's limit. Existing verified613 stays frozen. Continue
 caption wrapping/alignment from DE font metrics, settings/System/Help/dialog
 look/feel and performance autonomously; parity is not complete.
+
+## 2026-11-16 — Owner603 UI feedback and GG/save follow-up
+
+Owner reports603 Start/settings UI issues (not gameplay/plugin/save validation).
+Settings gear marker now expands1px on every side, x111/y142/w20/h16; four corners
+and masked odd-x writes retained. English labels exactly Show hidden, Fast ROM
+Load, Verify flash, EWRAM boost. Help hint exactly "Unlock: Down, Up, Left, Right,
+A in 5 sec". DSSMM submenu highlight14px instead of16 fits9-row geometry and
+preserves bottom frame151 with gap150; native font retains16px. Dedicated actual
+helper pixel/canary test and four-corner test pass. Interface bottom row screenshot
+inspected in mGBA: label fits and frame remains visible; Start screenshot follows.
+
+Owner wants GG to use SMS emulator but own icon. Shared Pogo extension helper maps
+GG→sms for resolver and loader; original GG filename/native wrapper flags remain.
+Actual native first/second emulator header flags and shared lookup tests pass on
+all3. No GG sprite existed: appended exact DE16x14 RGB555 icon to16x16 tile/palette
+with transparent row top/bottom; native IDs/colors unchanged. Read GAME-GEAR.md.
+All3 icon byte/pixel/palette/VRAM/icon-lookup checks pass (or rerun if interrupted).
+Bounded title copies also remove fixed-length reads beyond short emulator names.
+
+Owner asks regression checks for two-character GB/GG save filenames. Those worked;
+new realistic tests exposed separate repeated extension-stripping bug for dotted
+basenames. Now append .sav once after deriving stem, bounds-checked; .gb/.gg,
+uppercase, NoIntro, dots, legacy/backup/tmp and state-stem tests pass all3. Old
+shortened dotted-name saves are left untouched; cannot safely infer ownership
+when prefixes collide. Documented backup/manual rename, not automatic guesswork.
+
+Current613 remains frozen. New feedback/GG/save changes need clean same-source
+all3/full verifier/CI before next hardware-test image. Keep all3 synchronized;
+SD613 had3072bytes headroom, so added icon/code must pass real image gates. Broader
+performance profiling, caption/font/settings/dialog parity still active.
