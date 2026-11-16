@@ -1179,3 +1179,13 @@ cause unresolved. GG/SMS Exit remains unresolved; no blind reset patch. ARM synt
 check passed with native -fno-builtin; first ad hoc check omitted it and flagged
 pre-existing isascii name, not a firmware build failure. Freeze next source and
 run all3/full/package/CI before replacing hardware-test and publishing Test6.
+
+640/source4a85efb8d8e35e66259d89be133890fb458d4e36 passes clean full local/all3/
+nativeIGM ARM and hosted43978497350. All identities/header/seals/limits pass;
+report docs/build-640-validation.json. Chis640 now hardware-test with manifest/
+guide, superseding own638 after retained evidence. No640 hardware qualification.
+Publication pending: normal integration/all4CI, publish Test6 from source640 with
+/tmp/dssmm-release-test6 three images/full ZIP, then exact archive/pruneTest5,
+retaintags/DE/other lanes; root release docs/baseline ontrunk and normal branchsync.
+After publication continue unresolved physical settings/PCE/Exit/NOR-carousel/
+full parity. BIOS/scratch/fullZIP/ownerdevcontainerlock retained.

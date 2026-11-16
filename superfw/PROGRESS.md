@@ -758,3 +758,8 @@ ignore UI/US sidecars, save changes/exits, read back and roll back failed commit
 corruption/roundtrip/FAT16/FAT32 checks pass. Raw MB odd tails accepted with padded
 reset size; all3 plugin tests pass. Physical settings/PCE/plugin Exit remain open.
 No638 release yet; publish next validated correction per standing owner approval.
+
+640 clean full/all3/nativeIGM ARM and hosted43978497350 pass. Package integrity
+checks pass; Chis640 hardware-test delivered, replaces638 localcopy. Panel/settings/
+plugin regressions and real mGBA previews recorded in build-640-validation.json.
+Next normal integration/all4 gates and authorized Test6 publication, then porting.
