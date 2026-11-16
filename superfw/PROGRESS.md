@@ -580,3 +580,11 @@ fixture lacked the new Clean-list declaration. Production Chis linking and
 focused name tests had passed; fixed the fixture's default settings/prototype
 and rerun it. No failed full run is counted as a pass. Freeze new source for
 complete verification again before delivering a candidate.
+
+Build603/sourcef28de96b all3/full local verifier/hosted43780888958 passed. Exact
+IGM decompression/metadata replay all3, background/metadata/reset ARM checks,
+and mGBA Start/SET hub inspected. Delivered numbered Chis603 hardware-test image,
+manifest and guide; superseded own599 files after retaining historical evidence.
+No physical603/plugin/save qualification or full parity claim. SD flash headroom
+5632bytes; keep all3 budget gates. Owner full folder ZIP stays ignored in
+.release-assets. Next: remaining DS backgrounds/footer/dialog/settings parity.

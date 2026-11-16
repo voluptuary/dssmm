@@ -726,3 +726,22 @@ Next: freeze checkpoint, clean full all3 verifier and optional ARM IGM/backgroun
 plugin reset replays, mGBA screenshots, hosted CI. Do not replace599 until gates
 pass. Full generic/H/V backgrounds, footer removal outside List, final DE-font
 alignment, System/Help/dialog parity remain unfinished. Keep goal active.
+
+## 2026-11-16 — Build603 verified and delivered
+
+Source f28de96b7c205cb148adf7b470fab22048d20c9e (603), clean same-source all3
+identity/integrity/flash/resource/RAM gates and standard full verifier pass.
+Hosted43780888958 succeeds at that exact source. All3 IGM host/ELF/ARM byte
+replays pass. ARM embedded/standard/extended/missing-tag backgrounds match source
+pixels and preserve readonly assets; current carousel bus replay and plugin reset
+ROM/MB/MBZ replay pass. mGBA0.10.1 Start/SET hub with actual Light palette and
+DSSMM font inspected; synthetic games/art, no physical card/BIOS qualification.
+Evidence docs/build-603-validation.json. Root hardware-test now Chis603 plus
+manifest/guide; own599 files superseded, tracked historical evidence preserved.
+
+Flash used/headroom: SD518656/5632, Lite485888/22016, Chis1671680/425472 bytes.
+Do not raise limits; next asset/code work must honor especially tight SD budget.
+Owner archive stays .release-assets/folder-art.zip, full contents preserved.
+No public release in this milestone. Full DE generic/H/V backgrounds, footer
+removal outside List, final font/art alignment, System/Help/dialog parity remain
+unfinished. Continue port autonomously;603 remains frozen during later work.
