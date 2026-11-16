@@ -574,3 +574,9 @@ settings/navigation/art/background/file-IO checks pass; preview builds. Freeze
 for complete all3/ARM/mGBA/hosted validation before new hardware candidate.
 Owner archive moved to ignored .release-assets/folder-art.zip; retain/attach on
 all future releases. Remaining menu parity work continues after this milestone.
+
+602 full verifier stopped before board builds: the extracted carousel cache
+fixture lacked the new Clean-list declaration. Production Chis linking and
+focused name tests had passed; fixed the fixture's default settings/prototype
+and rerun it. No failed full run is counted as a pass. Freeze new source for
+complete verification again before delivering a candidate.
