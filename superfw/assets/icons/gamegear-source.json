@@ -1,8 +1,6 @@
 {
-  "credit": "DS Style / DSSMM DE contributors; Apache-2.0 retained in docs/licenses",
-  "reference": "ezfomegade/images/icon_GG.h",
-  "reference_sha256": "aaabcb441d0bb422468652ee65ef3ac46b841e1deece18d5dddfa739fc0bc69d",
-  "pixels_sha256": "59f3fb406c09f5160f973fc9939b8ff22b0027a37da5c61205ba74e9ed5a9372",
+  "credit": "Original DSSMM Game Gear cartridge pixel art, matching SuperFW cartridge silhouette, bevel and label style; upstream SuperFW icon authors retain their credits.",
+  "license": "GPL-3.0-or-later",
   "dimensions": [
     16,
     14
@@ -11,5 +9,32 @@
     16,
     16
   ],
-  "placement": "one transparent row above and below; native icon palette IDs unchanged"
+  "placement": "one transparent row above and below; native icon IDs and palette entries unchanged",
+  "pixels_sha256": "1f1f0411dafd79ee7de8f0b7cdd685ccb462b62347d38027a8b9f1913f856752",
+  "pixel_rows": [
+    "....hhhhhhhh....",
+    "...oooooooooo...",
+    "..ohbbbbbbbbdo..",
+    "..ohccccccccdo..",
+    "..ohccccccccdo..",
+    "..ohlllllllldo..",
+    "..ohggglgggldo..",
+    "..ohglllgllldo..",
+    "..ohglglglgldo..",
+    "..ohggglgggldo..",
+    "..ohlllllllldo..",
+    "...bddddddddb...",
+    "...ddggggggdd...",
+    "....oooooooo...."
+  ],
+  "rgb555_palette": {
+    ".": "0000",
+    "o": "18c6",
+    "h": "2d6b",
+    "b": "2108",
+    "d": "1084",
+    "l": "6739",
+    "c": "5106",
+    "g": "0421"
+  }
 }

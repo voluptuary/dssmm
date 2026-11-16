@@ -1,3 +1,4 @@
+#include "compiler.h"
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "dssmm_background.h"
 #include "dssmm_background_data.h"
@@ -31,7 +32,7 @@ void dssmm_background_clear(volatile uint8_t *frame,bool dark,unsigned x,unsigne
     for(unsigned col=0;col<width/2;++col)dest[col]=color|(color<<8);
   }
 }
-void dssmm_background_draw(volatile uint8_t *frame,bool dark,unsigned kind) {
+IWRAM_CODE NOINLINE void dssmm_background_draw(volatile uint8_t *frame,bool dark,unsigned kind) {
   if(kind==DSSMM_BG_LIST || kind>DSSMM_BG_HELP){dssmm_background_clear(frame,dark,0,0,240,160);return;}
 #ifdef DSSMM_EXTERNAL_BACKGROUNDS
 #ifdef FONTS_EXT

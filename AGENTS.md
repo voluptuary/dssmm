@@ -1,5 +1,7 @@
 # DSSMM shared-tree working architecture
 
+Always work in the most token-efficient manner possible: reuse existing findings and validation evidence, read only relevant context, batch independent checks, and avoid duplicate work or unnecessary output. Preserve correctness, required testing, and clear continuation notes.
+
 Repository: https://github.com/voluptuary/dssmm. Default/integration branch:
 `dssmm`. Hardware/project branches: `ezfomegade`, `ezfomega`, `ezfblue`, `superfw`. Do not recreate
 retired `main` or `ezfode` branches.
@@ -173,3 +175,16 @@ re-add it. Preserve this ignored local archive during cleanup. Root release-poli
 maintenance belongs on dssmm. If the local archive is missing in a later session,
 recover the exact asset from the latest published release or owner backup before
 publishing; never substitute the smaller generated letter-only pack.
+
+## 2026-11-16 — SuperFW Test5 current prerelease
+
+SuperFW Test5 is published at sourcea4cafcaf1da9539234c01de0a6933d0816371698,
+DSSMM Build624, with Chis/SD/Lite images and retained full folder-art.zip.
+All3/full local/nativeIGM ARM checks, hardwareCI43868556156 and all4 integration
+CI43868982790 pass; downloaded assets match. See project publication/validation
+records. Test4 release page/assets were removed after exact body/asset archive
+at docs/history/releases/prerelease-retention-2026-11-16-test5.json; git tag kept.
+BLUE/OMEGA newest prereleases and stable DEv8.4.0 remain unchanged. Earlier Chis
+artwork/boot observations do not qualify new plugin timings, Exit, full settings
+persistence, SD/Lite physical operation or complete DE parity. Owner requests
+adversarial SuperFW audit next, then continued autonomous porting; keep624 frozen.

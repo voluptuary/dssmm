@@ -65,6 +65,14 @@ int main(void) {
   assert(sms[0].hndlr(header,"/Sonic.sms",1234)==40 && header[8]==0);
   gg[1].hndlr(header,"/Sonic.gg",1234);assert(header[8]==4);
   sms[1].hndlr(header,"/Sonic.sms",1234);assert(header[8]==0);
+  uint32_t startup[16]={0xe3a00014,0xe59f1008,0xe1c100b0,0,0,0x04000204};
+  assert(pogo_fix_waitcnt(startup,sizeof(startup)) && startup[0]==0xe3a00901);
+  assert(!pogo_fix_waitcnt(startup,sizeof(startup)));
+  startup[0]=0xe3a00014;startup[5]=0x04000208;
+  assert(!pogo_fix_waitcnt(startup,sizeof(startup)) && startup[0]==0xe3a00014);
+  startup[5]=0x04000204;assert(!pogo_fix_waitcnt(startup,20));
+  startup[1]=0xe59f1009;assert(!pogo_fix_waitcnt(startup,sizeof(startup)));
+  startup[1]=0xe59f1fff;assert(!pogo_fix_waitcnt(startup,sizeof(startup)));
   uint32_t fo,to,ram[24],table[22];
   assert(pogo_layout(257,8193,&fo,&to)&&fo==260&&to==32768);
   assert(!pogo_layout(0,1,&fo,&to));assert(!pogo_layout(1,0,&fo,&to));

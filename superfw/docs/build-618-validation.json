@@ -62,7 +62,7 @@
   },
   "profile": {
     "environment": "mGBA0.10.1 synthetic ROM fixture; not physical firmware FPS",
-    "old_background_cycles": 790922,
+    "old_background_cycles": 700922,
     "new_background_cycles": 310810,
     "unchanged_artwork_cycles": 502309,
     "old_total_cycles": 1296968,

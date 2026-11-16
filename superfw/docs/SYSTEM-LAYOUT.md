@@ -22,7 +22,7 @@ sets into the canonical folders manually after backing them up if desired.
 
 ```text
 SYSTEM/
-  SETTINGS.TXT, RECENT.TXT, SUPERFW-RECENT.TXT
+  SETTINGS.TXT, RECENT.TXT
   config/, patches/, cheats/, PLUG/
   SAVER/, SAVESTATE/
   IMGS/, IMGS2/
@@ -50,3 +50,9 @@ that format cannot distinguish an external reselection of the same first title.
 
 SYSTEM/emulators is safely merged into PLUG without overwriting files. See
 PLUGIN-COMPATIBILITY.md for extension-named plugins and hardware limits.
+
+Recent history now uses only `RECENT.TXT`, with newest entries first. Old
+`SUPERFW-RECENT.TXT` entries are merged during migration; that sidecar is removed
+only after the canonical file is successfully replaced. SuperFW NOR entries
+retain `nor:` prefixes. EZ-FLASH menus understand SD paths and may stop at a NOR
+entry; this does not imply portable NOR slots across different hardware.

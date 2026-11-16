@@ -553,6 +553,7 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
       unsigned count=size-off>LOAD_BS?LOAD_BS:size-off;
       if(f_read(&file,tmp,count,&got)!=FR_OK || got!=count){f_close(&file);return ERR_LOAD_BADROM;}
       memset((uint8_t*)tmp+count,0,((count+3)&~3u)-count);
+      if(!part && !off && mode!=2)pogo_fix_waitcnt(tmp,count);
       set_supercard_mode(MAPPED_SDRAM,true,false);
       pogo_copy16(GBA_ROM_ADDR+base+off,tmp,(count+3)&~3u);
       set_supercard_mode(MAPPED_SDRAM,true,true);

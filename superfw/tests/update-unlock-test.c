@@ -7,8 +7,7 @@ static bool attempt(uint32_t start,uint32_t finish) {
  assert(!update_unlock_feed(&s,0,start+1)); /* held repeat has no fresh event */
  assert(!update_unlock_feed(&s,KEY_BUTTUP,start+2));
  assert(!update_unlock_feed(&s,KEY_BUTTLEFT,start+3));
- assert(!update_unlock_feed(&s,KEY_BUTTRIGHT,start+4));
- return update_unlock_feed(&s,KEY_BUTTA,finish);
+ return update_unlock_feed(&s,KEY_BUTTRIGHT,finish);
 }
 int main(void) {
  assert(attempt(100,398));assert(!attempt(100,399));
@@ -23,7 +22,6 @@ int main(void) {
  assert(!update_unlock_feed(&s,KEY_BUTTDOWN,6));assert(s.position==1 && s.began==6);
  assert(!update_unlock_feed(&s,KEY_BUTTUP,7));
  assert(!update_unlock_feed(&s,KEY_BUTTLEFT,8));
- assert(!update_unlock_feed(&s,KEY_BUTTRIGHT,9));
- assert(!update_unlock_feed(&s,KEY_BUTTA|KEY_BUTTB,10));assert(!s.position);
+ assert(!update_unlock_feed(&s,KEY_BUTTRIGHT|KEY_BUTTB,9));assert(!s.position);
  return 0;
 }

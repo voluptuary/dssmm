@@ -200,7 +200,7 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
   }
   if(PREVIEW_TIMING)profile_art=profile_now()-began_art;
   draw_text_ovf_rotate(browser_fixture_names[focus], frame,
-      vertical ? 98 : 40, vertical ? 85 : 122, vertical ? 136 : 162, &text_animation);
+      vertical ? 98 : 40, vertical ? 85 : 122, vertical ? 136 : 160, &text_animation);
 }
 
 int main(void) {
@@ -281,6 +281,7 @@ int main(void) {
     if (PREVIEW_TIMING) {
       timers[1] = 0; timers[3] = 0;
       uint32_t cycles = timers[0] | ((uint32_t)timers[2] << 16);
+      fill_rect(back,96,112,144,48,FG_COLOR); /* Keep debug counters unambiguous. */
       char timing[48];
       snprintf(timing,sizeof(timing),"BG %lu",(unsigned long)profile_bg);
       draw_text_idx8_bus16(timing,(uint8_t*)back+112*240+96,240,FT_COLOR);
