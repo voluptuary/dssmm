@@ -38,6 +38,7 @@ bash "$project_root/scripts/test-browser-navigation.sh"
 for board in sd lite chis; do
   bash "$project_root/scripts/build.sh" "$board"
 done
+bash "$project_root/scripts/test-native-settings-mgba.sh"
 python3 "$project_root/tools/pack-dssmm-resources.py" --check
 make -C "$project_root/tests" clean
 make -C "$project_root/tests" all
