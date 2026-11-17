@@ -15,7 +15,7 @@ for boot in 1 2; do
   trap finish EXIT
   sleep 6
   if [ "$3" = 2 ]; then
-    for n in 1 2 3 4 5 6 7 8; do
+    for n in 1 2 3 4 5 6 7 8 9; do
       xdotool keydown Down
       sleep 0.1
       xdotool keyup Down

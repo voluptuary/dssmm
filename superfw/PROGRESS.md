@@ -811,3 +811,13 @@ Font-specific action/help/unlock baselines corrected;18scene checks inprogress.
 remaining 657 menu feedback, optional 12-hour display and unchanged-save avoidance.
 Expanded native regression distinguishes accent colors from completion markers and
 checks frame bounds throughout animation. Clean all-board validation pending.
+
+664 validation and PR11 integration completed successfully. Owner tested664 and
+provided next UI/background-save corrections. No release published; new normal
+release authorized after new gates. hardware-test retains validated Chis664.
+
+Independent Top bar color (default gray/black, colored bars/white), synchronized
+clock x234 and shorter illustrated GG cartridge are implemented. Cooperative
+verified settings transactions pass host faults/interleaved reads/requeued changes
+and actual ARM replay; native mGBA navigation-while-pending and two-boot persistence
+pass. Full all-board/IGM/18-scene/hosted gates next; keep664 until replacement passes.

@@ -133,7 +133,12 @@ int main(void) {
     select_option(8);key(16);key(16); /* Accent Green. */
     select_option(3);key(16); /* Horizontal browser. */
     key(2); /* Real menu exit invokes the real settings save transaction. */
-    ok=restored();bootstrap();ok=ok&&restored();
+    ok=((bool(*)(void))(NATIVE_settings_save_poll|1u))();
+    ok=ok&&((bool(*)(void))(NATIVE_settings_save_pending|1u))();
+    VAR8(NATIVE_launcher_page)=0;select_option(2);key(128);
+    ok=ok&&VAR32(NATIVE_smenu+OFFSET_uiset_selector)==3;
+    ok=ok&&((bool(*)(void))(NATIVE_settings_save_pending|1u))();
+    ok=ok&&((bool(*)(void))(NATIVE_settings_save_flush|1u))() && restored();bootstrap();ok=ok&&restored();
   } else ok=restored();
   VAR8(NATIVE_menu_font)=TEST_FONT;select_option(2);
   ((void(*)(unsigned))(NATIVE_reload_theme|1u))(VAR8(NATIVE_menu_theme));

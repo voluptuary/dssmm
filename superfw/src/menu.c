@@ -118,6 +118,7 @@ enum {
   UiSetASpd,
   UiSetHid,
   UiSetAccent,
+  UiSetTopBar,
   UiSetClean,
   UiSetClock,
   UiSetSave, /* retired sentinel; no selectable Save action */
@@ -2280,7 +2281,7 @@ void render_ui_settings(volatile uint8_t *frame) {
   char tmpbuf[64];
   const char * const labels[UiSetSave] = {
     msgs[lang_id][MSG_UIS_THEME], "Font", "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
-    msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent", "Clean list", "Clock format"
+    msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent", "Top bar color", "Clean list", "Clock format"
   };
   for (unsigned row = 0; row < rows; ++row) {
     unsigned option = smenu.uiset.seloff + row;
@@ -2298,6 +2299,7 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetHid: value = msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED]; break;
     case UiSetClock: value=menu_clock_24?"24 hour":"12 hour";break;
     case UiSetClean: value=msgs[lang_id][clean_list?MSG_KNOB_ENABLED:MSG_KNOB_DISABLED];break;
+    case UiSetTopBar: value=accent_names[menu_topbar<ACCENT_COUNT?menu_topbar:0];break;
     case UiSetAccent: value = accent_names[menu_accent < ACCENT_COUNT ? menu_accent : 0]; break;
     }
     if (ds_style && (int)option == smenu.uiset.selector)
@@ -2410,9 +2412,8 @@ void reload_theme(unsigned thnum) {
   MEM_PALETTE[BG_COLOR] = colors.bg_color;
   MEM_PALETTE[FT_COLOR] = colors.ft_color;
   MEM_PALETTE[HI_COLOR] = colors.hi_color;
-  MEM_PALETTE[TOP_BG]=colors.hi_color;
-  unsigned c=colors.hi_color;
-  MEM_PALETTE[TOP_TEXT]=299*(c&31)+587*((c>>5)&31)+114*((c>>10)&31)>=15500?0:0x7fff;
+  MEM_PALETTE[TOP_BG]=menu_topbar?menu_theme_colors(thnum,menu_topbar).hi_color:themes[THEME_DSSMM_LIGHT].fg_color;
+  MEM_PALETTE[TOP_TEXT]=menu_topbar?0x7fff:0;
   MEM_PALETTE[SELECTED_TEXT]=0x7fff;
   // In-game menu palette
   MEM_PALETTE[IGM_PAL_FG] = colors.fg_color;
@@ -2504,7 +2505,7 @@ static void render_start_bar(volatile uint8_t *frame) {
   draw_text_ovf(menu_username,frame,3,1,132);
   uint32_t seconds=launcher_clock_get();char text[12];
   format_menu_clock(text,sizeof(text),seconds);
-  draw_rightj_text(text,frame,232,1);
+  draw_rightj_text(text,frame,234,1);
   if(launcher_selected==4)launcher_corners(frame,178,0,62,16);
 }
 
@@ -2514,7 +2515,7 @@ static void render_dssmm_settings_header(volatile uint8_t *frame,const char *tit
   draw_central_text_ovf(title,frame,120,1,96);
   uint32_t seconds=launcher_clock_get();char time[12];
   format_menu_clock(time,sizeof(time),seconds);
-  draw_rightj_text(time,frame,237,1);
+  draw_rightj_text(time,frame,234,1);
 }
 
 static void render_dssmm_settings_background(volatile uint8_t *frame,const char *title) {
@@ -2555,6 +2556,7 @@ static const struct {
 #pragma GCC optimize ("O2")
 
 void menu_render(unsigned fcnt) {
+  if(!settings_save_poll())spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];
   objnum = 0;
   volatile uint8_t *frame = &MEM_VRAM_U8[0xA000*framen];
   if (restart_required) {
@@ -3721,6 +3723,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       browser_invalidate_artwork();
     }
 
+    else if (smenu.uiset.selector == UiSetTopBar)
+      menu_topbar = menu_topbar ? menu_topbar-1 : 0;
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = menu_accent ? menu_accent - 1 : 0;
     else if (smenu.uiset.selector == UiSetASpd)
@@ -3749,6 +3753,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       browser_invalidate_artwork();
     }
 
+    else if (smenu.uiset.selector == UiSetTopBar)
+      menu_topbar = MIN(ACCENT_COUNT-1,menu_topbar+1);
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = MIN(ACCENT_COUNT - 1, menu_accent + 1);
     else if (smenu.uiset.selector == UiSetASpd)
@@ -3868,7 +3874,7 @@ static void keypress_menu_info(unsigned newkeys) {
 static void accept_menu_clock(void) {
   menu_clock_seed=(unsigned)spop.rtcpop.val.hour*3600+(unsigned)spop.rtcpop.val.min*60;
   launcher_clock_set(menu_clock_seed);launcher_invalidate();
-  if(!save_settings())spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];
+  settings_save_request();
 }
 static void open_menu_clock(void) {
   uint32_t seconds=launcher_clock_get();if(seconds==UINT32_MAX)seconds=12*3600;
@@ -3885,6 +3891,13 @@ static void launcher_move(unsigned newkeys) {
 }
 
 void menu_keypress(unsigned newkeys) {
+  /* Finish the pending transaction before actions can remap cartridge memory. */
+  if((newkeys&KEY_BUTTA) && settings_save_pending() &&
+      (spop.pop_num || (!launcher_page &&
+       (smenu.menu_tab==MENUTAB_ROMBROWSE || smenu.menu_tab==MENUTAB_RECENT)))) {
+    if(!settings_save_flush()){spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];return;}
+  }
+
   if (restart_required) return;
   if(smenu.menu_tab!=MENUTAB_INFO || launcher_page || spop.pop_num || spop.alert_msg || spop.qpop.message || spop.rtcpop.callback || (newkeys&(KEY_BUTTB|KEY_BUTTSEL|KEY_BUTTSTA|KEY_BUTTL|KEY_BUTTR)))update_unlock.position=0;
   /* Actions/tools may reuse cartridge RAM; never reuse the preview afterward. */
@@ -3959,11 +3972,10 @@ void menu_keypress(unsigned newkeys) {
       keyfns[spop.pop_num](newkeys);
     }
   } else {
-    /* Persist before every route out of settings. A failed save leaves the
-     * menu and edited values intact, with an actionable native error dialog. */
+    /* Queue a snapshot on exit; filesystem steps run between menu frames. */
     bool settings_tab=!launcher_page && (smenu.menu_tab==MENUTAB_SETTINGS || smenu.menu_tab==MENUTAB_UILANG);
     if(settings_tab && (newkeys&(KEY_BUTTB|KEY_BUTTSTA|KEY_BUTTL|KEY_BUTTR))) {
-      if(!save_settings()){spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];return;}
+      settings_save_request();
       if(menu_theme<THEME_DSSMM_LIGHT && (newkeys&KEY_BUTTB)){smenu.menu_tab=MENUTAB_ROMBROWSE;return;}
     }
     if(menu_theme>=THEME_DSSMM_LIGHT) {
