@@ -1,0 +1,38 @@
+{
+  "tag": "superfw-build667",
+  "source_commit": "a7259a8357d850c86744a074e305c0f8f39e1849",
+  "dssmm_build_number": 667,
+  "release_id": 448619378,
+  "url": "https://github.com/voluptuary/dssmm/releases/tag/superfw-build667",
+  "published_at": "2026-11-17T12:45:06Z",
+  "prerelease": false,
+  "assets": [
+    {
+      "name": "folder-art.zip",
+      "sha256": "b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5",
+      "download_matches": true
+    },
+    {
+      "name": "superfw-chis.fw",
+      "sha256": "498342d1013d85349915393c7ffae39ec923a85c9aa63b832532478015e3770f",
+      "download_matches": true
+    },
+    {
+      "name": "superfw-lite.fw",
+      "sha256": "ddfa49a61b4aaded6e46a3c9811ec5e7b3f91aabc4231444365c2393da4b1922",
+      "download_matches": true
+    },
+    {
+      "name": "superfw-sd.fw",
+      "sha256": "e1cc6f8360cad952f02ae708aedbba634fce7b267c4a9e786a776a903748db18",
+      "download_matches": true
+    }
+  ],
+  "body_sha256": "0de2ca82517850415ec26e56562b1719320c43305002dfab32a15c953ac2c4d6",
+  "validation_report": "superfw/docs/build-667-validation.json",
+  "hardware_ci": 44085042488,
+  "integration_ci": 44085053018,
+  "integration_pr": "https://github.com/voluptuary/dssmm/pull/12",
+  "retention": "No older SuperFW release pages exist; BLUE/OMEGA each retain their newest prerelease. Tags and stable DE history unchanged.",
+  "hardware_limits": "Only Chis has owner hardware tests; new667 hardware timing and SD/Lite unqualified."
+}

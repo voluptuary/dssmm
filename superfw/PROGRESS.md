@@ -821,3 +821,8 @@ clock x234 and shorter illustrated GG cartridge are implemented. Cooperative
 verified settings transactions pass host faults/interleaved reads/requeued changes
 and actual ARM replay; native mGBA navigation-while-pending and two-boot persistence
 pass. Full all-board/IGM/18-scene/hosted gates next; keep664 until replacement passes.
+
+667 normal release published; all3/full/nativeIGM/ARM/mGBA18 and all4 PR checks
+pass, downloads/body match. PR12 merged b7d91488. Chis667 delivered;664 report kept.
+No physical667/SD-Lite qualification. Publication docs/root milestone/normal sync
+next; DE remains latest. Future porting needs measured RAM recovery (200B free).

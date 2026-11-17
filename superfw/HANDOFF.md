@@ -1343,3 +1343,15 @@ check and all3/full/hosted gates remain pending; hardware-test664 stays frozen.
 an obsolete save-on-exit comment and synchronous-failure behavior. Updated it to
 assert queued exit/navigation; transaction failures remain covered in IO/native
 suites. No666 hardware-test artifact delivered. Next clean candidate/full gates.
+
+667/sourcea7259a83 published NORMAL as superfw-build667 after full all3/nativeIGM,
+actual ARM queued-save (14128B peak), native mGBA pending-navigation/two boots,
+18font scenes and all4 PR CI44085053018/source44085042488 passed. PR12 merged
+b7d91488. All4 downloaded assets/body match; full owner folder-art.zip retained.
+Chis667 now hardware-test;664 validation retained in docs. Only Chis owner testing,
+not new667 hardware qualification. DEv8.4.0 remains latest via explicit API metadata
+correction (CLI --latest=false initially still selected667). No older SuperFW
+pages to prune; BLUE/OMEGA latest prereleases and all DE history preserved.
+Next: normal doc integration/root publication overview/baseline and all5sync, then
+recover EWRAM via measured cold-code size work before more UI parity. Plugin Exit,
+PCE and full DE parity still open. Keep owner lock/private BIOS/scratch/fullZIP.
