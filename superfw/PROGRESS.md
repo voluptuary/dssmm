@@ -802,3 +802,7 @@ retained. Next visualslicePR/checks/normalintegration/sync; Test6withdrawn.
 
 PR10 merged after all4CI43990263281 pass. Native9-scene regression retainedmain;
 657currenthardware-test. Normaldoccheckpoint/all5sync next, then porting.
+
+Expandednativevisualchecks tobothfontchoices; font0had6popupdescenderoverlaps.
+Font-specific action/help/unlock baselines corrected;18scene checks inprogress.
+657stillcurrentvalidatedcandidate; no dirtybuild delivered.

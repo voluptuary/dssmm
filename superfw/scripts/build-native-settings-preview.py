@@ -3,7 +3,7 @@
 from pathlib import Path
 import argparse,struct,subprocess,os,json,re
 root=Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(10),default=0);a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(10),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
 elf=a.elf.read_bytes();nm=subprocess.check_output(['arm-none-eabi-nm',str(a.elf)],text=True)
 syms={r.split()[-1]:int(r.split()[0],16) for r in nm.splitlines() if len(r.split())==3}
 text='#include <stdint.h>\n'
@@ -63,7 +63,7 @@ def field_offset(obj,path):
 for obj,f in fields:text+='#define OFFSET_'+obj+'_'+f.replace('.','_')+' '+str(field_offset(obj,f))+'\n'
 # Preserve existing concise Interface field names for the persistence fixture.
 for f in ['menu_tab','uiset_selector','uiset_seloff']:text+='#define OFFSET_'+f+' OFFSET_smenu_'+f+'\n'
-text+='#define TEST_SCENE '+str(a.scene)+'\n'
+text+='#define TEST_SCENE '+str(a.scene)+'\n#define TEST_FONT '+str(a.font)+'\n'
 text+='#define TEST_UI_TAB '+('4' if 'keypress_menu_norbrowse' in syms else '3')+'\n'
 (a.out/'native-settings-image.h').write_text(text)
 objects=[str(x) for x in a.out.glob('native-segment-*.o')]

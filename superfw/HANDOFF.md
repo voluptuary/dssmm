@@ -1282,3 +1282,13 @@ frame/stale-art checks are now main-repo regression gates. Chis657 remains curre
 local candidate (source169b). Complete doccheckpoint/normalall5sync; then continue
 NOR/perf/parity and expand native font/theme visual coverage as needed. No public
 release recreated; Test6withdrawn andphysicalqualification limits unchanged.
+
+AfterPR10/all5sync e638a27: nativeSuperFWfont0 popup snapshot exposed6descender
+pixels across149/150 (DSSMMfont1 alreadypassed). Added --font0/1 viewer override,
+read-onlymatrixbothstyles, source action/help/unlock baselines dependonfont.
+Native-theme placement retained; NORactions reusecommon action renderer. Current
+18scene dirtyELFmatrix nearingcompletion, first15passed; no newcandidateyet,
+657frozen. Next verifyremaining, commit/fullall3/mGBA/CI thenhardwareupdate+PR/sync.
+
+Bothfonts/all18 native mGBA scenes nowpassed. Freezefontcoverage source andrun
+fullclean/all3/nativeIGM/persistence/matrix/CI; nextcandidateonlyafterallgates.

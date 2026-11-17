@@ -1886,16 +1886,17 @@ static const char *render_gbarom_loading(volatile uint8_t *frame, const t_load_g
 }
 
 static void render_gba_action(volatile uint8_t *frame, const char *label, bool selectable) {
-  draw_central_text_ovf(label, frame, 120, 134, 192);
+  unsigned y=menu_theme>=THEME_DSSMM_LIGHT && menu_font!=FONT_STYLE_DSSMM?132:134;
+  draw_central_text_ovf(label, frame, 120, y, 192);
   if (selectable) {
-    draw_text_ovf("<", frame, 12, 134, 16);
-    draw_rightj_text(">", frame, 228, 134);
+    draw_text_ovf("<", frame, 12, y, 16);
+    draw_rightj_text(">", frame, 228, y);
   }
 }
 
 static void render_gba_help(volatile uint8_t *frame, const char *text) {
   if (!text)return;
-  unsigned y=menu_theme>=THEME_DSSMM_LIGHT?135:137;
+  unsigned y=menu_theme>=THEME_DSSMM_LIGHT?(menu_font==FONT_STYLE_DSSMM?135:133):137;
   if (font_width(text)>SCREEN_WIDTH-20)
     draw_text_ovf_rotate(text,frame,10,y,SCREEN_WIDTH-20,&spop.anim);
   else
@@ -1978,7 +1979,7 @@ void render_gba_norwrite(volatile uint8_t *frame) {
     const t_patch *p = get_game_patch(info);
     render_gbarom_info(frame, info->romfn, is_superfw(&info->romh),
                        info->gcode, info->romh.version, p ? p->save_mode : -1);
-    draw_central_text(msgs[lang_id][MSG_NOR_WRITE], frame, 120, 134);
+    render_gba_action(frame,msgs[lang_id][MSG_NOR_WRITE],false);
   } else {
     const char *ht = render_gbarom_patching(frame, &spop.p.norwr.i, spop.selector);
     render_gba_help(frame,ht);
@@ -2004,7 +2005,7 @@ void render_gba_norload(volatile uint8_t *frame) {
       e->gamecode & 0xFF, (e->gamecode >> 8) & 0xFF, (e->gamecode >> 16) & 0xFF, e->gamecode >> 24, 0
     };
     render_gbarom_info(frame, e->game_name, false, gcode, e->gamever, save_type);
-    draw_central_text(msgs[lang_id][MSG_NOR_LAUNCH], frame, 120, 134);
+    render_gba_action(frame,msgs[lang_id][MSG_NOR_LAUNCH],false);
   } else {
     bool rtc_patching = e->gattrs & GATTR_RTC;
     const char *ht = render_gbarom_loading(frame, &spop.p.norld.l, rtc_patching, spop.selector);
@@ -2365,8 +2366,9 @@ void render_info(volatile uint8_t *frame) {
 
   // Flashing info
   if(menu_theme<THEME_DSSMM_LIGHT)dma_memset16(&frame[138*SCREEN_WIDTH],dup8(FG_COLOR),SCREEN_WIDTH*22/2);
+  unsigned unlock_y=menu_theme>=THEME_DSSMM_LIGHT?(menu_font==FONT_STYLE_DSSMM?135:133):141;
   draw_text_ovf_rotate(enable_flashing ? msgs[lang_id][MSG_FWUP_ENABLED] : msgs[lang_id][MSG_FWUP_HOTKEY], frame,
-                       5, 135, SCREEN_WIDTH - 10, &smenu.anim_state);
+                       5, unlock_y, SCREEN_WIDTH - 10, &smenu.anim_state);
 }
 
 void render_tools(volatile uint8_t *frame) {

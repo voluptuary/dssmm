@@ -62,7 +62,7 @@ static const t_flash_game_entry sample_nor = {
 static void visual_scene(void) {
   if (!TEST_SCENE)return;
   if (TEST_SCENE==9) {
-    select_option(8);VAR32(NATIVE_smenu+OFFSET_uiset_seloff)=0;
+    select_option(8);VAR32(NATIVE_smenu+OFFSET_uiset_seloff)=TEST_FONT?0:2;
     VAR8(NATIVE_menu_accent)=3;
     ((void(*)(unsigned))(NATIVE_reload_theme|1u))(VAR8(NATIVE_menu_theme));
     return;
@@ -119,7 +119,7 @@ int main(void) {
     key(2); /* Real menu exit invokes the real settings save transaction. */
     ok=restored();bootstrap();ok=ok&&restored();
   } else ok=restored();
-  VAR8(NATIVE_menu_font)=1;select_option(2);
+  VAR8(NATIVE_menu_font)=TEST_FONT;select_option(2);
   ((void(*)(unsigned))(NATIVE_reload_theme|1u))(VAR8(NATIVE_menu_theme));
   visual_scene();
   unsigned previous=0;
