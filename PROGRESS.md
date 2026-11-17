@@ -3241,3 +3241,17 @@ all4 CI43979085712; four downloads/notes exact. Archived Test5 metadata inroot
 before deleting its page/assets; tag and otherlanes/DE stable retained. Root user
 downloads/baseline/harness recovery docs refreshed. Normal five-lane sync follows;
 no physical qualification or full SuperFW DE parity claim. See project journals.
+
+Owner reports Build640 Interface-setting hard-freeze and deleted Test6 release.
+Public downloads withdrawn; README/journals updated without retagging/recreating
+release. Project investigation prioritized; CI/host checks were not hardwareproof.
+
+Added shared CI/devcontainer dependencies for the retained native SuperFW mGBA
+settings fixture, including explicitxauth. Recovery docs cover actual linked ARM,
+real FatFs, virtual SRAM SD and second-process persistence checks. Project ABI
+fix/harness remains onSuperFW pending fullgates/PR; no foreignkernel changes.
+
+MergedPR9 with all4/nativeARM/mGBACI success; retainedfixture now ondefaultbranch.
+647 hardware-test validatedlocally/all3; Test6withdrawalretained. Sharedtestdeps
+updatedseparately, otherkernelinputsunchanged. RootREADME save-on-exit corrected;
+normalfive-lane sync/remoteverification follows, then projectvisual/parity work.

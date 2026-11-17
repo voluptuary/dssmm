@@ -200,3 +200,17 @@ stable DEv8.4.0latest unchanged. Publication record is under superfw/docs/releas
 Root README links/registry baseline refreshed at this validated release checkpoint.
 No new physical qualification:640 settings persistence/PCE/plugin Exit/NOR/full
 DE parity remain unconfirmed/incomplete. See project journals; continue work there.
+
+URGENT: owner withdrew/deleted SuperFW Test6 after Build640 hard-freezes when
+changing Interface settings. Do NOT recreate640/Test6. Preserve tag and historic
+publication evidence; public downloads are temporarily unavailable. Root README
+records withdrawal; project crash investigation takes precedence over porting.
+Host/mGBA/CI passes did not qualify this physical save/settings path. Next release
+must use a new tag after corrective validation; do not retag published history.
+
+Current corrective checkpoint: SuperFW PR9 merged after all4 CI/nativeARM/mGBA
+save/restart checks passed. Chis647/sourcea55f4a7 is the local hardware-test; Test6/
+640 remains withdrawn and must not be recreated. Settings save on exit. Native
+fixture source/generator/runner/docs are tracked on dssmm and standard CI/container
+supply dependencies. See superfw/docs/SETTINGS-ARM-REGRESSION.md and projectjournals.
+Only SuperFW compilerflags changed; sharedenvironment changes are separate.

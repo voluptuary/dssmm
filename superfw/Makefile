@@ -70,7 +70,8 @@ ifeq ($(BUNDLE_OTHER_EMULATORS),1)
                 emu/smsadvance-v2.5-scptch.gba.comp
 endif
 
-BASEFLAGS=$(GLOBAL_DEFINES) -mcpu=arm7tdmi -mtune=arm7tdmi
+# GCC16 Thumb1 IPA-RA can misclassify return clobbers; see docs/SETTINGS-ARM-REGRESSION.md.
+BASEFLAGS=$(GLOBAL_DEFINES) -mcpu=arm7tdmi -mtune=arm7tdmi -fno-ipa-ra
 
 CFLAGS=-O2 -ggdb \
        $(BASEFLAGS) $(PAYLOADFLAGS) \

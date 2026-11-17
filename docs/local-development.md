@@ -254,3 +254,26 @@ mGBA0.10.1 SDL/Xvfb setup and launch flags are unchanged; no BIOS is required fo
 these fixtures. Canonical-settings host tests additionally verify corrupt-write
 rollback and actual FatFs FAT16/FAT32 save/unmount/remount; these are not physical
 power-cycle or SuperCard protocol tests.
+
+
+## Native SuperFW settings regression fixture
+
+The tracked SuperFW fixture (`docs/NATIVE-SETTINGS-PREVIEW.md` within the project)
+executes the actual linked firmware menu/settings/FatFs in stock mGBA, replacing
+only physical SD sector operations with SRAM-backed virtual storage. It performs
+menu changes, save-on-exit and a second emulator process to verify boot reload;
+source-frame comparisons cover the last selection row. Regenerate with the
+project's build script and `superfw/scripts/test-native-settings-mgba.sh`.
+
+The standard image and hosted kernel CI now explicitly install `mgba-sdl`,
+`xvfb`, `xauth` and `xdotool`; Python Unicorn and devkitARM/GDB are also required.
+The existing mGBA0.10.1 SDL executable/flags remain unchanged, and the fixture
+requires no BIOS. Generated ROMs, `.sav`, metadata and screenshots remain ignored
+under `superfw/build/native-settings`; the scripts/C harness/docs are tracked.
+
+GCC16.1.0 ARM Thumb1 IPA register allocation reproduced the withdrawn Build640
+settings crash: a callee return clobbered a register that its caller treated as
+preserved. SuperFW disables IPA-RA locally; no other kernel's compiler options
+or hardware protocols were changed. The actual linked-ARM regression catches
+this fault, which host-only tests did not. See the project's regression report.
+Keep emulator correctness separate from physical SuperCard SD/NOR qualification.
