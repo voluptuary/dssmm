@@ -1276,3 +1276,9 @@ Chis657 nowhardware-test/manifest/guide, supersedesown647 after retainedreports.
 Stillno physicalqualification orpubliccorrectiverelease. Next PR10 forvisualslice,
 currentbranchonlySuperFWchanges, all4PRchecks/mergecommit/all5sync thencontinuing
 NOR/perf/parity. Standardfixture retained onmain viaPR9; expandedscenes now onlane.
+
+PR10 nativevisualslice merged after all4CI43990263281 passed; 9native scene
+frame/stale-art checks are now main-repo regression gates. Chis657 remains current
+local candidate (source169b). Complete doccheckpoint/normalall5sync; then continue
+NOR/perf/parity and expand native font/theme visual coverage as needed. No public
+release recreated; Test6withdrawn andphysicalqualification limits unchanged.
