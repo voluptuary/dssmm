@@ -23,7 +23,7 @@ for i in range(count):
 text+='static const struct {uint32_t address,filesz,memsz;const uint8_t *source;} native_segments[]={\n'
 for address,filesz,memsz,source in segments:text+=f'{{0x{address:x},{filesz},{memsz},{source}}},\n'
 text+='};\n'
-for name in ['FatFs','sdfs','load_settings','f_mkdir','f_stat','sdcard_read_blocks','sdcard_write_blocks','menu_keypress','menu_render','menu_flip','reload_theme','smenu','spop','menu_theme','menu_accent','browser_view','artwork_mode','menu_font','frame_count','framen']:
+for name in ['FatFs','sdfs','load_settings','settings_save_flush','settings_save_pending','settings_save_poll','launcher_page','f_mkdir','f_stat','sdcard_read_blocks','sdcard_write_blocks','menu_keypress','menu_render','menu_flip','reload_theme','smenu','spop','menu_theme','menu_accent','browser_view','artwork_mode','menu_font','frame_count','framen']:
  text+='#define NATIVE_'+name+f' 0x{syms[name]:08x}u\n'
 # Struct offsets are queried from the actual ELF, never from a host ABI.
 fields=[('smenu',f) for f in ['menu_tab','uiset.selector','uiset.seloff','tools.selector','info.selector']]

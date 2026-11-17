@@ -34,4 +34,4 @@ for name,values in [('gamegear_pixels',words),('gamegear_palette',palette[native
 target=root/'src/res/icon-gamegear.h'
 if a.check:assert target.read_text()==text,'Regenerate Game Gear icon'
 else:target.write_text(text)
-print(f'Game Gear icon: native-style16x14 cartridge on16x16 canvas; {len(palette)-native} added palette entries.')
+print(f'Game Gear icon: native-style12-pixel-high cartridge on16x16 canvas; {len(palette)-native} added palette entries.')

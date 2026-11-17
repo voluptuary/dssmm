@@ -30,12 +30,11 @@ volatile unsigned frame_count;
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define MSG_ERR_SETSAVE 0
-static const char *msgs[1][1]={{"save failed"}};
-static unsigned lang_id,writes;
+static unsigned writes;
 static uint32_t menu_clock_seed,rtcvalue_default=12345;
 static struct {const char *alert_msg;struct {t_dec_date val;int selector;bool menu_clock;void (*callback)(void);} rtcpop;} spop;
 static void launcher_invalidate(void){}
-static bool save_settings(void){++writes;return true;}
+static void settings_save_request(void){++writes;}
 '''
 for name in ('format_menu_clock','accept_menu_clock','open_menu_clock'):
  a=s.index('static void '+name+'(');b=s.index('\n}',a)+2;out+=s[a:b]+'\n'

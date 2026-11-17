@@ -1319,3 +1319,23 @@ its new font-width dependency. The schematic preview also needed header palette
 and declaration updates; both are corrected. Actual native two-process mGBA
 persistence passes with the two-color marker. Clock formatter tests cover midnight,
 noon, PM and unset; ARM replay now covers both clock formats and unchanged exits.
+
+## Owner Build 664 follow-up — 2026-11-17
+664 full local/all-board/native IGM/ARM/mGBA18 scenes passed; source CI43998552194
+and all-four PR CI43998953470 passed. PR11 merged; Chis664 is in hardware-test.
+No Test7 release was published. Owner now requests a NORMAL (not prerelease)
+release after independent Top bar color/default gray+black text, white text for
+colored bars, unified clock x234, a shorter illustrated Game Gear label, and
+background settings saves where feasible. Preserve verified rollback; cooperative
+save work must yield between bounded filesystem operations and drain before game
+handoff. Only Chis has owner hardware tests; SD/Lite remain untested. Release notes
+must summarize major changes since the fork, remaining bugs and SD setup, attach
+full retained folder-art.zip and preserve DE latest stable unless explicitly changed.
+Cooperative implementation now stages output using temporary 8KiB stack storage,
+then owns existing original[] buffer across steps. Aligned FIL uses unused tail;
+near-capacity configs fall back synchronously. No second static buffer. Native ARM
+queued replay passes, stack14128B against linked live-data guard; Chis EWRAM
+256824/257024 (200B headroom). Do not add static data/raise limits. Host fault,
+rollback, unknown-key, FAT16/FAT32, interleaved read/requeued edit/retry tests pass
+with UBSAN halt enabled after fixing host FIL alignment. Native mGBA queued-input
+check and all3/full/hosted gates remain pending; hardware-test664 stays frozen.

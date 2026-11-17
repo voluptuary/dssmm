@@ -73,3 +73,9 @@ inspection; the default1 selects DSSMM. Preference setup/persistence assertions
 remain unchanged, and the visual override is not saved. The larger native font
 needs a higher action/help baseline inside DS panels; the font-specific baseline
 checks cover both choices without changing legacy native-theme placement.
+
+Background-save regression: native keys queue a settings snapshot. The fixture
+starts one save step, re-enters Interface and moves the selection while the
+transaction is still pending, then drains it before resetting native state. ARM
+replay exercises this same queued path, clock/bar roundtrips and unchanged exits.
+Two-color green/blue completion markers distinguish success from colored headers.
