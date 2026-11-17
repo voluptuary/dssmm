@@ -1254,3 +1254,31 @@ now onmain repository/dssmm, reproduciblewithoutprivateBIOS. Chis647 frozen rema
 hardware-test; codeinputsunchanged froma55 (laterdocs/tests/env). Test6 remains
 withdrawn, no public replacement release. Complete normalrootdocs/all5sync then
 continue native mGBA visual scenes/NOR/performance work; no feedbackpause.
+
+Continuation after647fix/PR9sync: actual native visual matrix added (Help/System/
+GBA/NOR/update/erase/load-options/patch-options/Orangebottomrow). Seeds only back
+page magenta, asserts no stale pixels and compares source-frame edges. All9Chis
+scenes pass locally on dirty development ELF after corrections. Foundreal defects:
+loadhelpdescenders4pixels at149/150, Orangeg2pixels at149. SharedGBApopuphelp DSy135
+(native137), DSSMMsettings/Interfacetop23 (nativefont24) keepinkinside. Firsthelper
+refactor dirtycompile caught brace-extraction error; restored functions from HEAD
+and applied boundedreplacement preserving nativeOAM loops, noimage fromfailedrun.
+Generator now readsGDBptype layouts (noPythonGDB) for optimizedfields, choosesfont
+pack perboard; sourcefixture/runner changes needcheckpoint/fullall3gates before
+newcandidate. 647remains frozenvalidatedcurrenthardware-test. Nativevisualscenes
+read-only and controlledInterfacekeys only; no agent physicalNOR operations.
+Next commit/verify/fullCI/hardware image and normalPRintegration; sourceprojectonly.
+
+657/source169b0430a1a075434b2bd0a10e968b2de3c1e994 clean full/all3/nativeIGM,
+repeatednativeARMsettings, two-bootmGBA and9nativevisualscenes pass. Hosted
+43989337269success, allpacket/size/sealchecks pass (SD520704/Lite488448/Chis1671680).
+Chis657 nowhardware-test/manifest/guide, supersedesown647 after retainedreports.
+Stillno physicalqualification orpubliccorrectiverelease. Next PR10 forvisualslice,
+currentbranchonlySuperFWchanges, all4PRchecks/mergecommit/all5sync thencontinuing
+NOR/perf/parity. Standardfixture retained onmain viaPR9; expandedscenes now onlane.
+
+PR10 nativevisualslice merged after all4CI43990263281 passed; 9native scene
+frame/stale-art checks are now main-repo regression gates. Chis657 remains current
+local candidate (source169b). Complete doccheckpoint/normalall5sync; then continue
+NOR/perf/parity and expand native font/theme visual coverage as needed. No public
+release recreated; Test6withdrawn andphysicalqualification limits unchanged.

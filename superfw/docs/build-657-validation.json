@@ -1,0 +1,66 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 657,
+  "boards": [
+    {
+      "source_tree_sha256": "bbe113623bc16b092659253f8e516deb577bcbcf4ae1a179c1b87f29113da625",
+      "board": "sd",
+      "dssmm_build": 657,
+      "source_commit": "169b0430a1a075434b2bd0a10e968b2de3c1e994",
+      "source_dirty": false,
+      "firmware_sha256": "24c061df6addbb29647d5f0ed0665e9a0e053ee9e22b78078e44d4eef8823bfa",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 520704,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 3584
+    },
+    {
+      "source_tree_sha256": "bbe113623bc16b092659253f8e516deb577bcbcf4ae1a179c1b87f29113da625",
+      "board": "lite",
+      "dssmm_build": 657,
+      "source_commit": "169b0430a1a075434b2bd0a10e968b2de3c1e994",
+      "source_dirty": false,
+      "firmware_sha256": "53b8309e571e96c1450a2a1b54fac9634622abe4d3624eb63ff597bf58e3f26c",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 488448,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 19456
+    },
+    {
+      "source_tree_sha256": "bbe113623bc16b092659253f8e516deb577bcbcf4ae1a179c1b87f29113da625",
+      "board": "chis",
+      "dssmm_build": 657,
+      "source_commit": "169b0430a1a075434b2bd0a10e968b2de3c1e994",
+      "source_dirty": false,
+      "firmware_sha256": "cc393b92d5e822343d3a512bcb9252134adf4b59dee168aa486910601a0dfe0d",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "run": 43989337269,
+    "head": "169b0430a1a075434b2bd0a10e968b2de3c1e994",
+    "conclusion": "success"
+  },
+  "checks": [
+    "Full clean all3 local verifier with native IGM replay passed",
+    "Actual linked ARM/FatFs repeated settings save/reload passed on SD/Lite/Chis",
+    "Actual linked firmware mGBA two-process settings persistence and last-row frame tests passed",
+    "Nine actual native menu screens passed exact source bevel/edge checks and cleared seeded stale artwork",
+    "All3 source/build/hash/header/full-image seals and hardware size limits passed"
+  ],
+  "limitations": "No new physical validation. Build640/Test6 withdrawn; retained Build647 settings correction plus visual baselines. Physical SD/NOR, PCE/plugin Exit and full DE parity remain open.",
+  "integration_pr": {
+    "url": "https://github.com/voluptuary/dssmm/pull/10",
+    "run": 43990263281,
+    "conclusion": "success",
+    "projects": [
+      "ezfomegade",
+      "ezfomega",
+      "ezfblue",
+      "superfw"
+    ]
+  }
+}
