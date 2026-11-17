@@ -1,0 +1,52 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 647,
+  "boards": [
+    {
+      "source_tree_sha256": "fd25b8c411d20a0f45c1d70c5a606f80978ac66ac101c680b6e08965e18730a3",
+      "board": "sd",
+      "dssmm_build": 647,
+      "source_commit": "a55f4a77c245dfa12262f263bf16e2737b9a8654",
+      "source_dirty": false,
+      "firmware_sha256": "fbcb6b91414312ba61e70e4ee8850ab4e3e77a230336a0a856f3d2ebba480989",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 520704,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 3584
+    },
+    {
+      "source_tree_sha256": "fd25b8c411d20a0f45c1d70c5a606f80978ac66ac101c680b6e08965e18730a3",
+      "board": "lite",
+      "dssmm_build": 647,
+      "source_commit": "a55f4a77c245dfa12262f263bf16e2737b9a8654",
+      "source_dirty": false,
+      "firmware_sha256": "b16fd46c863d644a4a86e9cd977816bca8216ccf0f7ad5e5eaf8adeddb13b89c",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 488448,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 19456
+    },
+    {
+      "source_tree_sha256": "fd25b8c411d20a0f45c1d70c5a606f80978ac66ac101c680b6e08965e18730a3",
+      "board": "chis",
+      "dssmm_build": 647,
+      "source_commit": "a55f4a77c245dfa12262f263bf16e2737b9a8654",
+      "source_dirty": false,
+      "firmware_sha256": "6fc40e113adb92f43fc11d07c2f69ca04acfc98d633ca08829bcd684c4d5228d",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "checks": [
+    "Clean full local verifier for SD/Lite/Chis including native IGM ARM replay passed",
+    "Actual linked ARM settings/FatFs replay passed on all3 boards; initial Chis measured6760B stack peak",
+    "Actual linked firmware mGBA changed Theme/Artwork/Accent/View, saved on exit and reloaded in a second process; passed",
+    "mGBA bottom selection bevel compared to original source pixels; passed",
+    "Compiler control without -fno-ipa-ra reproduced the invalid settings string pointer; corrected build passed",
+    "All3 source/build/hash/header/seal/size checks passed"
+  ],
+  "hosted_status": "Initial source push failed only at new mGBA fixture due missing xvfb-run in old workflow; shared dependencies fixed on dssmm; PR checks pending.",
+  "limitations": "mGBA virtual SD is not physical SD/NOR or actual card powercycle validation. Build640/Test6 withdrawn; no public corrective release yet."
+}

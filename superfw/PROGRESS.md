@@ -768,3 +768,20 @@ Test6/Build640 published after local/all3/nativeIGM and all4 integration gates.
 All4 downloaded assets/body match; folder pack attached. Archived/pruned Test5
 release while retaining tag; BLUE/OMEGA/DE untouched. PublicationJSON records
 source/CI/hashes/limits. Next universal release docs/sync/cleanup then porting.
+
+Owner640 hard-freeze changing Interface options; Test6 withdrawn/deleted by owner.
+Immediate save-on-change removed locally; investigate actual ARM save path and
+stack/bus constraints before next candidate. Save-on-exit remains. No fix claim,
+no640 republication. Other porting deferred for this critical regression.
+
+Actual ARM reproduced bad%s pointer from Thumb1 IPA-RA return clobber. Global
+SuperFW -fno-ipa-ra fixes native save/load; stack6760B. Actual compiled menu/FatFs
+mGBA tests pass change/save/native reset and separate-process persisted boot.
+Fixture sources/generator/runner/recovery docs added to repository; verifier now
+includes it. Frame149 bevel protected and screenshot-checked. Full gates/PR/new
+candidate next, no physical qualification claimed.
+
+647 all3/full/nativeIGM and actual linked ARM + mGBA persisted-boot/frame checks
+passed. Chis647 delivered hardware-test;640 withdrawn. Native GCC control fails,
+workaroundpasses. Hosted firstpush missingXvfb only; sharedCI deps fixed770f783.
+Next hardware PR/checks/mergecommit/all5sync, preserve fixtures andprivatefiles.

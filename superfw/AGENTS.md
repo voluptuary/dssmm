@@ -214,3 +214,15 @@ checks passed; no new physical qualification. Older Test5 page pruned after exac
 archive, tag retained. Chis640 in hardware-test is current; keep it frozen while
 porting continues. Physical settings/PCE/plugin Exit/NOR carousel/full parity remain
 open; do not repeat older current-release/current-build claims above.
+
+URGENT640 settings crash overrides older current-release/save-on-change claims:
+owner withdrew Test6. Read SETTINGS-ARM-REGRESSION.md and NATIVE-SETTINGS-PREVIEW.md.
+Disable IPA-RA for SuperFW ARM builds; actual GCC16.1 Thumb return clobbers broke
+settings string pointers/preservation. Save on exit, not on every change. Native
+ELF/FatFs replay and actual linked-menu mGBA two-boot persistence fixture are now
+tracked and must remain reproducible in a fresh devcontainer. Standard board
+builds run ARM replay; verifier runs mGBA. Use screenshot/frame checks for future
+UI uniformity, clipping and stale-background regressions. No private BIOS required.
+Do not republish640/reuseTest6 tag. Next corrective milestone: full all3 gates,
+new hardware-test image, commit/push PR to dssmm and normal branchsync. No feedback
+pause. Physical card/SD timing remains outside mGBA qualification.
