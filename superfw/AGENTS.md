@@ -226,3 +226,14 @@ UI uniformity, clipping and stale-background regressions. No private BIOS requir
 Do not republish640/reuseTest6 tag. Next corrective milestone: full all3 gates,
 new hardware-test image, commit/push PR to dssmm and normal branchsync. No feedback
 pause. Physical card/SD timing remains outside mGBA qualification.
+
+## Current normal release: Build667
+
+Owner authorized a normal release after Build664 feedback. `superfw-build667`
+(source a7259a83) is published for Chis/SD/Lite with the full folder-art archive.
+Read docs/releases/superfw-build667-publication.json and BACKGROUND-SETTINGS.md.
+Only Chis has owner hardware tests; SD/Lite remain untested. Cooperative saves
+reuse existing storage; Chis main EWRAM has only200 bytes free. Preserve native
+16KiB stack/flash budgets and -fno-ipa-ra. Future feature work must recover space
+rather than expand limits. Keep native mGBA/ARM fixtures and rollback coverage.
+DEv8.4.0 remains latest; normal release does not imply complete DE parity.

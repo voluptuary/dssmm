@@ -1,0 +1,66 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 667,
+  "boards": [
+    {
+      "source_tree_sha256": "cabb3a859de14cb5d9290dd96f9d5fb45dabd3fd1dbc069a287f09dbce380ac5",
+      "board": "sd",
+      "dssmm_build": 667,
+      "source_commit": "a7259a8357d850c86744a074e305c0f8f39e1849",
+      "source_dirty": false,
+      "firmware_sha256": "e1cc6f8360cad952f02ae708aedbba634fce7b267c4a9e786a776a903748db18",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 521728,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 2560
+    },
+    {
+      "source_tree_sha256": "cabb3a859de14cb5d9290dd96f9d5fb45dabd3fd1dbc069a287f09dbce380ac5",
+      "board": "lite",
+      "dssmm_build": 667,
+      "source_commit": "a7259a8357d850c86744a074e305c0f8f39e1849",
+      "source_dirty": false,
+      "firmware_sha256": "ddfa49a61b4aaded6e46a3c9811ec5e7b3f91aabc4231444365c2393da4b1922",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 489472,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 18432
+    },
+    {
+      "source_tree_sha256": "cabb3a859de14cb5d9290dd96f9d5fb45dabd3fd1dbc069a287f09dbce380ac5",
+      "board": "chis",
+      "dssmm_build": 667,
+      "source_commit": "a7259a8357d850c86744a074e305c0f8f39e1849",
+      "source_dirty": false,
+      "firmware_sha256": "498342d1013d85349915393c7ffae39ec923a85c9aa63b832532478015e3770f",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "run": 44085042488,
+    "conclusion": "success"
+  },
+  "integration_pr": {
+    "url": "https://github.com/voluptuary/dssmm/pull/12",
+    "run": 44085053018,
+    "conclusion": "success",
+    "projects": [
+      "ezfomegade",
+      "ezfomega",
+      "ezfblue",
+      "superfw"
+    ]
+  },
+  "checks": [
+    "Full clean all3 verifier, native IGM ARM replay, host sanitizer and fault checks passed",
+    "Actual ARM queued settings replay all3: two clock formats, independent bar colors, zero-write unchanged exits; stack peak14128 bytes",
+    "Native mGBA navigation while save pending and two-process persistence passed",
+    "All18 native menu scenes across both fonts passed continuous frame and stale-art checks",
+    "Native mGBA default gray/black and independent Blue/white header captures passed",
+    "All3 size, source identity, header and full-image seal checks passed"
+  ],
+  "limitations": "Only Chis has owner hardware tests, including664 feedback and657 settings persistence. New667 physical timing/gameplay and SD/Lite remain unqualified. Plugin Exit/PCE/full parity remain open."
+}

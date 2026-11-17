@@ -802,3 +802,27 @@ retained. Next visualslicePR/checks/normalintegration/sync; Test6withdrawn.
 
 PR10 merged after all4CI43990263281 pass. Native9-scene regression retainedmain;
 657currenthardware-test. Normaldoccheckpoint/all5sync next, then porting.
+
+Expandednativevisualchecks tobothfontchoices; font0had6popupdescenderoverlaps.
+Font-specific action/help/unlock baselines corrected;18scene checks inprogress.
+657stillcurrentvalidatedcandidate; no dirtybuild delivered.
+
+2026-11-17: Owner confirms Build 657 settings persistence on Chis. Implementing
+remaining 657 menu feedback, optional 12-hour display and unchanged-save avoidance.
+Expanded native regression distinguishes accent colors from completion markers and
+checks frame bounds throughout animation. Clean all-board validation pending.
+
+664 validation and PR11 integration completed successfully. Owner tested664 and
+provided next UI/background-save corrections. No release published; new normal
+release authorized after new gates. hardware-test retains validated Chis664.
+
+Independent Top bar color (default gray/black, colored bars/white), synchronized
+clock x234 and shorter illustrated GG cartridge are implemented. Cooperative
+verified settings transactions pass host faults/interleaved reads/requeued changes
+and actual ARM replay; native mGBA navigation-while-pending and two-boot persistence
+pass. Full all-board/IGM/18-scene/hosted gates next; keep664 until replacement passes.
+
+667 normal release published; all3/full/nativeIGM/ARM/mGBA18 and all4 PR checks
+pass, downloads/body match. PR12 merged b7d91488. Chis667 delivered;664 report kept.
+No physical667/SD-Lite qualification. Publication docs/root milestone/normal sync
+next; DE remains latest. Future porting needs measured RAM recovery (200B free).

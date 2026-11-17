@@ -122,6 +122,8 @@ static void card(volatile uint8_t *frame, const browser_carousel_item *item,
 static void reload_theme(unsigned theme) {
   font_set_style(menu_font);
   const t_theme_colors colors=menu_theme_colors(theme,menu_accent);
+  PALETTE[246]=menu_topbar?menu_theme_colors(theme,menu_topbar).hi_color:themes[THEME_DSSMM_LIGHT].fg_color;
+  PALETTE[247]=menu_topbar?0x7fff:0;
   PALETTE[0]=colors.bg_color;PALETTE[1]=colors.ft_color;
   PALETTE[2]=colors.hi_color;PALETTE[3]=colors.fg_color;
   PALETTE[16]=colors.fg_color;PALETTE[17]=colors.bg_color;PALETTE[18]=colors.ft_color;PALETTE[19]=colors.hi_color;
