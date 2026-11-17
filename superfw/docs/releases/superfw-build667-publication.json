@@ -34,5 +34,11 @@
   "integration_ci": 44085053018,
   "integration_pr": "https://github.com/voluptuary/dssmm/pull/12",
   "retention": "No older SuperFW release pages exist; BLUE/OMEGA each retain their newest prerelease. Tags and stable DE history unchanged.",
-  "hardware_limits": "Only Chis has owner hardware tests; new667 hardware timing and SD/Lite unqualified."
+  "hardware_limits": "Only Chis has owner hardware tests; new667 hardware timing and SD/Lite unqualified.",
+  "editorial_update": {
+    "reason": "Owner first normal release: upstream-relative additions/fixes only; no development regressions; known issues, hardware limits, SD setup and requested credits",
+    "before": "superfw-build667-before-note-rewrite.json",
+    "body_sha256": "b1bda0ada8bbb17a2edb3c6c86dd21eb155a9abad5ef23b9b8b49397fa24ec86",
+    "metadata_assets_unchanged": true
+  }
 }
