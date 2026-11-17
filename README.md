@@ -51,7 +51,7 @@ DSSMM SuperFW is a developing DS Style menu port for SuperCard-family flashcards
 [David Guillen Fandos’s SuperFW](https://github.com/davidgfnet/superfw). It adds
 Light/Dark themes, accents, horizontal/vertical artwork carousels, an optional
 DSSMM font, and a Start screen with last-played artwork and a configurable clock.
-Settings are grouped and saved when changed or when leaving a menu, using
+Settings are grouped and saved when leaving a menu, using
 `SYSTEM/SETTINGS.TXT`. Chis GBA launch screens let you switch between loading
 and writing to NOR with the D-pad; writes and replacing existing games require
 confirmation. Chis-only hardware features,

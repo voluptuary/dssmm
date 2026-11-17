@@ -3250,3 +3250,8 @@ Added shared CI/devcontainer dependencies for the retained native SuperFW mGBA
 settings fixture, including explicitxauth. Recovery docs cover actual linked ARM,
 real FatFs, virtual SRAM SD and second-process persistence checks. Project ABI
 fix/harness remains onSuperFW pending fullgates/PR; no foreignkernel changes.
+
+MergedPR9 with all4/nativeARM/mGBACI success; retainedfixture now ondefaultbranch.
+647 hardware-test validatedlocally/all3; Test6withdrawalretained. Sharedtestdeps
+updatedseparately, otherkernelinputsunchanged. RootREADME save-on-exit corrected;
+normalfive-lane sync/remoteverification follows, then projectvisual/parity work.

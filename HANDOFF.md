@@ -2159,3 +2159,14 @@ at a55f4a7, awaiting fullall3/PR integration. Root CI/devcontainer explicitly ad
 mGBA/Xvfb/xauth/xdotool dependencies; no permission expansion/packagepatch/BIOS.
 Project fixture sources/docs must merge through a hardware-confined PR; source
 flags stay private to SuperFW. Test6 remains withdrawn, rootdownloadswarnaccordingly.
+
+Settings correction PR9 merged (b5f80d6) after all4 CI43985535980 and lane push
+43985527343 passed; hosted actualnativeARM and mGBA two persistedboots confirmed.
+Sourcefix is SuperFW-only -fno-ipa-ra/save-on-exit, no otherkernelcompilerflags or
+protocol edits. Fixture C/generator/runner/docs are now ondefault dssmm andshared
+CI/devcontainer retain requiredtools. Chis647/sourcea55f4a7 is current local
+hardware-test, full local/all3/nativeIGM/package checks passed. Test6/640 withdrawn;
+no public corrective release yet, no physical qualification claimed. README
+clarifies save-on-exit. Finish normal five-lane sync andverifyremote state; then
+project-only nativevisualscene coverage and continuedparity. Ownerlock/private
+BIOS/session scratch/fullZIP retained. See project647report andregressiondocs.
