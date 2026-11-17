@@ -2170,3 +2170,20 @@ no public corrective release yet, no physical qualification claimed. README
 clarifies save-on-exit. Finish normal five-lane sync andverifyremote state; then
 project-only nativevisualscene coverage and continuedparity. Ownerlock/private
 BIOS/session scratch/fullZIP retained. See project647report andregressiondocs.
+
+
+2026-11-17 — SuperFW Build667 normal release published at tag `superfw-build667`,
+source a7259a83, after full all3/nativeIGM/ARM/mGBA18 and all4 PR12 checks passed.
+PR12 merged b7d91488; permanent native fixture remains on the default repository.
+Four downloaded assets and canonical notes match, including full folder-art.zip.
+Only Chis has owner hardware tests; new667 timing/gameplay and SD/Lite remain
+unqualified. Settings use cooperative verified steps, independent header color
+and aligned clocks. GG/SMS Exit, PCE and full DE parity remain open. Project report:
+superfw/docs/releases/superfw-build667-publication.json. Owner requested normal
+release, not prerelease; DE v8.4.0 remains latest. No old SuperFW pages existed to
+prune; BLUE/OMEGA each retain one prerelease, all tags/stable DE history preserved.
+Updated user README and refreshed only SuperFW's validated input baseline.
+Normal merge/sync follows this publication checkpoint; no other kernel inputs
+changed. Chis667 is current ignored hardware-test image; owner lock/private BIOS,
+session scratch and full artwork archive are retained. Project journals govern
+further single-project work; recover RAM headroom before substantial additions.

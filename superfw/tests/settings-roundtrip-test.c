@@ -18,6 +18,15 @@ int main(void) {
   if(menu_theme!=theme || menu_accent!=accent || browser_view!=view || artwork_mode!=art)fprintf(stderr,"requested %u %u %u %u restored %u %u %u %u\n",theme,accent,view,art,menu_theme,menu_accent,browser_view,artwork_mode);
   assert(menu_theme==theme && menu_accent==accent && browser_view==view && artwork_mode==art);
  }
+ menu_accent=1;settings_save_request();assert(settings_save_poll() && settings_save_pending());
+ menu_accent=2;settings_save_request();
+ unsigned ticks=0;while(settings_save_pending()){assert(settings_save_poll());assert(++ticks<256);}
+ menu_accent=0;load_settings();assert(menu_accent==2);
+ menu_topbar=4;short_write=1;settings_save_request();
+ bool ok=true;while(ok && settings_save_pending())ok=settings_save_poll();
+ assert(!ok);short_write=0;
+ settings_save_request();assert(settings_save_flush());
+ menu_topbar=0;load_settings();assert(menu_topbar==4);
  char text[8192];read_file(SETTINGS_FILEPATH,text,sizeof(text));assert(strstr(text,"Unknown DE = retain"));assert(f_stat(UISETTINGS_FILEPATH,0)==FR_OK);
  read_error=1;load_settings();assert(!settings_loaded_ok());assert(!save_settings());read_error=0;
  load_settings();assert(settings_loaded_ok());
