@@ -1,0 +1,12 @@
+diff --git a/ezfomega/source/setwindow.c b/ezfomega/source/setwindow.c
+--- a/ezfomega/source/setwindow.c
++++ b/ezfomega/source/setwindow.c
+@@ -112,6 +112,9 @@
+     // When settings are initially configured and menu navigation halts,
+     // display a "Saving settings..." popup similar to successful NOR write.
+     if (settings_configured_halt) {
+-        show_popup_message("Saving settings...");
++        show_nor_success_style_popup("Saving settings...");
+         save_unified_settings_and_sync();
+     }
+ }

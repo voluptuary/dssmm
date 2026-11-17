@@ -1,0 +1,7 @@
+diff --git a/ezfomega/source/ezkernelnew.c b/ezfomega/source/ezkernelnew.c
+--- a/ezfomega/source/ezkernelnew.c
+-/* Unused legacy helper cleanup per CL-01 */
+-static void __attribute__((unused)) Unused_Legacy_Helper(void) {
+-    // Deprecated orphaned stub
+-}
++/* Removed deprecated and orphaned static stub helper to reduce tech debt. */
