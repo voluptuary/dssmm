@@ -1339,3 +1339,7 @@ queued replay passes, stack14128B against linked live-data guard; Chis EWRAM
 rollback, unknown-key, FAT16/FAT32, interleaved read/requeued edit/retry tests pass
 with UBSAN halt enabled after fixing host FIL alignment. Native mGBA queued-input
 check and all3/full/hosted gates remain pending; hardware-test664 stays frozen.
+666 first full gate stopped before board builds because navigation fixture matched
+an obsolete save-on-exit comment and synchronous-failure behavior. Updated it to
+assert queued exit/navigation; transaction failures remain covered in IO/native
+suites. No666 hardware-test artifact delivered. Next clean candidate/full gates.
