@@ -15,7 +15,7 @@ for boot in 1 2; do
   trap finish EXIT
   sleep 6
   if [ "$3" = 2 ]; then
-    for n in 1 2 3 4 5 6 7; do
+    for n in 1 2 3 4 5 6 7 8; do
       xdotool keydown Down
       sleep 0.1
       xdotool keyup Down
@@ -33,7 +33,7 @@ from png_reader import read_rgb_png
 screens=sorted(out.glob('native-settings-*.png'),key=lambda p:p.stat().st_mtime);assert screens,'mGBA screenshot missing'
 path=screens[-1];w,h,rows=read_rgb_png(path);assert(w,h)==(240,160)
 start=232 if sys.argv[3]=='1' else 224
-assert all(tuple(rows[y][x*3:x*3+3])==(0,255,0) for y in range(1,7) for x in range(start,240)), 'Native settings save/boot validation did not reach success marker'
+assert all(tuple(rows[y][x*3:x*3+3])==((0,255,0) if x%2==0 else (0,0,255)) for y in range(1,7) for x in range(start,240)), 'Native settings save/boot validation did not reach success marker'
 (out/('boot-'+sys.argv[3]+'.png')).write_bytes(path.read_bytes())
 if sys.argv[3]=='2':
  import struct

@@ -43,11 +43,15 @@ def call(name,*args):
  return u.reg_read(UC_ARM_REG_R0)
 call('load_settings')
 save=next(name for name in syms if name.startswith('save_settings'))
-keys=['menu_theme','menu_accent','browser_view','artwork_mode']
+keys=['menu_theme','menu_accent','browser_view','artwork_mode','menu_clock_24']
 # Later saves exercise canonical-value preservation with a loaded baseline.
-for values in [(7,3,2,2),(6,4,1,1),(7,1,0,0),(3,0,0,2)]:
+for values in [(7,3,2,2,0),(6,4,1,1,1),(7,1,0,0,0),(3,0,0,2,1)]:
  for key,value in zip(keys,values):u.mem_write(syms[key],bytes([value]))
+ before=len(accesses)
  assert call(save)==1
+ assert len(accesses)>before,'Changed preferences were not written'
+ unchanged=len(accesses)
+ assert call(save)==1 and len(accesses)==unchanged,'Unchanged exit rewrote SD settings'
  for key in keys:u.mem_write(syms[key],b'\0')
  call('load_settings')
  for key,value in zip(keys,values):

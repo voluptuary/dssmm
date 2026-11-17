@@ -178,8 +178,22 @@ static bool settings_owned(const char *key) {
   for(unsigned i=0;i<sizeof(native_keys)/sizeof(*native_keys);++i)if(!strcmp(key,native_keys[i]))return true;
   return false;
 }
+/* Compare persisted values, excluding passive software-clock advancement. */
+static uint32_t saved_signature;
+static bool saved_signature_valid;
+static uint32_t settings_signature(void) {
+  const uint32_t values[]={menu_theme,menu_accent,menu_font,artwork_mode,thumbnail_preference,browser_view,
+    lang_id,recent_menu,anim_speed,hide_hidden,hide_system_files,clean_list,menu_clock_24,menu_clock_seed,
+    hotkey_combo,boot_bios_splash,backup_sram_default,enable_cheats,use_slowld,use_fastew,use_verify_nor,
+    patcher_default,ingamemenu_default,rtcpatch_default,rtcspeed_default,autoload_default,autosave_default,
+    autosave_prefer_ds,rtcvalue_default};
+  uint32_t hash=2166136261u;
+  for(unsigned i=0;i<sizeof(values)/sizeof(*values);++i)hash=(hash^values[i])*16777619u;
+  return hash;
+}
 bool save_settings(void) {
   if (!settings_read_ok) return false;
+  if(saved_signature_valid && saved_signature==settings_signature())return true;
   menu_clock_seed=launcher_clock_get();
   const char * const colors[]={"Pale Blue","Blue","Green","Orange","Purple"};
   const char * const views[]={"List","Horizontal","Vertical","List + art"};
@@ -205,7 +219,9 @@ bool save_settings(void) {
     hotkey_combo,boot_bios_splash,backup_sram_default,enable_cheats,use_slowld,use_fastew,use_verify_nor,
     (unsigned)patcher_default,ingamemenu_default,rtcpatch_default,rtcspeed_default,autoload_default,autosave_default,autosave_prefer_ds,(unsigned long)rtcvalue_default);
   if(n<0 || (unsigned)n>=sizeof(extra))return false;
-  return settings_write_text(common,extra,settings_owned);
+  bool ok=settings_write_text(common,extra,settings_owned);
+  if(ok){saved_signature=settings_signature();saved_signature_valid=true;}
+  return ok;
 }
 
 static void parse_settings(void *usr, const char *var, const char *value) {
@@ -349,6 +365,7 @@ static void read_setting(const char *key,const char *value) {
 }
 
 void load_settings(void) {
+  saved_signature_valid=false;
   ui_settings_version=0;
   bool exists;artwork_disabled=false;shared_seen=false;shared_view=-1;memset(shared_values,0,sizeof(shared_values));
   settings_read_ok=settings_read_text(SETTINGS_FILEPATH,read_setting,&exists);
@@ -357,6 +374,7 @@ void load_settings(void) {
   if(artwork_disabled)artwork_mode=0;
   if(shared_seen)ui_settings_version=UI_SETTINGS_VERSION;else migrate_ui_settings();
   for(unsigned i=0;i<SharedCount;++i)shared_values[i].baseline=shared_current(i);
+  if(settings_read_ok && exists){saved_signature=settings_signature();saved_signature_valid=true;}
   menu_username[0]=0;FIL fd;UINT size;char name[64];
   if(f_open(&fd,"/SYSTEM/NAME.TXT",FA_READ)==FR_OK || f_open(&fd,"/SYSTEM/NAME",FA_READ)==FR_OK) {
     FRESULT read=f_read(&fd,name,sizeof(name),&size),closed=f_close(&fd);

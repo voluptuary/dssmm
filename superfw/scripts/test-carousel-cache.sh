@@ -31,6 +31,7 @@ preamble=r'''
 #define FT_COLOR 18
 #define HI_COLOR 19
 #define SCREEN_WIDTH 240
+#define font_width(text) (strlen(text)*6)
 #define THEME_DSSMM_LIGHT 6
 #define THEME_DSSMM_DARK 7
 static unsigned menu_theme,clean_list;

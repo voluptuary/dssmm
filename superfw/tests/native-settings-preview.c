@@ -4,6 +4,7 @@
 #include "native-settings-image.h"
 #include "config.h"
 #include "flash_mgr.h"
+#include "res/dssmm-panel.h"
 #define REG16(a) (*(volatile uint16_t *)(a))
 #define VAR8(a) (*(volatile uint8_t *)(a))
 #define VAR32(a) (*(volatile uint32_t *)(a))
@@ -62,7 +63,7 @@ static const t_flash_game_entry sample_nor = {
 static void visual_scene(void) {
   if (!TEST_SCENE)return;
   if (TEST_SCENE==9) {
-    select_option(8);VAR32(NATIVE_smenu+OFFSET_uiset_seloff)=0;
+    select_option(8);VAR32(NATIVE_smenu+OFFSET_uiset_seloff)=TEST_FONT?0:2;
     VAR8(NATIVE_menu_accent)=3;
     ((void(*)(unsigned))(NATIVE_reload_theme|1u))(VAR8(NATIVE_menu_theme));
     return;
@@ -98,6 +99,21 @@ static void visual_scene(void) {
     }
   }
 }
+static uint16_t panel_pair(uint8_t packed) {
+  return (packed&15)|((packed>>4)<<8);
+}
+static bool frame_intact(void) {
+  if (!TEST_SCENE || TEST_SCENE==9)return true;
+  volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));
+  for(unsigned y=21;y<152;y++) {
+    const uint8_t *p=dssmm_panel_profile[0][y-21];
+    if(back[y*120+1]!=panel_pair(p[0]) || back[y*120+117]!=panel_pair(p[2]) ||
+       back[y*120+118]!=panel_pair(p[3]))return false;
+    if(y<23 || y>=149)for(unsigned x=2;x<117;x++)
+      if(back[y*120+x]!=(p[1]|(p[1]<<8)))return false;
+  }
+  return true;
+}
 static void wait_frame(void) {
   while(REG16(0x04000006)>=160){}
   while(REG16(0x04000006)<160){}
@@ -119,7 +135,7 @@ int main(void) {
     key(2); /* Real menu exit invokes the real settings save transaction. */
     ok=restored();bootstrap();ok=ok&&restored();
   } else ok=restored();
-  VAR8(NATIVE_menu_font)=1;select_option(2);
+  VAR8(NATIVE_menu_font)=TEST_FONT;select_option(2);
   ((void(*)(unsigned))(NATIVE_reload_theme|1u))(VAR8(NATIVE_menu_theme));
   visual_scene();
   unsigned previous=0;
@@ -129,13 +145,15 @@ int main(void) {
     VAR32(NATIVE_frame_count)++;
     if(TEST_SCENE) {
       REG16(0x050001d6)=0x7c1f; /* Detect stale artwork behind native modal panels. */
-      volatile uint16_t *back=(volatile uint16_t *)(0x06000000+((REG16(0x04000000)&16)?0:0xa000));
+      volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));
       for(unsigned n=16*120;n<160*120;n++)back[n]=0xebeb;
     }
     ((void(*)(unsigned))(NATIVE_menu_render|1u))(1);
+    ok=ok&&frame_intact();
     wait_frame();((void(*)(void))(NATIVE_menu_flip|1u))();
     REG16(0x050001de)=ok?0x03e0:0x001f;
+    REG16(0x050001f0)=ok?0x7c00:0x001f;
     volatile uint16_t *front=(volatile uint16_t *)(0x06000000+((REG16(0x04000000)&16)?0xa000:0));
-    for(unsigned y=1;y<7;y++)for(unsigned x=second?112:116;x<120;x++)front[y*120+x]=0xefef;
+    for(unsigned y=1;y<7;y++)for(unsigned x=second?112:116;x<120;x++)front[y*120+x]=0xf8ef;
   }
 }
