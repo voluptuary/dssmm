@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "native-settings-image.h"
+#include "config.h"
+#include "flash_mgr.h"
 #define REG16(a) (*(volatile uint16_t *)(a))
 #define VAR8(a) (*(volatile uint8_t *)(a))
 #define VAR32(a) (*(volatile uint32_t *)(a))
@@ -53,6 +55,49 @@ static bool restored(void) {
   return VAR8(NATIVE_menu_theme)==6 && VAR8(NATIVE_menu_accent)==2 &&
          VAR8(NATIVE_browser_view)==1 && VAR8(NATIVE_artwork_mode)==2;
 }
+static const t_flash_game_entry sample_nor = {
+  .gamecode=0x54534554,.gattrs=7,
+  .game_name="/Game Boy Advance/P/Native menu test ROM (USA).gba"
+};
+static void visual_scene(void) {
+  if (!TEST_SCENE)return;
+  if (TEST_SCENE==9) {
+    select_option(8);VAR32(NATIVE_smenu+OFFSET_uiset_seloff)=0;
+    VAR8(NATIVE_menu_accent)=3;
+    ((void(*)(unsigned))(NATIVE_reload_theme|1u))(VAR8(NATIVE_menu_theme));
+    return;
+  }
+  if (TEST_SCENE==1) {
+    VAR8(NATIVE_smenu+OFFSET_menu_tab)=TEST_UI_TAB+2;
+    VAR32(NATIVE_smenu+OFFSET_smenu_info_selector)=0;
+  } else if(TEST_SCENE==2) {
+    VAR8(NATIVE_smenu+OFFSET_menu_tab)=TEST_UI_TAB+1;
+    VAR32(NATIVE_smenu+OFFSET_smenu_tools_selector)=TEST_UI_TAB==4?5:4;
+  } else if(TEST_SCENE==6) {
+    VAR8(NATIVE_smenu+OFFSET_menu_tab)=TEST_UI_TAB+1;
+    VAR32(NATIVE_spop+OFFSET_spop_qpop_message)=(uintptr_t)"Erase existing NOR games?";
+    VAR32(NATIVE_spop+OFFSET_spop_qpop_default_button)=(uintptr_t)"No";
+    VAR32(NATIVE_spop+OFFSET_spop_qpop_confirm_button)=(uintptr_t)"Yes";
+  } else {
+    VAR8(NATIVE_smenu+OFFSET_menu_tab)=1;
+    VAR8(NATIVE_browser_view)=1;
+    if(TEST_SCENE==4 && TEST_UI_TAB==4) {
+      VAR8(NATIVE_spop+OFFSET_spop_pop_num)=6;
+      VAR32(NATIVE_spop+OFFSET_spop_p_norld_e)=(uintptr_t)&sample_nor;
+    } else if(TEST_SCENE==5) {
+      VAR8(NATIVE_spop+OFFSET_spop_pop_num)=3;
+      VAR8(NATIVE_spop+OFFSET_spop_p_update_issfw)=1;
+      VAR32(NATIVE_spop+OFFSET_spop_p_update_superfw_ver)=22;
+    } else {
+      VAR8(NATIVE_spop+OFFSET_spop_pop_num)=1;
+      const char *name="/Game Boy Advance/P/Native menu test ROM (USA).gba";
+      volatile uint8_t *out=(volatile uint8_t *)(NATIVE_spop+OFFSET_spop_p_load_i_romfn);
+      for(unsigned i=0;;i++){out[i]=name[i];if(!name[i])break;}
+      VAR32(NATIVE_spop+OFFSET_spop_p_load_i_gcode)=0x54534554;
+      if(TEST_SCENE>=7)VAR8(NATIVE_spop+OFFSET_spop_submenu)=TEST_SCENE-6;
+    }
+  }
+}
 static void wait_frame(void) {
   while(REG16(0x04000006)>=160){}
   while(REG16(0x04000006)<160){}
@@ -76,11 +121,17 @@ int main(void) {
   } else ok=restored();
   VAR8(NATIVE_menu_font)=1;select_option(2);
   ((void(*)(unsigned))(NATIVE_reload_theme|1u))(VAR8(NATIVE_menu_theme));
+  visual_scene();
   unsigned previous=0;
   for(;;) {
     unsigned held=(~REG16(0x04000130))&0x3ff,pressed=held&~previous;previous=held;
-    if(pressed)key(pressed);
+    if(!TEST_SCENE && pressed)key(pressed & (16|32|64|128|2));
     VAR32(NATIVE_frame_count)++;
+    if(TEST_SCENE) {
+      REG16(0x050001d6)=0x7c1f; /* Detect stale artwork behind native modal panels. */
+      volatile uint16_t *back=(volatile uint16_t *)(0x06000000+((REG16(0x04000000)&16)?0:0xa000));
+      for(unsigned n=16*120;n<160*120;n++)back[n]=0xebeb;
+    }
     ((void(*)(unsigned))(NATIVE_menu_render|1u))(1);
     wait_frame();((void(*)(void))(NATIVE_menu_flip|1u))();
     REG16(0x050001de)=ok?0x03e0:0x001f;

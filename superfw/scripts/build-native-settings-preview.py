@@ -3,7 +3,7 @@
 from pathlib import Path
 import argparse,struct,subprocess,os,json,re
 root=Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(10),default=0);a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
 elf=a.elf.read_bytes();nm=subprocess.check_output(['arm-none-eabi-nm',str(a.elf)],text=True)
 syms={r.split()[-1]:int(r.split()[0],16) for r in nm.splitlines() if len(r.split())==3}
 text='#include <stdint.h>\n'
@@ -23,23 +23,56 @@ for i in range(count):
 text+='static const struct {uint32_t address,filesz,memsz;const uint8_t *source;} native_segments[]={\n'
 for address,filesz,memsz,source in segments:text+=f'{{0x{address:x},{filesz},{memsz},{source}}},\n'
 text+='};\n'
-for name in ['FatFs','sdfs','load_settings','f_mkdir','f_stat','sdcard_read_blocks','sdcard_write_blocks','menu_keypress','menu_render','menu_flip','reload_theme','smenu','menu_theme','menu_accent','browser_view','artwork_mode','menu_font','frame_count']:
+for name in ['FatFs','sdfs','load_settings','f_mkdir','f_stat','sdcard_read_blocks','sdcard_write_blocks','menu_keypress','menu_render','menu_flip','reload_theme','smenu','spop','menu_theme','menu_accent','browser_view','artwork_mode','menu_font','frame_count']:
  text+='#define NATIVE_'+name+f' 0x{syms[name]:08x}u\n'
 # Struct offsets are queried from the actual ELF, never from a host ABI.
-fields=['menu_tab','uiset.selector','uiset.seloff']
-cmd=['arm-none-eabi-gdb','-batch','-ex','file '+str(a.elf)]
-for f in fields:cmd+=['-ex','p (char*)&smenu.'+f+'-(char*)&smenu']
-values=re.findall(r'\$\d+ = (\d+)',subprocess.check_output(cmd,text=True));assert len(values)==3
-for f,v in zip(fields,values):text+='#define OFFSET_'+f.replace('.','_')+' '+v+'\n'
+fields=[('smenu',f) for f in ['menu_tab','uiset.selector','uiset.seloff','tools.selector','info.selector']]
+fields += [('spop',f) for f in ['pop_num','submenu','selector','qpop.message','qpop.default_button','qpop.confirm_button','p.load.i.romfn','p.load.i.gcode','p.norld.e','p.update.issfw','p.update.superfw_ver']]
+def debug_layout(expression):
+ # ptype reads DWARF types even when optimizer location lists cannot materialize
+ # an object's address. This GDB build intentionally has no Python interpreter.
+ output=subprocess.check_output(['arm-none-eabi-gdb','-batch','-ex','file '+str(a.elf),'-ex','ptype /o '+expression],text=True)
+ stack=[];tree=None
+ for line in output.splitlines():
+  offset=re.search(r'/\*\s*(\d+)\s*\|',line)
+  if 'struct {' in line or 'union {' in line:
+   stack.append({'offset':int(offset[1]) if offset else (stack[-1]['offset'] if stack else 0),'children':{}})
+  elif '}' in line and stack:
+   node=stack.pop();name=re.search(r'}\s*(\w+)',line)
+   if name and stack:stack[-1]['children'][name[1]]=node
+   else:tree=node
+  elif offset and stack:
+   name=re.search(r'([A-Za-z_]\w*)(?:\[[^]]+\])?\s*;',line)
+   if name:stack[-1]['children'][name[1]]={'offset':int(offset[1]),'children':{}}
+ assert tree is not None,expression
+ result={}
+ def visit(node,prefix):
+  for name,child in node['children'].items():
+   key=prefix+name;result[key]=child['offset'];visit(child,key+'.')
+ visit(tree,'');return result
+layouts={}
+def field_offset(obj,path):
+ expression=obj;remaining=path;base=0
+ while True:
+  if expression not in layouts:layouts[expression]=debug_layout(expression)
+  table=layouts[expression]
+  if remaining in table:return base+table[remaining]
+  prefixes=[key for key in table if remaining.startswith(key+'.')]
+  assert prefixes,(expression,remaining)
+  prefix=max(prefixes,key=len);base+=table[prefix];expression+='.'+prefix;remaining=remaining[len(prefix)+1:]
+for obj,f in fields:text+='#define OFFSET_'+obj+'_'+f.replace('.','_')+' '+str(field_offset(obj,f))+'\n'
+# Preserve existing concise Interface field names for the persistence fixture.
+for f in ['menu_tab','uiset_selector','uiset_seloff']:text+='#define OFFSET_'+f+' OFFSET_smenu_'+f+'\n'
+text+='#define TEST_SCENE '+str(a.scene)+'\n'
 text+='#define TEST_UI_TAB '+('4' if 'keypress_menu_norbrowse' in syms else '3')+'\n'
 (a.out/'native-settings-image.h').write_text(text)
 objects=[str(x) for x in a.out.glob('native-segment-*.o')]
-subprocess.run(['arm-none-eabi-gcc','-Os','-fno-ipa-ra','-fno-builtin','-Wall','-Wextra','-Werror','-mthumb','-mcpu=arm7tdmi','-I',str(a.out),'-specs=gba.specs',str(root/'tests/native-settings-preview.c'),*objects,'-o',str(a.out/'native-settings.elf')],check=True)
+subprocess.run(['arm-none-eabi-gcc','-Os','-fno-ipa-ra','-fno-builtin','-Wall','-Wextra','-Werror','-mthumb','-mcpu=arm7tdmi','-I',str(a.out),'-I',str(root/'src'),'-specs=gba.specs',str(root/'tests/native-settings-preview.c'),*objects,'-o',str(a.out/'native-settings.elf')],check=True)
 subprocess.run(['arm-none-eabi-objcopy','-O','binary',str(a.out/'native-settings.elf'),str(a.out/'native-settings.gba')],check=True)
 rom=bytearray((a.out/'native-settings.gba').read_bytes());assert len(rom)<0xe80000
 rom+=b'\xff'*(0xe80000-len(rom));font=(root/('res/fonts-ext-dssmm.pack' if 'keypress_menu_norbrowse' in syms else 'res/fonts-dssmm.pack')).read_bytes();rom+=font
 # Standard GBA header complement; commercial BIOS is not needed for the harness.
 rom[0xb2]=0x96;rom[0xbd]=(-sum(rom[0xa0:0xbd])-0x19)&255
 (a.out/'native-settings.gba').write_bytes(rom)
-(a.out/'fixture.json').write_text(json.dumps({'native_elf':str(a.elf),'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
+(a.out/'fixture.json').write_text(json.dumps({'native_elf':str(a.elf),'nor_supported':'keypress_menu_norbrowse' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
 print(a.out/'native-settings.gba')
