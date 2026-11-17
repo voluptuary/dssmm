@@ -47,6 +47,15 @@
     "Compiler control without -fno-ipa-ra reproduced the invalid settings string pointer; corrected build passed",
     "All3 source/build/hash/header/seal/size checks passed"
   ],
-  "hosted_status": "Initial source push failed only at new mGBA fixture due missing xvfb-run in old workflow; shared dependencies fixed on dssmm; PR checks pending.",
-  "limitations": "mGBA virtual SD is not physical SD/NOR or actual card powercycle validation. Build640/Test6 withdrawn; no public corrective release yet."
+  "hosted_status": "Initial source push lacked xvfb-run; dependency update was integrated separately. Corrective PR9 passed all4 kernels and native mGBA fixtures.",
+  "limitations": "mGBA virtual SD is not physical SD/NOR or actual card powercycle validation. Build640/Test6 withdrawn; no public corrective release yet.",
+  "corrective_pr": {
+    "url": "https://github.com/voluptuary/dssmm/pull/9",
+    "head": "ceef1d139bb40a955f7fdbb474871cd3d776d9bf",
+    "run": 43985535980,
+    "conclusion": "success",
+    "source_push_after_shared_dependency_sync": 43985527343,
+    "source_push_conclusion": "success",
+    "candidate_kernel_inputs": "unchanged from a55f4a77; later commits add test/validation/shared environment evidence"
+  }
 }

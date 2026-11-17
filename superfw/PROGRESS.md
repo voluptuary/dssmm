@@ -785,3 +785,8 @@ candidate next, no physical qualification claimed.
 passed. Chis647 delivered hardware-test;640 withdrawn. Native GCC control fails,
 workaroundpasses. Hosted firstpush missingXvfb only; sharedCI deps fixed770f783.
 Next hardware PR/checks/mergecommit/all5sync, preserve fixtures andprivatefiles.
+
+PR9 mergecommit integrated correction/fixture after all4CI43985535980 + push
+43985527343 passed. Hosted nativeARM/mGBAtwobootproofconfirmed. Isolation5/merge3
+androotpolicy pass; no otherkernel source edits. Chis647current; Test6withdrawn.
+Next normalrootmilestone/branchsync and continued nativevisual/porting checks.
