@@ -790,3 +790,15 @@ PR9 mergecommit integrated correction/fixture after all4CI43985535980 + push
 43985527343 passed. Hosted nativeARM/mGBAtwobootproofconfirmed. Isolation5/merge3
 androotpolicy pass; no otherkernel source edits. Chis647current; Test6withdrawn.
 Next normalrootmilestone/branchsync and continued nativevisual/porting checks.
+
+Native mGBA9-screen visual matrix now catches stale-art and frame-overlap pixels.
+Found/fixed popuphelp lower descenders(4pixels) and Orangebottom-rowg(2pixels);
+all9dirtyELFscenes pass. Expandedfixture/DWARFtype offsets committednext; full
+all3 gates stillpending. 647current/frozen, no newdirtycandidate delivered.
+
+657 clean full/all3/nativeIGM/ARM andmGBA2boots+9visualscenes passed; hosted
+43989337269success, packet/budgetcheckspass. Chis657deliveredhardware-test,647report
+retained. Next visualslicePR/checks/normalintegration/sync; Test6withdrawn.
+
+PR10 merged after all4CI43990263281 pass. Native9-scene regression retainedmain;
+657currenthardware-test. Normaldoccheckpoint/all5sync next, then porting.
