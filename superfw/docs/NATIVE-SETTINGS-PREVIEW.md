@@ -43,3 +43,26 @@ focused menu/artwork/geometry scenes. Use mGBA screenshots and frame-bound check
 for UI milestones so clipping and stale carousel backgrounds cannot be accepted
 from static source review alone. Physical SD/NOR, saves/gameplay and real card
 power cycles still require hardware testing.
+
+
+## Native visual matrix
+
+Run `bash superfw/scripts/test-native-menu-visuals-mgba.sh` after the linked ELF
+is available. The verifier runs it after the two-boot persistence check. Scenes
+cover Help, System, GBA launch, Chis NOR launch, firmware update, erase confirmation,
+loading options, patching options and a bottom-row Orange accent with descenders.
+NOR scenes are omitted on unsupported boards. Generated `visual-1.png` through
+`visual-9.png` are reviewable artifacts, not tracked assets.
+
+Each scene seeds magenta pixels in the back page before calling the actual native
+renderer. Assertions require the old artwork to be completely cleared and compare
+the frame's edges/bevel to the original source pixels. Seeding only the back page
+is essential: overwriting the displayed front page would create a fixture artifact.
+The matrix found popup help descenders crossing the lower bevel and the Orange
+accent's last-row descender touching it; DS baselines now keep both inside.
+
+Additional fields are read from `ptype /o` DWARF layouts, including optimized
+objects that GDB cannot materialize as live addresses; GDB Python is not required.
+Visual scenes are read-only. Interactive Interface testing accepts directional
+keys and B only, preventing fixture navigation into destructive tools. No physical
+flash commands are issued by the automated tests. Never run fixture ROMs on cards.

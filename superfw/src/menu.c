@@ -1893,6 +1893,15 @@ static void render_gba_action(volatile uint8_t *frame, const char *label, bool s
   }
 }
 
+static void render_gba_help(volatile uint8_t *frame, const char *text) {
+  if (!text)return;
+  unsigned y=menu_theme>=THEME_DSSMM_LIGHT?135:137;
+  if (font_width(text)>SCREEN_WIDTH-20)
+    draw_text_ovf_rotate(text,frame,10,y,SCREEN_WIDTH-20,&spop.anim);
+  else
+    draw_central_text_ovf(text,frame,SCREEN_WIDTH/2,y,SCREEN_WIDTH-20);
+}
+
 void render_gba_load_popup(volatile uint8_t *frame) {
   if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
   draw_text_ovf("⯇", frame, 10, 23, 64);
@@ -1920,13 +1929,7 @@ void render_gba_load_popup(volatile uint8_t *frame) {
   };
 
   // Show some help if necessary
-  if (ht) {
-    unsigned twidth = font_width(ht);
-    if (twidth > SCREEN_WIDTH - 20)
-      draw_text_ovf_rotate(ht, frame, 10, 137, SCREEN_WIDTH - 20, &spop.anim);
-    else
-      draw_central_text_ovf(ht, frame, SCREEN_WIDTH/2, 137, SCREEN_WIDTH - 20);
-  }
+  render_gba_help(frame,ht);
 
   if (spop.submenu != GbaLoadPopInfo) {
     const unsigned offy = 43;
@@ -1978,13 +1981,7 @@ void render_gba_norwrite(volatile uint8_t *frame) {
     draw_central_text(msgs[lang_id][MSG_NOR_WRITE], frame, 120, 134);
   } else {
     const char *ht = render_gbarom_patching(frame, &spop.p.norwr.i, spop.selector);
-    if (ht) {
-      unsigned twidth = font_width(ht);
-      if (twidth > SCREEN_WIDTH - 20)
-        draw_text_ovf_rotate(ht, frame, 10, 137, SCREEN_WIDTH - 20, &spop.anim);
-      else
-        draw_central_text_ovf(ht, frame, SCREEN_WIDTH/2, 137, SCREEN_WIDTH - 20);
-    }
+    render_gba_help(frame,ht);
     const unsigned offy = 43;
     if (menu_theme < THEME_DSSMM_LIGHT)
     for (unsigned i = 8; i < 232; i += 16) {
@@ -2011,13 +2008,7 @@ void render_gba_norload(volatile uint8_t *frame) {
   } else {
     bool rtc_patching = e->gattrs & GATTR_RTC;
     const char *ht = render_gbarom_loading(frame, &spop.p.norld.l, rtc_patching, spop.selector);
-    if (ht) {
-      unsigned twidth = font_width(ht);
-      if (twidth > SCREEN_WIDTH - 20)
-        draw_text_ovf_rotate(ht, frame, 10, 137, SCREEN_WIDTH - 20, &spop.anim);
-      else
-        draw_central_text_ovf(ht, frame, SCREEN_WIDTH/2, 137, SCREEN_WIDTH - 20);
-    }
+    render_gba_help(frame,ht);
     const unsigned offy = 43;
     if (menu_theme < THEME_DSSMM_LIGHT)
     for (unsigned i = 8; i < 232; i += 16) {
@@ -2141,7 +2132,7 @@ void render_settings(volatile uint8_t *frame) {
   const unsigned maxrows = visible;
   unsigned optnum = 0, optcnt = 0;
   const unsigned value_x = ds_style?119:128;
-  const unsigned offy = ds_style?24:29;
+  const unsigned offy = ds_style?(menu_font==FONT_STYLE_DSSMM?23:24):29;
   const unsigned rowh = ds_style?(menu_font==FONT_STYLE_DSSMM?14:18):20;
   if (menu_theme >= THEME_DSSMM_LIGHT)
     draw_menu_selection(frame,offy+(position-baseopt)*rowh,112,224);
@@ -2284,7 +2275,7 @@ void render_ui_settings(volatile uint8_t *frame) {
   for (unsigned row = 0; row < rows; ++row) {
     unsigned option = smenu.uiset.seloff + row;
     if(option>UiSetMAX)break;
-    unsigned y=(ds_style?24:20)+row*line_h;
+    unsigned y=(ds_style?(menu_font==FONT_STYLE_DSSMM?23:24):20)+row*line_h;
     const char *value = "";
     switch (option) {
     case UiSetTheme: value = theme_names[menu_theme < THEME_COUNT ? menu_theme : 0]; break;
