@@ -11,7 +11,11 @@ python3 - "$root/src/menu.c" "$tmp/editor.c" <<'PY'
 from pathlib import Path
 import sys
 s=Path(sys.argv[1]).read_text()
-out='''#include <assert.h>
+out='''#include <stdio.h>
+#include <string.h>
+#define npf_snprintf snprintf
+static unsigned menu_clock_24=1;
+#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "util.h"
@@ -33,12 +37,19 @@ static struct {const char *alert_msg;struct {t_dec_date val;int selector;bool me
 static void launcher_invalidate(void){}
 static bool save_settings(void){++writes;return true;}
 '''
-for name in ('accept_menu_clock','open_menu_clock'):
+for name in ('format_menu_clock','accept_menu_clock','open_menu_clock'):
  a=s.index('static void '+name+'(');b=s.index('\n}',a)+2;out+=s[a:b]+'\n'
 a=s.index('    if (newkeys & KEY_BUTTLEFT)',s.index('  else if (spop.rtcpop.callback)',s.index('void menu_keypress(')))
 b=s.index('  }\n  else if (spop.pop_num)',a)
 out+='static void edit(unsigned newkeys) {\n'+s[a:b]+'''}
 int main(void) {
+ char text[12];
+ format_menu_clock(text,sizeof(text),0);assert(!strcmp(text,"00:00:00"));
+ menu_clock_24=0;
+ format_menu_clock(text,sizeof(text),0);assert(!strcmp(text,"12:00 AM"));
+ format_menu_clock(text,sizeof(text),43200);assert(!strcmp(text,"12:00 PM"));
+ format_menu_clock(text,sizeof(text),86340);assert(!strcmp(text,"11:59 PM"));
+ format_menu_clock(text,sizeof(text),UINT32_MAX);assert(!strcmp(text,"--:--:--"));
  launcher_clock_set(UINT32_MAX);open_menu_clock();assert(spop.rtcpop.val.hour==12 && spop.rtcpop.val.min==0);
  assert(spop.rtcpop.selector==3 && spop.rtcpop.menu_clock && spop.rtcpop.callback);
  edit(KEY_BUTTLEFT);assert(spop.rtcpop.selector==3);

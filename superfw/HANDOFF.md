@@ -1314,3 +1314,8 @@ All changes require clean all-board/local/native mGBA and hosted gates before a
 new hardware-test image or release. Owner authorizes publishing this correction,
 then normal merge-commit PR/integration and synchronization; preserve withdrawn
 Test6 tag, use a new release tag and attach the full retained folder-art archive.
+The first 663 verifier stopped before board builds: the cache unit harness needed
+its new font-width dependency. The schematic preview also needed header palette
+and declaration updates; both are corrected. Actual native two-process mGBA
+persistence passes with the two-color marker. Clock formatter tests cover midnight,
+noon, PM and unset; ARM replay now covers both clock formats and unchanged exits.

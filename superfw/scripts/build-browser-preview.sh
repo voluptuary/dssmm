@@ -17,13 +17,13 @@ import sys
 source=Path(sys.argv[1]).read_text()
 start=source.index("static void draw_text_ovf_rotate(")
 end=source.index("\n}",start)+2
-text='#include "dssmm_background.h"\n#include "res/dssmm-panel.h"\n'+"#define MAX(a,b) ((a)>(b)?(a):(b))\n#define KEY_BUTTUP 64\n#define KEY_BUTTDOWN 128\n#define MIN(a,b) ((a)<(b)?(a):(b))\n#define SCREEN_WIDTH 240\n#define FT_COLOR 18\n#define FG_COLOR 16\n#define BG_COLOR 17\n#define HI_COLOR 19\n#define SELECTED_TEXT 236\n#define TOP_BG 246\n#define TOP_TEXT 247\n#define MEM_PALETTE ((volatile uint16_t *)0x05000000)\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
+text='#define THEME_DSSMM_LIGHT 6\nstatic uint8_t menu_theme=6,artwork_mode=1,browser_view=1,recent_menu=1,anim_speed=1,hide_hidden=1,menu_accent,menu_font,clean_list,menu_clock_24=1;\n#include "dssmm_background.h"\n#include "res/dssmm-panel.h"\n'+"#define MAX(a,b) ((a)>(b)?(a):(b))\n#define KEY_BUTTUP 64\n#define KEY_BUTTDOWN 128\n#define MIN(a,b) ((a)<(b)?(a):(b))\n#define SCREEN_WIDTH 240\n#define FT_COLOR 18\n#define FG_COLOR 16\n#define BG_COLOR 17\n#define HI_COLOR 19\n#define SELECTED_TEXT 236\n#define TOP_BG 246\n#define TOP_TEXT 247\n#define MEM_PALETTE ((volatile uint16_t *)0x05000000)\n#define ANIM_INITIAL_WAIT 128\n#define THREEDOTS_WIDTH 9\n"+source[start:end]+"\n"
 for signature in ("static void draw_text_ovf_color(", "static void draw_text_ovf(", "static void draw_central_text(", "static void draw_central_text_ovf(", "static void draw_rightj_text("):
  start=source.index(signature);end=source.index("\n}",start)+2
  text+=source[start:end]+"\n"
 text+='#include "messages.h"\nstatic unsigned lang_id;\nstatic struct { unsigned anim_state; struct {unsigned selector;} info; struct {unsigned selector;} tools; struct {unsigned selector;} set; unsigned menu_tab; struct {int selector,seloff,maxentries;} recent; struct {int selector,seloff;} uiset; struct {char cpath[256];} browser; } smenu;\n#define ToolsMAX 5\nstatic void render_icon_trans(unsigned x,unsigned y,unsigned icon) {(void)x;(void)y;(void)icon;}\n'
 text+="extern void dma_memset16(volatile void *, uint16_t, uint16_t);\n#define dup8(x) ((x)|((x)<<8))\n#define npf_snprintf snprintf\n#define THEME_COUNT 8\n#define ACCENT_COUNT 5\n#define THEME_DSSMM_LIGHT 6\n#define THEME_DSSMM_DARK 7\n"
-text+="static uint8_t menu_theme=6,artwork_mode=1,browser_view=1,recent_menu=1,anim_speed=1,hide_hidden=1,menu_accent,menu_font,clean_list,menu_clock_24=1;\n"
+
 text+='static void render_dssmm_settings_background(volatile uint8_t *,const char *);\n'
 for signature in ('static unsigned settings_visible_rows(', 'static unsigned ui_visible_rows('):
  a=source.index(signature);b=source.index('\n}',a)+2
