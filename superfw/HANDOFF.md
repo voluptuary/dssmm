@@ -1234,3 +1234,14 @@ Only physical SD sector entrypoints replaced by SRAM virtual disk, rest actual
 compiled native firmware/FatFs. Original pointer failure also being recompiled as
 negative control in /tmp (not a candidate). Next commit checkpoint, full/all3/
 nativeIGM/mGBA/hosted gates, new Chis candidate then PR/sync as owner requests.
+
+Build647/sourcea55f4a77 clean full/all3/nativeIGM passes, including actual native
+ARMsettings regression all3 and native-menu mGBA two-process persistence+frame
+checks. Compiler control withoutflag faults as expected; corrected6760B stackpeak.
+Chis647+manifest/guide now hardware-test;640 artifact/manifest removed after
+history retained. Test6withdrawalJSON records owner deletion. Initial pushCI
+43984286751 builtall3/ARMchecks but failedonlymissingxvfb-run oldenvironment;
+root sharedCI/devcontainer dependency fix770f783 pushed. Next createhardware-only
+PR to dssmm, verifychecks withupdatedbase, mergecommit andnormalall5sync. Fixture
+sources alreadycommitted/pusheda55f4a7; userrequestedretention satisfiedonlane,
+mainintegration next. Rootnewcompilerinfo/docs separatedfromhardwarePR.

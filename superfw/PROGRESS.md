@@ -780,3 +780,8 @@ mGBA tests pass change/save/native reset and separate-process persisted boot.
 Fixture sources/generator/runner/recovery docs added to repository; verifier now
 includes it. Frame149 bevel protected and screenshot-checked. Full gates/PR/new
 candidate next, no physical qualification claimed.
+
+647 all3/full/nativeIGM and actual linked ARM + mGBA persisted-boot/frame checks
+passed. Chis647 delivered hardware-test;640 withdrawn. Native GCC control fails,
+workaroundpasses. Hosted firstpush missingXvfb only; sharedCI deps fixed770f783.
+Next hardware PR/checks/mergecommit/all5sync, preserve fixtures andprivatefiles.
