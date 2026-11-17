@@ -799,3 +799,6 @@ all3 gates stillpending. 647current/frozen, no newdirtycandidate delivered.
 657 clean full/all3/nativeIGM/ARM andmGBA2boots+9visualscenes passed; hosted
 43989337269success, packet/budgetcheckspass. Chis657deliveredhardware-test,647report
 retained. Next visualslicePR/checks/normalintegration/sync; Test6withdrawn.
+
+PR10 merged after all4CI43990263281 pass. Native9-scene regression retainedmain;
+657currenthardware-test. Normaldoccheckpoint/all5sync next, then porting.

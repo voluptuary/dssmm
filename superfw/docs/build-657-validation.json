@@ -51,5 +51,16 @@
     "Nine actual native menu screens passed exact source bevel/edge checks and cleared seeded stale artwork",
     "All3 source/build/hash/header/full-image seals and hardware size limits passed"
   ],
-  "limitations": "No new physical validation. Build640/Test6 withdrawn; retained Build647 settings correction plus visual baselines. Physical SD/NOR, PCE/plugin Exit and full DE parity remain open."
+  "limitations": "No new physical validation. Build640/Test6 withdrawn; retained Build647 settings correction plus visual baselines. Physical SD/NOR, PCE/plugin Exit and full DE parity remain open.",
+  "integration_pr": {
+    "url": "https://github.com/voluptuary/dssmm/pull/10",
+    "run": 43990263281,
+    "conclusion": "success",
+    "projects": [
+      "ezfomegade",
+      "ezfomega",
+      "ezfblue",
+      "superfw"
+    ]
+  }
 }
