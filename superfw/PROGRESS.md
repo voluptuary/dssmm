@@ -806,3 +806,8 @@ PR10 merged after all4CI43990263281 pass. Native9-scene regression retainedmain;
 Expandednativevisualchecks tobothfontchoices; font0had6popupdescenderoverlaps.
 Font-specific action/help/unlock baselines corrected;18scene checks inprogress.
 657stillcurrentvalidatedcandidate; no dirtybuild delivered.
+
+2026-11-17: Owner confirms Build 657 settings persistence on Chis. Implementing
+remaining 657 menu feedback, optional 12-hour display and unchanged-save avoidance.
+Expanded native regression distinguishes accent colors from completion markers and
+checks frame bounds throughout animation. Clean all-board validation pending.

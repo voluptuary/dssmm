@@ -1292,3 +1292,25 @@ Native-theme placement retained; NORactions reusecommon action renderer. Current
 
 Bothfonts/all18 native mGBA scenes nowpassed. Freezefontcoverage source andrun
 fullclean/all3/nativeIGM/persistence/matrix/CI; nextcandidateonlyafterallgates.
+
+Source19a4/Build662 hosted43993253063FAILED: font0Help scrollingunlock crosses
+rightbevelx234,y140; localsnapshot happened onspacephase andpassed. Notflakytest:
+oldwidth230 fromx5 reached234 outsideinterior. NarrowDSwidth228; nativelegacy
+widthunchanged. Newfixture checks everyrenderedframe's edges/bevel andlatches
+failure, notjustoneanimationphase screenshot. Nativeframen symbol selectsactual
+backpage forseed/check. Local662fullstillrunningmustpoll; no662candidate delivered.
+657remainsvalidatedcurrent. Freeze correctivefont source after regressionpasses.
+
+## Build 657 hardware feedback follow-up — 2026-11-17
+Owner confirms settings now persist on Chis. New work removes redundant unchanged
+settings writes while retaining verified transactions for changes; adds Interface
+Clock format (24-hour default/12-hour AM/PM), accent header contrast, centered
+horizontal captions, Gray label, six-pixel Help logo adjustment, filtered empty
+settings headings, Recents list chrome and themed GBA actions. Native mGBA success
+marker now uses two colors so green accents cannot masquerade as a passing test.
+Native ARM replay must assert unchanged exits produce no SD writes. Earlier 662
+hosted failure is addressed by bounded scrolling width and per-frame bevel checks.
+All changes require clean all-board/local/native mGBA and hosted gates before a
+new hardware-test image or release. Owner authorizes publishing this correction,
+then normal merge-commit PR/integration and synchronization; preserve withdrawn
+Test6 tag, use a new release tag and attach the full retained folder-art archive.

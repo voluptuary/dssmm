@@ -31,7 +31,7 @@ out,root=map(Path,sys.argv[1:3]);scene=int(sys.argv[3]);font=int(sys.argv[4]);sy
 from png_reader import read_rgb_png
 path=max(out.glob('native-settings-*.png'),key=lambda p:p.stat().st_mtime)
 w,h,rows=read_rgb_png(path);assert(w,h)==(240,160)
-assert all(tuple(rows[y][x*3:x*3+3])==(0,255,0) for y in range(1,7) for x in range(232,240)),'Native boot/renderer did not complete'
+assert all(tuple(rows[y][x*3:x*3+3])==((0,255,0) if x%2==0 else (0,0,255)) for y in range(1,7) for x in range(232,240)),'Native boot/renderer did not complete'
 assert not any(tuple(row[x*3:x*3+3])==(255,0,255) for row in rows[16:] for x in range(240)),'Stale carousel pixels remain behind menu'
 source=struct.unpack('<38400H',(root/'assets/backgrounds/light-settings.rgb555').read_bytes())
 points=[]
