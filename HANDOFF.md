@@ -2151,3 +2151,11 @@ SuperFW lane is investigating new immediate-save path/actual ARM stack/SD buffer
 constraints; no corrected build yet. Avoid broad porting changes until resolved.
 All5 previously synchronized7eeeada; no driver/emulator setup change. Local
 hardware-test640 withdrawn; project journals carry continuation details.
+
+Shared validation environment checkpoint: native SuperFW ARM/FatFs replay found
+the640 pointer crash (GCC16.1 Thumb1 IPA-RA preserved-register assumption vsreturn
+clobber); project fix and retained linked-firmware mGBA two-boot fixture pushed
+at a55f4a7, awaiting fullall3/PR integration. Root CI/devcontainer explicitly add
+mGBA/Xvfb/xauth/xdotool dependencies; no permission expansion/packagepatch/BIOS.
+Project fixture sources/docs must merge through a hardware-confined PR; source
+flags stay private to SuperFW. Test6 remains withdrawn, rootdownloadswarnaccordingly.

@@ -3245,3 +3245,8 @@ no physical qualification or full SuperFW DE parity claim. See project journals.
 Owner reports Build640 Interface-setting hard-freeze and deleted Test6 release.
 Public downloads withdrawn; README/journals updated without retagging/recreating
 release. Project investigation prioritized; CI/host checks were not hardwareproof.
+
+Added shared CI/devcontainer dependencies for the retained native SuperFW mGBA
+settings fixture, including explicitxauth. Recovery docs cover actual linked ARM,
+real FatFs, virtual SRAM SD and second-process persistence checks. Project ABI
+fix/harness remains onSuperFW pending fullgates/PR; no foreignkernel changes.
