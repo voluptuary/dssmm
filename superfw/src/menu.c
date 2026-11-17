@@ -1783,7 +1783,8 @@ void render_sav_menu_popup(volatile uint8_t *frame) {
 static void draw_menu_selection(volatile uint8_t *frame, unsigned y,
                                 unsigned left, unsigned right) {
   unsigned height=menu_font==FONT_STYLE_DSSMM?14:16;
-  for(unsigned row=0;row<height && y+row<160;++row)
+  unsigned bottom=menu_theme>=THEME_DSSMM_LIGHT?149:160;
+  for(unsigned row=0;row<height && y+row<bottom;++row)
     dma_memset16(frame+(y+row)*SCREEN_WIDTH+left,dup8(HI_COLOR),(right-left)/2);
 }
 
@@ -4016,10 +4017,6 @@ void menu_keypress(unsigned newkeys) {
       keypress_menu_info,
     };
     keyfns[smenu.menu_tab](newkeys);
-    if ((newkeys & (KEY_BUTTLEFT | KEY_BUTTRIGHT)) &&
-        (smenu.menu_tab == MENUTAB_UILANG || smenu.menu_tab == MENUTAB_SETTINGS) &&
-        !save_settings())
-      spop.alert_msg = msgs[lang_id][MSG_ERR_SETSAVE];
   }
 }
 

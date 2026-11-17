@@ -2143,3 +2143,30 @@ Help preview screen16 and panel/FatFs fixtures documented local-development; no
 mGBA package/flags/BIOS setup change. Finish normal five-lane sync and verifyremote
 refs. Project-only continuation: unresolved physical settings/PCE/Exit/NORcarousel/
 DE parity. Preserve privateBIOS/session scratch/fullZIP/ownerdevcontainerlock.
+
+Owner withdrew/deleted SuperFW Test6: Build640 changing Interface settings
+(Artwork/Theme/Accent/etc.) hard-freezes until powercycle. Root README removes
+invalid downloads and warns of withdrawal; preserve Test6 tag/publication history.
+SuperFW lane is investigating new immediate-save path/actual ARM stack/SD buffer
+constraints; no corrected build yet. Avoid broad porting changes until resolved.
+All5 previously synchronized7eeeada; no driver/emulator setup change. Local
+hardware-test640 withdrawn; project journals carry continuation details.
+
+Shared validation environment checkpoint: native SuperFW ARM/FatFs replay found
+the640 pointer crash (GCC16.1 Thumb1 IPA-RA preserved-register assumption vsreturn
+clobber); project fix and retained linked-firmware mGBA two-boot fixture pushed
+at a55f4a7, awaiting fullall3/PR integration. Root CI/devcontainer explicitly add
+mGBA/Xvfb/xauth/xdotool dependencies; no permission expansion/packagepatch/BIOS.
+Project fixture sources/docs must merge through a hardware-confined PR; source
+flags stay private to SuperFW. Test6 remains withdrawn, rootdownloadswarnaccordingly.
+
+Settings correction PR9 merged (b5f80d6) after all4 CI43985535980 and lane push
+43985527343 passed; hosted actualnativeARM and mGBA two persistedboots confirmed.
+Sourcefix is SuperFW-only -fno-ipa-ra/save-on-exit, no otherkernelcompilerflags or
+protocol edits. Fixture C/generator/runner/docs are now ondefault dssmm andshared
+CI/devcontainer retain requiredtools. Chis647/sourcea55f4a7 is current local
+hardware-test, full local/all3/nativeIGM/package checks passed. Test6/640 withdrawn;
+no public corrective release yet, no physical qualification claimed. README
+clarifies save-on-exit. Finish normal five-lane sync andverifyremote state; then
+project-only nativevisualscene coverage and continuedparity. Ownerlock/private
+BIOS/session scratch/fullZIP retained. See project647report andregressiondocs.
