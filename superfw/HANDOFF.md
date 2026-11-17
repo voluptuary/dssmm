@@ -1268,3 +1268,11 @@ pack perboard; sourcefixture/runner changes needcheckpoint/fullall3gates before
 newcandidate. 647remains frozenvalidatedcurrenthardware-test. Nativevisualscenes
 read-only and controlledInterfacekeys only; no agent physicalNOR operations.
 Next commit/verify/fullCI/hardware image and normalPRintegration; sourceprojectonly.
+
+657/source169b0430a1a075434b2bd0a10e968b2de3c1e994 clean full/all3/nativeIGM,
+repeatednativeARMsettings, two-bootmGBA and9nativevisualscenes pass. Hosted
+43989337269success, allpacket/size/sealchecks pass (SD520704/Lite488448/Chis1671680).
+Chis657 nowhardware-test/manifest/guide, supersedesown647 after retainedreports.
+Stillno physicalqualification orpubliccorrectiverelease. Next PR10 forvisualslice,
+currentbranchonlySuperFWchanges, all4PRchecks/mergecommit/all5sync thencontinuing
+NOR/perf/parity. Standardfixture retained onmain viaPR9; expandedscenes now onlane.
