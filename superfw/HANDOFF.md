@@ -1198,3 +1198,59 @@ metadata/assets unchanged, DEv8.4.0latest. Publication evidence projectJSON. Chi
 hardware-test remains current. Next root user docs/baseline/recovery milestone and
 normalall5sync, cleanownignoredcompiler outputs after retainedevidence; then
 continue unresolvedsettings/PCE/Exit/NORcarousel/fullparity withoutfeedbackpause.
+
+URGENT owner640 hardware regression: changing Interface Artwork/Theme/Accent etc
+hard-freezes until powercycle. Owner DELETED Test6 release. Do NOT recreate640 or
+reuse Test6 tag; retain source/history/publication evidence, mark withdrawn. Pause
+NORcarousel/otherporting and prioritize save-path crash. New immediate save after
+keypress (added640) removed locally first; original requested save-on-exit retained.
+Need actual ARM save/boot replay+stack/memory/SD-buffer alignment audit, not only
+POSIX/FatFs host tests. No corrected candidate/build yet; hardware-test640 unsafe
+and must be clearly flagged/removed from recommended test location. Root README
+withdrawal/docs update ontrunk required. Current root/SuperFW7eeeada synced all5;
+source640publication/local/host checks were green but NOT physicalqualification.
+
+Crash REPRODUCED in actual native ARM ELF+real FatFs replay (Python virtual SD,
+not physical protocols). /tmp/dssmm-settings-native-replay.py and trace log:
+save_settings.part.0 calls shared_current(SharedView), keeps views base in r1.
+GCC IPA register allocation assumes r1 preserved, but Thumb1 helper epilogue is
+pop{r1}; bx r1. Caller then indexes return-code address as views array; fifth
+common-setting snprintf receives0xbff9b3f7 and faults at npf_vpprintf%s read.
+Shared settings_owned also incorrectly relies on r1 across same helper, plausibly
+explaining older persistence failures. Native stack peak~4890B, not an overflow.
+Hostx86/FatFs tests could not catch this ABI/codegen issue. Test -fno-ipa-ra for all
+ARM firmware/payload CFLAGS, replay all3 nativeELFs; must show old fails/new passes.
+Then full compiled-menu mGBA storage fixture + key changes/powercycle persistence
+before new hardware candidate. Owner explicitly wants validated mGBA, then build,
+commit/push PR and normal all5sync throughtrunk, no cross-kernel edits. Rootwithdrawal
+58b9a7a pushed separately; Test6 tagretained. Do not recreate640 or reuseTest6 tag.
+
+-fno-ipa-ra native Chis ELF replay now passes save/reload with6760B stack peak;
+actual linked-menu mGBA fixture passes two separate emulator boots with persisted
+Theme/Accent/View/Artwork. Last Interface row now clips selection before149 to
+preserve bevel; real mGBA pixel comparison passes. Fixture/generator/runner/docs
+tracked under SuperFW, not private /tmp-only; std devcontainer has all dependencies.
+Only physical SD sector entrypoints replaced by SRAM virtual disk, rest actual
+compiled native firmware/FatFs. Original pointer failure also being recompiled as
+negative control in /tmp (not a candidate). Next commit checkpoint, full/all3/
+nativeIGM/mGBA/hosted gates, new Chis candidate then PR/sync as owner requests.
+
+Build647/sourcea55f4a77 clean full/all3/nativeIGM passes, including actual native
+ARMsettings regression all3 and native-menu mGBA two-process persistence+frame
+checks. Compiler control withoutflag faults as expected; corrected6760B stackpeak.
+Chis647+manifest/guide now hardware-test;640 artifact/manifest removed after
+history retained. Test6withdrawalJSON records owner deletion. Initial pushCI
+43984286751 builtall3/ARMchecks but failedonlymissingxvfb-run oldenvironment;
+root sharedCI/devcontainer dependency fix770f783 pushed. Next createhardware-only
+PR to dssmm, verifychecks withupdatedbase, mergecommit andnormalall5sync. Fixture
+sources alreadycommitted/pusheda55f4a7; userrequestedretention satisfiedonlane,
+mainintegration next. Rootnewcompilerinfo/docs separatedfromhardwarePR.
+
+PR9 merged with mergecommit after currentheadceef1d1 all4 CI43985535980 and push
+43985527343 passed. Hosted logs explicitly confirm actual linkedARM replay all3
+and mGBA bothpersistedboots; repeatedbaselinecases6768B stackpeak pass. PRdiffonly
+superfw16paths; sharedenvironment770f783 ontrunk separately. Fixture sources are
+now onmain repository/dssmm, reproduciblewithoutprivateBIOS. Chis647 frozen remains
+hardware-test; codeinputsunchanged froma55 (laterdocs/tests/env). Test6 remains
+withdrawn, no public replacement release. Complete normalrootdocs/all5sync then
+continue native mGBA visual scenes/NOR/performance work; no feedbackpause.

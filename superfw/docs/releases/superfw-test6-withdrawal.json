@@ -1,0 +1,8 @@
+{
+  "tag": "superfw-test6",
+  "build": 640,
+  "status": "release page deleted by owner; source history preserved",
+  "reason": "Owner reports Interface preference edits freeze until powercycle",
+  "correction": "Build647 local/actual ARM/mGBA validated; physical retest candidate",
+  "publication_record": "superfw-test6-publication.json"
+}
