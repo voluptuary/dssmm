@@ -42,11 +42,15 @@ def call(name,*args):
  assert u.reg_read(UC_ARM_REG_PC)==0x01000000,(name,'instruction budget',hex(u.reg_read(UC_ARM_REG_PC)))
  return u.reg_read(UC_ARM_REG_R0)
 call('load_settings')
-for key,value in [('menu_theme',7),('menu_accent',3),('browser_view',2),('artwork_mode',2)]:u.mem_write(syms[key],bytes([value]))
-assert call(next(name for name in syms if name.startswith('save_settings')))==1
-for key in ['menu_theme','menu_accent','browser_view','artwork_mode']:u.mem_write(syms[key],b'\0')
-call('load_settings')
-for key,value in [('menu_theme',7),('menu_accent',3),('browser_view',2),('artwork_mode',2)]:
- assert u.mem_read(syms[key],1)==bytes([value]),key
+save=next(name for name in syms if name.startswith('save_settings'))
+keys=['menu_theme','menu_accent','browser_view','artwork_mode']
+# Later saves exercise canonical-value preservation with a loaded baseline.
+for values in [(7,3,2,2),(6,4,1,1),(7,1,0,0),(3,0,0,2)]:
+ for key,value in zip(keys,values):u.mem_write(syms[key],bytes([value]))
+ assert call(save)==1
+ for key in keys:u.mem_write(syms[key],b'\0')
+ call('load_settings')
+ for key,value in zip(keys,values):
+  assert u.mem_read(syms[key],1)==bytes([value]),(key,value)
 assert minimum>=syms['__IWRAM_END__']+128,'Native save stack crossed live data'
 print(f'Actual ARM ELF/FatFs settings save/reload passed; stack peak{0x03007f00-minimum}B, {len(accesses)} virtual SD writes (not physical hardware).')
