@@ -9,22 +9,22 @@
     16,
     16
   ],
-  "placement": "13-pixel-high,16-pixel-wide cartridge; flat bottom and blank label, centered in16x16 sprite",
-  "pixels_sha256": "36557ca912cc370cda853996bd59d7f7654d2df8af6db10a25916fdf7d968beb",
+  "placement": "12-pixel-high,16-pixel-wide flat-bottom cartridge; compact illustrated label with maroon left strip on16x16 sprite",
+  "pixels_sha256": "07a90d203bf01fb0e633ce4c789bb9a352053af1469e4ed4eebf37cd4c762d2e",
   "pixel_rows": [
     ".hhhhhhhhhhhhhh.",
     "oooooooooooooooo",
     "ohbbbbbbbbbbbbdo",
-    "ohccccccccccccdo",
-    "ohccccccccccccdo",
-    "ohlllllllllllldo",
-    "ohlllllllllllldo",
-    "ohlllllllllllldo",
-    "ohlllllllllllldo",
-    "ohlllllllllllldo",
-    "ohlllllllllllldo",
+    "ohbllllllllllbdo",
+    "ohblmssssssssbdo",
+    "ohblmssssyyssbdo",
+    "ohblmsssddyyybdo",
+    "ohblmssdddgggbdo",
+    "ohblmggggggggbdo",
+    "ohbllllllllllbdo",
     "ohbbbbbbbbbbbbdo",
     "oooooooooooooooo",
+    "................",
     "................"
   ],
   "rgb555_palette": {
@@ -35,6 +35,9 @@
     "d": "1084",
     "l": "6739",
     "c": "5106",
-    "g": "0421"
+    "g": "226a",
+    "m": "1cb0",
+    "s": "6aab",
+    "y": "239e"
   }
 }

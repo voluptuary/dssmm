@@ -16,6 +16,21 @@ int main(void){char tmp[]="/tmp/dssmm-settings-XXXXXX";assert(mkdtemp(tmp));strc
  assert(f_stat(UISETTINGS_FILEPATH,0)==FR_OK);
  strcpy(before,text);assert(settings_write_text("Theme = Light\n","SuperFW.font=1\n",owned));
  assert(read_file(SETTINGS_FILEPATH,text,sizeof(text))==n&&!strcmp(text,before));
+ /* Simulate navigation reads between background transaction steps. */
+ assert(settings_write_start("Theme = Dark\n","SuperFW.font=0\n",owned));
+ assert(settings_write_pending());
+ unsigned ticks=0;
+ while(settings_write_pending()) {
+  assert(!settings_read_text(SETTINGS_FILEPATH,parse,&exists));
+  FIL nav;UINT bytes;char scratch[16];
+  assert(f_open(&nav,UISETTINGS_FILEPATH,FA_READ)==FR_OK);
+  assert(f_read(&nav,scratch,sizeof(scratch),&bytes)==FR_OK && bytes);
+  assert(f_close(&nav)==FR_OK);
+  assert(settings_write_step()>=0);assert(++ticks<128);
+ }
+ assert(ticks>10);
+ read_file(SETTINGS_FILEPATH,text,sizeof(text));assert(strstr(text,"Theme = Dark"));
+ assert(settings_write_text("Theme = Light\n","SuperFW.font=1\n",owned));
  corrupt_commit=1;assert(!settings_write_text("Theme = Dark\n","SuperFW.font=0\n",owned));corrupt_commit=0;
  read_file(SETTINGS_FILEPATH,text,sizeof(text));assert(!strcmp(text,before));
  short_write=1;assert(!settings_write_text("Theme = Dark\n","SuperFW.font=0\n",owned));short_write=0;
@@ -25,6 +40,10 @@ int main(void){char tmp[]="/tmp/dssmm-settings-XXXXXX";assert(mkdtemp(tmp));strc
  assert(f_rename(SETTINGS_FILEPATH,"/SYSTEM/.sf-settings.bak")==FR_OK);
  assert(settings_write_text("Theme = Light\n","SuperFW.font=1\n",owned));
  read_file(SETTINGS_FILEPATH,text,sizeof(text));assert(!strcmp(text,before));
+ memset(text,'x',7800);text[7800]='\n';text[7801]=0;write_file(SETTINGS_FILEPATH,text);
+ assert(settings_write_start("Theme = Light\n","SuperFW.font=1\n",owned));
+ assert(!settings_write_pending()); /* Large snapshots retain synchronous fallback. */
+ read_file(SETTINGS_FILEPATH,before,sizeof(before));assert(strlen(before)>7800);
  memset(text,'x',9000);text[9000]=0;write_file(SETTINGS_FILEPATH,text);
  assert(!settings_write_text("Theme = Light\n","",owned));assert(read_file(SETTINGS_FILEPATH,before,sizeof(before))==9000&&!strcmp(text,before));
  char filename[1024];path(filename,SETTINGS_FILEPATH);FILE *binary=fopen(filename,"wb");assert(binary);

@@ -44,14 +44,16 @@ and follow that release's installation instructions.
 
 ## SuperCard and SuperChis
 
-**SuperFW Test 6 (Build 640) has been withdrawn:** changing Interface settings
-can crash the system. Downloads are temporarily unavailable while this is fixed.
+**[Download SuperFW Build 667](https://github.com/voluptuary/dssmm/releases/tag/superfw-build667)**
+for SuperChis/SuperChis Prime, SuperCard SD or SuperCard Lite. The release also
+includes the optional folder-art pack. Build 667 replaces the withdrawn Test 6.
 
 DSSMM SuperFW is a developing DS Style menu port for SuperCard-family flashcards, built on
 [David Guillen Fandos’s SuperFW](https://github.com/davidgfnet/superfw). It adds
 Light/Dark themes, accents, horizontal/vertical artwork carousels, an optional
-DSSMM font, and a Start screen with last-played artwork and a configurable clock.
-Settings are grouped and saved when leaving a menu, using
+DSSMM font, and a Start screen with last-played artwork and a 12/24-hour clock.
+Choose top-bar color separately from the selection accent.
+Settings are grouped and save in background steps after leaving a menu, using
 `SYSTEM/SETTINGS.TXT`. Chis GBA launch screens let you switch between loading
 and writing to NOR with the D-pad; writes and replacing existing games require
 confirmation. Chis-only hardware features,
@@ -59,11 +61,11 @@ such as its NOR library, remain specific to that card.
 
 
 
-**Hardware testing:** earlier builds display filename and ROM-header artwork on
-one SuperChis Prime v1.0, and the browser-edge crash is fixed. This release still
-needs hardware testing; SD and Lite remain physically untested. Some emulator
-plugins do not yet run reliably, Exit can crash, and reported settings loss is
-still under investigation. Full EZ-FLASH DSSMM appearance and responsiveness are
+**Hardware testing:** only Chis has been tested on hardware, on one SuperChis
+Prime v1.0. The owner confirms artwork, five-image lookahead and settings
+persistence in earlier builds. New Build 667 changes still need physical
+testing; SD and Lite remain physically untested. GG/SMS plugin Exit can crash,
+PCE loading remains unresolved, and other plugin compatibility varies. Full EZ-FLASH DSSMM appearance and responsiveness are
 in progress. Choose your exact card’s file and back up saves and current firmware.
 Follow [SuperFW’s installation and recovery guide](https://superfw.davidgf.net/docs/install/flash/).
 Use only the matching SuperCard-family build; the OMEGA downloads above target

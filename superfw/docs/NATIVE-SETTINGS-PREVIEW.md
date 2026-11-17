@@ -51,8 +51,8 @@ Run `bash superfw/scripts/test-native-menu-visuals-mgba.sh` after the linked ELF
 is available. The verifier runs it after the two-boot persistence check. Scenes
 cover Help, System, GBA launch, Chis NOR launch, firmware update, erase confirmation,
 loading options, patching options and a bottom-row Orange accent with descenders.
-NOR scenes are omitted on unsupported boards. Generated `visual-1.png` through
-`visual-9.png` are reviewable artifacts, not tracked assets.
+NOR scenes are omitted on unsupported boards. Both font choices run; generated `visual-1-font1.png` through
+`visual-9-font0.png` are reviewable artifacts, not tracked assets.
 
 Each scene seeds magenta pixels in the back page before calling the actual native
 renderer. Assertions require the old artwork to be completely cleared and compare
@@ -66,3 +66,16 @@ objects that GDB cannot materialize as live addresses; GDB Python is not require
 Visual scenes are read-only. Interactive Interface testing accepts directional
 keys and B only, preventing fixture navigation into destructive tools. No physical
 flash commands are issued by the automated tests. Never run fixture ROMs on cards.
+
+
+`build-native-settings-preview.py --font 0` selects the SuperFW font for visual
+inspection; the default1 selects DSSMM. Preference setup/persistence assertions
+remain unchanged, and the visual override is not saved. The larger native font
+needs a higher action/help baseline inside DS panels; the font-specific baseline
+checks cover both choices without changing legacy native-theme placement.
+
+Background-save regression: native keys queue a settings snapshot. The fixture
+starts one save step, re-enters Interface and moves the selection while the
+transaction is still pending, then drains it before resetting native state. ARM
+replay exercises this same queued path, clock/bar roundtrips and unchanged exits.
+Two-color green/blue completion markers distinguish success from colored headers.

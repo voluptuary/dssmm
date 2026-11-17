@@ -42,12 +42,21 @@ def call(name,*args):
  assert u.reg_read(UC_ARM_REG_PC)==0x01000000,(name,'instruction budget',hex(u.reg_read(UC_ARM_REG_PC)))
  return u.reg_read(UC_ARM_REG_R0)
 call('load_settings')
-save=next(name for name in syms if name.startswith('save_settings'))
-keys=['menu_theme','menu_accent','browser_view','artwork_mode']
+def save_native():
+ call('settings_save_request')
+ for _ in range(256):
+  if not call('settings_save_pending'):return 1
+  if not call('settings_save_poll'):return 0
+ raise AssertionError('Background save did not complete')
+keys=['menu_theme','menu_accent','browser_view','artwork_mode','menu_clock_24','menu_topbar']
 # Later saves exercise canonical-value preservation with a loaded baseline.
-for values in [(7,3,2,2),(6,4,1,1),(7,1,0,0),(3,0,0,2)]:
+for values in [(7,3,2,2,0,4),(6,4,1,1,1,0),(7,1,0,0,0,2),(3,0,0,2,1,1)]:
  for key,value in zip(keys,values):u.mem_write(syms[key],bytes([value]))
- assert call(save)==1
+ before=len(accesses)
+ assert save_native()==1
+ assert len(accesses)>before,'Changed preferences were not written'
+ unchanged=len(accesses)
+ assert save_native()==1 and len(accesses)==unchanged,'Unchanged exit rewrote SD settings'
  for key in keys:u.mem_write(syms[key],b'\0')
  call('load_settings')
  for key,value in zip(keys,values):

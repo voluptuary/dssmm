@@ -9,7 +9,7 @@
 #define CONFIG_TEMP "/SYSTEM/.sf-settings.tmp"
 #define CONFIG_BACKUP "/SYSTEM/.sf-settings.bak"
 /* GBA RAM: ordinary byte parsing must never use cartridge SDRAM. */
-static char original[CONFIG_CAPACITY] __attribute__((section(".sbss"),aligned(4)));
+static char original[CONFIG_CAPACITY] __attribute__((section(".sbss"),aligned(__alignof__(FIL))));
 static unsigned original_size;
 static bool read_original(const char *path,bool *exists) {
   FIL file;*exists=false;original_size=0;original[0]=0;
@@ -37,6 +37,7 @@ static bool split(char *line,char **key,char **value) {
   *eq=0;*key=trim(*key);*value=trim(eq+1);return **key!=0;
 }
 bool settings_read_text(const char *path,settings_line_fn callback,bool *exists) {
+  if(settings_write_pending())return false;
   /* Interrupted replacement: restore the original if commit never completed. */
   if(!strcmp(path,SETTINGS_FILEPATH) && f_stat(path,0)==FR_NO_FILE && f_stat(CONFIG_BACKUP,0)==FR_OK)
     if(f_rename(CONFIG_BACKUP,path)!=FR_OK)return false;
@@ -52,30 +53,19 @@ bool settings_read_text(const char *path,settings_line_fn callback,bool *exists)
   return true;
 }
 static uint32_t output_hash, output_size;
+static char *staging;
 static uint32_t text_hash(uint32_t hash, const void *data, unsigned size) {
   const unsigned char *p = data;
   while (size--) hash = (hash ^ *p++) * 16777619u;
   return hash;
 }
-static bool write_bytes(FIL *file,const void *data,unsigned size) {
-  UINT written=0;
-  if(f_write(file,data,size,&written)!=FR_OK || written!=size)return false;
+static bool append_bytes(const void *data,unsigned size) {
+  if(size>=CONFIG_CAPACITY-output_size)return false;
+  memcpy(staging+output_size,data,size);
   output_hash=text_hash(output_hash,data,size);output_size+=size;
   return true;
 }
-static bool verify_saved_text(void) {
-  FIL file;
-  if(f_open(&file,SETTINGS_FILEPATH,FA_READ)!=FR_OK)return false;
-  uint32_t hash=2166136261u,size=0;bool ok=true;
-  char buffer[256];UINT count;
-  do {
-    if(f_read(&file,buffer,sizeof(buffer),&count)!=FR_OK){ok=false;break;}
-    hash=text_hash(hash,buffer,count);size+=count;
-  }while(count);
-  if(f_close(&file)!=FR_OK)ok=false;
-  return ok && size==output_size && hash==output_hash;
-}
-static bool preserve(FIL *out,settings_owned_fn owned,bool private_lines) {
+static bool preserve(settings_owned_fn owned,bool private_lines) {
   unsigned position=0;
   while(position<original_size) {
     unsigned end=position;while(end<original_size && original[end]!='\n')++end;
@@ -86,34 +76,102 @@ static bool preserve(FIL *out,settings_owned_fn owned,bool private_lines) {
     bool native=entry && !strncasecmp(key,"SuperFW.",8);
     bool marker=!strncmp(original+position,"# DSSMM shared settings",strlen("# DSSMM shared settings")) || !strncmp(original+position,"# SuperFW-specific settings",strlen("# SuperFW-specific settings"));
     if(!marker && native==private_lines && !(entry && owned(key)))
-      if(!write_bytes(out,original+position,count) || (end==original_size && !write_bytes(out,"\n",1)))return false;
+      if(!append_bytes(original+position,count) || (end==original_size && !append_bytes("\n",1)))return false;
     position=end+1;
   }
   return true;
 }
-bool settings_write_text(const char *shared,const char *private_text,settings_owned_fn owned) {
+/* Bounded filesystem steps; the existing text buffer owns the snapshot.
+ * FIL occupies unused tail bytes. Very large configs use a synchronous stack FIL. */
+enum {Idle,Open,Write,Close,Backup,MoveOld,Commit,VerifyOpen,VerifyRead,VerifyClose,Cleanup};
+static unsigned phase,position;
+static bool existed,moved,committed,opened;
+static FIL *transaction;
+static uint32_t verify_hash,verify_size;
+bool settings_write_pending(void) {return phase!=Idle;}
+static int write_failed(void) {
+  if(opened)f_close(transaction);
+  opened=false;
+  if(committed) {
+    if(f_unlink(SETTINGS_FILEPATH)==FR_OK && moved)f_rename(CONFIG_BACKUP,SETTINGS_FILEPATH);
+  } else if(moved)f_rename(CONFIG_BACKUP,SETTINGS_FILEPATH);
+  f_unlink(CONFIG_TEMP);phase=Idle;return -1;
+}
+int settings_write_step(void) {
+  UINT count;
+  switch(phase) {
+    case Idle:return 1;
+    case Open:
+      if(f_open(transaction,CONFIG_TEMP,FA_WRITE|FA_CREATE_ALWAYS)!=FR_OK)return write_failed();
+      opened=true;phase=Write;break;
+    case Write: {
+      unsigned size=output_size-position;if(size>512)size=512;
+      if(f_write(transaction,original+position,size,&count)!=FR_OK || count!=size)return write_failed();
+      position+=size;if(position==output_size)phase=Close;break;
+    }
+    case Close:
+      opened=false;if(f_close(transaction)!=FR_OK)return write_failed();phase=Backup;break;
+    case Backup:
+      if(f_stat(CONFIG_BACKUP,0)==FR_OK && f_unlink(CONFIG_BACKUP)!=FR_OK)return write_failed();
+      phase=MoveOld;break;
+    case MoveOld:
+      if(existed) {
+        if(f_rename(SETTINGS_FILEPATH,CONFIG_BACKUP)!=FR_OK)return write_failed();
+        moved=true;
+      }
+      phase=Commit;break;
+    case Commit:
+      if(f_rename(CONFIG_TEMP,SETTINGS_FILEPATH)!=FR_OK)return write_failed();
+      committed=true;phase=VerifyOpen;break;
+    case VerifyOpen:
+      if(f_open(transaction,SETTINGS_FILEPATH,FA_READ)!=FR_OK)return write_failed();
+      opened=true;verify_hash=2166136261u;verify_size=0;phase=VerifyRead;break;
+    case VerifyRead: {
+      char buffer[256];
+      if(f_read(transaction,buffer,sizeof(buffer),&count)!=FR_OK)return write_failed();
+      verify_hash=text_hash(verify_hash,buffer,count);verify_size+=count;
+      if(!count)phase=VerifyClose;
+      break;
+    }
+    case VerifyClose:
+      opened=false;
+      if(f_close(transaction)!=FR_OK || verify_size!=output_size || verify_hash!=output_hash)return write_failed();
+      phase=Cleanup;break;
+    case Cleanup:
+      if(moved)f_unlink(CONFIG_BACKUP);
+      phase=Idle;return 1;
+  }
+  return 0;
+}
+bool settings_write_start(const char *shared,const char *private_text,settings_owned_fn owned) {
+  if(phase)return false;
   bool exists;
   if(f_stat(SETTINGS_FILEPATH,0)==FR_NO_FILE && f_stat(CONFIG_BACKUP,0)==FR_OK)
     if(f_rename(CONFIG_BACKUP,SETTINGS_FILEPATH)!=FR_OK)return false;
-  if(!read_original(SETTINGS_FILEPATH,&exists))return false; /* Refuse oversize/error; never truncate. */
-  f_mkdir(SYSTEM_DIR);
-  FIL out;if(f_open(&out,CONFIG_TEMP,FA_WRITE|FA_CREATE_ALWAYS)!=FR_OK)return false;
+  if(!read_original(SETTINGS_FILEPATH,&exists))return false;
+  /* Temporary output is on the user stack only during snapshot construction. */
+  char output[CONFIG_CAPACITY];staging=output;
   output_hash=2166136261u;output_size=0;
-  bool ok=write_bytes(&out,"# DSSMM shared settings\n",strlen("# DSSMM shared settings\n")) && write_bytes(&out,shared,strlen(shared)) &&
-      preserve(&out,owned,false) && write_bytes(&out,"# SuperFW-specific settings\n",strlen("# SuperFW-specific settings\n")) &&
-      write_bytes(&out,private_text,strlen(private_text)) && preserve(&out,owned,true);
-  if(f_close(&out)!=FR_OK)ok=false;
-  if(!ok || output_size>=CONFIG_CAPACITY){f_unlink(CONFIG_TEMP);return false;}
-  if(f_stat(CONFIG_BACKUP,0)==FR_OK && f_unlink(CONFIG_BACKUP)!=FR_OK)return false;
-  if(exists && f_rename(SETTINGS_FILEPATH,CONFIG_BACKUP)!=FR_OK)return false;
-  if(f_rename(CONFIG_TEMP,SETTINGS_FILEPATH)!=FR_OK) {
-    if(exists)f_rename(CONFIG_BACKUP,SETTINGS_FILEPATH);
-    return false;
+  bool ok=append_bytes("# DSSMM shared settings\n",strlen("# DSSMM shared settings\n")) && append_bytes(shared,strlen(shared)) &&
+      preserve(owned,false) && append_bytes("# SuperFW-specific settings\n",strlen("# SuperFW-specific settings\n")) &&
+      append_bytes(private_text,strlen(private_text)) && preserve(owned,true);
+  staging=0;if(!ok)return false;
+  memcpy(original,output,output_size);
+  existed=exists;moved=committed=opened=false;position=0;phase=Open;
+  f_mkdir(SYSTEM_DIR);
+  unsigned align=__alignof__(FIL);
+  unsigned aligned=(output_size+align-1)&~(align-1);
+  if(aligned+sizeof(FIL)<=sizeof(original))transaction=(FIL*)(original+aligned);
+  else {
+    /* Preserve support for near-capacity files without adding a persistent buffer. */
+    FIL file;transaction=&file;
+    int result;do{result=settings_write_step();}while(!result);
+    return result>0;
   }
-  if(!verify_saved_text()) {
-    if(f_unlink(SETTINGS_FILEPATH)==FR_OK && exists)f_rename(CONFIG_BACKUP,SETTINGS_FILEPATH);
-    return false;
-  }
-  if(exists)f_unlink(CONFIG_BACKUP);
   return true;
+}
+bool settings_write_text(const char *shared,const char *private_text,settings_owned_fn owned) {
+  if(!settings_write_start(shared,private_text,owned))return false;
+  int result;do{result=settings_write_step();}while(!result);
+  return result>0;
 }

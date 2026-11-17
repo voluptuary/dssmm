@@ -1,0 +1,61 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 664,
+  "boards": [
+    {
+      "source_tree_sha256": "f294180db8f907d9e5cdeddcb2d65c86e775797b19f7314415b927754366da35",
+      "board": "sd",
+      "dssmm_build": 664,
+      "source_commit": "a3657dd067596a3ff23afc6b1d3e920d37b979f2",
+      "source_dirty": false,
+      "firmware_sha256": "dac2c75586459a57919d0e8e4da3cd88ff5149c3f957da7af07db7516b6b069b",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 521216,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 3072
+    },
+    {
+      "source_tree_sha256": "f294180db8f907d9e5cdeddcb2d65c86e775797b19f7314415b927754366da35",
+      "board": "lite",
+      "dssmm_build": 664,
+      "source_commit": "a3657dd067596a3ff23afc6b1d3e920d37b979f2",
+      "source_dirty": false,
+      "firmware_sha256": "c88e51e8ba83a549f8a953799545522ba38be2170ea99f15f071ba03eb547069",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 488960,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 18944
+    },
+    {
+      "source_tree_sha256": "f294180db8f907d9e5cdeddcb2d65c86e775797b19f7314415b927754366da35",
+      "board": "chis",
+      "dssmm_build": 664,
+      "source_commit": "a3657dd067596a3ff23afc6b1d3e920d37b979f2",
+      "source_dirty": false,
+      "firmware_sha256": "786f32a2b860b476ba391ebf30c2eee9ba09186ad12b4748267b26605f0dc0ee",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "hosted_ci": {
+    "run": 43998552194,
+    "conclusion": "success"
+  },
+  "checks": [
+    "Full clean SD/Lite/Chis verifier with native IGM ARM replay passed",
+    "Actual ARM/FatFs preference and clock-format roundtrips passed on all three boards; unchanged saves caused no further SD writes; stack peak 6784 bytes",
+    "Native mGBA two-process persistence and last-row frame checks passed",
+    "18 native mGBA scenes across both fonts passed continuous frame checks and cleared seeded stale artwork",
+    "Captured green/orange top bars match selected accent RGB555 colors",
+    "All three source identities, firmware seals, headers and hardware size budgets passed"
+  ],
+  "limitations": "Owner confirms settings persistence on Chis Build657. No new physical validation for664; SD/Lite timing, PCE loading, GG/SMS Exit and full DE parity remain unqualified.",
+  "integration_pr": {
+    "url": "https://github.com/voluptuary/dssmm/pull/11",
+    "run": 43998953470,
+    "conclusion": "success"
+  },
+  "owner_observation": "Owner Build664 feedback confirms runtime UI; new requested header/icon/cooperative-save changes are667."
+}

@@ -1282,3 +1282,76 @@ frame/stale-art checks are now main-repo regression gates. Chis657 remains curre
 local candidate (source169b). Complete doccheckpoint/normalall5sync; then continue
 NOR/perf/parity and expand native font/theme visual coverage as needed. No public
 release recreated; Test6withdrawn andphysicalqualification limits unchanged.
+
+AfterPR10/all5sync e638a27: nativeSuperFWfont0 popup snapshot exposed6descender
+pixels across149/150 (DSSMMfont1 alreadypassed). Added --font0/1 viewer override,
+read-onlymatrixbothstyles, source action/help/unlock baselines dependonfont.
+Native-theme placement retained; NORactions reusecommon action renderer. Current
+18scene dirtyELFmatrix nearingcompletion, first15passed; no newcandidateyet,
+657frozen. Next verifyremaining, commit/fullall3/mGBA/CI thenhardwareupdate+PR/sync.
+
+Bothfonts/all18 native mGBA scenes nowpassed. Freezefontcoverage source andrun
+fullclean/all3/nativeIGM/persistence/matrix/CI; nextcandidateonlyafterallgates.
+
+Source19a4/Build662 hosted43993253063FAILED: font0Help scrollingunlock crosses
+rightbevelx234,y140; localsnapshot happened onspacephase andpassed. Notflakytest:
+oldwidth230 fromx5 reached234 outsideinterior. NarrowDSwidth228; nativelegacy
+widthunchanged. Newfixture checks everyrenderedframe's edges/bevel andlatches
+failure, notjustoneanimationphase screenshot. Nativeframen symbol selectsactual
+backpage forseed/check. Local662fullstillrunningmustpoll; no662candidate delivered.
+657remainsvalidatedcurrent. Freeze correctivefont source after regressionpasses.
+
+## Build 657 hardware feedback follow-up — 2026-11-17
+Owner confirms settings now persist on Chis. New work removes redundant unchanged
+settings writes while retaining verified transactions for changes; adds Interface
+Clock format (24-hour default/12-hour AM/PM), accent header contrast, centered
+horizontal captions, Gray label, six-pixel Help logo adjustment, filtered empty
+settings headings, Recents list chrome and themed GBA actions. Native mGBA success
+marker now uses two colors so green accents cannot masquerade as a passing test.
+Native ARM replay must assert unchanged exits produce no SD writes. Earlier 662
+hosted failure is addressed by bounded scrolling width and per-frame bevel checks.
+All changes require clean all-board/local/native mGBA and hosted gates before a
+new hardware-test image or release. Owner authorizes publishing this correction,
+then normal merge-commit PR/integration and synchronization; preserve withdrawn
+Test6 tag, use a new release tag and attach the full retained folder-art archive.
+The first 663 verifier stopped before board builds: the cache unit harness needed
+its new font-width dependency. The schematic preview also needed header palette
+and declaration updates; both are corrected. Actual native two-process mGBA
+persistence passes with the two-color marker. Clock formatter tests cover midnight,
+noon, PM and unset; ARM replay now covers both clock formats and unchanged exits.
+
+## Owner Build 664 follow-up — 2026-11-17
+664 full local/all-board/native IGM/ARM/mGBA18 scenes passed; source CI43998552194
+and all-four PR CI43998953470 passed. PR11 merged; Chis664 is in hardware-test.
+No Test7 release was published. Owner now requests a NORMAL (not prerelease)
+release after independent Top bar color/default gray+black text, white text for
+colored bars, unified clock x234, a shorter illustrated Game Gear label, and
+background settings saves where feasible. Preserve verified rollback; cooperative
+save work must yield between bounded filesystem operations and drain before game
+handoff. Only Chis has owner hardware tests; SD/Lite remain untested. Release notes
+must summarize major changes since the fork, remaining bugs and SD setup, attach
+full retained folder-art.zip and preserve DE latest stable unless explicitly changed.
+Cooperative implementation now stages output using temporary 8KiB stack storage,
+then owns existing original[] buffer across steps. Aligned FIL uses unused tail;
+near-capacity configs fall back synchronously. No second static buffer. Native ARM
+queued replay passes, stack14128B against linked live-data guard; Chis EWRAM
+256824/257024 (200B headroom). Do not add static data/raise limits. Host fault,
+rollback, unknown-key, FAT16/FAT32, interleaved read/requeued edit/retry tests pass
+with UBSAN halt enabled after fixing host FIL alignment. Native mGBA queued-input
+check and all3/full/hosted gates remain pending; hardware-test664 stays frozen.
+666 first full gate stopped before board builds because navigation fixture matched
+an obsolete save-on-exit comment and synchronous-failure behavior. Updated it to
+assert queued exit/navigation; transaction failures remain covered in IO/native
+suites. No666 hardware-test artifact delivered. Next clean candidate/full gates.
+
+667/sourcea7259a83 published NORMAL as superfw-build667 after full all3/nativeIGM,
+actual ARM queued-save (14128B peak), native mGBA pending-navigation/two boots,
+18font scenes and all4 PR CI44085053018/source44085042488 passed. PR12 merged
+b7d91488. All4 downloaded assets/body match; full owner folder-art.zip retained.
+Chis667 now hardware-test;664 validation retained in docs. Only Chis owner testing,
+not new667 hardware qualification. DEv8.4.0 remains latest via explicit API metadata
+correction (CLI --latest=false initially still selected667). No older SuperFW
+pages to prune; BLUE/OMEGA latest prereleases and all DE history preserved.
+Next: normal doc integration/root publication overview/baseline and all5sync, then
+recover EWRAM via measured cold-code size work before more UI parity. Plugin Exit,
+PCE and full DE parity still open. Keep owner lock/private BIOS/scratch/fullZIP.
