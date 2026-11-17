@@ -1245,3 +1245,12 @@ root sharedCI/devcontainer dependency fix770f783 pushed. Next createhardware-onl
 PR to dssmm, verifychecks withupdatedbase, mergecommit andnormalall5sync. Fixture
 sources alreadycommitted/pusheda55f4a7; userrequestedretention satisfiedonlane,
 mainintegration next. Rootnewcompilerinfo/docs separatedfromhardwarePR.
+
+PR9 merged with mergecommit after currentheadceef1d1 all4 CI43985535980 and push
+43985527343 passed. Hosted logs explicitly confirm actual linkedARM replay all3
+and mGBA bothpersistedboots; repeatedbaselinecases6768B stackpeak pass. PRdiffonly
+superfw16paths; sharedenvironment770f783 ontrunk separately. Fixture sources are
+now onmain repository/dssmm, reproduciblewithoutprivateBIOS. Chis647 frozen remains
+hardware-test; codeinputsunchanged froma55 (laterdocs/tests/env). Test6 remains
+withdrawn, no public replacement release. Complete normalrootdocs/all5sync then
+continue native mGBA visual scenes/NOR/performance work; no feedbackpause.
