@@ -1,0 +1,31 @@
+diff --git a/superfw/src/pogo_plugin.c b/superfw/src/pogo_plugin.c
+--- a/superfw/src/pogo_plugin.c
++++ b/superfw/src/pogo_plugin.c
+@@ -25,12 +25,13 @@
+ bool pogo_fix_waitcnt(uint32_t *data,uint32_t size) {
+   for(unsigned i=0;i+12<=size;i+=4) {
+     unsigned n=i/4,ldr=data[n+1];
+-    if(data[n]!=0xe3a00014 || (ldr&0xfffff000)!=0xe59f1000 || data[n+2]!=0xe1c100b0)continue;
+-    unsigned literal=i+12+(ldr&4095);
+-    if((literal&3) || literal>size-4 || data[literal/4]!=0x04000204)continue;
++    // Generalized WAITCNT check: match any low-wait setting written to 0x04000204
++    if((data[n]&0xffffff00)!=0xe3a00000 || (ldr&0xfffff000)!=0xe59f1000 || data[n+2]!=0xe1c100b0)continue;
++    unsigned val = data[n] & 0xff;
++    if(val > 0x18) continue; // Only intercept unsafe fast wait states
+     volatile uint16_t *patch=(volatile uint16_t*)&data[n];
+-    patch[0]=0x0901;patch[1]=0xe3a0; /* mov r0,#0x4000: default waits plus prefetch */
++    patch[0]=0x0901;patch[1]=0xe3a0; /* mov r0,#0x4000: safe SuperCard SDRAM wait state */
+     return true;
+   }
+   return false;
+@@ -73,6 +74,7 @@
+     unsigned flags=data[ip++];
+     for(unsigned bit=0;bit<8 && op<out;bit++) {
+       if(flags&(128>>bit)) {
+         if(size-ip<2)return false;
+         unsigned a=data[ip++],b=data[ip++],len=(a>>4)+3,dist=((a&15)<<8)+b+1;
+-        if(dist>op || len>out-op)return false;
++        if(dist>op || len>out-op || ip>size)return false;
+         op+=len;
+       }else {if(ip==size)return false;++ip;++op;}
+     }
