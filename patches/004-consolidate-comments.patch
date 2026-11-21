@@ -1,0 +1,20 @@
+diff --git a/ezfomega/source/Ezcard_OP.c b/ezfomega/source/Ezcard_OP.c
+--- a/ezfomega/source/Ezcard_OP.c
++++ b/ezfomega/source/Ezcard_OP.c
+@@ -35,7 +35,7 @@
+ 
+ extern FIL gfile;
+-// --------------------------------------------------------------------
++/* Hardware control register base definitions and offsets */
+ #ifndef FlashBase_S71
+ #define FlashBase_S71		0x08000000
+ #endif
+@@ -43,7 +43,6 @@
+ #define NOR_info_offset 0x7A0000
+ #define SET_info_offset 0x7B0000
+ 
+-
+-// --------------------------------------------------------------------
++/* Hardware controller state management routines */
+ void IWRAM_CODE SetSDControl(u16  control)
+ {

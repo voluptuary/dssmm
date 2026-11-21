@@ -1,0 +1,12 @@
+diff --git a/ezfomega/source/setwindow.c b/ezfomega/source/setwindow.c
+--- a/ezfomega/source/setwindow.c
++++ b/ezfomega/source/setwindow.c
+@@ -200,8 +200,8 @@
+     // Standardize settings menu headers: center System and Info titles,
+     // and render standard username and time display in top bar across all settings submenus.
+     if (current_menu_id == MENU_SYSTEM || current_menu_id == MENU_INFO) {
+-        draw_left_aligned_title(get_menu_title_string(current_menu_id));
++        draw_centered_title(get_menu_title_string(current_menu_id));
++        draw_standard_username_and_time();
+     }
+ }
