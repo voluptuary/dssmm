@@ -2081,3 +2081,8 @@ The release was created and subsequently corrected to use the cartridge-required
 separate-boot scenes, deterministic clock/files/artwork and SRAM completion
 checks. No hardware action/driver change. See docs/NATIVE-MENU-PREVIEW.md.
 Production verifier and screenshot validation recorded before integration.
+
+Native9-scene stock mGBA run and normal full project verifier passed. Added
+Start clock draw used by the real native Start loop and retested scene0. Exact
+capture/source hashes and limits: docs/native-menu-preview-validation.json.
+No production behavior/driver changes or hardware qualification.

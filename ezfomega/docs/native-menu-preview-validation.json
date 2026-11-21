@@ -1,0 +1,102 @@
+{
+  "date": "2026-11-21",
+  "project": "ezfomega",
+  "emulator": "stock SDL mGBA 0.10.1, Xvfb, no BIOS/patches/new dependencies",
+  "scenes": [
+    {
+      "scene": 0,
+      "source_commit": "e27cb2fb92b9c5f04a870c23b1c7d36b9f7f9562",
+      "source_dirty": true,
+      "renderer": "actual project kernel translation unit; deterministic clock and filesystem seams",
+      "fixture": "ROM-backed read-only PSRAM directory, synthetic decoded artwork cache",
+      "limits": "visual tests only; no flash/save/SD protocol qualification",
+      "sha256": "215aaf44a82a4ef6fdb27a55ba9d91c62bdfb67016e741c5767df70fb6f56bbd",
+      "screenshot_sha256": "1128dbf338a62c76bf844bb5c03e7707d1e488ff0e0b83cd4e15cb75fd54e991"
+    },
+    {
+      "scene": 1,
+      "source_commit": "e27cb2fb92b9c5f04a870c23b1c7d36b9f7f9562",
+      "source_dirty": false,
+      "renderer": "actual project kernel translation unit; deterministic clock and filesystem seams",
+      "fixture": "ROM-backed read-only PSRAM directory, synthetic decoded artwork cache",
+      "limits": "visual tests only; no flash/save/SD protocol qualification",
+      "sha256": "167f6e1b3db21f8c0a8f05d11f00b2afb07f5c1dd1ce948312b388efafb610f0",
+      "screenshot_sha256": "43d3a5f9abd12f2fe7e9ecdb10b4bce06cd25e0452fc787931dc3e1a9a9c8966"
+    },
+    {
+      "scene": 2,
+      "source_commit": "e27cb2fb92b9c5f04a870c23b1c7d36b9f7f9562",
+      "source_dirty": false,
+      "renderer": "actual project kernel translation unit; deterministic clock and filesystem seams",
+      "fixture": "ROM-backed read-only PSRAM directory, synthetic decoded artwork cache",
+      "limits": "visual tests only; no flash/save/SD protocol qualification",
+      "sha256": "167f6e1b3db21f8c0a8f05d11f00b2afb07f5c1dd1ce948312b388efafb610f0",
+      "screenshot_sha256": "12057f0fb2220ab379135d5423525ce6885180c9a4a500d43fa6960ee2001d54"
+    },
+    {
+      "scene": 3,
+      "source_commit": "e27cb2fb92b9c5f04a870c23b1c7d36b9f7f9562",
+      "source_dirty": false,
+      "renderer": "actual project kernel translation unit; deterministic clock and filesystem seams",
+      "fixture": "ROM-backed read-only PSRAM directory, synthetic decoded artwork cache",
+      "limits": "visual tests only; no flash/save/SD protocol qualification",
+      "sha256": "167f6e1b3db21f8c0a8f05d11f00b2afb07f5c1dd1ce948312b388efafb610f0",
+      "screenshot_sha256": "2c0d3e7e1bf7526be958df80a4493e8c94130e21fbd376226619b14ea9b1d3a4"
+    },
+    {
+      "scene": 4,
+      "source_commit": "e27cb2fb92b9c5f04a870c23b1c7d36b9f7f9562",
+      "source_dirty": false,
+      "renderer": "actual project kernel translation unit; deterministic clock and filesystem seams",
+      "fixture": "ROM-backed read-only PSRAM directory, synthetic decoded artwork cache",
+      "limits": "visual tests only; no flash/save/SD protocol qualification",
+      "sha256": "167f6e1b3db21f8c0a8f05d11f00b2afb07f5c1dd1ce948312b388efafb610f0",
+      "screenshot_sha256": "7e4dcef2a6697656b2e51de4aadee4421bf5717726d9388f10532d04d5b8e259"
+    },
+    {
+      "scene": 5,
+      "source_commit": "e27cb2fb92b9c5f04a870c23b1c7d36b9f7f9562",
+      "source_dirty": false,
+      "renderer": "actual project kernel translation unit; deterministic clock and filesystem seams",
+      "fixture": "ROM-backed read-only PSRAM directory, synthetic decoded artwork cache",
+      "limits": "visual tests only; no flash/save/SD protocol qualification",
+      "sha256": "167f6e1b3db21f8c0a8f05d11f00b2afb07f5c1dd1ce948312b388efafb610f0",
+      "screenshot_sha256": "87dd1eced76acd6227ede2937c2c6a0c7adddd5c481cb0578c2bdf0bf21e3904"
+    },
+    {
+      "scene": 6,
+      "source_commit": "e27cb2fb92b9c5f04a870c23b1c7d36b9f7f9562",
+      "source_dirty": false,
+      "renderer": "actual project kernel translation unit; deterministic clock and filesystem seams",
+      "fixture": "ROM-backed read-only PSRAM directory, synthetic decoded artwork cache",
+      "limits": "visual tests only; no flash/save/SD protocol qualification",
+      "sha256": "167f6e1b3db21f8c0a8f05d11f00b2afb07f5c1dd1ce948312b388efafb610f0",
+      "screenshot_sha256": "e905c40dd2146e2600137b7f6e79755879fd697ccd49235fc3b330579c996e43"
+    },
+    {
+      "scene": 7,
+      "source_commit": "e27cb2fb92b9c5f04a870c23b1c7d36b9f7f9562",
+      "source_dirty": false,
+      "renderer": "actual project kernel translation unit; deterministic clock and filesystem seams",
+      "fixture": "ROM-backed read-only PSRAM directory, synthetic decoded artwork cache",
+      "limits": "visual tests only; no flash/save/SD protocol qualification",
+      "sha256": "167f6e1b3db21f8c0a8f05d11f00b2afb07f5c1dd1ce948312b388efafb610f0",
+      "screenshot_sha256": "744a147f4eaa1d5b15c96189152b4090da06d20bf2c29b712e9086987e3c3838"
+    },
+    {
+      "scene": 8,
+      "source_commit": "e27cb2fb92b9c5f04a870c23b1c7d36b9f7f9562",
+      "source_dirty": false,
+      "renderer": "actual project kernel translation unit; deterministic clock and filesystem seams",
+      "fixture": "ROM-backed read-only PSRAM directory, synthetic decoded artwork cache",
+      "limits": "visual tests only; no flash/save/SD protocol qualification",
+      "sha256": "167f6e1b3db21f8c0a8f05d11f00b2afb07f5c1dd1ce948312b388efafb610f0",
+      "screenshot_sha256": "8ccd444748fba8b4b73dab1d5cf420f935a718743510da51ff8ce24cab5948b1"
+    }
+  ],
+  "normal_project_verifier": "passed (exit 0)",
+  "normal_verifier_log_sha256": "a1da64d51f1f5b1107e3729cab26921d39409505de8c7f6c0b64558849655242",
+  "hardware_validation": false,
+  "limits": "Synthetic clock/files/artwork; native renderer only. No card IO/launch/save timing qualification.",
+  "fixture_sha256": "388d3f75955c0ca6989df2079af190c20f3c7edc8d3c8f24ad6e5a138e7c33de"
+}
