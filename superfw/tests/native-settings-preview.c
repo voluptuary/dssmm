@@ -159,7 +159,7 @@ int main(void) {
   for(unsigned i=0;i<sizeof(reference_name);++i)VAR8(NATIVE_menu_username+i)=reference_name[i];
 #endif
   visual_scene();
-  unsigned previous=0;
+  unsigned previous=0,seeded_pages=0;
   for(;;) {
     unsigned held=(~REG16(0x04000130))&0x3ff,pressed=held&~previous;previous=held;
     if(!TEST_SCENE && pressed)key(pressed & (16|32|64|128|2));
@@ -168,7 +168,8 @@ int main(void) {
     VAR32(NATIVE_clock_seconds)=12*3600+34*60+56;
     VAR32(NATIVE_clock_frame)=VAR32(NATIVE_frame_count);
 #endif
-    if(TEST_SCENE) {
+    if(TEST_SCENE && (TEST_SCENE!=10 || !(seeded_pages&(1u<<VAR8(NATIVE_framen))))) {
+      seeded_pages|=1u<<VAR8(NATIVE_framen);
       REG16(0x050001d6)=0x7c1f; /* Detect stale artwork behind native modal panels. */
       volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));
       for(unsigned n=16*120;n<160*120;n++)back[n]=0xebeb;

@@ -1406,3 +1406,9 @@ are running; hardware-test667 remains frozen until a clean candidate passes.
 Owner root audit artifacts moved intact on trunk to docs/history/patch-review-2026-11-21;
 review remains project-local. New shared comparison tool is universal, and each
 EZ harness compiles its own translation unit; no foreign driver imports.
+
+First expanded matrix stopped at new Start scene10: fixture overwrote both cached
+Start pages every frame, then incorrectly required the production cache to redraw.
+Seed Start pages once each; modal scenes still reseed every frame. This is a
+fixture correction, not a production stale-art fix. All earlier9/font1 scenes
+and native2boot saves passed. Rerun expanded matrix and final clean all3 build.
