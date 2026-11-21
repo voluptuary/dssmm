@@ -1,0 +1,18 @@
+diff --git a/superfw/src/artwork.c b/superfw/src/artwork.c
+--- a/superfw/src/artwork.c
++++ b/superfw/src/artwork.c
+@@ -145,6 +145,14 @@
+     // Check negative cache to avoid redundant SD card hits for previously missing artwork
+     if (is_negative_cached(rom_path, mode)) {
+         return ARTWORK_STATUS_NOT_FOUND;
+     }
+ 
++    // Asynchronous / non-blocking idle check: defer disk I/O if carousel motion is active
++    if (is_carousel_motion_active() && !is_slot_cached(rom_path, mode)) {
++        // Return placeholder/icon state immediately without blocking on FatFs reads during scroll
++        return ARTWORK_STATUS_DEFERRED;
++    }
++
+     // Proceed with optimized single-read or chunked buffer loading
+     return load_artwork_from_sd_optimized(rom_path, mode, out_buf);
+ }

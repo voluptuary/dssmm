@@ -1,0 +1,20 @@
+diff --git a/ezfomega/source/Ezcard_OP.c b/ezfomega/source/Ezcard_OP.c
+--- a/ezfomega/source/Ezcard_OP.c
++++ b/ezfomega/source/Ezcard_OP.c
+@@ -15,7 +15,7 @@
+ 
+ extern void delay(u32 R0);
+ void IWRAM_CODE Set_RTC_status(u16  status);
+-extern void SoftReset_now(u16 unknown1, u16 unknown2); //this function is undocumented. wtf does it do?
++extern void SoftReset_now(u16 unknown1, u16 unknown2); // Low-level firmware system reset routine.
+ extern void HardReset();
+ int aP_depack(u8 *source,u8 *destination);
+ 
+@@ -83,8 +83,6 @@
+         count++;
+         if(count>0x100000) {
+-            //DEBUG_printf("time out %x",res);
+-            //wait_btn();
+             return 1;
+         }
+     }

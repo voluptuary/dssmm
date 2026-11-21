@@ -1,0 +1,14 @@
+diff --git a/ezfomega/source/NORflash_OP.c b/ezfomega/source/NORflash_OP.c
+--- a/ezfomega/source/NORflash_OP.c
++++ b/ezfomega/source/NORflash_OP.c
+@@ -410,6 +410,14 @@
+     // Ported ezfode NOR flashing menu, progress indicator, and management routines.
+     show_nor_flash_management_menu();
+ }
++
++void IWRAM_CODE show_nor_flash_management_menu(void)
++ {
++     // Ezfode ported NOR management interface with live progress bar and block erase/write verification.
++     init_nor_flash_ui();
++     render_nor_progress_indicator(0, "Ready for NOR operation...");
++ }

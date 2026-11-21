@@ -1,0 +1,21 @@
+diff --git a/ezfomega/source/Ezcard_OP.c b/ezfomega/source/Ezcard_OP.c
+--- a/ezfomega/source/Ezcard_OP.c
++++ b/ezfomega/source/Ezcard_OP.c
+@@ -120,7 +120,7 @@
+             SD_Disable();
+             return 1;
+         }
+-        dmaCopy((void*)0x9E00000, SDbuffer+i*512, blocks*512);
++        dmaCopy((void*)0x9E00000, SDbuffer+(i<<9), blocks<<9);
+     }
+     SD_Disable();
+     return 0;
+@@ -136,7 +136,7 @@
+     u32 res;
+     for(i=0; i<count; i+=4) {
+         blocks = (count-i>4)?4:(count-i);
+-        dmaCopy( SDbuffer+i*512,(void*)0x9E00000, blocks*512);
++        dmaCopy( SDbuffer+(i<<9),(void*)0x9E00000, blocks<<9);
+         *(vu16 *)0x9fe0000 = 0xd200;
+         *(vu16 *)0x8000000 = 0x1500;
+         *(vu16 *)0x8020000 = 0xd200;

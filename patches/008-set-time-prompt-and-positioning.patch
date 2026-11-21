@@ -1,0 +1,11 @@
+diff --git a/ezfomega/source/RTC.c b/ezfomega/source/RTC.c
+--- a/ezfomega/source/RTC.c
++++ b/ezfomega/source/RTC.c
+@@ -88,7 +88,7 @@
+     // In Settings->Games time adjustment: prompt "A: Set   B: Cancel",
+     // move bottom panel text up 2 pixels, and display title as "Set time".
+-    draw_bottom_prompt("A: OK   B: Back");
++    draw_bottom_prompt("A: Set   B: Cancel");
+-    draw_panel_text_at_y(panel_y_default, "Set menu time");
++    draw_panel_text_at_y(panel_y_default - 2, "Set time");
+ }
