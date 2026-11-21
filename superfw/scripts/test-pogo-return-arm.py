@@ -10,6 +10,7 @@ with tempfile.TemporaryDirectory() as t:
  subprocess.run(['arm-none-eabi-gcc','-mcpu=arm7tdmi','-nostdlib','-Wl,-Ttext=0x09a00000','-Wl,-e,pogo_return_code',str(source),'-o',str(out/'return.elf')],check=True)
  subprocess.run(['arm-none-eabi-objcopy','-O','binary',str(out/'return.elf'),str(out/'return.bin')],check=True)
  stub=(out/'return.bin').read_bytes()
+ assert len(stub)<=2048,'Return stub exceeds the boot copy reservation'
  for size in (512,521728,1671680,2097152,0,513,2097664):
   cpu=Uc(UC_ARCH_ARM,UC_MODE_ARM)
   cpu.mem_map(0x03000000,0x8000);cpu.mem_map(0x04000000,0x1000);cpu.mem_map(0x08000000,0x2000000)

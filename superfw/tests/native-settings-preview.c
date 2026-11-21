@@ -174,8 +174,11 @@ int main(void) {
       volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));
       for(unsigned n=16*120;n<160*120;n++)back[n]=0xebeb;
     }
-    if(TEST_SCENE==13)
-      ((void(*)(volatile uint8_t*,unsigned,unsigned))(NATIVE_render_nor_progress|1u))((volatile uint8_t*)(0x06000000+VAR8(NATIVE_framen)*0xa000),1,2);
+    if(TEST_SCENE==13) {
+      /* Exercise the retained callback: its small render helper is inlined. */
+      ((void(*)(unsigned,unsigned))(NATIVE_nor_write_progress|1u))(1,2);
+      VAR8(NATIVE_framen)^=1; /* Callback already flipped; inspect that page. */
+    }
     else ((void(*)(unsigned))(NATIVE_menu_render|1u))(1);
     ok=ok&&frame_intact();
     wait_frame();((void(*)(void))(NATIVE_menu_flip|1u))();

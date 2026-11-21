@@ -1417,3 +1417,14 @@ Expanded scene11 exposed one real DSSMM clock-popup descender touching frame at
 (191,149). Moved the clock-running hint up2px; native font keeps its existing
 baseline. Start scene10 now passes with correct cache seeding. Added optional
 DSSMM_PREVIEW_FONTS/SCENES for focused reruns, defaults still full26 scenes.
+
+Clean e1494ba0/Build677 all3 builds passed native settings/plugin ARM and IGM ARM
+checks; SD522240/524288, Lite489472/507904, Chis1671680/2097152 bytes. Native2boot
+mGBA passes. Font1 scenes1..12 pass. Scene13 initially called an optimized-away
+private helper (address0); now calls retained nor_write_progress and compensates
+its own flip before frame inspection. Focused13/font1 passes; font0 matrix now
+running. Firmware bytes did not change for this fixture correction. Added2KiB
+return-code reservation test. Hold hardware-test667 until final matrix/CI passes.
+EZ native harness PR13/14/15 merged normally after all4 CI passes; no production
+hardware inputs changed. New DE/SuperFW Start overlay is build/de-superfw-start-comparison.html
+(ignored) and shows remaining Start fallback icon/text-centering parity work.

@@ -28,7 +28,7 @@ for name in ['FatFs','sdfs','load_settings','settings_save_flush','settings_save
 if a.reference:
  for name in ['menu_username','clock_seconds','clock_frame']:
   text+='#define NATIVE_'+name+f' 0x{syms[name]:08x}u\n'
-text+='#define NATIVE_render_nor_progress '+(f'0x{syms["render_nor_progress"]:08x}u' if 'render_nor_progress' in syms else '0')+'\n'
+text+='#define NATIVE_nor_write_progress '+(f'0x{syms["nor_write_progress"]:08x}u' if 'nor_write_progress' in syms else '0')+'\n'
 # Struct offsets are queried from the actual ELF, never from a host ABI.
 fields=[('smenu',f) for f in ['menu_tab','uiset.selector','uiset.seloff','tools.selector','info.selector']]
 fields += [('spop',f) for f in ['pop_num','submenu','selector','qpop.message','qpop.default_button','qpop.confirm_button','p.load.i.romfn','p.load.i.gcode','p.norld.e','p.update.issfw','p.update.superfw_ver']]
