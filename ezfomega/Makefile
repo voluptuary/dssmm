@@ -40,6 +40,10 @@ CFLAGS	:=	-g -Wall -O\
 
 CFLAGS	+=	$(INCLUDE)
 
+ifneq ($(strip $(PREVIEW_SCENE)),)
+CFLAGS += -DPREVIEW_SCENE=$(PREVIEW_SCENE)
+endif
+
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
