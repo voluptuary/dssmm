@@ -2076,3 +2076,13 @@ The release was created and subsequently corrected to use the cartridge-required
 ## 2026-11-12 — Release-note asset cleanup published
 
 - All 4 published notes for this platform were updated on GitHub and verified against canonical files. Release identity, flags and assets are unchanged. Proof: root docs/releases/end-user-cleanup-2026-11-12.json. Shared commit72f5fe293f8a3ec62ddf24852917af0b340e9b4f is pushed on all four branches. Editorial task complete; no kernel tests were run because product inputs did not change.
+
+2026-11-21: Added opt-in own-kernel mGBA native visual reference with nine
+separate-boot scenes, deterministic clock/files/artwork and SRAM completion
+checks. No hardware action/driver change. See docs/NATIVE-MENU-PREVIEW.md.
+Production verifier and screenshot validation recorded before integration.
+
+Native9-scene stock mGBA run and normal full project verifier passed. Added
+Start clock draw used by the real native Start loop and retested scene0. Exact
+capture/source hashes and limits: docs/native-menu-preview-validation.json.
+No production behavior/driver changes or hardware qualification.

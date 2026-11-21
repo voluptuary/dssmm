@@ -3185,3 +3185,13 @@ Entries below record what was known at each stage. Do not use older branch hashe
 - **Changes already in progress:** renamed `handoff.md`/`progress.md` to `HANDOFF.md`/`PROGRESS.md`, replaced current references to lower-case names and the former prompt filename, updated the audit script's checkpoint filename, added the save/settings fix to the 8.3.0 changelog, and removed the superseded evidence folders and user-authorized integrated Claude patch archive. Root `AGENTS.md` is the current instruction file. A duplicate `files/AGENTS.md` deletion was already present in the shared worktree; preserve that state.
 - **Next:** correct historical status wording and stale references, refresh the official candidate at `files/candidate/8.3.0/`, run the full audit/build, prepare the source ZIP from the final commit, commit and push to `origin`, create and merge the PR if repository rules permit, then update this repository's existing v8.3.0 tag/release assets and verify remote hashes. Never publish the candidate to `merkin-agent`.
 - Completion: all this platform's published release bodies match canonical notes on GitHub; release metadata/assets are unchanged. Shared commit72f5fe293f8a3ec62ddf24852917af0b340e9b4f is synchronized across all branches. No kernel inputs changed.
+
+2026-11-21: Added opt-in own-kernel mGBA native visual reference with nine
+separate-boot scenes, deterministic clock/files/artwork and SRAM completion
+checks. No hardware action/driver change. See docs/NATIVE-MENU-PREVIEW.md.
+Production verifier and screenshot validation recorded before integration.
+
+Native9-scene stock mGBA run and normal full project verifier passed. Added
+Start clock draw used by the real native Start loop and retested scene0. Exact
+capture/source hashes and limits: docs/native-menu-preview-validation.json.
+No production behavior/driver changes or hardware qualification.
