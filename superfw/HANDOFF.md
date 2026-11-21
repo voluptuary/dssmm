@@ -1412,3 +1412,8 @@ Start pages every frame, then incorrectly required the production cache to redra
 Seed Start pages once each; modal scenes still reseed every frame. This is a
 fixture correction, not a production stale-art fix. All earlier9/font1 scenes
 and native2boot saves passed. Rerun expanded matrix and final clean all3 build.
+
+Expanded scene11 exposed one real DSSMM clock-popup descender touching frame at
+(191,149). Moved the clock-running hint up2px; native font keeps its existing
+baseline. Start scene10 now passes with correct cache seeding. Added optional
+DSSMM_PREVIEW_FONTS/SCENES for focused reruns, defaults still full26 scenes.

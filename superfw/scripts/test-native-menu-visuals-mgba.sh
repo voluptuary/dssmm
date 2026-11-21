@@ -9,8 +9,8 @@ if [[ ! -f "$out/native-settings.sav" ]]; then
 fi
 python3 "$root/scripts/build-native-settings-preview.py" --scene 0 >/dev/null
 nor_supported=$(python3 -c 'import json,sys;print(int(json.load(open(sys.argv[1]))["nor_supported"]))' "$out/fixture.json")
-for font in 1 0; do
-for scene in 1 2 3 4 5 6 7 8 9 10 11 12 13; do
+for font in ${DSSMM_PREVIEW_FONTS:-1 0}; do
+for scene in ${DSSMM_PREVIEW_SCENES:-1 2 3 4 5 6 7 8 9 10 11 12 13}; do
  if [[ ( "$scene" = 4 || "$scene" = 13 ) && "$nor_supported" = 0 ]]; then continue; fi
  python3 "$root/scripts/build-native-settings-preview.py" --scene "$scene" --font "$font"
  SDL_AUDIODRIVER=dummy xvfb-run -a bash -c '

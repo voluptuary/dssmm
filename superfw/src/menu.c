@@ -2080,7 +2080,7 @@ void render_rtcpop(volatile uint8_t *frame) {
     unsigned x=120-font_width(time)/2+(spop.rtcpop.selector==3?font_width(hours)/2:font_width(hours)+font_width(":")+font_width(minutes)/2);
     draw_central_text("⯅",frame,x,52);draw_central_text("⯆",frame,x,88);
     draw_central_text("A: Set   B: Cancel",frame,120,112);
-    draw_central_text("Clock runs while menu is open",frame,120,menu_font==FONT_STYLE_DSSMM?136:132);
+    draw_central_text("Clock runs while menu is open",frame,120,menu_font==FONT_STYLE_DSSMM?134:132);
     return;
   }
   if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);

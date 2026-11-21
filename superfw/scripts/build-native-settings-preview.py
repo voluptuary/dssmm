@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build a ROM running the linked firmware settings/menu with SRAM-backed test SD."""
 from pathlib import Path
-import argparse,struct,subprocess,os,json,re
+import argparse,struct,subprocess,os,json,re,hashlib
 root=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(14),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
 elf=a.elf.read_bytes();nm=subprocess.check_output(['arm-none-eabi-nm',str(a.elf)],text=True)
@@ -78,5 +78,5 @@ rom+=b'\xff'*(0xe80000-len(rom));font=(root/('res/fonts-ext-dssmm.pack' if 'keyp
 # Standard GBA header complement; commercial BIOS is not needed for the harness.
 rom[0xb2]=0x96;rom[0xbd]=(-sum(rom[0xa0:0xbd])-0x19)&255
 (a.out/'native-settings.gba').write_bytes(rom)
-(a.out/'fixture.json').write_text(json.dumps({'native_elf':str(a.elf),'nor_supported':'keypress_menu_norbrowse' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
+(a.out/'fixture.json').write_text(json.dumps({'scene':a.scene,'font':a.font,'reference':a.reference,'native_elf_sha256':hashlib.sha256(elf).hexdigest(),'native_elf':str(a.elf),'nor_supported':'keypress_menu_norbrowse' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
 print(a.out/'native-settings.gba')
