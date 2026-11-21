@@ -277,3 +277,30 @@ preserved. SuperFW disables IPA-RA locally; no other kernel's compiler options
 or hardware protocols were changed. The actual linked-ARM regression catches
 this fault, which host-only tests did not. See the project's regression report.
 Keep emulator correctness separate from physical SuperCard SD/NOR qualification.
+
+## Native EZ-FLASH visual references (2026-11-21)
+
+Each EZ-FLASH project now has an opt-in `scripts/test-native-menu-preview-mgba.sh`
+and `scripts/build-native-menu-preview.py`. Run with the normal devkitARM
+variables from that project's worktree. The fixture includes that project's own
+kernel translation unit/assets and replaces only entry point, clock and filesystem
+reads. Nine separate boots capture Start, Settings, Interface, Games, Hardware,
+View, Info and both carousels in ignored project `build/native-scene-N.png` files.
+Synthetic filenames and decoded RGB555 artwork are baked into the visual ROM;
+there is no flash-card boot/protocol emulation. Preview ROMs are not installable
+firmware. Production builds do not enable PREVIEW_SCENE.
+
+Use stock SDL mGBA0.10.1 (`/usr/games/mgba -1`), Xvfb and xdotool already in the
+standard container. No emulator patches, BIOS or additional packages are needed.
+Each capture uses a separate boot and checks its SRAM scene-completion signature;
+rapid key-driven screenshot cycling was found to race repaint and is not evidence.
+Compare any two native 240x160 captures with
+`python3 scripts/compare-menu-captures.py reference.png candidate.png --output /tmp/menu-comparison.html`.
+The standalone HTML has side-by-side views and an opacity overlay at integer
+pixel scale. SuperFW's native preview accepts `--reference` for deterministic
+Test User/12:34:56 headers without its completion marker. Hardware action tests
+remain in each project's existing verifiers; visual fixtures do not qualify them.
+
+The owner's unmodified audit suggestions were archived from root PATCHES.md and
+patches/ under docs/history/patch-review-2026-11-21/ to restore the existing shared
+root allowlist. Review decisions are in SuperFW's project documentation.

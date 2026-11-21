@@ -3272,3 +3272,8 @@ Normal merge/sync follows this publication checkpoint; no other kernel inputs
 changed. Chis667 is current ignored hardware-test image; owner lock/private BIOS,
 session scratch and full artwork archive are retained. Project journals govern
 further single-project work; recover RAM headroom before substantial additions.
+
+2026-11-21: Added shared native-capture overlay report; documented unchanged stock
+mGBA setup and independent screenshot boots. Archived owner patch suggestions
+intact under docs/history to restore root layout checks. Hardware renderer harness
+changes remain in their owning lanes; no hardware drivers shared or replaced.

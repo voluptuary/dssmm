@@ -2187,3 +2187,10 @@ Normal merge/sync follows this publication checkpoint; no other kernel inputs
 changed. Chis667 is current ignored hardware-test image; owner lock/private BIOS,
 session scratch and full artwork archive are retained. Project journals govern
 further single-project work; recover RAM headroom before substantial additions.
+
+2026-11-21: Native visual-reference harness work is in each EZ-FLASH owning lane;
+shared comparison HTML tool and setup documentation are on dssmm. Stock mGBA0.10.1,
+no new packages/patches/BIOS. Owner audit artifacts moved intact to
+`docs/history/patch-review-2026-11-21/`; unexpected root files had blocked every
+project command, so restore existing allowlist rather than weakening isolation.
+See docs/local-development.md for deterministic boots and validation limits.
