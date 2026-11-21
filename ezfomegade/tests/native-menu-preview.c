@@ -35,7 +35,7 @@ static void preview_artwork(void) {
 }
 static void preview_draw(unsigned scene,unsigned selected) {
     Launcher_ApplyThemeColours();
-    if(scene==0)Launcher_DrawStartWindow(selected%4);
+    if(scene==0){Launcher_DrawStartWindow(selected%4);Launcher_DrawStartClock(1); }
     else if(scene==1)Launcher_SettingsDrawList("Settings",SETTINGS_CATEGORY_TOTAL,selected%SETTINGS_CATEGORY_TOTAL,0,Launcher_SettingsCategoryGetLine);
     else if(scene<6) {
         const unsigned categories[]={SETTINGS_CATEGORY_INTERFACE,SETTINGS_CATEGORY_GAMES,SETTINGS_CATEGORY_HARDWARE,SETTINGS_CATEGORY_VIEW};
