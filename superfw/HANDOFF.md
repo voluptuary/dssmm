@@ -1428,3 +1428,11 @@ return-code reservation test. Hold hardware-test667 until final matrix/CI passes
 EZ native harness PR13/14/15 merged normally after all4 CI passes; no production
 hardware inputs changed. New DE/SuperFW Start overlay is build/de-superfw-start-comparison.html
 (ignored) and shows remaining Start fallback icon/text-centering parity work.
+
+Build677 delivered to hardware-test after all local/native/mGBA26/sourceCI44954125901
+and all4 PR16 CI44954129956 passed. Sourcee1494ba0, clean Chis1671680 bytes;
+record docs/build-677-validation.json retains all3 identities/budgets/tests and
+limits. Superseded ignored667 image/JSON removed only after hash-verified677 copy;
+tracked667 publication/validation remains. No new public release or hardware
+qualification. Next: integrate final evidence, normal all5 synchronization, then
+Start fallback icon/recent-caption centering using the new native comparison.

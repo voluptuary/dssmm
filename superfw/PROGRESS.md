@@ -837,3 +837,12 @@ remain active. Current physical test image remains667.
 pass. Implemented owner667 UI queue and optional wrap with collision-safe cache;
 registered native loader replay and wrap persistence regression. Full verifier
 running; no new hardware candidate yet. Physical Exit/PCE remain unqualified.
+
+Clean Build677/e1494ba0 all3/nativeARM/settings/plugin/IGM gates pass with fixed
+hardware limits. Actual Chis mGBA2boots and26 scenes across bothfonts pass; real
+SMS/GG/PCE Exit-to-marker and upstream host suite pass. SourceCI44954125901 passed;
+PR16 integrationCI44954129956 all4 jobs passed. No new
+physical qualification. Exact candidate record: docs/build-677-validation.json.
+Removed only the failed generated NOR-debug ROM directory after preserving its
+cause/results; retained native fixtures/current3 packages, full artwork ZIP,
+owner lock, private BIOS and session scratch.

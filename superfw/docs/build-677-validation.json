@@ -1,0 +1,112 @@
+{
+  "build": 677,
+  "validation": "clean all3/native ARM/IGM and native mGBA checks passed; physical hardware not qualified",
+  "boards": [
+    {
+      "source_tree_sha256": "8114b367ef39f3010d3e8639c98af52e73d4777376ffa9d2da632dfe920dc547",
+      "board": "sd",
+      "dssmm_build": 677,
+      "source_commit": "e1494ba0ece45aefb574392ab53d01005ce5fe0d",
+      "source_dirty": false,
+      "firmware_sha256": "06462a365f3a9340f77e044dc57871c0b415d4579f38951b89e36213bcce1e79",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 522240,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 2048
+    },
+    {
+      "source_tree_sha256": "8114b367ef39f3010d3e8639c98af52e73d4777376ffa9d2da632dfe920dc547",
+      "board": "lite",
+      "dssmm_build": 677,
+      "source_commit": "e1494ba0ece45aefb574392ab53d01005ce5fe0d",
+      "source_dirty": false,
+      "firmware_sha256": "b68863e4e94f1a9052b32e174c7f404846470001b0ac70f502961939f7d4ac36",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 489472,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 18432
+    },
+    {
+      "source_tree_sha256": "8114b367ef39f3010d3e8639c98af52e73d4777376ffa9d2da632dfe920dc547",
+      "board": "chis",
+      "dssmm_build": 677,
+      "source_commit": "e1494ba0ece45aefb574392ab53d01005ce5fe0d",
+      "source_dirty": false,
+      "firmware_sha256": "9cc6bd359aaebe82f628e354e17e001b80256f671fb9ee3b54e53186d55baf3c",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "tests": {
+    "native_settings": "all3 actual optimized ARM/FatFs save/reload, stack14128B; Chis mGBA two boots passed",
+    "native_plugins": "all3 actual optimized loader/FAT16/ABI/halfword bus for SMS/GG/PCE, MBZ/BIN/GBA, stack10496B",
+    "native_igm": "all3 exact package/ELF and ARM halfword unpack replay",
+    "menus": "Chis font1 scenes1..12 plus retained NOR callback scene13 passed; font0 all13 passed (26 total)",
+    "real_plugin_mgba": "bundled real SMS/GG/PCE menu Exit to marker passed; synthetic games, production restoration separately ARM-replayed",
+    "host": "complete host/sanitizer suites and upstream tests passed on preceding identical functional source apart from the 2px clock-hint alignment; evidence reused, final native visual checks cover alignment",
+    "firmware_return": "actual production boot/reset/copy, complete firmware sizes, mode/interrupt/DMA/halfword writes and 2KiB stub guard passed"
+  },
+  "ram": {
+    "chis_ewram_used": 256712,
+    "chis_ewram_limit": 257024,
+    "iwram_data_bytes": 15576,
+    "stack_reserve_bytes": 16384
+  },
+  "fixture_corrections": [
+    "Seed cached Start pages once each; reseed modal pages every frame",
+    "Call retained NOR callback rather than inlined renderer; compensate its page flip before checking pixels"
+  ],
+  "ci": {
+    "source_run": 44954125901,
+    "integration_run": 44954129956,
+    "status": "passed: source and all4 integration jobs"
+  },
+  "known_limits": [
+    "No new physical qualification; only Chis has earlier owner tests",
+    "Physical GG/SMS Exit and owner PCE load error require retest",
+    "SD/Lite physical operation and flash/save timing remain unqualified",
+    "Complete DE parity and NOR/Recents carousels remain unfinished"
+  ],
+  "evidence_logs": {
+    "dssmm-current-full-verify.log": "e520aa0cc9e96b37734c6b306ed0c1759a09b78d1e468576fe4cc9d684c2d8e5",
+    "dssmm-clean-candidate-builds.log": "caa6c24ec09709f6faa05c79e9fba494352e8bc28aa60cd148dfa8537ea8d01a",
+    "dssmm-build677-mgba.log": "9520da81821e5b76fd94295c63c0b3a949ed1c6ea7eb1a0055db26196ad5c4e4",
+    "dssmm-nor-callback-visual.log": "19da50c943d02d7e2dbeadf327994d349d5334259e78a38d8d480efe1c7b45cd",
+    "dssmm-build677-font0.log": "fc68df03ed2cd248947bf915bcdab82c823f9f188d9ecc609f630fba58d86838",
+    "dssmm-own-plugin-exit.log": "ab9e14175a098dc431a9a41fa76b3ce39ff9a11f494ab3cf531b18342404dd1e",
+    "dssmm-upstream-final.log": "f8ac0e83cc6d41aafa2976ad0814c0cc1caa8202750fa54c0dea35c716a68ca8",
+    "dssmm-return-size-guard.log": "464f6551a9300807f7be6c5f32c65593975e9e0ace3ef49ffdb371c2322e7a7d"
+  },
+  "capture_sha256": {
+    "visual-1-font0.png": "ecffd6000cb793ba8a01209841431f2f1cd5bf18be6076144138efcd43962573",
+    "visual-1-font1.png": "6b8f3a51c9564b15e3e8b062fd559c7ca46cc04f532bb07513aa2cdf5fa86204",
+    "visual-10-font0.png": "02ce3111a2ccaf3ae5b29db9868d1fb9667bb2a48bcc6318fe3a2200d015de55",
+    "visual-10-font1.png": "178a3597222319757ddedfc406361d5f4ee7d717e0729443d00e56bb3d98c08f",
+    "visual-11-font0.png": "c249b03c70e45f3f3f2bfd1a5159f8d7de4d16859f04181147af09d4bea87907",
+    "visual-11-font1.png": "093aa2d4a3216e9f08fea7943208e4d094573be57da0ee2e9b4eb89f24c0646b",
+    "visual-12-font0.png": "13f8deed72033f8968a56d23dbf7ad974784560443779c1124330c736f571b3e",
+    "visual-12-font1.png": "f1847ec19b3ba076af4eb3c7c38c334ced8581d2d207c0c712fa62ae534db736",
+    "visual-13-font0.png": "02d6bba80c33e8de5b242c8c785f5abab8f143dd3c057778b99fe02b18b9e288",
+    "visual-13-font1.png": "544bd8883f7b467dd9f67cb575567d119cd532f7d94c1319c525d923631edded",
+    "visual-2-font0.png": "048b284a237e62ec8e7c57aa398f6b9d80c8774e14e70210891e3d9212c5ad3a",
+    "visual-2-font1.png": "a5364257400d38f3443c49e38ee614751c4c9a63a1cfc202f9d91a56a24924d9",
+    "visual-3-font0.png": "7f209c924a614fc683ff5387668585a1b6cd930e5f3fa0cb103801040014b48b",
+    "visual-3-font1.png": "c4265fc431b48a0c3c23f39ab254efa13d6659a279ace8f0c44eecfcc06463e4",
+    "visual-4-font0.png": "190657d32b07ae222a6f7d28770a4d7fd836567dedd01be85819edd16476651b",
+    "visual-4-font1.png": "c591ca5aec2ffb7af20f3a44c97e2a1bc22a16ae41617403aac023b9db32d66c",
+    "visual-5-font0.png": "ffd85551bf823619cdf15d2f25017cb5d19352ce85b7d595c0c188390fcf6f09",
+    "visual-5-font1.png": "9b5b5d3a1c392ac28cb30c717423663eb846084c045c42a11978ac05be345c1b",
+    "visual-6-font0.png": "af4e97d06078cc47c9c1f787f10660ee0401669c32401a20e629a0a620bd72ec",
+    "visual-6-font1.png": "519d853db57540c324632454d475d45cc41051929b248a261b0cb51affa556f6",
+    "visual-7-font0.png": "f21fe957522ef83d24a9762f2d7a804bd5815c0dd21d2b81733fe8fed306734d",
+    "visual-7-font1.png": "0df7ae9a7e399c8dc7a8ef423ca166dd19d43250f3169c089fe237eae9d4ab1a",
+    "visual-8-font0.png": "51f715a0a00191d5fe8986c6faa2d2e2c47c061fec66d6b7665b0a9b81403821",
+    "visual-8-font1.png": "2c966d8a00166b7b8b156ebf8eefc754fbb2a2e6e5f45f9a96c4924d87ed7f11",
+    "visual-9-font0.png": "e2f9c760d9e510444382b4d66cdea6672f245863bde6c9611cbc3c7e7479b0c4",
+    "visual-9-font1.png": "550131d62dc9a134ed174dd7e88ddd8a013abea967e7896c28783f26c7d8331f"
+  },
+  "verifier_source_commit": "3abc909",
+  "comparison": "build/de-superfw-start-comparison.html: actual native Start, matching SD selection and Test User/12:34:56; accent colors intentionally differ"
+}
