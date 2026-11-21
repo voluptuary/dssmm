@@ -39,6 +39,10 @@ CFLAGS	:=	-g -Wall -O -fomit-frame-pointer -ffast-math -ffunction-sections -fdat
 
 CFLAGS	+=	$(INCLUDE)
 
+ifneq ($(strip $(PREVIEW_SCENE)),)
+CFLAGS += -DPREVIEW_SCENE=$(PREVIEW_SCENE)
+endif
+
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
@@ -135,7 +139,9 @@ else
 $(OUTPUT).gba	:	$(OUTPUT).elf $(dir $(OUTPUT))../../scripts/pack-blue-kernel.py $(dir $(OUTPUT))Makefile
 	$(SILENTCMD)$(OBJCOPY) -O binary $< $@
 	$(SILENTCMD)gbafix $@ -tezbluekernel -c0000 -m00
+ifeq ($(strip $(PREVIEW_SCENE)),)
 	@python3 "$(dir $(OUTPUT))../../scripts/check-blue-linked-layout.py" "$(@:.gba=.elf)"
+endif
 
 $(OUTPUT).elf	:	$(OFILES)
 
