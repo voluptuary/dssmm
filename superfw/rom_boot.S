@@ -313,6 +313,26 @@ _main_end:
   ldr r1, =0x0404    // Mode 4, BG2 enabled
   strh r1, [r8]
 
+  @ Preserve the exact installed/chain-loaded kernel before scratch overwrites it.
+  @ Plugins use <14MiB; backup24..26MiB and return code26MiB stay outside that area.
+  mov r0, $GAMEPAK_BASEADDR
+  ldr r2, [r0, #0xcc]
+  cmp r2, $0x100
+  blo 8f
+  ldr r1, =(FW_MAX_SIZE_KB*1024)
+  cmp r2, r1
+  bhi 8f
+  add r2, r2, $0x700
+  add r2, r2, $0xff
+  lsr r2, r2, $11
+  mov r1, $0x09800000
+  bl sdram_copy
+  ldr r0, =pogo_return_code
+  mov r1, $0x09a00000
+  mov r2, $1
+  bl sdram_copy
+8:
+
   @ Uncompress/extract the font glyphs. This supports any size.
   ldr r0, =font_start
   #if defined(COMPRESS_FONTS)
@@ -678,6 +698,9 @@ setup_bg2_regs:
 .pool
 
 _end_bootloader:
+
+@ Return stub is data copied separately, not part of the 3KiB IWRAM bootloader.
+#include "src/pogo_return.S"
 
 @ apack compressed assets!
 payload_ewram:

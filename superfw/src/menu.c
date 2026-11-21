@@ -121,8 +121,9 @@ enum {
   UiSetTopBar,
   UiSetClean,
   UiSetClock,
+  UiSetWrap,
   UiSetSave, /* retired sentinel; no selectable Save action */
-  UiSetMAX = UiSetClock,
+  UiSetMAX = UiSetWrap,
 };
 
 enum {
@@ -1194,6 +1195,7 @@ static artwork_info preview_info;
 /* Byte flags and path strings must live in GBA RAM, not the 16-bit cart bus. */
 static struct {
   bool cached, valid;
+  uint16_t index; /* Uses former alignment padding; stays off the cartridge bus. */
   unsigned mode;
   char rom[MAX_FN_LEN];
   artwork_info info;
@@ -1207,6 +1209,12 @@ static int browser_motion_offset;
 static bool browser_fast_reuse, browser_fast_valid[2];
 static int browser_fast_selection[2];
 static unsigned browser_fast_view[2], browser_fast_mode[2];
+
+static unsigned carousel_find_slot(int index) {
+  for(unsigned slot=0;slot<ARTWORK_CACHE_SLOTS;++slot)
+    if(carousel_meta[slot].cached && carousel_meta[slot].index==index)return slot;
+  return ARTWORK_CACHE_SLOTS;
+}
 
 static void browser_invalidate_artwork(void) {
   browser_fast_valid[0] = browser_fast_valid[1] = false;
@@ -1522,8 +1530,12 @@ void render_flashbrowser(volatile uint8_t *frame) {
 
   human_size(tmp1, sizeof(tmp1), smenu.fbrowser.usedblks * NOR_BLOCK_SIZE);
   human_size(tmp2, sizeof(tmp2), NOR_GAMEBLOCK_COUNT * NOR_BLOCK_SIZE);
-  npf_snprintf(tmp, sizeof(tmp), "Flash usage: %s/%s", tmp1, tmp2);
-  draw_text_ovf(tmp, frame, 8, 144, SCREEN_WIDTH - 16);
+  npf_snprintf(tmp,sizeof(tmp),"NOR %s/%s",tmp1,tmp2);
+  draw_text_ovf(tmp,frame,8,144,140);
+  draw_box_outline(frame,156,234,148,158,FT_COLOR);
+  unsigned filled=(uint64_t)MIN(smenu.fbrowser.usedblks,NOR_GAMEBLOCK_COUNT)*74/NOR_GAMEBLOCK_COUNT;
+  for(unsigned y=150;y<156;++y)
+    dma_memset16(frame+y*240+158,dup8(HI_COLOR),(filled&~1u)/2);
 }
 #endif
 
@@ -1605,6 +1617,44 @@ static unsigned browser_entry_icon(const t_centry *entry) {
          (entry->attr & AM_DIR) ? ICON_FOLDER : guessicon(entry->fname);
 }
 
+/* One bounded SD read per settled frame; hot drawing stays in the renderer. */
+__attribute__((optimize("Os")))
+static void browser_cache_prepare(const int candidates[ARTWORK_CACHE_SLOTS]) {
+  for (unsigned c = 0; c < ARTWORK_CACHE_SLOTS; ++c) {
+    int index = candidates[c];
+    if (index < 0 || index >= smenu.browser.dispentries) continue;
+    const t_centry *entry = sdr_state->filefilter[index];
+    char rom[MAX_FN_LEN];
+    int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
+    if (n <= 0 || (unsigned)n >= sizeof(rom)) continue;
+    unsigned slot=carousel_find_slot(index);
+    if(slot<ARTWORK_CACHE_SLOTS && carousel_meta[slot].mode==artwork_mode &&
+        !strcmp(carousel_meta[slot].rom,rom))continue;
+    if(slot==ARTWORK_CACHE_SLOTS)for(unsigned s=0;s<ARTWORK_CACHE_SLOTS;++s) {
+      bool keep=false;
+      if(carousel_meta[s].cached)for(unsigned c=0;c<ARTWORK_CACHE_SLOTS;++c)
+        if(candidates[c]==carousel_meta[s].index)keep=true;
+      if(!keep){slot=s;break;}
+    }
+    if(slot==ARTWORK_CACHE_SLOTS)continue;
+    if(carousel_hot_valid && carousel_meta[slot].cached &&
+        carousel_meta[slot].index==carousel_hot_index)carousel_hot_valid=false;
+    carousel_meta[slot].index=index;
+    strbcpy(carousel_meta[slot].rom, rom, MAX_FN_LEN);
+    carousel_meta[slot].mode = artwork_mode;
+    carousel_meta[slot].valid = ((entry->attr & AM_DIR) ? artwork_load_directory : artwork_load)(rom, artwork_mode - 1,
+        (uint8_t *)sdr_state->carousel_art[slot].pixels, ARTWORK_MAX_PIXELS,
+        sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
+        &carousel_meta[slot].info);
+    carousel_meta[slot].cached = true;
+    if (index==candidates[0] || index==candidates[1] || index==candidates[2]) {
+      browser_fast_reuse = false;
+      browser_fast_valid[0] = browser_fast_valid[1] = false;
+    }
+    break;
+  }
+}
+
 static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
   if (!browser_fast_reuse) {
     /* DS backgrounds were drawn once by menu_render before the header. */
@@ -1625,48 +1675,23 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
     int selected = smenu.browser.selector;
     browser_carousel_item items[3];
     unsigned item_count = browser_carousel_layout(vertical, selected,
-        smenu.browser.dispentries, browser_motion_offset, items);
+        smenu.browser.dispentries, browser_motion_offset, carousel_wrap, items);
     /* Populate one missing slot per settled frame, selected entry first. */
-    const int candidates[ARTWORK_CACHE_SLOTS] = {selected, selected-1, selected+1, selected-2, selected+2};
-    if (artwork_mode && browser_motion_offset == 0) {
-      for (unsigned c = 0; c < ARTWORK_CACHE_SLOTS; ++c) {
-        int index = candidates[c];
-        if (index < 0 || index >= smenu.browser.dispentries) continue;
-        const t_centry *entry = sdr_state->filefilter[index];
-        char rom[MAX_FN_LEN];
-        int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
-        if (n <= 0 || (unsigned)n >= sizeof(rom)) continue;
-        unsigned slot = (unsigned)index % ARTWORK_CACHE_SLOTS;
-        if (carousel_meta[slot].cached &&
-            carousel_meta[slot].mode == artwork_mode &&
-            !strcmp(carousel_meta[slot].rom, rom)) continue;
-        strbcpy(carousel_meta[slot].rom, rom, MAX_FN_LEN);
-        carousel_meta[slot].mode = artwork_mode;
-        carousel_meta[slot].valid = ((entry->attr & AM_DIR) ? artwork_load_directory : artwork_load)(rom, artwork_mode - 1,
-            (uint8_t *)sdr_state->carousel_art[slot].pixels, ARTWORK_MAX_PIXELS,
-            sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
-            &carousel_meta[slot].info);
-        carousel_meta[slot].cached = true;
-        if (carousel_hot_valid && (unsigned)carousel_hot_index%ARTWORK_CACHE_SLOTS==slot)
-          carousel_hot_valid=false;
-        if (index >= selected-1 && index <= selected+1) {
-          browser_fast_reuse = false;
-          browser_fast_valid[0] = browser_fast_valid[1] = false;
-        }
-        break;
-      }
-    }
+    int candidates[ARTWORK_CACHE_SLOTS] = {selected, selected-1, selected+1, selected-2, selected+2};
+    for(unsigned c=0;c<ARTWORK_CACHE_SLOTS;++c)
+      candidates[c]=browser_carousel_index(candidates[c],smenu.browser.dispentries,carousel_wrap);
+    if(artwork_mode && browser_motion_offset==0)browser_cache_prepare(candidates);
     int focus_index = selected;
     for (unsigned i = 0; i < item_count; ++i) {
       const browser_carousel_item *item = &items[i];
       const t_centry *entry = sdr_state->filefilter[item->index];
       if (item->focused) focus_index = item->index;
-      unsigned slot = (unsigned)item->index % ARTWORK_CACHE_SLOTS;
+      unsigned slot=carousel_find_slot(item->index);
       char rom[MAX_FN_LEN];
       int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
       bool drawn = false;
       if (artwork_mode && n > 0 && (unsigned)n < sizeof(rom) &&
-          carousel_meta[slot].cached && carousel_meta[slot].valid &&
+          slot<ARTWORK_CACHE_SLOTS && carousel_meta[slot].cached && carousel_meta[slot].valid &&
           carousel_meta[slot].mode == artwork_mode &&
           !strcmp(carousel_meta[slot].rom, rom)) {
         const artwork_info *info = &carousel_meta[slot].info;
@@ -2048,19 +2073,19 @@ void render_popupq(volatile uint8_t *frame, unsigned fcnt) {
 
 void render_rtcpop(volatile uint8_t *frame) {
   if(spop.rtcpop.menu_clock) {
-    draw_central_text("Set menu time",frame,120,30);
+    draw_central_text("Set time",frame,120,30);
     char time[8];npf_snprintf(time,sizeof(time),"%02u:%02u",(unsigned)(uint8_t)spop.rtcpop.val.hour%24,(unsigned)(uint8_t)spop.rtcpop.val.min%60);
     draw_central_text(time,frame,120,70);
     char hours[3]={time[0],time[1],0},minutes[3]={time[3],time[4],0};
     unsigned x=120-font_width(time)/2+(spop.rtcpop.selector==3?font_width(hours)/2:font_width(hours)+font_width(":")+font_width(minutes)/2);
     draw_central_text("⯅",frame,x,52);draw_central_text("⯆",frame,x,88);
-    draw_central_text("A: Set   B: Cancel",frame,120,114);
-    draw_central_text("Clock runs while menu is open",frame,120,138);
+    draw_central_text("A: Set   B: Cancel",frame,120,112);
+    draw_central_text("Clock runs while menu is open",frame,120,menu_font==FONT_STYLE_DSSMM?136:132);
     return;
   }
   if(menu_theme<THEME_DSSMM_LIGHT)draw_box_outline(frame, 2, 240-2, 18, 158, FG_COLOR);
 
-  draw_central_text(msgs[lang_id][MSG_DEF_RTCVAL], frame, SCREEN_WIDTH/2, 32);
+  draw_central_text(menu_theme>=THEME_DSSMM_LIGHT?"Set time":msgs[lang_id][MSG_DEF_RTCVAL], frame, SCREEN_WIDTH/2, 32);
 
   const t_dec_date *v = &spop.rtcpop.val;
   char thour[3] = {'0' + v->hour /10, '0' + v->hour  % 10, 0};
@@ -2083,6 +2108,7 @@ void render_rtcpop(volatile uint8_t *frame) {
   };
   draw_central_text("⯅", frame, cox[spop.rtcpop.selector], 54);
   draw_central_text("⯆", frame, cox[spop.rtcpop.selector], 84);
+  draw_central_text("A: Set   B: Cancel",frame,120,112);
 }
 
 static void render_dssmm_settings_background(volatile uint8_t *frame,const char *title);
@@ -2281,7 +2307,7 @@ void render_ui_settings(volatile uint8_t *frame) {
   char tmpbuf[64];
   const char * const labels[UiSetSave] = {
     msgs[lang_id][MSG_UIS_THEME], "Font", "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
-    msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent", "Top bar color", "Clean list", "Clock format"
+    msgs[lang_id][MSG_UIS_RECNT], msgs[lang_id][MSG_UIS_ANSPD], msgs[lang_id][MSG_UIS_BHID], "Accent", "Top bar color", "Clean list", "Clock format", "Wrap around"
   };
   for (unsigned row = 0; row < rows; ++row) {
     unsigned option = smenu.uiset.seloff + row;
@@ -2297,6 +2323,7 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetRect: value = msgs[lang_id][recent_menu ? MSG_KNOB_ENABLED : MSG_KNOB_DISABLED]; break;
     case UiSetASpd: value = msgs[lang_id][MSG_UIS_SPD0 + anim_speed]; break;
     case UiSetHid: value = msgs[lang_id][hide_hidden ? MSG_KNOB_DISABLED : MSG_KNOB_ENABLED]; break;
+    case UiSetWrap: value=carousel_wrap?"On":"Off";break;
     case UiSetClock: value=menu_clock_24?"24 hour":"12 hour";break;
     case UiSetClean: value=msgs[lang_id][clean_list?MSG_KNOB_ENABLED:MSG_KNOB_DISABLED];break;
     case UiSetTopBar: value=accent_names[menu_topbar<ACCENT_COUNT?menu_topbar:0];break;
@@ -2427,9 +2454,7 @@ void reload_theme(unsigned thnum) {
   MEM_PALETTE[256 + SEL_COLOR] = colors.hi_blend;
 }
 
-/* DS Style Start layout matches the DE default geometry. Hardware actions stay
- * in SuperFW; SD/Lite substitute Recents for the unsupported NOR browser. */
-/* Mask partial Mode4 pairs so odd-width strokes never byte-write VRAM. */
+/* Shared header format; persisted time remains24-hour seconds. */
 static void format_menu_clock(char *out,unsigned size,uint32_t seconds) {
   if(seconds==UINT32_MAX){strbcpy(out,"--:--:--",size);return;}
   unsigned hour=seconds/3600%24;
@@ -2437,11 +2462,12 @@ static void format_menu_clock(char *out,unsigned size,uint32_t seconds) {
   else npf_snprintf(out,size,"%02u:%02u %s",hour%12?hour%12:12,(unsigned)(seconds/60%60),hour<12?"AM":"PM");
 }
 
+/* Mask partial Mode4 pairs; odd-width strokes never byte-write VRAM. */
 static void launcher_corner_span(volatile uint8_t *frame,unsigned x,unsigned y,unsigned width) {
   for(unsigned px=x&~1u;px<x+width;px+=2) {
     volatile uint16_t *dest=(volatile uint16_t *)(frame+y*240+px);
     unsigned mask=(px>=x?255:0)|((px+1<x+width)?0xff00:0);
-    *dest=(*dest&~mask)|(dup8(y<16?TOP_TEXT:HI_COLOR)&mask);
+    *dest=(*dest&~mask)|(dup8(y<16 && menu_topbar?TOP_TEXT:HI_COLOR)&mask);
   }
 }
 static void launcher_corners(volatile uint8_t *frame,unsigned x,unsigned y,unsigned w,unsigned h) {
@@ -2456,6 +2482,7 @@ static void launcher_corners(volatile uint8_t *frame,unsigned x,unsigned y,unsig
   }
 }
 
+/* SD/Lite substitute Recents for the Chis-only NOR shortcut. */
 static void render_start(volatile uint8_t *frame) {
   dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,true);
   char title_buffer[MAX_FN_LEN];
@@ -2525,7 +2552,7 @@ static void render_dssmm_settings_background(volatile uint8_t *frame,const char 
 }
 
 static void render_settings_home(volatile uint8_t *frame) {
-  static const char * const labels[]={"Interface","Games","Hardware","System","Help"};
+  static const char * const labels[]={"Interface","Games","Hardware","System","Info"};
   render_dssmm_settings_background(frame,"Settings");
   unsigned line_h=menu_font==FONT_STYLE_DSSMM?14:18;
   for(unsigned i=0;i<5;++i) {
@@ -2551,12 +2578,27 @@ static const struct {
   #endif
 };
 
+static void render_menu_notice(volatile uint8_t *frame) {
+  const char *notice=spop.alert_msg;
+  if(!notice && settings_save_preparing())notice="Saving settings...";
+  if (notice) {
+    draw_box_full(frame, 15, 227, SCREEN_HEIGHT / 2 - 20, SCREEN_HEIGHT / 2 + 20, FG_COLOR, HI_COLOR);
+    draw_central_text(notice, frame, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 8);
+    REG_WIN0H = 226 | (14 << 8);
+    REG_WIN0V = (SCREEN_HEIGHT / 2 + 20) | ((SCREEN_HEIGHT / 2 - 20) << 8);
+  } else {
+    REG_WIN0H = 0;
+    REG_WIN0V = 0;
+  }
+}
+
 // Renders the menu. Arg0 represents the frame count difference with the
 // previous rendered frame (for animations and similar stuff).
 #pragma GCC optimize ("O2")
 
+/* Routing favors size; pixel/scaling functions retain their own hot settings. */
+__attribute__((optimize("Os")))
 void menu_render(unsigned fcnt) {
-  if(!settings_save_poll())spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];
   objnum = 0;
   volatile uint8_t *frame = &MEM_VRAM_U8[0xA000*framen];
   if (restart_required) {
@@ -2607,16 +2649,6 @@ void menu_render(unsigned fcnt) {
     for(unsigned i=mintab;i<MENUTAB_MAX;++i)
       if(i==smenu.menu_tab)render_icon((i-mintab)*16,0,i+ICON_RECENT);
       else render_icon_trans((i-mintab)*16,0,i+ICON_RECENT);
-  } else if(!launcher || launcher_page==2) {
-    static const char * const titles[]={"Recents","SD Card",
-#ifdef SUPPORT_NORGAMES
-      "NOR Flash",
-#endif
-      "Settings","Interface","System","Help"};
-    const char *heading=launcher?"Settings":titles[smenu.menu_tab];
-    if(!launcher && smenu.menu_tab==MENUTAB_SETTINGS && launcher_settings_group)
-      heading=launcher_settings_group==1?"Games":"Hardware";
-    draw_text_ovf(heading,frame,8,0,160);
   }
 
   if(launcher) {
@@ -2627,7 +2659,7 @@ void menu_render(unsigned fcnt) {
     }
     if(launcher_page==1)render_start_bar(frame);
     else render_dssmm_settings_header(frame,"Settings");
-    REG_WIN0H=REG_WIN0V=0;
+    render_menu_notice(frame);
     return;
   }
   launcher_invalidate();
@@ -2666,16 +2698,18 @@ void menu_render(unsigned fcnt) {
     browser_fast_mode[framen] = artwork_mode;
   }
 
-  // Render popup window. Use windowing to ensure the pop up is not covered by OBJs.
-  if (spop.alert_msg) {
-    draw_box_full(frame, 15, 227, SCREEN_HEIGHT / 2 - 20, SCREEN_HEIGHT / 2 + 20, FG_COLOR, HI_COLOR);
-    draw_central_text(spop.alert_msg, frame, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 8);
-    REG_WIN0H = 226 | (14 << 8);
-    REG_WIN0V = (SCREEN_HEIGHT / 2 + 20) | ((SCREEN_HEIGHT / 2 - 20) << 8);
-  } else {
-    REG_WIN0H = 0;
-    REG_WIN0V = 0;
+  if(ds_style) {
+    static const char *const titles[]={"Recents","SD Card",
+#ifdef SUPPORT_NORGAMES
+      "NOR Flash",
+#endif
+      "Settings","Interface","System","Info"};
+    const char *title=titles[smenu.menu_tab];
+    if(smenu.menu_tab==MENUTAB_SETTINGS && launcher_settings_group)
+      title=launcher_settings_group==1?"Games":"Hardware";
+    render_dssmm_settings_header(frame,title);
   }
+  render_menu_notice(frame);
 }
 
 void menu_flip() {
@@ -2687,6 +2721,8 @@ void menu_flip() {
   dma_memset16(&MEM_OAM[objnum*4], 0, 256 - objnum*2);  // Clear unused objects
   REG_DISPCNT = (REG_DISPCNT & ~0x10) | (framen << 4);
   framen ^= 1;
+  /* Show the snapshot notice before a synchronous read or large-file fallback. */
+  if(!settings_save_poll())spop.alert_msg=msgs[lang_id][MSG_ERR_SETSAVE];
 }
 
 /* Cold setup/action paths favor size; rendering above retains -O2. */
@@ -3088,6 +3124,29 @@ static unsigned nor_write_blocks(void) {
   return spop.p.norwr.i.romfs / NOR_BLOCK_SIZE + (spop.p.norwr.i.romfs % NOR_BLOCK_SIZE != 0);
 }
 
+/* Presentation only: native SuperChis allocation/erase/write/verify remain unchanged. */
+static void render_nor_progress(volatile uint8_t *frame,unsigned done,unsigned total) {
+  dssmm_background_palette(MEM_PALETTE,menu_theme==THEME_DSSMM_DARK);
+  draw_lined_panel(frame);
+  render_dssmm_settings_header(frame,"NOR Flash");
+  draw_central_text("Writing NOR",frame,120,42);
+  draw_box_outline(frame,18,222,76,96,FT_COLOR);
+  unsigned width=total?(uint64_t)MIN(done,total)*196/total:0;
+  for(unsigned y=79;y<94;++y)
+    dma_memset16(frame+y*240+22,dup8(HI_COLOR),(width&~1u)/2);
+  char text[12];npf_snprintf(text,sizeof(text),"%u%%",total?(unsigned)((uint64_t)MIN(done,total)*100/total):0);
+  draw_central_text(text,frame,120,106);
+  draw_central_text("Do not power off",frame,120,132);
+}
+static void nor_write_progress(unsigned done,unsigned total) {
+  if(menu_theme<THEME_DSSMM_LIGHT){loadrom_progress(done,total);return;}
+  /* Flash helpers return with SDRAM/SD mapped; keep fonts available to the UI. */
+  set_supercard_mode(MAPPED_SDRAM,true,true);
+  render_nor_progress(&MEM_VRAM_U8[0xa000*framen],done,total);
+  dma_memset16(MEM_OAM,0,256);
+  REG_DISPCNT=(REG_DISPCNT&~0x10)|(framen<<4);framen^=1;
+}
+
 static void confirm_nor_write(bool confirm) {
   if (!confirm) return;
   unsigned blkcnt = nor_write_blocks();
@@ -3149,7 +3208,7 @@ static void confirm_nor_write(bool confirm) {
   unsigned errc = flash_gba_nor(info->romfn, info->romfs, &info->romh, p,
                                 dirsaving, ingame_menu,
                                 info->rtc_patch_enabled,
-                                ne.blkmap, loadrom_progress,
+                                ne.blkmap, nor_write_progress,
                                 sdr_state->scratch, scratch_mem_size);
   if (errc)
     spop.alert_msg = msgs[lang_id][errc == ERR_LOAD_BADROM ? MSG_ERR_READ : MSG_ERR_NORUPD];
@@ -3531,17 +3590,17 @@ static void keypress_menu_browse(unsigned newkeys) {
   if (smenu.browser.dispentries) {
     // Move menu up and down
     if (newkeys & KEY_BUTTUP)
-      smenu.browser.selector = MAX(0, smenu.browser.selector - 1);
+      smenu.browser.selector=browser_carousel_step(smenu.browser.selector,smenu.browser.dispentries,-1,browser_view && carousel_wrap);
     if (newkeys & KEY_BUTTDOWN)
-      smenu.browser.selector = MIN(smenu.browser.dispentries - 1, smenu.browser.selector + 1);
+      smenu.browser.selector=browser_carousel_step(smenu.browser.selector,smenu.browser.dispentries,1,browser_view && carousel_wrap);
     if (newkeys & KEY_BUTTLEFT) {
       int step = browser_view ? 1 : BROWSER_ROWS;
-      smenu.browser.selector = MAX(0, smenu.browser.selector - step);
+      smenu.browser.selector=browser_view?browser_carousel_step(smenu.browser.selector,smenu.browser.dispentries,-1,carousel_wrap):MAX(0,smenu.browser.selector-step);
       smenu.browser.seloff   = MAX(0, smenu.browser.seloff - step);
     }
     if (newkeys & KEY_BUTTRIGHT) {
       int step = browser_view ? 1 : BROWSER_ROWS;
-      smenu.browser.selector = MIN(smenu.browser.dispentries - 1, smenu.browser.selector + step);
+      smenu.browser.selector=browser_view?browser_carousel_step(smenu.browser.selector,smenu.browser.dispentries,1,carousel_wrap):MIN(smenu.browser.dispentries-1,smenu.browser.selector+step);
       smenu.browser.seloff   = MIN(smenu.browser.dispentries - 1, smenu.browser.seloff   + step);
     }
     // Move into a new dir and/or open a file
@@ -3589,8 +3648,8 @@ static void keypress_menu_browse(unsigned newkeys) {
 
   if (browser_view && smenu.browser.selector != old_selector &&
       (newkeys & (KEY_BUTTUP | KEY_BUTTDOWN | KEY_BUTTLEFT | KEY_BUTTRIGHT))) {
-    browser_motion_offset = browser_motion_retarget(browser_motion_offset,
-                                                     smenu.browser.selector - old_selector);
+    int direction=(newkeys&(KEY_BUTTDOWN|KEY_BUTTRIGHT))?1:-1;
+    browser_motion_offset=browser_motion_retarget(browser_motion_offset,direction);
     artwork_cached = false;
   carousel_hot_valid = false;
   }
@@ -3729,6 +3788,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       menu_accent = menu_accent ? menu_accent - 1 : 0;
     else if (smenu.uiset.selector == UiSetASpd)
       anim_speed = anim_speed ? anim_speed - 1 : 0;
+    else if (smenu.uiset.selector == UiSetWrap)
+      carousel_wrap ^= 1, browser_invalidate_artwork();
     else if (smenu.uiset.selector == UiSetClock)
       menu_clock_24 ^= 1;
     else if (smenu.uiset.selector == UiSetClean)
@@ -3759,6 +3820,8 @@ static void keypress_menu_uisettings(unsigned newkeys) {
       menu_accent = MIN(ACCENT_COUNT - 1, menu_accent + 1);
     else if (smenu.uiset.selector == UiSetASpd)
       anim_speed = MIN(animspd_cnt - 1, anim_speed + 1);
+    else if (smenu.uiset.selector == UiSetWrap)
+      carousel_wrap ^= 1, browser_invalidate_artwork();
     else if (smenu.uiset.selector == UiSetClock)
       menu_clock_24 ^= 1;
     else if (smenu.uiset.selector == UiSetClean)

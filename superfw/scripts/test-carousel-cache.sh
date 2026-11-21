@@ -35,6 +35,7 @@ preamble=r'''
 #define THEME_DSSMM_LIGHT 6
 #define THEME_DSSMM_DARK 7
 static unsigned menu_theme,clean_list;
+static unsigned carousel_wrap;
 #define dssmm_background_clear(...) ((void)0)
 #define SCREEN_HEIGHT 160
 #define MSG_BROW_EMPTY 0
@@ -52,7 +53,7 @@ static struct { struct { int selector,dispentries; char cpath[64]; } browser; } 
 static struct state {
  CAROUSEL_STORAGE
  uint8_t artwork_bmp_buffer[ARTWORK_BMP_MAX_SIZE];
- t_centry *filefilter[5];
+ t_centry *filefilter[24];
 }
 #ifdef TEST_CART_BUS
 *sdr_state=(void *)0x08000000;
@@ -106,8 +107,8 @@ bool artwork_blit_scaled_cropped(volatile uint16_t *frame,const uint16_t *pixels
 tests=r'''
 int main(void) {
  static uint8_t frame[240*160];
- t_centry entries[5]={{0,"one.gba"},{0,"two.gba"},{0,"missing.gba"},{0,"four.gba"},{0,"five.gba"}};
- for(unsigned i=0;i<5;++i) state.filefilter[i]=&entries[i];
+ t_centry entries[24]={{0,"one.gba"},{0,"two.gba"},{0,"missing.gba"},{0,"four.gba"},{0,"five.gba"}};
+ for(unsigned i=0;i<24;++i){state.filefilter[i]=&entries[i];if(i>=5)snprintf(entries[i].fname,sizeof(entries[i].fname),"Game%u.gba",i);}
  strcpy(smenu.browser.cpath,"/"); smenu.browser.selector=1;smenu.browser.dispentries=3;
  render_browser_carousel(frame,false);assert(loads==1);
  render_browser_carousel(frame,false);assert(loads==2);
@@ -163,6 +164,19 @@ int main(void) {
  render_browser_carousel(frame,false);
  assert(loads==far_loads+1 && blits==far_blits && hot_copies==far_copies);
  assert(browser_fast_valid[0] && browser_fast_valid[1] && browser_fast_reuse);
+ browser_invalidate_artwork();carousel_wrap=1;browser_fast_reuse=false;
+ smenu.browser.dispentries=16;smenu.browser.selector=0;browser_motion_offset=0;
+ for(unsigned i=0;i<5;++i)render_browser_carousel(frame,false);
+ const int wrapped[]={0,15,1,14,2};
+ for(unsigned i=0;i<5;++i){unsigned slot=carousel_find_slot(wrapped[i]);assert(slot<5);for(unsigned j=0;j<i;++j)assert(slot!=carousel_find_slot(wrapped[j]));}
+ unsigned cached_loads=loads;
+ for(unsigned i=0;i<8;++i)render_browser_carousel(frame,false);
+ assert(loads==cached_loads);
+ smenu.browser.selector=15;browser_motion_offset=-256;
+ render_browser_carousel(frame,false);assert(loads==cached_loads);
+ browser_motion_offset=0;render_browser_carousel(frame,false);
+ for(int i=14;i<=16;++i)assert(carousel_find_slot(i%16)<5);
+
  return 0;
 }
 '''
@@ -181,7 +195,9 @@ else:
  tests=tests.replace('CACHE_META','state.carousel_art')
 if 'static void render_artwork_placeholder(' in source:
  preamble+='\n#define render_artwork_placeholder(...) ((void)0)\n'
-Path(sys.argv[2]).write_text(preamble+function('browser_invalidate_artwork')+'\n'+function('render_browser_carousel')+'\n'+tests)
+a=source.index('static unsigned carousel_find_slot(');b=source.index('\n}',a)+2
+preamble+=source[a:b]+'\n'
+Path(sys.argv[2]).write_text(preamble+function('browser_cache_prepare')+'\n'+function('browser_invalidate_artwork')+'\n'+function('render_browser_carousel')+'\n'+tests)
 PY
 if [[ -n "${CAROUSEL_TEST_SOURCE:-}" ]]; then exit 0; fi
 gcc -O2 -Wall -Wextra -Wno-unused-variable -I "$root/src" "$tmp/test.c" "$root/src/browser_carousel.c" -o "$tmp/test"

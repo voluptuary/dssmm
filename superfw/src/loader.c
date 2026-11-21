@@ -16,6 +16,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+/* Cold file-loading orchestration; bulk transfers remain in native assembly. */
+#pragma GCC optimize ("Os")
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -522,8 +525,12 @@ unsigned launch_gba_nor(
   return 0;
 }
 
+#ifndef POGO_BACKUP_IMAGE
+#define POGO_BACKUP_IMAGE ((const uint32_t*)POGO_RETURN_BACKUP)
+#define POGO_STUB_IMAGE ((const uint32_t*)POGO_RETURN_STUB)
+#endif
 /* Extension-named portable Pogoshell plugins, with ROM or RAM entry. */
-extern void launch_pogo_reset(bool ewram_overclock,unsigned mode,unsigned size);
+extern void launch_pogo_reset(bool ewram_overclock,unsigned mode,unsigned size,bool returning);
 static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progress) {
   const char *ext=pogo_plugin_extension(fn);
   if(!ext || strlen(ext)>16)return ERR_LOAD_NOEMU;
@@ -538,8 +545,17 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
     if(r!=FR_NO_FILE && r!=FR_NO_PATH)return ERR_LOAD_BADROM;
   }
   if(!found)return ERR_LOAD_NOEMU;
-  uint32_t ps=f_size(&file),fo,to;
-  if(!pogo_layout(ps,fs,&fo,&to)){f_close(&file);return ERR_LOAD_BADROM;}
+  uint32_t ps=f_size(&file),logical=ps,fo,to;
+  if(mode==2) {
+    uint8_t header[4];UINT count;
+    if(f_read(&file,header,4,&count)!=FR_OK || count!=4 || header[0]!=0x10 || f_lseek(&file,0)!=FR_OK) {
+      f_close(&file);return ERR_LOAD_BADROM;
+    }
+    logical=header[1]|((uint32_t)header[2]<<8)|((uint32_t)header[3]<<16);
+    if(!logical || logical>0x3fbf8){f_close(&file);return ERR_LOAD_BADROM;}
+    if(logical<ps)logical=ps;
+  }
+  if(!pogo_layout(logical,fs,&fo,&to)){f_close(&file);return ERR_LOAD_BADROM;}
   /* Internal buffers only: cartridge SDRAM rejects byte stores. Padding is
    * deterministic and all writes use aligned halfwords, including short tails. */
   for(unsigned part=0;part<2;part++) {
@@ -551,7 +567,7 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
       unsigned count=size-off>LOAD_BS?LOAD_BS:size-off;
       if(f_read(&file,tmp,count,&got)!=FR_OK || got!=count){f_close(&file);return ERR_LOAD_BADROM;}
       memset((uint8_t*)tmp+count,0,((count+3)&~3u)-count);
-      if(!part && !off && mode!=2)pogo_fix_waitcnt(tmp,count);
+
       set_supercard_mode(MAPPED_SDRAM,true,false);
       rom_write16_exact(GBA_ROM_ADDR+base+off,tmp,(count+3)&~3u);
       set_supercard_mode(MAPPED_SDRAM,true,true);
@@ -559,8 +575,25 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
     }
     if(f_close(&file)!=FR_OK)return ERR_LOAD_BADROM;
   }
-  unsigned launch_size = mode == 1 ? (ps + 3) & ~3u : ps;
-  if(!pogo_ram_valid(GBA_ROM_ADDR,launch_size,mode))return ERR_LOAD_BADROM;
+  unsigned launch_size=mode==1?(ps+3)&~3u:ps;
+  set_supercard_mode(MAPPED_SDRAM,true,false);
+  if(!pogo_ram_valid(GBA_ROM_ADDR,launch_size,mode)) {
+    set_supercard_mode(MAPPED_SDRAM,true,true);return ERR_LOAD_BADROM;
+  }
+  if(mode==2) {
+    uint16_t *unpacked=(uint16_t*)ROM_HISCRATCH_U8;
+    launch_size=pogo_unpack16(GBA_ROM_ADDR,ps,unpacked);
+    if(!launch_size){set_supercard_mode(MAPPED_SDRAM,true,true);return ERR_LOAD_BADROM;}
+    /* Scratch is separate from compressed input, game data and return image. */
+    for(unsigned off=0;off<(launch_size+3u)/4;off++)
+      ((volatile uint16_t*)GBA_ROM_ADDR)[off*2]=unpacked[off*2],
+      ((volatile uint16_t*)GBA_ROM_ADDR)[off*2+1]=unpacked[off*2+1];
+    launch_size=(launch_size+3)&~3u;mode=1;
+  }
+  bool returning=pogo_return_available(POGO_BACKUP_IMAGE,POGO_STUB_IMAGE,
+                                       VERSION_SLUG_WORD,FW_MAX_SIZE_KB*1024u);
+  pogo_adapt_image((uint32_t*)GBA_ROM_ADDR,mode?launch_size:ps,returning?POGO_RETURN_STUB:0);
+  set_supercard_mode(MAPPED_SDRAM,true,true);
   uint32_t ram[24],table[22];pogo_arguments(ram,table,path,fn,fo,fs,to);
   set_supercard_mode(MAPPED_SDRAM,true,false);
   rom_write16_exact(GBA_ROM_ADDR+to,table,sizeof(table));
@@ -568,7 +601,7 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
   REG_WAITCNT=0x4000;
   /* No C calls after overwriting the fixed ABI block at the top of EWRAM. */
   memcpy32((void*)0x0203fbf8,ram,sizeof(ram));
-  launch_pogo_reset(use_fastew,mode,launch_size);
+  launch_pogo_reset(use_fastew,mode,launch_size,returning);
   return 0;
 }
 

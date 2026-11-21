@@ -16,6 +16,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+/* Cold metadata/load setup: retain RAM headroom for the menu and stack. */
+#pragma GCC optimize ("Os")
+
 #include <stdlib.h>
 #include <string.h>
 

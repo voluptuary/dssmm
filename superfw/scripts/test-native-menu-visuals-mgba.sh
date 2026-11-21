@@ -10,8 +10,8 @@ fi
 python3 "$root/scripts/build-native-settings-preview.py" --scene 0 >/dev/null
 nor_supported=$(python3 -c 'import json,sys;print(int(json.load(open(sys.argv[1]))["nor_supported"]))' "$out/fixture.json")
 for font in 1 0; do
-for scene in 1 2 3 4 5 6 7 8 9; do
- if [[ "$scene" = 4 && "$nor_supported" = 0 ]]; then continue; fi
+for scene in 1 2 3 4 5 6 7 8 9 10 11 12 13; do
+ if [[ ( "$scene" = 4 || "$scene" = 13 ) && "$nor_supported" = 0 ]]; then continue; fi
  python3 "$root/scripts/build-native-settings-preview.py" --scene "$scene" --font "$font"
  SDL_AUDIODRIVER=dummy xvfb-run -a bash -c '
   set -euo pipefail
@@ -35,7 +35,9 @@ assert all(tuple(rows[y][x*3:x*3+3])==((0,255,0) if x%2==0 else (0,0,255)) for y
 assert not any(tuple(row[x*3:x*3+3])==(255,0,255) for row in rows[16:] for x in range(240)),'Stale carousel pixels remain behind menu'
 source=struct.unpack('<38400H',(root/'assets/backgrounds/light-settings.rgb555').read_bytes())
 points=[]
-if scene==9:
+if scene==10:
+ points=[]
+elif scene==9:
  points=[(x,y,x) for y in (149,150,151) for x in range(112,224)]
 else:
  for y in range(21,152):

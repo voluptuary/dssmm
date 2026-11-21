@@ -58,6 +58,7 @@ static const uint16_t accent_colors[ACCENT_COUNT - 1][2] = {
 };
 uint8_t menu_accent = 0;
 uint8_t menu_topbar = 0;
+uint8_t carousel_wrap = 1;
 char menu_username[LAUNCHER_NAME_BYTES];
 uint32_t menu_clock_seed=UINT32_MAX;
 uint8_t menu_font = FONT_STYLE_NATIVE;
@@ -171,7 +172,7 @@ static const char *language_name(void) {
     if(code==((uint8_t)language_names[i].code[0]|((uint8_t)language_names[i].code[1]<<8)))return language_names[i].name;
   return "English (US)";
 }
-static const char * const native_keys[]={"topbar","artwork_off","ui_version","theme","native_theme","font","clock_seconds","accent","artwork","browser_view","langcode","recent_menu","anim_speed","hide_hidden","hotkey_opt","boot_to_bios","sram_backup_count","enable_cheats","enable_slowld","enable_fastewram","enable_norwrcheck","default_patcher","default_igmenu","default_rtcpatch","default_rtctick","default_loadgame","default_savegame","prefer_directsave","default_rtcts"};
+static const char * const native_keys[]={"carousel_wrap","topbar","artwork_off","ui_version","theme","native_theme","font","clock_seconds","accent","artwork","browser_view","langcode","recent_menu","anim_speed","hide_hidden","hotkey_opt","boot_to_bios","sram_backup_count","enable_cheats","enable_slowld","enable_fastewram","enable_norwrcheck","default_patcher","default_igmenu","default_rtcpatch","default_rtctick","default_loadgame","default_savegame","prefer_directsave","default_rtcts"};
 static bool settings_owned(const char *key) {
   for(unsigned i=0;i<SharedCount;++i)if(!strcasecmp(key,shared_keys[i]))
     return !(shared_values[i].long_value && shared_current(i)==shared_values[i].baseline);
@@ -183,7 +184,7 @@ static bool settings_owned(const char *key) {
 static uint32_t saved_signature;
 static bool saved_signature_valid;
 static uint32_t settings_signature(void) {
-  const uint32_t values[]={menu_theme,menu_accent,menu_topbar,menu_font,artwork_mode,thumbnail_preference,browser_view,
+  const uint32_t values[]={menu_theme,menu_accent,menu_topbar,carousel_wrap,menu_font,artwork_mode,thumbnail_preference,browser_view,
     lang_id,recent_menu,anim_speed,hide_hidden,hide_system_files,clean_list,menu_clock_24,menu_clock_seed,
     hotkey_combo,boot_bios_splash,backup_sram_default,enable_cheats,use_slowld,use_fastew,use_verify_nor,
     patcher_default,ingamemenu_default,rtcpatch_default,rtcspeed_default,autoload_default,autosave_default,
@@ -210,13 +211,13 @@ static bool save_settings_mode(bool background) {
   }
   char extra[1536];
   int n=npf_snprintf(extra,sizeof(extra),
-    "SuperFW.topbar=%u\nSuperFW.ui_version=%u\nSuperFW.native_theme=%u\nSuperFW.font=%u\nSuperFW.artwork_off=%u\nSuperFW.clock_seconds=%lu\n"
+    "SuperFW.carousel_wrap=%u\nSuperFW.topbar=%u\nSuperFW.ui_version=%u\nSuperFW.native_theme=%u\nSuperFW.font=%u\nSuperFW.artwork_off=%u\nSuperFW.clock_seconds=%lu\n"
     "SuperFW.recent_menu=%u\nSuperFW.anim_speed=%u\nSuperFW.hide_hidden=%u\n"
     "SuperFW.hotkey_opt=%u\nSuperFW.boot_to_bios=%u\nSuperFW.sram_backup_count=%u\nSuperFW.enable_cheats=%u\n"
     "SuperFW.enable_slowld=%u\nSuperFW.enable_fastewram=%u\nSuperFW.enable_norwrcheck=%u\n"
     "SuperFW.default_patcher=%u\nSuperFW.default_igmenu=%u\nSuperFW.default_rtcpatch=%u\nSuperFW.default_rtctick=%u\n"
     "SuperFW.default_loadgame=%u\nSuperFW.default_savegame=%u\nSuperFW.prefer_directsave=%u\nSuperFW.default_rtcts=%lu\n",
-    menu_topbar,UI_SETTINGS_VERSION,menu_theme<6?menu_theme:255,menu_font,!artwork_mode,(unsigned long)menu_clock_seed,recent_menu,anim_speed,hide_hidden,
+    carousel_wrap,menu_topbar,UI_SETTINGS_VERSION,menu_theme<6?menu_theme:255,menu_font,!artwork_mode,(unsigned long)menu_clock_seed,recent_menu,anim_speed,hide_hidden,
     hotkey_combo,boot_bios_splash,backup_sram_default,enable_cheats,use_slowld,use_fastew,use_verify_nor,
     (unsigned)patcher_default,ingamemenu_default,rtcpatch_default,rtcspeed_default,autoload_default,autosave_default,autosave_prefer_ds,(unsigned long)rtcvalue_default);
   if(n<0 || (unsigned)n>=sizeof(extra))return false;
@@ -228,6 +229,8 @@ static bool save_settings_mode(bool background) {
 static bool save_requested;
 static uint32_t active_signature;
 __attribute__((noinline)) void settings_save_request(void) {save_requested=true;}
+bool settings_save_preparing(void) {return save_requested && !settings_write_pending() &&
+    (!saved_signature_valid || saved_signature!=settings_signature());}
 __attribute__((noinline)) bool settings_save_pending(void) {return save_requested || settings_write_pending();}
 bool settings_save_poll(void) {
   if(settings_write_pending()) {
@@ -312,6 +315,7 @@ static void parse_ui_settings(void *usr, const char *var, const char *value) {
       { "font",&menu_font, FONT_STYLE_COUNT },
       { "accent",      &menu_accent, ACCENT_COUNT },
       { "topbar", &menu_topbar, ACCENT_COUNT },
+      { "carousel_wrap", &carousel_wrap, 2 },
       { "artwork",     &artwork_mode, 3 },
       { "browser_view",&browser_view, 3 },
       { "recent_menu", &recent_menu, 2 },

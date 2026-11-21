@@ -1368,3 +1368,41 @@ preserve chain-loaded DSSMM via reserved SDRAM firmware snapshot at boot, patch
 only exact recognized exit routines, retain native SuperCard mapping and test
 actual ARM/emulator execution. Need RAM headroom recovery before added code;
 never import OMEGA drivers or claim hardware exit qualification from mocks.
+
+## 2026-11-21 recovery and owner patch review
+No old validation process remained active. Owner committed root PATCHES.md/patches
+as0563331; preserve them. Review is docs/PATCH-REVIEW-2026-11-21.md: none apply
+verbatim; useful005–010 behavior will be reimplemented in real SuperFW APIs.
+Reject012: removes WAITCNT destination validation. 011 invents caching APIs already
+covered by current motion/miss cache. Root artifact integration is separate before
+new hardware PR so its diff remains private to superfw.
+
+Interrupted plugin prototype is NOT a validated candidate. It snapshots the
+running installed/chain-loaded firmware to SDRAM24..26MiB, return stub26MiB;
+8MiB patch scratch16..24MiB must not overlap it. Modeled ARM return passes complete
+image restoration, halfword-only writes and invalid-size guards. MBZ now decodes
+to halfword scratch and receives full-image startup/exit adaptation. Exact SMS/PCE
+reset patterns match real portable pack; mutation/truncation tests pass. First
+mGBA Exit marker was garbage-collected by linker; fixed fixture link retains it.
+Actual SMS/GG/PCE Exit replay is rerunning. Keephardware-test667 until all3/full
+native/mGBA/hosted gates pass. Bootloader3KiB and RAM/flash budgets remain fixed;
+return stub is copied separately outside that bootloader limit.
+Owner now also requests native EZ-FLASH mGBA comparison harnesses in each hardware
+lane. New667 UI queue: accent clock corners/defaultbar; visible Saving settings
+snapshot, centered uniform headers/Info, time prompts/baselines, optional carousel
+wrap with correct cache, and sensible DS Style NOR progress/management presentation.
+
+2026-11-21 continuation: Implemented exact SMS/PCE reset adaptation, boot snapshot
+and halfword MBZ expansion. Actual native loader/FatFs cases and stock mGBA real
+SMS/GG/PCE Exit-to-marker passed focused tests; no physical exit claim. Native
+loader replay is now part of each board build. Optional carousel wrap uses
+index-keyed five-slot metadata without increasing its RAM size; host tests cover
+0/15 collisions, missing art and one/two-file boundaries. Native settings ARM
+roundtrips include wrap. UI queue implemented: defaultbar accent clock corners,
+visible blocking snapshot notice, uniform headers/Info, clock instructions and
+NOR capacity/progress presentation with original backend guards. Chis partial
+ELF had312B free EWRAM; preserve stack/flash limits. Full all3+native visual gates
+are running; hardware-test667 remains frozen until a clean candidate passes.
+Owner root audit artifacts moved intact on trunk to docs/history/patch-review-2026-11-21;
+review remains project-local. New shared comparison tool is universal, and each
+EZ harness compiles its own translation unit; no foreign driver imports.

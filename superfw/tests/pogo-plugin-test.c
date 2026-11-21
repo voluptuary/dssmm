@@ -9,6 +9,13 @@
 #include "config.h"
 const char *find_extension(const char *s);
 #define LOAD_BS 8192
+#define VERSION_SLUG_WORD 0
+#define FW_MAX_SIZE_KB 2048
+static const uint32_t backup[64],stub[2];
+#define POGO_BACKUP_IMAGE backup
+#define POGO_STUB_IMAGE stub
+static uint16_t unpack_area[0x40000/2];
+#define ROM_HISCRATCH_U8 unpack_area
 #define ERR_LOAD_NOEMU 1
 #define ERR_LOAD_BADROM 2
 #define MAPPED_SDRAM 0
@@ -25,22 +32,24 @@ FRESULT f_stat(const TCHAR *path,FILINFO *info) {
   assert(!strncmp(path,"/SYSTEM/PLUG/nes.",17) || !strncmp(path,"/SYSTEM/PLUG/sms.",17));
   memset(info,0,sizeof(*info));return FR_OK;
 }
-static uint32_t ps=257,fs=8193,abi[24];static jmp_buf launched;
+static uint32_t ps=257,fs=8193,abi[24],expected_size;
+static const uint8_t compressed[]={0x10,64,0,0,0x78,0x42,0xf0,0,0xf0,0,0xf0,0,0x60,0};static jmp_buf launched;
 FRESULT f_open(FIL *f,const TCHAR *path,BYTE mode) {
   (void)mode;opens++;
   if(strstr(path,"/PLUG/")) {
     const char *suffix=strrchr(path,'.');unsigned bit=!strcmp(suffix,".bin")?1:!strcmp(suffix,".gba")?2:!strcmp(suffix,".mb")?4:8;
     if(missing || !(available_plugins&bit))return FR_NO_FILE;
   }
-  memset(f,0,sizeof(*f));f->obj.objsize=strstr(path,"/PLUG/")?ps:fs;return FR_OK;
+  memset(f,0,sizeof(*f));f->obj.id=strstr(path,"/PLUG/")?1:2;f->obj.objsize=strstr(path,"/PLUG/")?ps:fs;return FR_OK;
 }
 FRESULT f_read(FIL *f,void *buf,UINT n,UINT *got) {
   if(fail_read)return FR_DISK_ERR;
   if(n>f_size(f)-f->fptr)n=f_size(f)-f->fptr;
   if(short_read&&n)n--;
-  for(unsigned i=0;i<n;i++)((unsigned char*)buf)[i]=(f->fptr+i)*17+3;
+  for(unsigned i=0;i<n;i++)((unsigned char*)buf)[i]=(available_plugins==8 && f->obj.id==1)?compressed[f->fptr+i]:(f->fptr+i)*17+3;
   *got=n;f->fptr+=n;return FR_OK;
 }
+FRESULT f_lseek(FIL *f,FSIZE_t offset){f->fptr=offset;return FR_OK;}
 FRESULT f_close(FIL *f){(void)f;closes++;return close_error?FR_DISK_ERR:FR_OK;}
 static void set_supercard_mode(int a,bool b,bool c){(void)a;(void)b;(void)c;}
 static void rom_copy_write16(void *dst,const void *src,unsigned n) {
@@ -49,7 +58,7 @@ static void rom_copy_write16(void *dst,const void *src,unsigned n) {
   memcpy(dst,src,n);
 }
 static void memcpy32(void *dst,const void *src,unsigned n){assert(dst==(void*)0x0203fbf8);assert(n==96);memcpy(abi,src,n);}
-void launch_pogo_reset(bool fast,unsigned mode,unsigned size){assert(!fast && mode==expected_mode && size==(mode==1?(ps+3)&~3u:ps));longjmp(launched,1);}
+void launch_pogo_reset(bool fast,unsigned mode,unsigned size,bool returning){assert(!returning);assert(!fast && mode==expected_mode && size==(expected_size?expected_size:mode==1?(ps+3)&~3u:ps));longjmp(launched,1);}
 #include "pogo-loader-under-test.h"
 int main(void) {
   char resolved[64];
@@ -110,6 +119,12 @@ int main(void) {
   available_plugins=4;expected_mode=1;
   if(!setjmp(launched)){load_pogo_plugin("/Game.PCE",fs,NULL);assert(0);}
   assert(cartridge[ps]==0 && cartridge[ps+1]==0 && cartridge[ps+2]==0);
+  available_plugins=8;ps=sizeof(compressed);expected_mode=1;expected_size=64;
+  if(!setjmp(launched)){load_pogo_plugin("/Game.NSF",fs,NULL);assert(0);}
+  assert(abi[1]==0x08000040);
+  for(unsigned i=0;i<64;++i)assert(cartridge[i]==0x42);
+  for(unsigned i=0;i<fs;++i)assert(cartridge[64+i]==(unsigned char)(i*17+3));
+  ps=257;expected_size=0;
   available_plugins=1;expected_mode=0;
   missing=1;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_NOEMU);missing=0;
   fail_read=1;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_BADROM);fail_read=0;

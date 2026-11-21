@@ -50,6 +50,7 @@ extern const t_theme_colors themes[THEME_COUNT];
 #define ACCENT_COUNT 5
 extern const char * const accent_names[ACCENT_COUNT];
 extern uint8_t menu_accent;
+extern uint8_t carousel_wrap;
 extern char menu_username[LAUNCHER_NAME_BYTES];
 extern uint32_t menu_clock_seed;
 extern uint8_t menu_font; /* Native or optional DSSMM printable ASCII font. */
@@ -107,6 +108,7 @@ extern uint32_t rtcvalue_default;
 bool save_settings(void);
 void settings_save_request(void);
 bool settings_save_pending(void);
+bool settings_save_preparing(void);
 bool settings_save_poll(void);
 bool settings_save_flush(void);
 void load_settings();

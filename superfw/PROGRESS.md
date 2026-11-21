@@ -826,3 +826,14 @@ pass. Full all-board/IGM/18-scene/hosted gates next; keep664 until replacement p
 pass, downloads/body match. PR12 merged b7d91488. Chis667 delivered;664 report kept.
 No physical667/SD-Lite qualification. Publication docs/root milestone/normal sync
 next; DE remains latest. Future porting needs measured RAM recovery (200B free).
+
+2026-11-21: Recovered uncommitted plugin prototype and reviewed owner patch set.
+No verbatim application; decisions recorded. ARM firmware-return model and real
+portable-pack adapters pass; actual plugin Exit mGBA fixture is being corrected/
+rerun before candidate validation. User UI/NOR requests and native EZ harness goal
+remain active. Current physical test image remains667.
+
+2026-11-21: Focused actual plugin/boot/return ARM and real plugin Exit mGBA checks
+pass. Implemented owner667 UI queue and optional wrap with collision-safe cache;
+registered native loader replay and wrap persistence regression. Full verifier
+running; no new hardware candidate yet. Physical Exit/PCE remain unqualified.

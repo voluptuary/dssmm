@@ -237,3 +237,19 @@ reuse existing storage; Chis main EWRAM has only200 bytes free. Preserve native
 16KiB stack/flash budgets and -fno-ipa-ra. Future feature work must recover space
 rather than expand limits. Keep native mGBA/ARM fixtures and rollback coverage.
 DEv8.4.0 remains latest; normal release does not imply complete DE parity.
+
+## Plugin-return reservation and native visual gates (2026-11-21)
+
+Portable plugin payloads remain below14MiB. Preserve firmware backup24..26MiB and
+return code26MiB; the patch scanner owns scratch16..24MiB, so20MiB is unsafe for
+backup. Boot snapshots installed or chain-loaded firmware; known SMS/PCE Exit
+patterns and RAM SoftReset can use it. Never patch guessed SWIs/WAITCNT literals.
+Keep halfword-only cartridge transfers/MBZ expansion and actual boot/reset/loader
+ARM tests, plus stock mGBA real-plugin Exit fixtures. Physical Exit/PCE remains
+unqualified until an owner report identifies the candidate. SD flash has only
+2KiB headroom in the current prototype; optimize, never raise budgets.
+Optional wrap must protect five index-keyed cache slots across boundaries; simple
+index%5 collides for0/15. Retain one/two-entry, negative-cache and persistence tests.
+The native visual matrix now covers13 scenes perfont, including Start, clock,
+blocking-save notice and NOR progress. Use --reference for deterministic clean
+headers when comparing to the EZ-FLASH own-renderer fixtures, not card emulation.
