@@ -1355,3 +1355,16 @@ pages to prune; BLUE/OMEGA latest prereleases and all DE history preserved.
 Next: normal doc integration/root publication overview/baseline and all5sync, then
 recover EWRAM via measured cold-code size work before more UI parity. Plugin Exit,
 PCE and full DE parity still open. Keep owner lock/private BIOS/scratch/fullZIP.
+
+2026-11-17 owner changes first normal release notes to upstream-relative New
+features/New fixes only (exclude regressions introduced during port), then Known
+issues/hardware, SD setup, credits only davidgfnet/FrankieT19/emulator authors.
+Rewrote canonical+remote667 body, archived exact previous metadata/body, verified
+assets/title/tag/status unchanged. New instruction supersedes four-section style
+for this first normal release. Next priority is GG/SMS Exit and general Pogoshell.
+Evidence: existing SMS/PCE MB binaries contain FluBBa Visoly doReset sequences;
+they page a different cartridge and reset into plugin at ROM0. Proposed fix must
+preserve chain-loaded DSSMM via reserved SDRAM firmware snapshot at boot, patch
+only exact recognized exit routines, retain native SuperCard mapping and test
+actual ARM/emulator execution. Need RAM headroom recovery before added code;
+never import OMEGA drivers or claim hardware exit qualification from mocks.

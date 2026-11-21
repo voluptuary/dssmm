@@ -1,0 +1,11 @@
+diff --git a/ezfomega/source/draw.c b/ezfomega/source/draw.c
+--- a/ezfomega/source/draw.c
++++ b/ezfomega/source/draw.c
+@@ -245,8 +245,8 @@
+     // When top bar color is default and time is selected at start screen,
+     // use the accent color for selection indicators.
+     if (is_topbar_default && is_time_selected) {
+-        indicator_color = get_accent_color();
++        ui_set_selection_indicator_color(get_accent_color());
+     }
+ }
