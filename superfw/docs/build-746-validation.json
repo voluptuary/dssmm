@@ -1,0 +1,56 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 746,
+  "boards": [
+    {
+      "source_tree_sha256": "b6a7096864a848b384c423b1cf0f0515271050dc592945c8ad3daae4a45c2dba",
+      "board": "sd",
+      "dssmm_build": 746,
+      "source_commit": "43065c9add97b55e7f659220ef79600105885e15",
+      "source_dirty": false,
+      "firmware_sha256": "758bc53589c78a2521ce1f051e34918e760a651ac24b659fb4d47a677f2a06c1",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 524288,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 0
+    },
+    {
+      "source_tree_sha256": "b6a7096864a848b384c423b1cf0f0515271050dc592945c8ad3daae4a45c2dba",
+      "board": "lite",
+      "dssmm_build": 746,
+      "source_commit": "43065c9add97b55e7f659220ef79600105885e15",
+      "source_dirty": false,
+      "firmware_sha256": "fef24090cce7b0a3743e45ae1b6c30b4ad2bbb158490593f85174db18a49173e",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 492032,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 15872
+    },
+    {
+      "source_tree_sha256": "b6a7096864a848b384c423b1cf0f0515271050dc592945c8ad3daae4a45c2dba",
+      "board": "chis",
+      "dssmm_build": 746,
+      "source_commit": "43065c9add97b55e7f659220ef79600105885e15",
+      "source_dirty": false,
+      "firmware_sha256": "13043548bacd0d5d1df9d18dd720c045d1e190ddf42e4816f3d25d9e2476812d",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "source": "43065c9add97b55e7f659220ef79600105885e15",
+  "tests": {
+    "local_full": "DSSMM_ARM_IGM=1 UBSAN_OPTIONS=halt_on_error=1 make verify-superfw: exit0; all3 builds/native settings/plugins/IGM, host suites, mGBA2 boots+28 scenes+4 pixel caption cases+SMS/GG/PCE Exit",
+    "ez_pack_pce": "2.5MiB actual-loader/FatFs/halfword-bus replay passed",
+    "source_ci": 45039947282,
+    "all4_integration_ci": 45039951109
+  },
+  "limits": {
+    "chis_main_ram": "254704/257024 bytes",
+    "chis_iwram": "15592 bytes; native16KiB stack retained",
+    "chis_boot": "3056/3072 bytes; stage1=460/1024 bytes",
+    "physical": "No new physical validation; PCE failure/Exit timing need card retest; SD/Lite unqualified"
+  },
+  "sd_followup": "SD image fits exactly512KiB; owner requested compression/unused-board-asset investigation"
+}

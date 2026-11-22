@@ -872,3 +872,11 @@ symbol/ABI guards after a sync-source CI failed13 despite integration success.
 - Focused host and ARM tests pass; native loading screenshots pass with poisoned
   external fonts. All-board full verification and a clean numbered hardware-test
   replacement are next. Build677 remains the delivered image until then.
+
+- Build746/source43065c9a completed full all3/local/native ARM/mGBA and sourceCI
+  45039947282/all4 integration45039951109. PR17 mergedccff55c; Chis746 is the
+  validated local hardware-test replacement for677. Exact evidence/limits are in
+  docs/build-746-validation.json. No new physical or public-release claim.
+- Owner asks for SD headroom and removal of genuinely unsupported board media.
+  Existing board guards already exclude NOR/extended fonts/extra emulators as
+  appropriate. Lossless compression trials are underway; no features removed.

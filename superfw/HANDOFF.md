@@ -1537,3 +1537,28 @@ LTO removes that guard. Replay now supplies the actual loadpogo_progress callbac
 intercepts only final rendering, and verifies both game/emulator phases. All six
 SD plugin cases pass with10528B stack. No production loader workaround or ABI
 flag change was needed. Restart full validation on the corrected checkpoint.
+
+## 2026-11-22 — Build746 delivered; PR17 integrated
+
+Clean source43065c9a / Build746 passes full all3/native settings/plugins/IGM ARM,
+host suites, mGBA2 boots/28 scenes/4 pixel-exact Start captions and plugin Exit.
+SourceCI45039947282 and all4 PR17 CI45039951109 pass. PR17 mergedccff55c;
+normal FF synchronization/push of all5 lanes follows (verify remote refs).
+Root hardware-test now contains hash-verified superfw-chis-build746.fw and
+build746.json; superseded local677 files removed after hash validation.
+Tracked docs/build-746-validation.json preserves all3 identities and limits.
+Chis main254704/257024, IWRAM15592 with16KiB stack, boot3056/3072 bytes.
+SD524288/524288, Lite492032/507904, Chis1671680/2097152 bytes. Physical PCE
+failure and GG/SMS Exit timing remain unqualified; no public release changed.
+
+Owner now prioritizes SD flash headroom and clean omission of unsupported
+board-specific media. Existing guards already omit Chis NOR code/icon/extended
+fonts on SD/Lite, all bundled emulators on Lite, and the five extra emulators
+on SD. Shared GBA menu graphics remain supported on all boards. Investigate
+measurable lossless compression before dropping supported languages/features.
+Offline study in ignored build/compression-study: default apultra font pack
+308252 bytes; UPKR level9 patch DB48085 (vs48944 at4), GB/C32143 (vs32395 at4).
+Font UPKR4/9 trials still running; compare exact roundtrips, decoder size, ARM
+halfword writes and boot time before any format change. Do not run make clean
+until these processes finish (tools live in project intermediates). Scratch
+/tmp/dssmm-context-scratch.md remains session-only, <=1GiB; BIOS/owner ZIP retained.
