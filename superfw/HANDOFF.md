@@ -1452,3 +1452,73 @@ corner/navigation checks pass. Registered caption oracle in full verifier.
 Next: clean source checkpoint, full all3/native/mGBA/hosted gates, then replace
 hardware-test677 only after those pass. Current partial ELF is dirty, not a test
 firmware. Owner lock/private BIOS/session scratch/full artwork archive retained.
+
+Owner677 hardware follow-up (2026-11-22): GG/SMS now load on Chis, but Exit has a
+longer white interval and the return splash's Writing previous savegame text is
+orange-red rather than black; PCE still returns kernel MSG_ERR_READ after load
+progress. Do not call Exit/PCE physically fixed. NOR fill needs x-2/y-1 expansion
+up/left. Saving settings popup should stay at least1second and coalesce further
+writes with only a short extension, avoiding flicker. Shared lined panels lack a
+thin left inner outline. Owner requests textured/shaded DE-style top bars, but
+omit if firmware exceeds the original hardware limits; try procedural shading,
+not new image assets. These supersede the next-candidate delivery queue;677 stays
+hardware-test until a candidate includes the corrections and passes gates.
+
+Start-only743/ad2b8b36 finished full all3/native/IGM/mGBA26+4caption/host checks
+locally; do not distribute yet because owner feedback now has priority. A later
+sync-source CI45030119788 failed ONLY new NOR scene13 whereas identical-tree
+integration45030107951 passed. Need inspect/stabilize native callback availability
+or ABI instead of ignoring it; renderer probe must never silently call address0.
+Current frozen743 image is not the requested next hardware image.
+
+743 full verifier and sourceCI45030978467 passed; checkpoint identity recorded in
+docs/build-743-validation.json but not delivered because newer owner feedback is
+pending. Current Chis has200B free EWRAM. Before adding notice/topbar/error work,
+reviewed moving existing4352-byte icons_img (only consumed by menu_init upload)
+into the existing read-only font/resource partition. No new art, native font
+prefix change or limit raise. Need exact icon roundtrip/read-only/missing-tag tests
+and measured all3 RAM/flash checks; retain palettes and existing icon source/credits.
+
+Owner adds: replace every old white/light-gray loading bar with the corrected
+framed NOR-style panel and describe the real operation. Shared progress renderer
+now covers game/emulator SD reads, save preparation/loading, patch generation,
+firmware backup and RAM/SD tests; NOR uses the same widget. Labels distinguish
+SDRAM ROM loading from SRAM saves. Rendering is asset-independent (built-in ASCII
+and panel profile); header sanitizes non-ASCII names during loading because ROM
+loads/RAM tests may overwrite external fonts. Native/manual themes get readable
+styled progress too. New generic scene14 poisons the external font pointer and
+uses a CJK username to exercise that constraint. Full matrix becomes28 scenes;
+caption oracle remains4. Compile/focused checks are in progress, not a delivered
+candidate. Keep677 frozen.
+
+Additional implemented prototypes: steady60-frame save notice with3-frame
+coalesced extensions (including boundary/wrap tests), procedural shaded/textured
+top bar without new art, black inner left panel outline, gap-free200px NOR fill.
+Exact existing icon tiles moved into appended read-only resources; standard has
+4096bytes, Chis4352 (NOR icon conditional). C-initialized ARM oracle caught/fixed
+that variant difference; tags/counts/read-only checks pass. Chis main RAM regained
+about4KiB; original font prefixes and existing native icon/palette sources remain.
+
+Plugin return requests BIOS video/palette/OAM/IO reset and reapplies safe waits;
+halfword copy is unrolled. A consumed20-byte token at EWRAM0203FFE0..0203FFF3 stores
+DRET+the firmware header's16-byte SHA prefix. ROM-only pogo_boot_reuse compares it
+before mapping changes and skips only the redundant same-image snapshot. Boot
+caller uses its explicit Z/R0 contract; Chis boot actual_end=0xBF0 (3056/3072),
+main/stack limits unchanged. ARM cold/flash/SDRAM/matched/mismatched tests pass.
+Known Exit hooks preserve the plugin ROM entry; generic RAM plugins retain the
+ROM0 fallback. PCE2.5MiB actual-loader/FAT16/ABI/halfword replay with the existing
+EZ pack passes; physical error remains unreproduced. Failures now distinguish
+plugin/game/format/size and log only errors to SYSTEM/superfwlog.txt (stage/detail
+plus game context), not ordinary writes. No physical Exit/PCE fix claim yet.
+
+Shared loading-panel follow-up: operation labels now cover game/emulator reads,
+save-to-SRAM/preparation, patches, firmware backup, SDRAM/SD diagnostics and NOR.
+The panel uses builtin ASCII and internal palette/profile data, not external
+fonts/backgrounds that a large ROM may overwrite. Native scenes13/14 deliberately
+poison the runtime font pointer and use a non-ASCII username; both font settings
+render safely. The runtime font pointer remains externally visible for native/IGM
+probes (4-byte storage; main RAM254704/257024 on the current Chis prototype).
+The fixture writes progress_action as a byte, matching the actual ARM enum ABI.
+Host topbar/notice/panel/plugin-phase and ARM icon tests pass; clean all-board
+validation and fresh hardware-test delivery still required. Do not distribute
+these dirty-source743 intermediates or overwrite the validated677 image yet.

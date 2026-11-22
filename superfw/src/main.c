@@ -40,7 +40,8 @@ t_flash_info flashinfo;
 t_card_info sd_info;
 t_patchdb_info pdbinfo;
 
-void *font_base_addr = (void*)ROM_FONTBASE_U8;
+/* Keep the runtime font pointer visible to native/IGM integration probes. */
+void *font_base_addr __attribute__((externally_visible)) = (void*)ROM_FONTBASE_U8;
 
 static void wait_for_vblank() {
   while (!(REG_DISPSTAT & DISPSTAT_VBLANK));

@@ -77,7 +77,14 @@ static void visual_scene(void) {
     ((void(*)(void))(NATIVE_settings_save_request|1u))();
     return;
   }
-  if(TEST_SCENE==13)return;
+  if(TEST_SCENE==13 || TEST_SCENE==14) {
+    /* No external font/background resource may be consulted during loading. */
+    VAR32(NATIVE_font_base_addr)=0x08000000;
+    const char name[]="\xe6\xbc\xa2Test";
+    for(unsigned i=0;i<sizeof(name);++i)VAR8(NATIVE_menu_username+i)=name[i];
+    VAR8(NATIVE_progress_action)=TEST_PROGRESS_ACTION;
+    return;
+  }
   if (TEST_SCENE==9) {
     select_option(8);VAR32(NATIVE_smenu+OFFSET_uiset_seloff)=TEST_FONT?0:2;
     VAR8(NATIVE_menu_accent)=3;
@@ -125,8 +132,12 @@ static bool frame_intact(void) {
     const uint8_t *p=dssmm_panel_profile[0][y-21];
     if(back[y*120+1]!=panel_pair(p[0]) || back[y*120+117]!=panel_pair(p[2]) ||
        back[y*120+118]!=panel_pair(p[3]))return false;
-    if(y<23 || y>=149)for(unsigned x=2;x<117;x++)
-      if(back[y*120+x]!=(p[1]|(p[1]<<8)))return false;
+    if(y>=23 && y<=149 && (back[y*120+2]&255))return false;
+    if(y<23 || y>=149)for(unsigned x=2;x<117;x++) {
+      unsigned expected=p[1]|(p[1]<<8);
+      if(x==2 && y==149)expected&=0xff00;
+      if(back[y*120+x]!=expected)return false;
+    }
   }
   return true;
 }
@@ -178,9 +189,10 @@ int main(void) {
       volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));
       for(unsigned n=16*120;n<160*120;n++)back[n]=0xebeb;
     }
-    if(TEST_SCENE==13) {
+    if(TEST_SCENE==13 || TEST_SCENE==14) {
       /* Exercise the retained callback: its small render helper is inlined. */
-      ((void(*)(unsigned,unsigned))(NATIVE_nor_write_progress|1u))(1,2);
+      if(TEST_SCENE==13)((void(*)(unsigned,unsigned))(NATIVE_nor_write_progress|1u))(1,2);
+      else ((void(*)(unsigned,unsigned))(NATIVE_loadrom_progress|1u))(1,2);
       VAR8(NATIVE_framen)^=1; /* Callback already flipped; inspect that page. */
     }
     else ((void(*)(unsigned))(NATIVE_menu_render|1u))(1);

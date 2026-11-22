@@ -3,9 +3,10 @@
 from pathlib import Path
 import argparse,struct,subprocess,os,json,re,hashlib
 root=Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(14),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");p.add_argument("--recent-title",help="Read-only synthetic recent filename; Start caption test only");a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(15),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");p.add_argument("--progress-action",type=int,choices=range(10),default=0);p.add_argument("--recent-title",help="Read-only synthetic recent filename; Start caption test only");a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
 elf=a.elf.read_bytes();nm=subprocess.check_output(['arm-none-eabi-nm',str(a.elf)],text=True)
 syms={r.split()[-1]:int(r.split()[0],16) for r in nm.splitlines() if len(r.split())==3}
+if a.scene in (4,13) and 'nor_write_progress' not in syms:p.error('NOR scene is unavailable in this linked board image')
 text='#include <stdint.h>\n'
 def blob(name,data):
  global text
@@ -23,10 +24,10 @@ for i in range(count):
 text+='static const struct {uint32_t address,filesz,memsz;const uint8_t *source;} native_segments[]={\n'
 for address,filesz,memsz,source in segments:text+=f'{{0x{address:x},{filesz},{memsz},{source}}},\n'
 text+='};\n'
-for name in ['FatFs','sdfs','load_settings','settings_save_flush','settings_save_request','settings_save_pending','settings_save_poll','launcher_page','launcher_selected','f_mkdir','f_stat','sdcard_read_blocks','sdcard_write_blocks','menu_keypress','menu_render','menu_flip','reload_theme','smenu','spop','menu_theme','menu_accent','browser_view','artwork_mode','menu_font','frame_count','framen']:
+for name in ['FatFs','sdfs','load_settings','settings_save_flush','settings_save_request','settings_save_pending','settings_save_poll','launcher_page','launcher_selected','f_mkdir','f_stat','sdcard_read_blocks','sdcard_write_blocks','menu_keypress','menu_render','menu_flip','reload_theme','smenu','spop','menu_theme','menu_accent','browser_view','artwork_mode','menu_font','frame_count','framen','font_base_addr','menu_username','progress_action','loadrom_progress']:
  text+='#define NATIVE_'+name+f' 0x{syms[name]:08x}u\n'
 if a.reference:
- for name in ['menu_username','clock_seconds','clock_frame']:
+ for name in ['clock_seconds','clock_frame']:
   text+='#define NATIVE_'+name+f' 0x{syms[name]:08x}u\n'
 text+='#define NATIVE_nor_write_progress '+(f'0x{syms["nor_write_progress"]:08x}u' if 'nor_write_progress' in syms else '0')+'\n'
 # Struct offsets are queried from the actual ELF, never from a host ABI.
@@ -68,9 +69,10 @@ def field_offset(obj,path):
 for obj,f in fields:text+='#define OFFSET_'+obj+'_'+f.replace('.','_')+' '+str(field_offset(obj,f))+'\n'
 # Preserve existing concise Interface field names for the persistence fixture.
 for f in ['menu_tab','uiset_selector','uiset_seloff']:text+='#define OFFSET_'+f+' OFFSET_smenu_'+f+'\n'
+text+='#define TEST_PROGRESS_ACTION '+str(a.progress_action)+'\n'
 text+='#define TEST_RECENT '+str(int(bool(a.recent_title)))+'\n'
 text+='#define TEST_REFERENCE '+str(int(a.reference))+'\n#define TEST_SCENE '+str(a.scene)+'\n#define TEST_FONT '+str(a.font)+'\n'
-text+='#define TEST_UI_TAB '+('4' if 'keypress_menu_norbrowse' in syms else '3')+'\n'
+text+='#define TEST_UI_TAB '+('4' if 'nor_write_progress' in syms else '3')+'\n'
 (a.out/'native-settings-image.h').write_text(text)
 objects=[str(x) for x in a.out.glob('native-segment-*.o')]
 subprocess.run(['arm-none-eabi-gcc','-Os','-fno-ipa-ra','-fno-builtin','-Wall','-Wextra','-Werror','-mthumb','-mcpu=arm7tdmi','-I',str(a.out),'-I',str(root/'src'),'-specs=gba.specs',str(root/'tests/native-settings-preview.c'),*objects,'-o',str(a.out/'native-settings.elf')],check=True)
@@ -86,9 +88,9 @@ if a.recent_title:
  record=struct.pack('<HH',0,7)+bytes(path_offset-4)+recent
  assert position+len(record)<=len(rom) and rom[position:position+len(record)]==b'\xff'*len(record),'Fixture recent record overlaps live ROM data'
  rom[position:position+len(record)]=record
-font=(root/('res/fonts-ext-dssmm.pack' if 'keypress_menu_norbrowse' in syms else 'res/fonts-dssmm.pack')).read_bytes();rom+=font
+font=(root/('res/fonts-ext-dssmm.pack' if 'nor_write_progress' in syms else 'res/fonts-dssmm.pack')).read_bytes();rom+=font
 # Standard GBA header complement; commercial BIOS is not needed for the harness.
 rom[0xb2]=0x96;rom[0xbd]=(-sum(rom[0xa0:0xbd])-0x19)&255
 (a.out/'native-settings.gba').write_bytes(rom)
-(a.out/'fixture.json').write_text(json.dumps({'recent_title':a.recent_title,'scene':a.scene,'font':a.font,'reference':a.reference,'native_elf_sha256':hashlib.sha256(elf).hexdigest(),'native_elf':str(a.elf),'nor_supported':'keypress_menu_norbrowse' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
+(a.out/'fixture.json').write_text(json.dumps({'progress_action':a.progress_action,'recent_title':a.recent_title,'scene':a.scene,'font':a.font,'reference':a.reference,'native_elf_sha256':hashlib.sha256(elf).hexdigest(),'native_elf':str(a.elf),'nor_supported':'nor_write_progress' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
 print(a.out/'native-settings.gba')

@@ -4,7 +4,7 @@ from pathlib import Path
 import argparse,struct,subprocess
 from unicorn import Uc,UC_ARCH_ARM,UC_MODE_ARM,UC_HOOK_CODE,UC_HOOK_MEM_WRITE
 from unicorn.arm_const import *
-root=Path(__file__).resolve().parents[1];p=argparse.ArgumentParser();p.add_argument('--pack',type=Path);a=p.parse_args()
+root=Path(__file__).resolve().parents[1];p=argparse.ArgumentParser();p.add_argument('--pack',type=Path);p.add_argument('--extension');p.add_argument('--game-bytes',type=int,default=32768);a=p.parse_args();assert 0<a.game_bytes<=3*1024*1024
 elf=(root/'firmware.ewram.elf').read_bytes()
 version=struct.pack('<I',int(subprocess.check_output(['git','rev-parse','--short=8','HEAD'],cwd=root,text=True).strip(),16))
 if (root/'superfw.gba').exists():version=(root/'superfw.gba').read_bytes()[0xc8:0xcc]
@@ -14,6 +14,8 @@ sms=(root/'emu/smsadvance-v2.5-scptch.gba.bin').read_bytes();pce=(root/'emu/pcea
 cases=[('sms','mb',sms),('gg','mb',sms),('pce','mb',pce),('nsf','mbz',bytes([0x10,64,0,0,0x78,0x42,0xf0,0,0xf0,0,0xf0,0,0x60,0])),('txt','bin',struct.pack('<I',0xea00002e)+bytes(252)),('jpg','gba',struct.pack('<I',0xea00002e)+bytes(252))]
 if a.pack:
  cases=[(path.stem,path.suffix[1:],path.read_bytes()) for path in sorted(a.pack.iterdir()) if path.suffix in ('.mb','.mbz','.gba','.bin') and path.stat().st_size<0x40000]
+if a.extension:cases=[case for case in cases if case[0]==a.extension]
+assert cases,'No matching plugin cases'
 for extension,suffix,payload in cases:
  plugin_key='sms' if extension=='gg' else extension
  disk=bytearray(8192*512)
@@ -31,7 +33,7 @@ for extension,suffix,payload in cases:
   return first
  def record(name,attr,cluster,size):
   base,_,ext=name.partition('.');return struct.pack('<11sB14xHI',base.upper().encode().ljust(8,b' ')+ext.upper().encode().ljust(3,b' '),attr,cluster,size)
- system=allocate(bytes(512));plug=allocate(bytes(512));game=bytes((i*31)&255 for i in range(32768));gc=allocate(game);pc=allocate(payload)
+ system=allocate(bytes(512));plug=allocate(bytes(512));game=bytes((i*31)&255 for i in range(a.game_bytes));gc=allocate(game);pc=allocate(payload)
  disk[65*512:65*512+32]=record('SYSTEM',16,system,0);disk[65*512+32:65*512+64]=record('SMOKE.'+extension,32,gc,len(game))
  system_sector=(97+system-2)*512;disk[system_sector:system_sector+32]=record('PLUG',16,plug,0)
  plug_sector=(97+plug-2)*512;disk[plug_sector:plug_sector+32]=record(plugin_key+'.'+suffix,32,pc,len(payload))
@@ -51,7 +53,9 @@ for extension,suffix,payload in cases:
   state['minimum']=min(state['minimum'],uc.reg_read(UC_ARM_REG_SP))
   if address==syms['launch_pogo_reset']:
    mode,size=(uc.reg_read(r) for r in (UC_ARM_REG_R1,UC_ARM_REG_R2));assert mode==(1 if suffix in ('mb','mbz') else 0)
-   assert uc.reg_read(UC_ARM_REG_R3)==1,'Matching firmware return snapshot not recognized'
+   patched=bytes(uc.mem_read(0x08000000,size)).count(struct.pack('<II',0xe51ff004,0x09a00000))
+   if extension in ('sms','gg','pce'):assert patched,'Known plugin Exit hook missing'
+   assert uc.reg_read(UC_ARM_REG_R3)==int(not patched),'Known hooks must preserve the ROM entry; unknown RAM plugins keep the fallback'
    abi=struct.unpack('<4I',uc.mem_read(0x0203fbf8,16));assert abi[0]==len(game) and abi[2:]==(0xfab0babe,2)
    assert uc.mem_read(abi[1],len(game))==game
    state['launched']=True;uc.emu_stop();return

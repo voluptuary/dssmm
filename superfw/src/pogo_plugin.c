@@ -53,7 +53,7 @@ void pogo_arguments(uint32_t ram[24],uint32_t table[22],const char *plugin,
   memcpy(table+12,file,32);table[20]=fs;table[21]=fo-(to+8);
 }
 
-/* Validate the entire BIOS LZ77 stream before handing it to SWI 0x11. */
+/* Validate every LZ77 token before expansion into the bounded RAM image. */
 bool pogo_ram_valid(const uint8_t *data,uint32_t size,unsigned mode) {
   if(mode==0)return true;
   if(mode==1)return size && !(size&3) && size<=0x3fbf8;

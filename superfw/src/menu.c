@@ -493,33 +493,35 @@ NOINLINE int romsort(const void *a, const void *b) {
   return strcasecmp(&ca->game_name[ca->bnoffset], &cb->game_name[cb->bnoffset]);
 }
 
-static void loadrom_progress(unsigned done, unsigned total) {
-  // Draws and flips the buffer, do not care about vsync here
-  volatile uint8_t *frame = &MEM_VRAM_U8[0xA000*framen];
+enum progress_action {
+  ProgressGame,ProgressEmulator,ProgressPrepareEmulator,ProgressSave,ProgressPrepareSave,
+  ProgressPatches,ProgressBackup,ProgressRamTest,ProgressSdTest,ProgressNor
+};
+static enum progress_action progress_action;
+static void render_progress_panel(volatile uint8_t *frame,unsigned done,unsigned total,enum progress_action action);
 
-  // Render the full background to a solid color
-  dma_memset16(&frame[0], dup8(BG_COLOR), SCREEN_WIDTH*SCREEN_HEIGHT/2);
-
-  // Render a simple progress bar
-  unsigned prog=total?(unsigned)((uint64_t)MIN(done,total)*200/total):0;
-  for (unsigned i = 76; i < 84; i++)
-    dma_memset16(&frame[SCREEN_WIDTH * i + 20], dup8(FG_COLOR), prog/2);
-
-  dma_memset16(MEM_OAM, 0, 256);  // Clear icons
-
-  REG_DISPCNT = (REG_DISPCNT & ~0x10) | (framen << 4);
-  framen ^= 1;
+/* Callbacks retain a stable ABI for real loaders and native visual/ARM probes. */
+__attribute__((noipa))
+static void loadrom_progress(unsigned done,unsigned total) {
+  render_progress_panel(&MEM_VRAM_U8[0xa000*framen],done,total,progress_action);
+  dma_memset16(MEM_OAM,0,256);
+  REG_DISPCNT=(REG_DISPCNT&~0x10)|(framen<<4);framen^=1;
+}
+static void loadpogo_progress(unsigned done,unsigned total) {
+  progress_action=plugin_loading_game()?ProgressGame:ProgressEmulator;
+  loadrom_progress(done,total);
 }
 
 static bool loadrom_progress_abort(unsigned done, unsigned total) {
   loadrom_progress(done, total);
 
-  // Capture A/B buttons to abort the progress
+  // Start aborts the native diagnostic.
   return ((~REG_KEYINPUT) & KEY_BUTTSTA);
 }
 
 
 bool generate_patches_progress(const char *fn, unsigned fs) {
+  progress_action=ProgressPatches;
   FIL fd;
   if (f_open(&fd, fn, FA_READ) != FR_OK) return false;
   if (f_size(&fd) != fs) {f_close(&fd);return false;}
@@ -571,6 +573,7 @@ read_failed:
 }
 
 bool dump_flashmem_backup() {
+  progress_action=ProgressBackup;
   f_mkdir(SUPERFW_DIR);
 
   // Use a different file name to ensure we do not overwrite firmwares by
@@ -1035,6 +1038,7 @@ void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
   // Load: Sav/Reset Save: Reboot/Disable
   sram_filename_calc(fn, spop.p.load.l.savefn);
   t_sram_load_policy lp = check_file_exists(spop.p.load.l.savefn) ? SaveLoadSav : SaveLoadReset;
+  progress_action=lp==SaveLoadSav?ProgressSave:ProgressPrepareSave;loadrom_progress(0,1);
   unsigned errsave = prepare_sram_based_savegame(lp, SaveReboot, spop.p.load.l.savefn);
   if (errsave) {
     unsigned errmsg = (errsave == ERR_SAVE_BADSAVE)   ? MSG_ERR_SAVERD :
@@ -1042,21 +1046,25 @@ void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
     spop.alert_msg = msgs[lang_id][errmsg];
   }
   else {
-    unsigned plugin_error=load_extemu_rom(fn,fs,&pogo_plugin_loader,loadrom_progress);
+    progress_action=ProgressPrepareEmulator;loadrom_progress(0,1);
+    unsigned plugin_error=load_extemu_rom(fn,fs,&pogo_plugin_loader,loadpogo_progress);
     if(plugin_error!=ERR_LOAD_NOEMU) {
       recover_emu_browser();
-      spop.alert_msg=msgs[lang_id][MSG_ERR_READ];return;
+      write_log("emulator",plugin_error,"bytes=%lu game=%s",(unsigned long)fs,fn);
+      spop.alert_msg=plugin_load_error();return;
     }
     // Try to load the emu and ROM, keep trying if there's more than one emulatior option.
     unsigned errcode = ERR_LOAD_NOEMU;
     while (ldinfo->emu_name) {
 
+      progress_action=ProgressGame;
       errcode = load_extemu_rom(fn, fs, ldinfo, loadrom_progress);
       if (errcode && errcode != ERR_LOAD_NOEMU)
         break;
       ldinfo++;
     }
     recover_emu_browser();
+    write_log("emulator",errcode,"bytes=%lu game=%s",(unsigned long)fs,fn);
     unsigned errmsg = (errcode == ERR_LOAD_NOEMU) ? MSG_ERR_NOEMU :
                                                     MSG_ERR_READ;
     spop.alert_msg = msgs[lang_id][errmsg];
@@ -1407,6 +1415,7 @@ static void draw_lined_panel(volatile uint8_t *frame) {
     row[1] = (p[0] & 15) | ((p[0] >> 4) << 8);
     row[117] = (p[2] & 15) | ((p[2] >> 4) << 8);
     row[118] = (p[3] & 15) | ((p[3] >> 4) << 8);
+    if(y>=23 && y<=149)row[2]&=0xff00; /* Thin black inner left outline. */
   }
 }
 
@@ -2428,6 +2437,29 @@ void render_tools(volatile uint8_t *frame) {
       render_icon_trans(i, 26 + smenu.tools.selector * 22, 63);
 }
 
+static unsigned topbar_index(unsigned shade) {
+  return shade==3?TOP_BG:249+shade-(shade>3);
+}
+static uint16_t topbar_shade(uint16_t base,unsigned shade) {
+  unsigned result=0;
+  for(unsigned shift=0;shift<15;shift+=5) {
+    int value=(int)((base>>shift)&31)+3-(int)shade;
+    result|=(unsigned)MIN(31,MAX(0,value))<<shift;
+  }
+  return result;
+}
+static void render_topbar_styled(volatile uint8_t *frame) {
+  for(unsigned y=0;y<16;++y) {
+    unsigned shade=y/2,next=shade+((y&1) && shade<7);
+    dma_memset16(frame+y*240,topbar_index(shade)|(topbar_index(next)<<8),120);
+  }
+}
+
+static void render_topbar_background(volatile uint8_t *frame) {
+  if(menu_theme<THEME_DSSMM_LIGHT)dma_memset16(frame,dup8(FG_COLOR),240*16/2);
+  else render_topbar_styled(frame);
+}
+
 void reload_theme(unsigned thnum) {
   font_set_style(menu_font);
   launcher_invalidate();
@@ -2441,6 +2473,9 @@ void reload_theme(unsigned thnum) {
   MEM_PALETTE[HI_COLOR] = colors.hi_color;
   MEM_PALETTE[TOP_BG]=menu_topbar?menu_theme_colors(thnum,menu_topbar).hi_color:themes[THEME_DSSMM_LIGHT].fg_color;
   MEM_PALETTE[TOP_TEXT]=menu_topbar?0x7fff:0;
+  uint16_t topbar_base=MEM_PALETTE[TOP_BG];
+  for(unsigned shade=0;shade<8;++shade)
+    MEM_PALETTE[topbar_index(shade)]=topbar_shade(topbar_base,shade);
   MEM_PALETTE[SELECTED_TEXT]=0x7fff;
   // In-game menu palette
   MEM_PALETTE[IGM_PAL_FG] = colors.fg_color;
@@ -2537,7 +2572,7 @@ static void render_start(volatile uint8_t *frame) {
 }
 
 static void render_start_bar(volatile uint8_t *frame) {
-  dma_memset16(frame,dup8(menu_theme>=THEME_DSSMM_LIGHT?TOP_BG:FG_COLOR),240*16/2);
+  render_topbar_background(frame);
   draw_text_ovf(menu_username,frame,3,1,132);
   uint32_t seconds=launcher_clock_get();char text[12];
   format_menu_clock(text,sizeof(text),seconds);
@@ -2546,12 +2581,48 @@ static void render_start_bar(volatile uint8_t *frame) {
 }
 
 static void render_dssmm_settings_header(volatile uint8_t *frame,const char *title) {
-  dma_memset16(frame,dup8(menu_theme>=THEME_DSSMM_LIGHT?TOP_BG:FG_COLOR),240*16/2);
+  render_topbar_background(frame);
   draw_text_ovf(menu_username,frame,3,1,84);
   draw_central_text_ovf(title,frame,120,1,96);
   uint32_t seconds=launcher_clock_get();char time[12];
   format_menu_clock(time,sizeof(time),seconds);
   draw_rightj_text(time,frame,234,1);
+}
+
+/* Loading never reads SD art or external fonts: large ROMs/tests may overwrite them. */
+static void progress_text(const char *text,volatile uint8_t *frame,unsigned y,uint8_t color) {
+  unsigned width=MIN(200,font_width(text));
+  draw_text_ovf_color(text,frame,120-width/2,y,200,color);
+}
+static void render_progress_panel(volatile uint8_t *frame,unsigned done,unsigned total,enum progress_action action) {
+  static const char * const labels[]={
+    "Loading game from SD","Loading emulator from SD","Preparing emulator",
+    "Loading save to SRAM","Preparing save memory","Generating game patches",
+    "Backing up firmware to SD","Testing cartridge SDRAM","Testing SD read speed",
+    "Writing game to NOR"
+  };
+  dssmm_background_palette(MEM_PALETTE,menu_theme==THEME_DSSMM_DARK);
+  draw_lined_panel(frame);render_topbar_styled(frame);
+  const char *heading=action==ProgressNor?"NOR Flash":action==ProgressPatches?"Patches":
+      action>=ProgressBackup?"System":"Loading";
+  progress_text(heading,frame,1,TOP_TEXT);
+  char name[13],time[12];unsigned used=0;
+  for(unsigned i=0;i<LAUNCHER_NAME_BYTES && menu_username[i] && used<12;++i) {
+    unsigned c=(uint8_t)menu_username[i];
+    if((c&0xc0)!=0x80)name[used++]=(c>=32 && c<127)?c:'?';
+  }
+  name[used]=0;draw_text_ovf_color(name,frame,3,1,84,TOP_TEXT);
+  format_menu_clock(time,sizeof(time),launcher_clock_get());
+  draw_text_ovf_color(time,frame,234-font_width(time),1,72,TOP_TEXT);
+  uint8_t text=menu_theme>=THEME_DSSMM_LIGHT?FT_COLOR:0;
+  progress_text(labels[MIN((unsigned)action,(unsigned)ProgressNor)],frame,42,text);
+  draw_box_outline(frame,18,222,76,96,text);
+  unsigned width=total?(uint64_t)MIN(done,total)*200/total:0;
+  for(unsigned y=78;y<94;++y)dma_memset16(frame+y*240+20,dup8(HI_COLOR),(width&~1u)/2);
+  char percent[12];npf_snprintf(percent,sizeof(percent),"%u%%",total?(unsigned)((uint64_t)MIN(done,total)*100/total):0);
+  progress_text(percent,frame,106,text);
+  progress_text(action==ProgressNor?"Do not power off":
+      action==ProgressRamTest || action==ProgressSdTest?"Start: Cancel":"Please wait",frame,132,text);
 }
 
 static void render_dssmm_settings_background(volatile uint8_t *frame,const char *title) {
@@ -2587,9 +2658,10 @@ static const struct {
   #endif
 };
 
+static launcher_notice save_notice;
 static void render_menu_notice(volatile uint8_t *frame) {
   const char *notice=spop.alert_msg;
-  if(!notice && settings_save_preparing())notice="Saving settings...";
+  if(!notice && save_notice.visible)notice="Saving settings...";
   if (notice) {
     draw_box_full(frame, 15, 227, SCREEN_HEIGHT / 2 - 20, SCREEN_HEIGHT / 2 + 20, FG_COLOR, HI_COLOR);
     draw_central_text(notice, frame, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 8);
@@ -2608,6 +2680,12 @@ static void render_menu_notice(volatile uint8_t *frame) {
 /* Routing favors size; pixel/scaling functions retain their own hot settings. */
 __attribute__((optimize("Os")))
 void menu_render(unsigned fcnt) {
+  bool notice_was_visible=save_notice.visible;
+  launcher_notice_update(&save_notice,frame_count,settings_save_preparing());
+  if(notice_was_visible!=save_notice.visible) {
+    launcher_invalidate();
+    browser_fast_valid[0]=browser_fast_valid[1]=false;
+  }
   objnum = 0;
   volatile uint8_t *frame = &MEM_VRAM_U8[0xA000*framen];
   if (restart_required) {
@@ -2627,7 +2705,7 @@ void menu_render(unsigned fcnt) {
   if(ds_style)
     dssmm_background_palette(MEM_PALETTE,menu_theme==THEME_DSSMM_DARK);
   if(!(launcher && launcher_page==1 && launcher_valid[framen]))
-    dma_memset16(&frame[0],dup8(menu_theme>=THEME_DSSMM_LIGHT?TOP_BG:FG_COLOR),SCREEN_WIDTH*16/2);
+    render_topbar_background(frame);
 
   bool fast_carousel = !launcher && smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view &&
       browser_motion_offset == 0 && !spop.qpop.message && !spop.rtcpop.callback &&
@@ -2649,7 +2727,7 @@ void menu_render(unsigned fcnt) {
         unsigned kind=smenu.menu_tab==MENUTAB_ROMBROWSE?(browser_view==2?DSSMM_BG_VERTICAL:DSSMM_BG_HORIZONTAL):
                       DSSMM_BG_GRID;
         dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,kind);
-        dma_memset16(frame,dup8(menu_theme>=THEME_DSSMM_LIGHT?TOP_BG:FG_COLOR),240*16/2);
+        render_topbar_background(frame);
       }
     } else dma_memset16(&frame[16*SCREEN_WIDTH],dup8(BG_COLOR),SCREEN_WIDTH*(SCREEN_HEIGHT-16)/2);
   }
@@ -2739,6 +2817,7 @@ void menu_flip() {
 
 void menu_init(int sram_testres) {
   restart_required=false;
+  save_notice=(launcher_notice){0};
   update_unlock.position=0;
   browser_invalidate_artwork();
   // Reset to ROM browser and SD card root.
@@ -2760,7 +2839,13 @@ void menu_init(int sram_testres) {
   smenu.menu_tab = (recent_menu && smenu.recent.maxentries) ? MENUTAB_RECENT : MENUTAB_ROMBROWSE;
 
   // Load icons into VRAM
-  dma_memcpy16(MEM_VRAM_OBJS, icons_img, sizeof(icons_img) / 2);
+#ifdef DSSMM_EXTERNAL_BACKGROUNDS
+  const uint8_t *icon_pixels=dssmm_icon_pixels(sizeof(icons_img));
+  if(icon_pixels)dma_memcpy16(MEM_VRAM_OBJS,icon_pixels,sizeof(icons_img)/2);
+  else {dma_memset16(MEM_VRAM_OBJS,0,sizeof(icons_img)/2);restart_required=true;}
+#else
+  dma_memcpy16(MEM_VRAM_OBJS,icons_img,sizeof(icons_img)/2);
+#endif
   dma_memcpy16(&MEM_PALETTE[256], icons_pal, sizeof(icons_pal) / 2);
   dma_memcpy16(MEM_VRAM_OBJS+sizeof(icons_img),gamegear_pixels,sizeof(gamegear_pixels)/2);
   dma_memcpy16(&MEM_PALETTE[256+sizeof(icons_pal)/2],gamegear_palette,sizeof(gamegear_palette)/2);
@@ -3053,6 +3138,7 @@ static void keypress_popup_loadgba(unsigned newkeys) {
 
       // Prepare the savegame (load and store stuff, directsave...)
       t_dirsave_info dsinfo;
+      progress_action=spop.p.load.l.sram_load_type==SaveLoadSav?ProgressSave:ProgressPrepareSave;loadrom_progress(0,1);
       unsigned errsave = prepare_savegame(
         spop.p.load.l.sram_load_type, spop.p.load.l.sram_save_type,
         st, &dsinfo, spop.p.load.l.savefn);
@@ -3070,6 +3156,7 @@ static void keypress_popup_loadgba(unsigned newkeys) {
         .ts_step = rtcspeed_default
       };
 
+      progress_action=ProgressGame;
       unsigned err = load_gba_rom(
         spop.p.load.i.romfn, spop.p.load.i.romfs,
         spop.p.load.l.sram_save_type == SaveDisable ? NULL : spop.p.load.l.savefn, p,
@@ -3134,24 +3221,12 @@ static unsigned nor_write_blocks(void) {
 }
 
 /* Presentation only: native SuperChis allocation/erase/write/verify remain unchanged. */
-static void render_nor_progress(volatile uint8_t *frame,unsigned done,unsigned total) {
-  dssmm_background_palette(MEM_PALETTE,menu_theme==THEME_DSSMM_DARK);
-  draw_lined_panel(frame);
-  render_dssmm_settings_header(frame,"NOR Flash");
-  draw_central_text("Writing NOR",frame,120,42);
-  draw_box_outline(frame,18,222,76,96,FT_COLOR);
-  unsigned width=total?(uint64_t)MIN(done,total)*196/total:0;
-  for(unsigned y=79;y<94;++y)
-    dma_memset16(frame+y*240+22,dup8(HI_COLOR),(width&~1u)/2);
-  char text[12];npf_snprintf(text,sizeof(text),"%u%%",total?(unsigned)((uint64_t)MIN(done,total)*100/total):0);
-  draw_central_text(text,frame,120,106);
-  draw_central_text("Do not power off",frame,120,132);
-}
+/* Stable callback ABI also keeps native visual probes independent of LTO clones. */
+__attribute__((noipa,optimize("Os")))
 static void nor_write_progress(unsigned done,unsigned total) {
-  if(menu_theme<THEME_DSSMM_LIGHT){loadrom_progress(done,total);return;}
   /* Flash helpers return with SDRAM/SD mapped; keep fonts available to the UI. */
   set_supercard_mode(MAPPED_SDRAM,true,true);
-  render_nor_progress(&MEM_VRAM_U8[0xa000*framen],done,total);
+  render_progress_panel(&MEM_VRAM_U8[0xa000*framen],done,total,ProgressNor);
   dma_memset16(MEM_OAM,0,256);
   REG_DISPCNT=(REG_DISPCNT&~0x10)|(framen<<4);framen^=1;
 }
@@ -3392,6 +3467,7 @@ static void keypress_popup_norload(unsigned newkeys) {
       bool uses_rtc   = e->gattrs & GATTR_RTC;
 
       t_dirsave_info dsinfo;
+      progress_action=spop.p.norld.l.sram_load_type==SaveLoadSav?ProgressSave:ProgressPrepareSave;loadrom_progress(0,1);
       unsigned errsave = prepare_savegame(
         spop.p.norld.l.sram_load_type, spop.p.norld.l.sram_save_type,
         st, &dsinfo, spop.p.norld.l.savefn);
@@ -3868,6 +3944,7 @@ static void keypress_menu_tools(unsigned newkeys) {
       // Performs a test on the SRAM/SDRAM, ensure they are fine.
       set_supercard_mode(MAPPED_SDRAM, true, false);
 
+      progress_action=ProgressRamTest;
       if (sdram_test(loadrom_progress_abort))
         spop.alert_msg = msgs[lang_id][MSG_BAD_SDRAM];
       else
@@ -3892,6 +3969,7 @@ static void keypress_menu_tools(unsigned newkeys) {
     }
     else if (smenu.tools.selector == ToolsSDBench) {
       slowsd = use_slowld;
+      progress_action=ProgressSdTest;
       int ret = sdbench_read(loadrom_progress_abort);
       slowsd = true;
       if (ret <= 0)

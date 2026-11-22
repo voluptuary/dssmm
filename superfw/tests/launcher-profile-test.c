@@ -20,5 +20,18 @@ int main(void) {
  assert(launcher_title_top(1,1)==58 && launcher_title_top(2,1)==53 && launcher_title_top(3,1)==47);
  assert(launcher_title_top(0,1)==58 && launcher_title_top(99,1)==47);
  assert(launcher_title_top(1,0)==58 && launcher_title_top(2,0)==50 && launcher_title_top(99,0)==50);
+ launcher_notice notice={0};
+ launcher_notice_update(&notice,100,true);assert(notice.visible && notice.until==160);
+ launcher_notice_update(&notice,101,true);assert(notice.until==160);
+ launcher_notice_update(&notice,120,false);launcher_notice_update(&notice,121,true);assert(notice.until==163);
+ launcher_notice_update(&notice,162,false);assert(notice.visible);
+ launcher_notice_update(&notice,163,false);assert(!notice.visible);
+ launcher_notice_update(&notice,200,true);assert(notice.until==260);
+ launcher_notice_update(&notice,259,false);launcher_notice_update(&notice,260,true);assert(notice.visible && notice.until==263);
+ launcher_notice_update(&notice,261,true);assert(notice.until==263);
+ launcher_notice_update(&notice,263,false);assert(!notice.visible);
+ launcher_notice_update(&notice,0xfffffff0u,true);assert(notice.visible && notice.until==44);
+ launcher_notice_update(&notice,43,false);assert(notice.visible);
+ launcher_notice_update(&notice,44,false);assert(!notice.visible);
  return 0;
 }

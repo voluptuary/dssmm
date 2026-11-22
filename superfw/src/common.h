@@ -279,6 +279,8 @@ unsigned launch_gba_nor(
   const char *romfn, const char *savefn, const uint8_t *normap, unsigned blkcnts, const t_dirsave_info *dsinfo,
   const t_rtc_info *rtcinfo, bool ingame_menu, unsigned cheats);
 
+const char *plugin_load_error(void);
+bool plugin_loading_game(void);
 unsigned load_extemu_rom(const char *fn, uint32_t fs, const t_emu_loader *ldinfo, progress_fn progress);
 bool validate_gba_header(const uint8_t *header);
 bool validate_gb_header(const uint8_t *header);
@@ -305,8 +307,8 @@ void program_sram_check();
 int sdbench_read(progress_abort_fn progcb);
 
 // Logging
+void write_log(const char *fname, int line, const char *format, ...);
 #if defined(ENABLE_DISK_LOGGING)
-  void write_log(const char *fname, int line, const char *format, ...);
   #define WRITE_LOG(fmt, ...) write_log(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
 #elif defined(ENABLE_EMU_LOGGING)
   void write_log_emu(const char *fname, int line, const char *format, ...);

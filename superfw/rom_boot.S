@@ -322,6 +322,11 @@ _main_end:
   ldr r1, =(FW_MAX_SIZE_KB*1024)
   cmp r2, r1
   bhi 8f
+  @ This helper stays in source ROM to retain the native 3KiB IWRAM limit.
+  mov lr, pc
+  ldr pc, =pogo_boot_reuse
+  @ Z is set only for reuse; otherwise R0 is restored to the Game Pak base.
+  beq 8f
   add r2, r2, $0x700
   add r2, r2, $0xff
   lsr r2, r2, $11

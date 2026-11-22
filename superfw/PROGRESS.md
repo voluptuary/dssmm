@@ -852,3 +852,23 @@ shared integration CI passed. Continued Start caption/Title geometry parity.
 Actual native four-case caption replay matches every DE font/position pixel;
 partial Chis RAM gate passes with200B free EWRAM. Added bounded ROM recent-record
 fixture and verifier registration. Clean all3/full gates pending;677 frozen.
+
+2026-11-22: Full clean743 Start-only gates passed locally; withheld delivery to
+include new677 hardware feedback. Focus now NOR fill/panel outline, steady
+minimum1second save notice, textured budget-safe top bar, GG/SMS return state/
+latency and unresolved native PCE load error. Native NOR probe also needs robust
+symbol/ABI guards after a sync-source CI failed13 despite integration success.
+
+## 2026-11-22 — Build677 feedback and shared loading candidate
+
+- Added accurate operation labels and one framed progress renderer for loading,
+  save preparation, patches, diagnostics, backup and NOR. Corrected NOR fill,
+  left panel outline, procedural topbar depth and coalesced one-second save notice.
+- Recovered main RAM by moving exact existing icon tiles into the read-only font
+  resource partition. Added independent ARM lookup/oracle checks for both sizes.
+- Plugin return resets video/IO, restores halfword-safe firmware faster and uses
+  a consumed same-image snapshot marker. Added failure-only PCE/plugin diagnostics;
+  actual EZ-pack PCE2.5MiB native-loader replay passes, hardware failure unresolved.
+- Focused host and ARM tests pass; native loading screenshots pass with poisoned
+  external fonts. All-board full verification and a clean numbered hardware-test
+  replacement are next. Build677 remains the delivered image until then.
