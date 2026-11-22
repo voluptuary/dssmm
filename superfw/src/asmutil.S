@@ -413,6 +413,7 @@ START_ARM_FUNC(gba_irq_handler)
 // Pogoshell entry preserves only the top EWRAM ABI block. No C frame may run
 // after the clear. This is a SuperCard handoff, not an EZ-FLASH reset routine.
 START_ARM_FUNC(launch_pogo_reset)
+  mov r11, r3
   mov r9, r1
   mov r10, r2
   cmp r0, #0
@@ -465,18 +466,36 @@ pogo_reset_tail:
   beq 5f
   mov r0, #0x08000000
   mov r1, #0x02000000
-  cmp r9, #2
-  beq 4f
   mov r2, r10
 3:
   ldr r3, [r0], #4
   str r3, [r1], #4
   subs r2, r2, #4
   bne 3b
-  b 6f
-4:
-  swi 0x110000
 6:
+  // RAM plugins may SoftReset to ROM0; make that a return to the preserved kernel.
+  cmp r11, #0
+  beq 7f
+  mov r4, #0x0a000000
+  sub r4, r4, #2
+  mov r5, #0x5a
+  orr r5, r5, #0xa500
+  mov r6, #5
+  strh r5, [r4]
+  strh r5, [r4]
+  strh r6, [r4]
+  strh r6, [r4]
+  mov r0, #0x08000000
+  ldr r3, =0xea67fffe // b 0x09a00000
+  strh r3, [r0]
+  mov r3, r3, lsr #16
+  strh r3, [r0, #2]
+  mov r6, #1
+  strh r5, [r4]
+  strh r5, [r4]
+  strh r6, [r4]
+  strh r6, [r4]
+7:
   // BIOS SoftReset selects EWRAM entry when this flag is nonzero.
   mov r0, #0x03000000
   add r0, r0, #0x7F00
@@ -484,4 +503,6 @@ pogo_reset_tail:
   strb r1, [r0, #0xFA]
 5:
   swi 0x000000
+  .pool
 pogo_reset_tail_end:
+.global pogo_reset_tail,pogo_reset_tail_end

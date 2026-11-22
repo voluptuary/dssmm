@@ -1,6 +1,8 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include <string.h>
 #include "pogo_plugin.h"
+
+#pragma GCC optimize ("Os")
 #define ROM_BASE 0x08000000u
 /* Keep clear of the existing menu/font resource region beginning at 14MiB. */
 #define PAYLOAD_LIMIT (14u*1024*1024)
@@ -22,7 +24,8 @@ bool pogo_fix_waitcnt(uint32_t *data,uint32_t size) {
     if(data[n]!=0xe3a00014 || (ldr&0xfffff000)!=0xe59f1000 || data[n+2]!=0xe1c100b0)continue;
     unsigned literal=i+12+(ldr&4095);
     if((literal&3) || literal>size-4 || data[literal/4]!=0x04000204)continue;
-    data[n]=0xe3a00901; /* mov r0,#0x4000: default waits plus prefetch */
+    volatile uint16_t *patch=(volatile uint16_t*)&data[n];
+    patch[0]=0x0901;patch[1]=0xe3a0; /* mov r0,#0x4000: default waits plus prefetch */
     return true;
   }
   return false;
@@ -71,4 +74,57 @@ bool pogo_ram_valid(const uint8_t *data,uint32_t size,unsigned mode) {
     }
   }
   return true;
+}
+
+/* Complete known FluBBa Visoly doReset bodies; never guess from a lone SWI. */
+static const uint32_t reset_sms[]={0xe3a01301,0xe3a00000,0xe1c10bba,0xe1c10cb6,
+  0xe1c10db2,0xe1c10dbe,0xe5810208,0xebffffd6,0xe3a00000,0xe59f1090,
+  0xe1c100b0,0xebfffff0,0xe3a0000c,0xef010000,0xef000000};
+static const uint32_t reset_pce[]={0xe3a01301,0xe3a00000,0xe1c10bba,0xe1c10cb6,
+  0xe1c10db2,0xe1c10dbe,0xe2811c02,0xe5810008,0xebffffd3,0xe3a00000,
+  0xe59f1084,0xe1c100b0,0xebffffef,0xe3a0000c,0xef010000,0xef000000};
+unsigned pogo_adapt_image(uint32_t *data,uint32_t size,uint32_t target) {
+  pogo_fix_waitcnt(data,size);
+  if(!target || (target&3))return 0;
+  unsigned patched=0;
+  for(unsigned i=0;i+sizeof(reset_sms)<=size;i+=4) {
+    const void *body=(const uint8_t*)data+i;
+    bool sms=!memcmp(body,reset_sms,sizeof(reset_sms));
+    bool pce=i+sizeof(reset_pce)<=size && !memcmp(body,reset_pce,sizeof(reset_pce));
+    if(!sms && !pce)continue;
+    volatile uint16_t *p=(volatile uint16_t*)body;
+    p[0]=0xf004;p[1]=0xe51f; /* ldr pc,[pc,#-4] */
+    p[2]=target;p[3]=target>>16;++patched;
+  }
+  return patched;
+}
+bool pogo_return_available(const uint32_t *image,const uint32_t *stub,uint32_t version,uint32_t limit) {
+  return image[0xa0/4]==0x45505553 && image[0xa4/4]==0x00574652 &&
+      image[0xc8/4]==version && image[0xcc/4]>=256 && image[0xcc/4]<=limit &&
+      !(image[0xcc/4]&511) && stub[1]==0x54525344;
+}
+/* LZ77 output uses only halfword writes, including overlapping backreferences. */
+unsigned pogo_unpack16(const uint8_t *in,uint32_t size,uint16_t *out) {
+  if(!pogo_ram_valid(in,size,2))return 0;
+  unsigned total=in[1]|((unsigned)in[2]<<8)|((unsigned)in[3]<<16),ip=4,op=0;
+  volatile uint16_t *dest=out;
+  while(op<total) {
+    unsigned flags=in[ip++];
+    for(unsigned bit=0;bit<8 && op<total;++bit) {
+      unsigned length=1,distance=0;
+      if(flags&(128>>bit)) {
+        unsigned a=in[ip++],b=in[ip++];length=(a>>4)+3;distance=((a&15)<<8)+b+1;
+      }
+      while(length--) {
+        unsigned value=distance?(((const uint8_t*)out)[op-distance]):in[ip++];
+        unsigned shift=(op&1)*8;
+        dest[op/2]=(dest[op/2]&~(255u<<shift))|(value<<shift);++op;
+      }
+    }
+  }
+  /* Reset copies complete words; the last output word has deterministic padding. */
+  for(unsigned i=op;i<((total+3)&~3u);++i) {
+    unsigned shift=(i&1)*8;dest[i/2]&=~(255u<<shift);
+  }
+  return total;
 }

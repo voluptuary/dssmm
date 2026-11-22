@@ -62,6 +62,18 @@ static const t_flash_game_entry sample_nor = {
 };
 static void visual_scene(void) {
   if (!TEST_SCENE)return;
+  if(TEST_SCENE==10 || TEST_SCENE==11) {
+    VAR8(NATIVE_launcher_page)=1;VAR8(NATIVE_launcher_selected)=TEST_SCENE==10?1:4;
+    if(TEST_SCENE==11)key(1);
+    return;
+  }
+  if(TEST_SCENE==12) {
+    VAR8(NATIVE_smenu+OFFSET_menu_tab)=TEST_UI_TAB+2;
+    VAR8(NATIVE_menu_accent)=(VAR8(NATIVE_menu_accent)+1)%5;
+    ((void(*)(void))(NATIVE_settings_save_request|1u))();
+    return;
+  }
+  if(TEST_SCENE==13)return;
   if (TEST_SCENE==9) {
     select_option(8);VAR32(NATIVE_smenu+OFFSET_uiset_seloff)=TEST_FONT?0:2;
     VAR8(NATIVE_menu_accent)=3;
@@ -103,7 +115,7 @@ static uint16_t panel_pair(uint8_t packed) {
   return (packed&15)|((packed>>4)<<8);
 }
 static bool frame_intact(void) {
-  if (!TEST_SCENE || TEST_SCENE==9)return true;
+  if (!TEST_SCENE || TEST_SCENE==9 || TEST_SCENE==10)return true;
   volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));
   for(unsigned y=21;y<152;y++) {
     const uint8_t *p=dssmm_panel_profile[0][y-21];
@@ -142,23 +154,40 @@ int main(void) {
   } else ok=restored();
   VAR8(NATIVE_menu_font)=TEST_FONT;select_option(2);
   ((void(*)(unsigned))(NATIVE_reload_theme|1u))(VAR8(NATIVE_menu_theme));
+#if TEST_REFERENCE
+  const char reference_name[]="Test User";
+  for(unsigned i=0;i<sizeof(reference_name);++i)VAR8(NATIVE_menu_username+i)=reference_name[i];
+#endif
   visual_scene();
-  unsigned previous=0;
+  unsigned previous=0,seeded_pages=0;
   for(;;) {
     unsigned held=(~REG16(0x04000130))&0x3ff,pressed=held&~previous;previous=held;
     if(!TEST_SCENE && pressed)key(pressed & (16|32|64|128|2));
     VAR32(NATIVE_frame_count)++;
-    if(TEST_SCENE) {
+#if TEST_REFERENCE
+    VAR32(NATIVE_clock_seconds)=12*3600+34*60+56;
+    VAR32(NATIVE_clock_frame)=VAR32(NATIVE_frame_count);
+#endif
+    if(TEST_SCENE && (TEST_SCENE!=10 || !(seeded_pages&(1u<<VAR8(NATIVE_framen))))) {
+      seeded_pages|=1u<<VAR8(NATIVE_framen);
       REG16(0x050001d6)=0x7c1f; /* Detect stale artwork behind native modal panels. */
       volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));
       for(unsigned n=16*120;n<160*120;n++)back[n]=0xebeb;
     }
-    ((void(*)(unsigned))(NATIVE_menu_render|1u))(1);
+    if(TEST_SCENE==13) {
+      /* Exercise the retained callback: its small render helper is inlined. */
+      ((void(*)(unsigned,unsigned))(NATIVE_nor_write_progress|1u))(1,2);
+      VAR8(NATIVE_framen)^=1; /* Callback already flipped; inspect that page. */
+    }
+    else ((void(*)(unsigned))(NATIVE_menu_render|1u))(1);
     ok=ok&&frame_intact();
     wait_frame();((void(*)(void))(NATIVE_menu_flip|1u))();
+#if !TEST_REFERENCE
     REG16(0x050001de)=ok?0x03e0:0x001f;
     REG16(0x050001f0)=ok?0x7c00:0x001f;
     volatile uint16_t *front=(volatile uint16_t *)(0x06000000+((REG16(0x04000000)&16)?0xa000:0));
     for(unsigned y=1;y<7;y++)for(unsigned x=second?112:116;x<120;x++)front[y*120+x]=0xf8ef;
+#endif
+    if(TEST_SCENE==12)for(;;)wait_frame();
   }
 }

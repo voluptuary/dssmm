@@ -1,24 +1,26 @@
 #include "browser_carousel.h"
 #include "browser_motion.h"
 
-unsigned browser_carousel_layout(bool vertical, int selected, int count, int offset,
+unsigned browser_carousel_layout(bool vertical, int selected, int count, int offset, bool wrap,
                                  browser_carousel_item items[3]) {
   if (!items || count <= 0 || selected < 0 || selected >= count) return 0;
   unsigned total = 0;
-  int focused_item = selected, focused_distance = 0x7fffffff;
+  int focused_slot = 0, focused_distance = 0x7fffffff;
   for (int slot = -1; slot <= 1; ++slot) {
-    int index = selected + slot;
-    if (index < 0 || index >= count) continue;
+    if(count==1 && slot)continue;
+    int index=browser_carousel_index(selected+slot,count,wrap);
+    if(index<0)continue;
     int position = slot * BROWSER_MOTION_UNIT + offset;
     int distance = position < 0 ? -position : position;
     if (distance < focused_distance) {
-      focused_item = index;
+      focused_slot = slot;
       focused_distance = distance;
     }
   }
   for (int slot = -1; slot <= 1; ++slot) {
-    int index = selected + slot;
-    if (index < 0 || index >= count) continue;
+    if(count==1 && slot)continue;
+    int index=browser_carousel_index(selected+slot,count,wrap);
+    if(index<0)continue;
     int position = slot * BROWSER_MOTION_UNIT + offset;
     int distance = position < 0 ? -position : position;
     int w = vertical ? 84 : 120;
@@ -37,7 +39,7 @@ unsigned browser_carousel_layout(bool vertical, int selected, int count, int off
       y = 27 + d * 20 / BROWSER_MOTION_UNIT;
     }
     items[total++] = (browser_carousel_item){
-      index, x, y, w, h, distance, index == focused_item
+      index, x, y, w, h, distance, slot == focused_slot
     };
   }
   /* Neighbor rectangles can overlap the focused card, especially vertically. */

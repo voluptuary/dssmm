@@ -826,3 +826,23 @@ pass. Full all-board/IGM/18-scene/hosted gates next; keep664 until replacement p
 pass, downloads/body match. PR12 merged b7d91488. Chis667 delivered;664 report kept.
 No physical667/SD-Lite qualification. Publication docs/root milestone/normal sync
 next; DE remains latest. Future porting needs measured RAM recovery (200B free).
+
+2026-11-21: Recovered uncommitted plugin prototype and reviewed owner patch set.
+No verbatim application; decisions recorded. ARM firmware-return model and real
+portable-pack adapters pass; actual plugin Exit mGBA fixture is being corrected/
+rerun before candidate validation. User UI/NOR requests and native EZ harness goal
+remain active. Current physical test image remains667.
+
+2026-11-21: Focused actual plugin/boot/return ARM and real plugin Exit mGBA checks
+pass. Implemented owner667 UI queue and optional wrap with collision-safe cache;
+registered native loader replay and wrap persistence regression. Full verifier
+running; no new hardware candidate yet. Physical Exit/PCE remain unqualified.
+
+Clean Build677/e1494ba0 all3/nativeARM/settings/plugin/IGM gates pass with fixed
+hardware limits. Actual Chis mGBA2boots and26 scenes across bothfonts pass; real
+SMS/GG/PCE Exit-to-marker and upstream host suite pass. SourceCI44954125901 passed;
+PR16 integrationCI44954129956 all4 jobs passed. No new
+physical qualification. Exact candidate record: docs/build-677-validation.json.
+Removed only the failed generated NOR-debug ROM directory after preserving its
+cause/results; retained native fixtures/current3 packages, full artwork ZIP,
+owner lock, private BIOS and session scratch.

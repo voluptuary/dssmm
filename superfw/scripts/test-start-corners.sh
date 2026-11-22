@@ -12,19 +12,21 @@ Path(sys.argv[2]).write_text('''#include <stdint.h>
 #include <assert.h>
 #define HI_COLOR 19
 #define TOP_TEXT 247
+static unsigned menu_topbar;
 #define dup8(x) ((x)|((x)<<8))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 '''+s[a:b]+'''
 static uint16_t image[19216];
 int main(void) {
  const unsigned boxes[][4]={{109,142,23,16},{176,0,64,16},{24,42,192,48},{111,143,19,14}};
+ for(menu_topbar=0;menu_topbar<2;++menu_topbar)
  for(unsigned box=0;box<4;++box) {
   for(unsigned i=0;i<19216;++i)image[i]=0xeeee;
   uint8_t *frame=(uint8_t *)&image[8];
   unsigned x=boxes[box][0],y=boxes[box][1],w=boxes[box][2],h=boxes[box][3];
   launcher_corners(frame,x,y,w,h);
-  assert(frame[y*240+x]==(y<16?247:19) && frame[y*240+x+w-1]==(y<16?247:19));
-  assert(frame[(y+h-1)*240+x]==(y<16?247:19) && frame[(y+h-1)*240+x+w-1]==(y<16?247:19));
+  assert(frame[y*240+x]==(y<16 && menu_topbar?247:19) && frame[y*240+x+w-1]==(y<16 && menu_topbar?247:19));
+  assert(frame[(y+h-1)*240+x]==(y<16 && menu_topbar?247:19) && frame[(y+h-1)*240+x+w-1]==(y<16 && menu_topbar?247:19));
   assert(frame[(y+h/2)*240+x]==0xee && frame[(y+h/2)*240+x+w-1]==0xee);
   assert(frame[y*240+x+w/2]==0xee && frame[(y+h-1)*240+x+w/2]==0xee);
   for(unsigned yy=0;yy<160;++yy)for(unsigned xx=0;xx<240;++xx)

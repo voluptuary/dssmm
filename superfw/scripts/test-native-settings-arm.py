@@ -48,9 +48,9 @@ def save_native():
   if not call('settings_save_pending'):return 1
   if not call('settings_save_poll'):return 0
  raise AssertionError('Background save did not complete')
-keys=['menu_theme','menu_accent','browser_view','artwork_mode','menu_clock_24','menu_topbar']
+keys=['menu_theme','menu_accent','browser_view','artwork_mode','menu_clock_24','menu_topbar','carousel_wrap']
 # Later saves exercise canonical-value preservation with a loaded baseline.
-for values in [(7,3,2,2,0,4),(6,4,1,1,1,0),(7,1,0,0,0,2),(3,0,0,2,1,1)]:
+for values in [(7,3,2,2,0,4,0),(6,4,1,1,1,0,1),(7,1,0,0,0,2,1),(3,0,0,2,1,1,0)]:
  for key,value in zip(keys,values):u.mem_write(syms[key],bytes([value]))
  before=len(accesses)
  assert save_native()==1

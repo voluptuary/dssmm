@@ -5,7 +5,7 @@ import struct
 import subprocess
 import tempfile
 from unicorn import Uc, UC_ARCH_ARM, UC_MODE_ARM, UC_HOOK_INTR
-from unicorn.arm_const import (UC_ARM_REG_PC, UC_ARM_REG_R0, UC_ARM_REG_R1, UC_ARM_REG_R2, UC_ARM_REG_SP)
+from unicorn.arm_const import (UC_ARM_REG_PC, UC_ARM_REG_R0, UC_ARM_REG_R1, UC_ARM_REG_R2, UC_ARM_REG_R3, UC_ARM_REG_SP)
 
 root = Path(__file__).resolve().parents[1]
 source = (root / 'src/asmutil.S').read_text().split(
@@ -25,10 +25,10 @@ launch_pogo_reset:
     data = (work / 'reset.elf').read_bytes()
     entry, phoff = struct.unpack_from('<II', data, 24)
     phsize, phnum = struct.unpack_from('<HH', data, 42)
-    for fast,mode in ((f,m) for f in (0,1) for m in (0,1,2)):
+    for fast,mode,returning in ((f,m,r) for f in (0,1) for m in (0,1) for r in (0,1)):
         cpu = Uc(UC_ARCH_ARM, UC_MODE_ARM)
         for address, size in ((0x02000000, 0x40000), (0x03000000, 0x8000),
-                              (0x04000000, 0x1000), (0x08000000, 0x1000)):
+                              (0x04000000, 0x1000), (0x08000000, 0x1000), (0x09fff000,0x1000)):
             cpu.mem_map(address, size)
             cpu.mem_write(address, bytes([0xa5]) * size)
         for i in range(phnum):
@@ -37,13 +37,14 @@ launch_pogo_reset:
             if kind == 1 and size:
                 cpu.mem_write(address, data[offset:offset + size])
         payload=bytes(range(32))
-        cpu.mem_write(0x08000000,payload if mode!=2 else bytes([0x10,32,0,0])+payload)
+        cpu.mem_write(0x08000000,payload)
         abi = bytes(range(96))
         cpu.mem_write(0x0203fbf8, abi)
         cpu.mem_write(0x04000204, struct.pack('<I', 0x4000))
         cpu.reg_write(UC_ARM_REG_R0, fast)
         cpu.reg_write(UC_ARM_REG_R1, mode)
         cpu.reg_write(UC_ARM_REG_R2, len(payload))
+        cpu.reg_write(UC_ARM_REG_R3,returning)
         cpu.reg_write(UC_ARM_REG_SP, 0x03007000)
         calls = []
 
@@ -55,11 +56,6 @@ launch_pogo_reset:
                 assert uc.reg_read(UC_ARM_REG_R0) == 0xfe
                 uc.mem_write(0x03000000, bytes(0x7e00))
                 uc.mem_write(0x04000000, bytes(0x1000))
-            elif swi==0x110000:
-                assert mode==2
-                assert uc.reg_read(UC_ARM_REG_R0)==0x08000000
-                assert uc.reg_read(UC_ARM_REG_R1)==0x02000000
-                uc.mem_write(0x02000000,payload)
             elif swi == 0:
                 expected=(payload+bytes(0x3fbf8-len(payload))) if mode else bytes(0x3fbf8)
                 assert uc.mem_read(0x02000000, 0x3fbf8) == expected
@@ -67,11 +63,14 @@ launch_pogo_reset:
                 assert struct.unpack('<I', uc.mem_read(0x04000204, 4))[0] == 0x4000
                 assert uc.reg_read(UC_ARM_REG_SP) == 0x03007f00
                 assert uc.mem_read(0x03007ffa, 1) == bytes([bool(mode)])
+                if mode and returning:
+                    assert uc.mem_read(0x08000000,4)==struct.pack('<I',0xea67fffe)
+                else: assert uc.mem_read(0x08000000,4)==payload[:4]
                 uc.emu_stop()
             else:
                 raise AssertionError(hex(swi))
 
         cpu.hook_add(UC_HOOK_INTR, interrupt)
         cpu.emu_start(entry, 0, count=400000)
-        assert calls == ([0x010000,0x110000,0] if mode==2 else [0x010000,0])
+        assert calls == [0x010000,0]
 print('ARM plugin reset: lower RAM cleared, ABI and WAITCNT preserved at both RAM speeds.')

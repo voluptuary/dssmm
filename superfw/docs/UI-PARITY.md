@@ -94,3 +94,22 @@ at each side with an even-aligned156px clear region. Start recent top corners+1y
 clock left corners+2x; GG cartridge13px tall/full16px wide, blank label/flat bottom.
 Settings now derive only from canonical SETTINGS.TXT and save on changes/exits
 with readback/rollback; physical powercycle persistence is not yet confirmed.
+
+## 2026-11-21 native visual-reference checkpoint
+
+DE, Original OMEGA and BLUE now have native nine-scene mGBA harnesses in their
+own projects, integrated through PR13/14/15 after all four CI checks passed.
+The shared root comparison tool creates side-by-side/opacity-overlay HTML from
+two240x160 captures. Stock mGBA0.10.1 is unchanged; no BIOS is required. SuperFW
+native preview --reference holds Test User/12:34:56 and removes test markers.
+A local Start comparison is build/de-superfw-start-comparison.html.
+
+New SuperFW behavior includes optional wrapped carousel browsing with the same
+five-image cache, consistent centered Info/System headers, a visible blocking
+settings-snapshot notice and lined NOR progress/capacity presentation. Native
+NOR allocation/write/verification remains unchanged. Full DE parity is unfinished:
+next visual pass should match Start fallback artwork and recent-caption vertical
+centering, then compare category/settings/dialog spacing against native captures.
+NOR/Recents carousel support and hardware performance remain separate goals.
+Owner585/657 confirmed artwork/cache and settings persistence on Chis; the new
+plugin return path, PCE loading, SD/Lite and new menus remain physically unqualified.

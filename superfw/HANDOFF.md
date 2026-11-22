@@ -1368,3 +1368,71 @@ preserve chain-loaded DSSMM via reserved SDRAM firmware snapshot at boot, patch
 only exact recognized exit routines, retain native SuperCard mapping and test
 actual ARM/emulator execution. Need RAM headroom recovery before added code;
 never import OMEGA drivers or claim hardware exit qualification from mocks.
+
+## 2026-11-21 recovery and owner patch review
+No old validation process remained active. Owner committed root PATCHES.md/patches
+as0563331; preserve them. Review is docs/PATCH-REVIEW-2026-11-21.md: none apply
+verbatim; useful005–010 behavior will be reimplemented in real SuperFW APIs.
+Reject012: removes WAITCNT destination validation. 011 invents caching APIs already
+covered by current motion/miss cache. Root artifact integration is separate before
+new hardware PR so its diff remains private to superfw.
+
+Interrupted plugin prototype is NOT a validated candidate. It snapshots the
+running installed/chain-loaded firmware to SDRAM24..26MiB, return stub26MiB;
+8MiB patch scratch16..24MiB must not overlap it. Modeled ARM return passes complete
+image restoration, halfword-only writes and invalid-size guards. MBZ now decodes
+to halfword scratch and receives full-image startup/exit adaptation. Exact SMS/PCE
+reset patterns match real portable pack; mutation/truncation tests pass. First
+mGBA Exit marker was garbage-collected by linker; fixed fixture link retains it.
+Actual SMS/GG/PCE Exit replay is rerunning. Keephardware-test667 until all3/full
+native/mGBA/hosted gates pass. Bootloader3KiB and RAM/flash budgets remain fixed;
+return stub is copied separately outside that bootloader limit.
+Owner now also requests native EZ-FLASH mGBA comparison harnesses in each hardware
+lane. New667 UI queue: accent clock corners/defaultbar; visible Saving settings
+snapshot, centered uniform headers/Info, time prompts/baselines, optional carousel
+wrap with correct cache, and sensible DS Style NOR progress/management presentation.
+
+2026-11-21 continuation: Implemented exact SMS/PCE reset adaptation, boot snapshot
+and halfword MBZ expansion. Actual native loader/FatFs cases and stock mGBA real
+SMS/GG/PCE Exit-to-marker passed focused tests; no physical exit claim. Native
+loader replay is now part of each board build. Optional carousel wrap uses
+index-keyed five-slot metadata without increasing its RAM size; host tests cover
+0/15 collisions, missing art and one/two-file boundaries. Native settings ARM
+roundtrips include wrap. UI queue implemented: defaultbar accent clock corners,
+visible blocking snapshot notice, uniform headers/Info, clock instructions and
+NOR capacity/progress presentation with original backend guards. Chis partial
+ELF had312B free EWRAM; preserve stack/flash limits. Full all3+native visual gates
+are running; hardware-test667 remains frozen until a clean candidate passes.
+Owner root audit artifacts moved intact on trunk to docs/history/patch-review-2026-11-21;
+review remains project-local. New shared comparison tool is universal, and each
+EZ harness compiles its own translation unit; no foreign driver imports.
+
+First expanded matrix stopped at new Start scene10: fixture overwrote both cached
+Start pages every frame, then incorrectly required the production cache to redraw.
+Seed Start pages once each; modal scenes still reseed every frame. This is a
+fixture correction, not a production stale-art fix. All earlier9/font1 scenes
+and native2boot saves passed. Rerun expanded matrix and final clean all3 build.
+
+Expanded scene11 exposed one real DSSMM clock-popup descender touching frame at
+(191,149). Moved the clock-running hint up2px; native font keeps its existing
+baseline. Start scene10 now passes with correct cache seeding. Added optional
+DSSMM_PREVIEW_FONTS/SCENES for focused reruns, defaults still full26 scenes.
+
+Clean e1494ba0/Build677 all3 builds passed native settings/plugin ARM and IGM ARM
+checks; SD522240/524288, Lite489472/507904, Chis1671680/2097152 bytes. Native2boot
+mGBA passes. Font1 scenes1..12 pass. Scene13 initially called an optimized-away
+private helper (address0); now calls retained nor_write_progress and compensates
+its own flip before frame inspection. Focused13/font1 passes; font0 matrix now
+running. Firmware bytes did not change for this fixture correction. Added2KiB
+return-code reservation test. Hold hardware-test667 until final matrix/CI passes.
+EZ native harness PR13/14/15 merged normally after all4 CI passes; no production
+hardware inputs changed. New DE/SuperFW Start overlay is build/de-superfw-start-comparison.html
+(ignored) and shows remaining Start fallback icon/text-centering parity work.
+
+Build677 delivered to hardware-test after all local/native/mGBA26/sourceCI44954125901
+and all4 PR16 CI44954129956 passed. Sourcee1494ba0, clean Chis1671680 bytes;
+record docs/build-677-validation.json retains all3 identities/budgets/tests and
+limits. Superseded ignored667 image/JSON removed only after hash-verified677 copy;
+tracked667 publication/validation remains. No new public release or hardware
+qualification. Next: integrate final evidence, normal all5 synchronization, then
+Start fallback icon/recent-caption centering using the new native comparison.

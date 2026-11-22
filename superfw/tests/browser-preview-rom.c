@@ -198,7 +198,7 @@ static void render(volatile uint8_t *frame, int vertical, int selected, int offs
     fill_rect(frame,0,0,240,16,FG_COLOR);
   }
   browser_carousel_item items[3];
-  unsigned n = browser_carousel_layout(vertical, selected, 3, offset, items);
+  unsigned n = browser_carousel_layout(vertical, selected, 3, offset, false, items);
   uint32_t began_art=PREVIEW_TIMING?profile_now():0;
   int focus = selected;
   for (unsigned i = 0; i < n; ++i) {

@@ -69,3 +69,27 @@ copy. This remains a separate compatibility issue; the startup timing correction
 does not claim to fix Exit. Power cycling remains the available return method.
 Upstream SuperFW already documents a WAITCNT-patched bundled PCEAdvance in
 `emu/README.md`; the timing correction follows that hardware requirement.
+
+## 2026-11-21 candidate: exact Exit adaptation and compressed plugins
+
+The above Build618 limits describe the older implementation. The new candidate
+also expands validated MBZ streams into separate halfword-only cartridge scratch
+before applying the same startup and Exit checks. It reserves SDRAM24..26MiB for
+a snapshot of the running firmware and26MiB for a self-contained return stub.
+This avoids the existing patch scanner's16..24MiB scratch and the portable
+payload's14MiB bound. Boot captures installed or chain-loaded firmware without
+writing flash. Exact SMSAdvance2.5/PCEAdvance7.5 reset routines can return through
+this snapshot; unrecognized reset code is not rewritten. RAM plugins also receive
+a guarded ROM0 SoftReset trampoline. This does not promise arbitrary card-specific
+plugins will work, nor does it add emulator-specific save-state support.
+
+Validation uses production ARM boot/copy/reset code, full firmware restoration,
+invalid-size and cartridge halfword-store guards. The actual linked optimized
+loader/FatFs runs against a FAT16 sector fixture for SMS/GG/PCE, MBZ, BIN and GBA
+payloads. Stock mGBA runs real SMS/GG/PCE binaries with synthetic homebrew ROMs and
+checks their Exit menu reaches a test marker; production restoration is separately
+covered by ARM replay. No commercial game, BIOS or extra plugin binary is added
+to the repository. Scripts `test-pogo-boot-arm.py`, `test-pogo-return-arm.py`,
+`test-native-plugins-arm.py` and `test-plugin-preview-mgba.sh` retain these checks.
+Physical Chis Exit, the owner's PCE load error, saves and SD/Lite operation still
+require hardware retesting; emulator success is not that qualification.

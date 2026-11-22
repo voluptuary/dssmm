@@ -222,3 +222,5 @@ SECTIONS
 
 #include "validate.inc"
 
+
+ASSERT(pogo_reset_tail_end-pogo_reset_tail<=256, "Pogoshell reset tail crosses BIOS-preserved IWRAM")
