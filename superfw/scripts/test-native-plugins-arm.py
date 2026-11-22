@@ -46,9 +46,9 @@ for extension,suffix,payload in cases:
  cpu.mem_write(syms['FatFs'],struct.pack('<I',syms['sdfs']))
  cpu.mem_write(0x098000a0,b'SUPERFW\0');cpu.mem_write(0x098000c8,version+struct.pack('<I',512));cpu.mem_write(0x09a00004,b'DSRT')
  name=('/Smoke.'+extension).encode()+b'\0';cpu.mem_write(0x0203ff00,name)
- cpu.reg_write(UC_ARM_REG_R0,0x0203ff00);cpu.reg_write(UC_ARM_REG_R1,len(game));cpu.reg_write(UC_ARM_REG_R2,syms['pogo_plugin_loader']);cpu.reg_write(UC_ARM_REG_R3,0)
+ cpu.reg_write(UC_ARM_REG_R0,0x0203ff00);cpu.reg_write(UC_ARM_REG_R1,len(game));cpu.reg_write(UC_ARM_REG_R2,syms['pogo_plugin_loader']);cpu.reg_write(UC_ARM_REG_R3,syms['loadpogo_progress']|1)
  cpu.reg_write(UC_ARM_REG_SP,0x03007f00);cpu.reg_write(UC_ARM_REG_LR,0x01000001)
- state={'launched':False,'minimum':0x03007f00}
+ state={'launched':False,'minimum':0x03007f00,'phases':set()}
  def code(uc,address,size,user):
   state['minimum']=min(state['minimum'],uc.reg_read(UC_ARM_REG_SP))
   if address==syms['launch_pogo_reset']:
@@ -60,6 +60,8 @@ for extension,suffix,payload in cases:
    assert uc.mem_read(abi[1],len(game))==game
    state['launched']=True;uc.emu_stop();return
   if address==syms.get('loadrom_progress'):
+   state['phases'].add(cpu.mem_read(syms['progress_action'],1)[0])
+   assert uc.reg_read(UC_ARM_REG_R0)<=uc.reg_read(UC_ARM_REG_R1)==len(payload)+len(game)
    uc.reg_write(UC_ARM_REG_PC,uc.reg_read(UC_ARM_REG_LR));return
   if address not in (syms['sdcard_read_blocks'],syms['sdcard_write_blocks']):return
   buf,sector,count=(uc.reg_read(r)for r in (UC_ARM_REG_R0,UC_ARM_REG_R1,UC_ARM_REG_R2));assert count and sector+count<=8192
@@ -69,7 +71,11 @@ for extension,suffix,payload in cases:
  def bus(uc,access,address,size,value,user):
   if 0x08000000<=address<0x0a000000:assert size==2 and address%2==0,('Cartridge write',hex(address),size)
  cpu.hook_add(UC_HOOK_CODE,code);cpu.hook_add(UC_HOOK_MEM_WRITE,bus)
- cpu.emu_start(entry|1,0x01000000,count=30000000)
+ try:cpu.emu_start(entry|1,0x01000000,count=30000000)
+ except Exception:
+  print(f'{extension}: PC={cpu.reg_read(UC_ARM_REG_PC):08x} LR={cpu.reg_read(UC_ARM_REG_LR):08x} SP={cpu.reg_read(UC_ARM_REG_SP):08x}')
+  raise
+ assert state['phases']=={0,1},'Plugin/game progress phases missing'
  assert state['launched'],(extension,suffix,'Native loader returned',cpu.reg_read(UC_ARM_REG_R0))
  assert state['minimum']>=syms['__IWRAM_END__']+128,'Native plugin stack crossed live globals'
  print(f'Native {extension}.{suffix} loader/FatFs/ABI/cart bus passed; stack peak {0x03007f00-state["minimum"]}B.')

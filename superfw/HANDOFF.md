@@ -1528,3 +1528,12 @@ needed the new production progress enum/callback dependencies. Updated extractio
 to reuse the actual enum and the emulator mock to distinguish plugin/game callbacks;
 both focused suites pass. This was a fixture compile failure, not a runtime pass.
 Restart the complete verifier on the corrective checkpoint before hardware delivery.
+
+745 clean-checkout CI caught the new icon test relying on a local generated pack;
+it now explicitly generates its resource input. Local SD replay also exposed a
+fixture assumption: passing a NULL progress callback into a whole-program-
+optimized function whose production callers are all non-NULL is invalid after
+LTO removes that guard. Replay now supplies the actual loadpogo_progress callback,
+intercepts only final rendering, and verifies both game/emulator phases. All six
+SD plugin cases pass with10528B stack. No production loader workaround or ABI
+flag change was needed. Restart full validation on the corrected checkpoint.

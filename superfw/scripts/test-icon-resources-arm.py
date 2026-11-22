@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Check actual ARM icon lookup against C-initialized native tiles in read-only ROM."""
 from pathlib import Path
-import struct,subprocess,tempfile
+import struct,subprocess,tempfile,sys
 from unicorn import Uc,UC_ARCH_ARM,UC_MODE_THUMB,UC_PROT_READ
 from unicorn.arm_const import UC_ARM_REG_R0,UC_ARM_REG_SP,UC_ARM_REG_LR,UC_ARM_REG_PC
 root=Path(__file__).resolve().parents[1]
+subprocess.run([sys.executable,str(root/'tools/pack-dssmm-resources.py')],check=True)
 with tempfile.TemporaryDirectory() as tmp:
  out=Path(tmp);source=out/'probe.c'
  source.write_text('#include <stdint.h>\n#include "dssmm_background.h"\n#include "res/icons.h"\nvoid *font_base_addr=(void*)0x08e80000;\nuintptr_t main(unsigned size){return (uintptr_t)dssmm_icon_pixels(size);}\n')
