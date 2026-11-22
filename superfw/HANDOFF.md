@@ -1522,3 +1522,9 @@ The fixture writes progress_action as a byte, matching the actual ARM enum ABI.
 Host topbar/notice/panel/plugin-phase and ARM icon tests pass; clean all-board
 validation and fresh hardware-test delivery still required. Do not distribute
 these dirty-source743 intermediates or overwrite the validated677 image yet.
+
+744 full verifier stopped before board builds because two extracted host seams
+needed the new production progress enum/callback dependencies. Updated extraction
+to reuse the actual enum and the emulator mock to distinguish plugin/game callbacks;
+both focused suites pass. This was a fixture compile failure, not a runtime pass.
+Restart the complete verifier on the corrective checkpoint before hardware delivery.

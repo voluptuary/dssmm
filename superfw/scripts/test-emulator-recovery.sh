@@ -7,6 +7,7 @@ python3 - "$root/src/menu.c" "$tmp/test.c" <<'PY'
 from pathlib import Path
 import sys
 s=Path(sys.argv[1]).read_text();a=s.index('static void browser_reload(void);');b=s.index('\nNOINLINE static void browser_open(',a)
+declarations=s[s.index('enum progress_action {'):s.index('static void render_progress_panel(')]
 Path(sys.argv[2]).write_text('''#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -38,15 +39,18 @@ static void sram_filename_calc(const char *rom,char *save){(void)rom;strcpy(save
 bool check_file_exists(const char *fn){(void)fn;return false;}
 static unsigned prepare_sram_based_savegame(unsigned a,unsigned b,const char *c){(void)a;(void)b;(void)c;return save_error;}
 static void loadrom_progress(unsigned a,unsigned b){(void)a;(void)b;}
+static void loadpogo_progress(unsigned a,unsigned b){(void)a;(void)b;}
+static const char *plugin_load_error(void){return msgs[0][MSG_ERR_READ];}
+#define write_log(...) ((void)0)
 static unsigned load_extemu_rom(const char *fn,unsigned fs,const t_emu_loader *ld,void(*cb)(unsigned,unsigned)){
- assert(!strcmp(fn,"/Games/Dr. Mario (USA).gg")&&fs==1234&&cb==loadrom_progress);loads++;
+ assert(!strcmp(fn,"/Games/Dr. Mario (USA).gg")&&fs==1234&&cb==(ld==&pogo_plugin_loader?loadpogo_progress:loadrom_progress));loads++;
  return ld==&pogo_plugin_loader?plugin_error:native_error;
 }
 static void browser_invalidate_artwork(void){}
 static void browser_reload(void){assert(!smenu.browser.filecount&&!smenu.browser.dispentries&&!smenu.browser.selector&&!smenu.browser.seloff);reloads++;}
 static void flashbrowser_reload(void){reloads++;}
 static void recent_reload(void){reloads++;}
-'''+s[a:b]+'''
+'''+declarations+s[a:b]+'''
 int main(void){const t_emu_loader native[]={{"sms",0},{0,0}};
  plugin_error=3;start_emu_game(native,"/Games/Dr. Mario (USA).gg",1234);
  assert(loads==1&&records==1&&reloads==3&&spop.alert_msg==msgs[0][MSG_ERR_READ]);
