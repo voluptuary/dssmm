@@ -2194,3 +2194,13 @@ no new packages/patches/BIOS. Owner audit artifacts moved intact to
 `docs/history/patch-review-2026-11-21/`; unexpected root files had blocked every
 project command, so restore existing allowlist rather than weakening isolation.
 See docs/local-development.md for deterministic boots and validation limits.
+
+2026-11-22 recovery: PR13/14/15 integrated native own-kernel nine-scene mGBA
+harnesses for DE/OMEGA/BLUE after each all4 CI pass; PR16 merged9fab796 after
+final all4 CI44954827428 passed. Shared comparison tool/setup remain universal;
+no BIOS, emulator patch or new dependency. Kernel protocols remain isolated.
+SuperFW clean Chis677/e1494ba0 is the current ignored hardware-test; project
+validation/journals retain all3 builds/nativeARM/IGM/mGBA26/plugin Exit evidence
+and physical limits. No public release changed. Normal all5 synchronization
+follows this checkpoint; do not refresh source baselines outside a release.
+Continue SuperFW Start fallback/title-centering parity in its owning lane.

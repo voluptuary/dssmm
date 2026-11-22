@@ -3277,3 +3277,10 @@ further single-project work; recover RAM headroom before substantial additions.
 mGBA setup and independent screenshot boots. Archived owner patch suggestions
 intact under docs/history to restore root layout checks. Hardware renderer harness
 changes remain in their owning lanes; no hardware drivers shared or replaced.
+
+2026-11-22: Recovered final successful checks; no abandoned local processes.
+Native EZ visual references PR13–15 and SuperFW plugin/menu PR16 merged with
+merge commits and all4 CI checks passed. Shared setup documentation and overlay
+utility are tracked; fixtures use native renderers, not card hardware emulation.
+Chis677 retained for hardware tests. Normal all5 tree synchronization next;
+other kernel driver behavior and published releases remain unchanged.
