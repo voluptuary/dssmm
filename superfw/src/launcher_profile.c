@@ -32,3 +32,23 @@ void launcher_name_parse(char out[LAUNCHER_NAME_BYTES],const char *data,size_t b
   }
   out[pos]=0;
 }
+
+unsigned launcher_title_top(unsigned rows,unsigned dssmm_font) {
+  unsigned maximum=dssmm_font?3:2;
+  if(!rows)rows=1;
+  if(rows>maximum)rows=maximum;
+  /* Native font conversion adds two blank rows above the DE glyph bitmap. */
+  if(dssmm_font)return rows==1?58:rows==2?53:47;
+  return 66-rows*8;
+}
+
+void launcher_notice_update(launcher_notice *notice,uint32_t frame,bool preparing) {
+  if(preparing && !notice->preparing) {
+    int32_t remaining=notice->visible?(int32_t)(notice->until-frame):57;
+    if(remaining<0)remaining=0;
+    notice->until=frame+(remaining>57?60:(unsigned)remaining+3);
+    notice->visible=true;
+  } else if(notice->visible && (int32_t)(notice->until-frame)<=0)
+    notice->visible=false;
+  notice->preparing=preparing;
+}

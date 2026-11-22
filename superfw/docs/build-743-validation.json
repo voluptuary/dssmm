@@ -1,0 +1,48 @@
+{
+  "build": 743,
+  "source": "ad2b8b367798df8dde573e4d357e16405f160891",
+  "status": "validated Start-only checkpoint; withheld for newer owner677 hardware feedback",
+  "boards": [
+    {
+      "source_tree_sha256": "654c0c8ae9e06205cb410eeff4cfc1d49c860b63216c40fdf71fb329a332a8e1",
+      "board": "sd",
+      "dssmm_build": 743,
+      "source_commit": "ad2b8b367798df8dde573e4d357e16405f160891",
+      "source_dirty": false,
+      "firmware_sha256": "8decba9d6038c72d76c679671449be6bd4dd88e4bbae123a4c77146ebc33fb0b",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 522240,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 2048
+    },
+    {
+      "source_tree_sha256": "654c0c8ae9e06205cb410eeff4cfc1d49c860b63216c40fdf71fb329a332a8e1",
+      "board": "lite",
+      "dssmm_build": 743,
+      "source_commit": "ad2b8b367798df8dde573e4d357e16405f160891",
+      "source_dirty": false,
+      "firmware_sha256": "f3bf3909f7ef917b2560855144afa8ef6e0fbdd70cd4c436098876173a037b79",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 489984,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 17920
+    },
+    {
+      "source_tree_sha256": "654c0c8ae9e06205cb410eeff4cfc1d49c860b63216c40fdf71fb329a332a8e1",
+      "board": "chis",
+      "dssmm_build": 743,
+      "source_commit": "ad2b8b367798df8dde573e4d357e16405f160891",
+      "source_dirty": false,
+      "firmware_sha256": "9e6e6f01df7357a196a424f678fe8eec914b85bf6ab67028c6b3d5449d80b099",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "checks": "full local all3/native settings+plugin ARM/IGM ARM/mGBA2boots+26menus+4pixel-exact captions/plugin Exit/host suite passed",
+  "source_ci": 45030978467,
+  "source_ci_status": "success",
+  "hardware_validation": false,
+  "evidence_log_sha256": "b1b1c6e6426be601376dd15e195800f80c7d29ceabf05a832314bc8751f3f0de"
+}

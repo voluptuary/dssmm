@@ -9,7 +9,7 @@ root,out=map(pathlib.Path,sys.argv[1:])
 s=(root/'src/loader.c').read_text();start=s.index('static void rom_write16_exact(')
 end=s.index('\n}',start)+2
 helper=s[start:end]
-start=s.index('static unsigned load_pogo_plugin(');end=s.index('// Generic-emulator',start)
+start=s.index('enum pogo_stage {');end=s.index('// Generic-emulator',start)
 (out/'pogo-loader-under-test.h').write_text(helper+'\n'+s[start:end])
 PY
 for board in sd lite chis; do

@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 /* Palette0..15 reserved for background; logo screen supplies its own palette. */
+/* Exact native startup tiles in the read-only font/resource partition. */
+const uint8_t *dssmm_icon_pixels(unsigned expected_size);
 void dssmm_background_palette(volatile uint16_t *palette,bool dark);
 enum {DSSMM_BG_LIST,DSSMM_BG_START,DSSMM_BG_SETTINGS,DSSMM_BG_HORIZONTAL,
       DSSMM_BG_VERTICAL,DSSMM_BG_GRID};

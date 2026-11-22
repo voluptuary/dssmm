@@ -253,3 +253,20 @@ index%5 collides for0/15. Retain one/two-entry, negative-cache and persistence t
 The native visual matrix now covers13 scenes perfont, including Start, clock,
 blocking-save notice and NOR progress. Use --reference for deterministic clean
 headers when comparing to the EZ-FLASH own-renderer fixtures, not card emulation.
+
+## Loading/return resource constraints (2026-11-22)
+
+Loading panels must use builtin ASCII and internal palette/profile data: game
+loads and SDRAM diagnostics can overwrite external fonts/backgrounds. Keep phase
+labels accurate (ROMs use SDRAM; saves use SRAM), and use the shared framed
+progress renderer. Native scenes13/14 poison the font pointer and check the
+corrected fill at (20,78), width200; preserve these checks.
+Existing icon tiles now reside in the read-only DBR2 resource tail as ICN1:
+standard4096/extended4352 bytes, independently checked against the C tile array.
+Do not restore the main-RAM icon copy. Topbar shade slots249–255 must not overlap
+artwork, logo, text or fixture marker palette roles.
+Pogoshell return reserves EWRAM0203FFE0..0203FFF3 for a consumed DRET+image-digest
+marker. Same-image SDRAM return may reuse the firmware snapshot; other sources
+and mismatches must refresh it. The ROM-only boot helper returns Z/R0 explicitly;
+keep its ARM regression and the original3KiB boot limit. Native tests do not
+qualify physical plugin Exit timing or the outstanding hardware PCE failure.

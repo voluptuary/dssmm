@@ -10,7 +10,7 @@ fi
 python3 "$root/scripts/build-native-settings-preview.py" --scene 0 >/dev/null
 nor_supported=$(python3 -c 'import json,sys;print(int(json.load(open(sys.argv[1]))["nor_supported"]))' "$out/fixture.json")
 for font in ${DSSMM_PREVIEW_FONTS:-1 0}; do
-for scene in ${DSSMM_PREVIEW_SCENES:-1 2 3 4 5 6 7 8 9 10 11 12 13}; do
+for scene in ${DSSMM_PREVIEW_SCENES:-1 2 3 4 5 6 7 8 9 10 11 12 13 14}; do
  if [[ ( "$scene" = 4 || "$scene" = 13 ) && "$nor_supported" = 0 ]]; then continue; fi
  python3 "$root/scripts/build-native-settings-preview.py" --scene "$scene" --font "$font"
  SDL_AUDIODRIVER=dummy xvfb-run -a bash -c '
@@ -42,11 +42,18 @@ elif scene==9:
 else:
  for y in range(21,152):
   for x in (2,3,234,235,236,237):points.append((x,y,x+12 if x<4 else x-10))
+ for y in range(23,150):points.append((4,y,14))
  for y in (21,22,149,150,151):
-  for x in range(4,234):points.append((x,y,120))
+  for x in range(4,234):points.append((x,y,14 if x==4 and y==149 else 120))
 for x,y,sx in points:
  pixel=source[y*240+sx];expected=tuple((((pixel>>b)&31)<<3)|(((pixel>>b)&31)>>2) for b in (0,5,10))
  assert tuple(rows[y][x*3:x*3+3])==expected,f'Scene{scene}: text/selection crossed frame at{x},{y}'
+if scene in (13,14):
+ # At 50%, the corrected 200px fill begins at (20,78), including its top/left edges.
+ rgb=lambda x,y:tuple(rows[y][x*3:x*3+3])
+ fill=rgb(20,78)
+ assert all(rgb(x,y)==fill for y in range(78,94) for x in range(20,120)),'Progress fill has gaps'
+ assert rgb(120,78)!=fill and rgb(18,78)!=fill and rgb(20,76)!=fill,'Progress fill crossed its outline/percentage'
 (out/f'visual-{scene}-font{font}.png').write_bytes(path.read_bytes())
 print(f'Native mGBA scene{scene}/font{font}: frame pixels intact; seeded carousel cleared.')
 PY

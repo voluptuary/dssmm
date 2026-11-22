@@ -7,7 +7,7 @@ python3 - "$root/src/menu.c" "$tmp/test.c" <<'PY'
 from pathlib import Path
 import sys
 s=Path(sys.argv[1]).read_text()
-a=s.index('static void launcher_corner_span(');b=s.index('\nstatic void render_start(',a)
+a=s.index('static void launcher_corner_span(');b=s.index('\n}',s.index('static void launcher_corners(',a))+2
 Path(sys.argv[2]).write_text('''#include <stdint.h>
 #include <assert.h>
 #define HI_COLOR 19

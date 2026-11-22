@@ -531,7 +531,27 @@ unsigned launch_gba_nor(
 #endif
 /* Extension-named portable Pogoshell plugins, with ROM or RAM entry. */
 extern void launch_pogo_reset(bool ewram_overclock,unsigned mode,unsigned size,bool returning);
+enum pogo_stage {
+  PogoOpen=1,PogoLayout,PogoFormat,PogoGameOpen,PogoSizeChanged,
+  PogoReadPlugin,PogoReadGame,PogoClosePlugin,PogoCloseGame
+};
+static unsigned current_pogo_stage;
+static unsigned pogo_fail(enum pogo_stage stage,unsigned detail,const char *plugin,unsigned ps,unsigned fs) {
+  current_pogo_stage=stage;
+  write_log("pogo",stage,"detail=%lx p=%lu g=%lu %s",(unsigned long)detail,(unsigned long)ps,(unsigned long)fs,plugin);
+  return ERR_LOAD_BADROM;
+}
+bool plugin_loading_game(void) {return current_pogo_stage==PogoReadGame;}
+const char *plugin_load_error(void) {
+  if(current_pogo_stage==PogoLayout)return "Invalid plugin/game size.";
+  if(current_pogo_stage==PogoFormat)return "Plugin format unsupported.";
+  if(current_pogo_stage==PogoGameOpen || current_pogo_stage==PogoSizeChanged ||
+      current_pogo_stage==PogoReadGame || current_pogo_stage==PogoCloseGame)
+    return "Could not read game.";
+  return "Could not read plugin.";
+}
 static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progress) {
+  current_pogo_stage=0;
   const char *ext=pogo_plugin_extension(fn);
   if(!ext || strlen(ext)>16)return ERR_LOAD_NOEMU;
   char path[64];FIL file;bool found=false;unsigned mode=0;
@@ -542,30 +562,36 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
     strcpy(p,suffixes[i]);
     FRESULT r=f_open(&file,path,FA_READ);
     if(r==FR_OK){found=true;mode=i<2?0:i-1;break;}
-    if(r!=FR_NO_FILE && r!=FR_NO_PATH)return ERR_LOAD_BADROM;
+    if(r!=FR_NO_FILE && r!=FR_NO_PATH)return pogo_fail(PogoOpen,r,path,0,fs);
   }
   if(!found)return ERR_LOAD_NOEMU;
   uint32_t ps=f_size(&file),logical=ps,fo,to;
   if(mode==2) {
-    uint8_t header[4];UINT count;
-    if(f_read(&file,header,4,&count)!=FR_OK || count!=4 || header[0]!=0x10 || f_lseek(&file,0)!=FR_OK) {
-      f_close(&file);return ERR_LOAD_BADROM;
+    uint8_t header[4];UINT count=0;
+    FRESULT result=f_read(&file,header,4,&count);
+    if(result!=FR_OK || count!=4) {
+      f_close(&file);return pogo_fail(PogoReadPlugin,(result<<16)|count,path,ps,fs);
     }
+    if(header[0]!=0x10){f_close(&file);return pogo_fail(PogoFormat,header[0],path,ps,fs);}
+    result=f_lseek(&file,0);
+    if(result!=FR_OK){f_close(&file);return pogo_fail(PogoReadPlugin,result<<16,path,ps,fs);}
     logical=header[1]|((uint32_t)header[2]<<8)|((uint32_t)header[3]<<16);
-    if(!logical || logical>0x3fbf8){f_close(&file);return ERR_LOAD_BADROM;}
+    if(!logical || logical>0x3fbf8){f_close(&file);return pogo_fail(PogoFormat,logical,path,ps,fs);}
     if(logical<ps)logical=ps;
   }
-  if(!pogo_layout(logical,fs,&fo,&to)){f_close(&file);return ERR_LOAD_BADROM;}
+  if(!pogo_layout(logical,fs,&fo,&to)){f_close(&file);return pogo_fail(PogoLayout,logical,path,ps,fs);}
   /* Internal buffers only: cartridge SDRAM rejects byte stores. Padding is
    * deterministic and all writes use aligned halfwords, including short tails. */
   for(unsigned part=0;part<2;part++) {
+    current_pogo_stage=part?PogoReadGame:PogoReadPlugin;
     uint32_t size=part?fs:ps,base=part?fo:0;
-    if(part && f_open(&file,fn,FA_READ)!=FR_OK)return ERR_LOAD_BADROM;
-    if(f_size(&file)!=size){f_close(&file);return ERR_LOAD_BADROM;}
+    if(part){FRESULT result=f_open(&file,fn,FA_READ);if(result!=FR_OK)return pogo_fail(PogoGameOpen,result,path,ps,fs);}
+    if(f_size(&file)!=size){unsigned actual=f_size(&file);f_close(&file);return pogo_fail(PogoSizeChanged,actual,path,ps,fs);}
     for(uint32_t off=0;off<size;) {
       uint32_t tmp[LOAD_BS/4];UINT got=0;
       unsigned count=size-off>LOAD_BS?LOAD_BS:size-off;
-      if(f_read(&file,tmp,count,&got)!=FR_OK || got!=count){f_close(&file);return ERR_LOAD_BADROM;}
+      FRESULT result=f_read(&file,tmp,count,&got);
+      if(result!=FR_OK || got!=count){f_close(&file);return pogo_fail(part?PogoReadGame:PogoReadPlugin,(result<<16)|got,path,ps,fs);}
       memset((uint8_t*)tmp+count,0,((count+3)&~3u)-count);
 
       set_supercard_mode(MAPPED_SDRAM,true,false);
@@ -573,17 +599,18 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
       set_supercard_mode(MAPPED_SDRAM,true,true);
       off+=count;if(progress)progress(part?ps+off:off,ps+fs);
     }
-    if(f_close(&file)!=FR_OK)return ERR_LOAD_BADROM;
+    FRESULT closed=f_close(&file);
+    if(closed!=FR_OK)return pogo_fail(part?PogoCloseGame:PogoClosePlugin,closed,path,ps,fs);
   }
   unsigned launch_size=mode==1?(ps+3)&~3u:ps;
   set_supercard_mode(MAPPED_SDRAM,true,false);
   if(!pogo_ram_valid(GBA_ROM_ADDR,launch_size,mode)) {
-    set_supercard_mode(MAPPED_SDRAM,true,true);return ERR_LOAD_BADROM;
+    set_supercard_mode(MAPPED_SDRAM,true,true);return pogo_fail(PogoFormat,mode,path,ps,fs);
   }
   if(mode==2) {
     uint16_t *unpacked=(uint16_t*)ROM_HISCRATCH_U8;
     launch_size=pogo_unpack16(GBA_ROM_ADDR,ps,unpacked);
-    if(!launch_size){set_supercard_mode(MAPPED_SDRAM,true,true);return ERR_LOAD_BADROM;}
+    if(!launch_size){set_supercard_mode(MAPPED_SDRAM,true,true);return pogo_fail(PogoFormat,mode,path,ps,fs);}
     /* Scratch is separate from compressed input, game data and return image. */
     for(unsigned off=0;off<(launch_size+3u)/4;off++)
       ((volatile uint16_t*)GBA_ROM_ADDR)[off*2]=unpacked[off*2],
@@ -592,7 +619,7 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
   }
   bool returning=pogo_return_available(POGO_BACKUP_IMAGE,POGO_STUB_IMAGE,
                                        VERSION_SLUG_WORD,FW_MAX_SIZE_KB*1024u);
-  pogo_adapt_image((uint32_t*)GBA_ROM_ADDR,mode?launch_size:ps,returning?POGO_RETURN_STUB:0);
+  unsigned exit_hooks=pogo_adapt_image((uint32_t*)GBA_ROM_ADDR,mode?launch_size:ps,returning?POGO_RETURN_STUB:0);
   set_supercard_mode(MAPPED_SDRAM,true,true);
   uint32_t ram[24],table[22];pogo_arguments(ram,table,path,fn,fo,fs,to);
   set_supercard_mode(MAPPED_SDRAM,true,false);
@@ -601,7 +628,8 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
   REG_WAITCNT=0x4000;
   /* No C calls after overwriting the fixed ABI block at the top of EWRAM. */
   memcpy32((void*)0x0203fbf8,ram,sizeof(ram));
-  launch_pogo_reset(use_fastew,mode,launch_size,returning);
+  /* Known Exit hooks already return safely; preserve their ROM entry/header. */
+  launch_pogo_reset(use_fastew,mode,launch_size,returning && !exit_hooks);
   return 0;
 }
 

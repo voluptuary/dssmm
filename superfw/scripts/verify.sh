@@ -19,9 +19,11 @@ python3 "$project_root/scripts/test-pogo-adapters.py"
 python3 "$project_root/scripts/test-pogo-reset-arm.py"
 python3 "$project_root/scripts/test-pogo-return-arm.py"
 python3 "$project_root/scripts/test-pogo-boot-arm.py"
+python3 "$project_root/scripts/test-icon-resources-arm.py"
 bash "$project_root/scripts/test-emulator-recovery.sh"
 bash "$project_root/scripts/test-gamegear-icon.sh"
 bash "$project_root/scripts/test-start-corners.sh"
+bash "$project_root/scripts/test-topbar.sh"
 bash "$project_root/scripts/test-settings-highlight.sh"
 bash "$project_root/scripts/test-update-unlock.sh"
 bash "$project_root/scripts/test-system-layout.sh"
@@ -44,6 +46,7 @@ for board in sd lite chis; do
 done
 bash "$project_root/scripts/test-native-settings-mgba.sh"
 bash "$project_root/scripts/test-native-menu-visuals-mgba.sh"
+bash "$project_root/scripts/test-start-caption-mgba.sh"
 bash "$project_root/scripts/test-plugin-preview-mgba.sh"
 python3 "$project_root/tools/pack-dssmm-resources.py" --check
 make -C "$project_root/tests" clean

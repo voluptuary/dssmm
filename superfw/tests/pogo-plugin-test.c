@@ -32,6 +32,8 @@ FRESULT f_stat(const TCHAR *path,FILINFO *info) {
   assert(!strncmp(path,"/SYSTEM/PLUG/nes.",17) || !strncmp(path,"/SYSTEM/PLUG/sms.",17));
   memset(info,0,sizeof(*info));return FR_OK;
 }
+static unsigned logged_stage,logged_count;
+void write_log(const char *name,int stage,const char *format,...){(void)name;(void)format;logged_stage=stage;++logged_count;}
 static uint32_t ps=257,fs=8193,abi[24],expected_size;
 static const uint8_t compressed[]={0x10,64,0,0,0x78,0x42,0xf0,0,0xf0,0,0xf0,0,0x60,0};static jmp_buf launched;
 FRESULT f_open(FIL *f,const TCHAR *path,BYTE mode) {
@@ -43,7 +45,7 @@ FRESULT f_open(FIL *f,const TCHAR *path,BYTE mode) {
   memset(f,0,sizeof(*f));f->obj.id=strstr(path,"/PLUG/")?1:2;f->obj.objsize=strstr(path,"/PLUG/")?ps:fs;return FR_OK;
 }
 FRESULT f_read(FIL *f,void *buf,UINT n,UINT *got) {
-  if(fail_read)return FR_DISK_ERR;
+  if(fail_read==1 || (fail_read==2 && f->obj.id==2))return FR_DISK_ERR;
   if(n>f_size(f)-f->fptr)n=f_size(f)-f->fptr;
   if(short_read&&n)n--;
   for(unsigned i=0;i<n;i++)((unsigned char*)buf)[i]=(available_plugins==8 && f->obj.id==1)?compressed[f->fptr+i]:(f->fptr+i)*17+3;
@@ -60,6 +62,8 @@ static void rom_copy_write16(void *dst,const void *src,unsigned n) {
 static void memcpy32(void *dst,const void *src,unsigned n){assert(dst==(void*)0x0203fbf8);assert(n==96);memcpy(abi,src,n);}
 void launch_pogo_reset(bool fast,unsigned mode,unsigned size,bool returning){assert(!returning);assert(!fast && mode==expected_mode && size==(expected_size?expected_size:mode==1?(ps+3)&~3u:ps));longjmp(launched,1);}
 #include "pogo-loader-under-test.h"
+static unsigned seen_progress;
+static void trace_progress(unsigned done,unsigned total){assert(done<=total);seen_progress|=plugin_loading_game()?2:1;}
 int main(void) {
   char resolved[64];
   assert(find_pogo_plugin("/Game.NES",resolved)&&!strcmp(resolved,"/SYSTEM/PLUG/nes.bin"));
@@ -107,7 +111,8 @@ int main(void) {
   assert(pogo_ram_valid(lz,4,1));assert(!pogo_ram_valid(lz,3,1));
   assert(!pogo_ram_valid(lz,0x3fbfc,1));
   memset(cartridge,0xcc,sizeof(cartridge));
-  if(!setjmp(launched)){load_pogo_plugin("/Game.NES",fs,NULL);assert(0);}
+  if(!setjmp(launched)){load_pogo_plugin("/Game.NES",fs,trace_progress);assert(0);}
+  assert(seen_progress==3);
   assert(REG_WAITCNT==0x4000&&abi[0]==fs&&abi[1]==0x08000104);
   for(unsigned i=0;i<ps;i++)assert(cartridge[i]==(unsigned char)(i*17+3));
   for(unsigned i=ps;i<fo;i++)assert(cartridge[i]==0);
@@ -127,7 +132,9 @@ int main(void) {
   ps=257;expected_size=0;
   available_plugins=1;expected_mode=0;
   missing=1;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_NOEMU);missing=0;
-  fail_read=1;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_BADROM);fail_read=0;
+  assert(!logged_count);
+  fail_read=1;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_BADROM);assert(logged_stage==PogoReadPlugin && !strcmp(plugin_load_error(),"Could not read plugin."));
+  fail_read=2;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_BADROM);assert(logged_stage==PogoReadGame && !strcmp(plugin_load_error(),"Could not read game."));fail_read=0;
   short_read=1;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_BADROM);short_read=0;
   close_error=1;assert(load_pogo_plugin("/Game.nes",fs,NULL)==ERR_LOAD_BADROM);close_error=0;
   assert(load_pogo_plugin("/Game.nes",0xffffffff,NULL)==ERR_LOAD_BADROM);

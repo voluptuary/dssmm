@@ -73,3 +73,21 @@ IWRAM_CODE NOINLINE void dssmm_background_draw(volatile uint8_t *frame,bool dark
     pos+=length;
   }
 }
+
+const uint8_t *dssmm_icon_pixels(unsigned expected_size) {
+#ifdef DSSMM_EXTERNAL_BACKGROUNDS
+#ifdef FONTS_EXT
+  const unsigned base=DSSMM_BG_BASE_EXTENDED;
+#else
+  const unsigned base=DSSMM_BG_BASE_STANDARD;
+#endif
+  const uint8_t *asset=(const uint8_t*)font_base_addr+base;
+  const uint32_t *icons=(const uint32_t*)(asset+DSSMM_ICON_OFFSET);
+  if(*(const uint32_t*)asset==DSSMM_BG_MAGIC && icons[0]==0x314e4349 &&
+      icons[1]==DSSMM_ICON_BYTES && icons[1]==expected_size)
+    return (const uint8_t*)(icons+2);
+#else
+  (void)expected_size;
+#endif
+  return 0;
+}

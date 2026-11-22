@@ -79,3 +79,19 @@ starts one save step, re-enters Interface and moves the selection while the
 transaction is still pending, then drains it before resetting native state. ARM
 replay exercises this same queued path, clock/bar roundtrips and unchanged exits.
 Two-color green/blue completion markers distinguish success from colored headers.
+
+## Native Start caption cases
+
+`build-native-settings-preview.py --scene 10 --recent-title 'Example.gba'`
+bakes a bounded, synthetic recent record into unused ROM at the actual linked
+SDRAM-table offset. The firmware reads this record through its normal Start
+renderer; it never writes cartridge RAM or launches the fake game. Artwork is
+off for these caption cases, so this does not claim decoder/filesystem testing.
+The default preview remains unchanged when the option is absent.
+
+`test-start-caption-mgba.sh` checks empty, one-, two- and three-line captions.
+Every text pixel is compared with the original credited DE ASCII row bitmap at
+native DE positions. The SuperFW column conversion adds two blank rows, so its
+draw origin must be two pixels higher to produce identical visible glyphs.
+This catches shifts invisible to frame-only checks. Standard stock mGBA/GDB and
+the existing Python PNG reader suffice; no BIOS, packages or emulator changes.
