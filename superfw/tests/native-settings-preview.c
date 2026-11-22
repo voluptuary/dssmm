@@ -63,6 +63,10 @@ static const t_flash_game_entry sample_nor = {
 static void visual_scene(void) {
   if (!TEST_SCENE)return;
   if(TEST_SCENE==10 || TEST_SCENE==11) {
+#if TEST_RECENT
+    VAR32(NATIVE_smenu+OFFSET_smenu_recent_maxentries)=1;
+    VAR8(NATIVE_artwork_mode)=0; /* Caption-only fixture does not claim art I/O. */
+#endif
     VAR8(NATIVE_launcher_page)=1;VAR8(NATIVE_launcher_selected)=TEST_SCENE==10?1:4;
     if(TEST_SCENE==11)key(1);
     return;

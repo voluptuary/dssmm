@@ -2483,10 +2483,11 @@ static void launcher_corners(volatile uint8_t *frame,unsigned x,unsigned y,unsig
 }
 
 /* SD/Lite substitute Recents for the Chis-only NOR shortcut. */
+__attribute__((optimize("Os")))
 static void render_start(volatile uint8_t *frame) {
   dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,true);
   char title_buffer[MAX_FN_LEN];
-  const char *title="No recently played game";
+  const char *title="No recent game";
   if(smenu.recent.maxentries) {
     const t_rentry *entry=&sdr_state->rentries[0];
     strbcpy(title_buffer,file_basename(entry->fpath),sizeof(title_buffer));
@@ -2502,18 +2503,26 @@ static void render_start(volatile uint8_t *frame) {
         artwork_cached=true;
       }
       if(artwork_valid)artwork_blit_scaled_cropped((volatile uint16_t *)frame,
-          sdr_state->artwork_pixels,&preview_info,preview_info.width==80?40:28,46,preview_info.width==80?40:58,preview_info.width==80?40:38);
+          sdr_state->artwork_pixels,&preview_info,preview_info.width==80?40:30,preview_info.width==80?46:48,preview_info.width==80?40:56,preview_info.width==80?40:37);
       else draw_central_text("GBA",frame,60,60);
     }
   }
   const unsigned lines=menu_font==FONT_STYLE_DSSMM?3:2;
+  unsigned rows=0;
+  for(const char *scan=title;rows<lines && *scan;++rows) {
+    unsigned width,count=font_width_cap_space(scan,110,&width);
+    if(!count)count=font_width_cap(scan,110);
+    if(!count)break;
+    scan+=count;while(*scan==' ')++scan;
+  }
+  unsigned top=launcher_title_top(rows,menu_font==FONT_STYLE_DSSMM);
   for(unsigned row=0;row<lines && *title;++row) {
     unsigned width,count=font_width_cap_space(title,110,&width);
     if(!count)count=font_width_cap(title,110);
     if(!count)break;
     char line[128];if(count>=sizeof(line))count=sizeof(line)-1;
     memcpy(line,title,count);line[count]=0;
-    draw_central_text_ovf(line,frame,150,49+row*(lines==3?12:16),110);
+    draw_central_text_ovf(line,frame,150,top+row*(lines==3?11:16),110);
     title+=count;while(*title==' ')++title;
   }
   draw_central_text("SD Card",frame,72,106);

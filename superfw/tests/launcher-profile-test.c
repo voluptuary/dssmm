@@ -17,5 +17,8 @@ int main(void) {
  frame_count=0;launcher_clock_set(0);frame_count=16777216;assert(launcher_clock_get()==21696);
  frame_count=0xfffffff0u;launcher_clock_set(0);frame_count=44;assert(launcher_clock_get()==1);
  launcher_clock_set(UINT32_MAX);frame_count+=120;assert(launcher_clock_get()==UINT32_MAX);
+ assert(launcher_title_top(1,1)==58 && launcher_title_top(2,1)==53 && launcher_title_top(3,1)==47);
+ assert(launcher_title_top(0,1)==58 && launcher_title_top(99,1)==47);
+ assert(launcher_title_top(1,0)==58 && launcher_title_top(2,0)==50 && launcher_title_top(99,0)==50);
  return 0;
 }

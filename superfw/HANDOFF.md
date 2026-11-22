@@ -1436,3 +1436,19 @@ limits. Superseded ignored667 image/JSON removed only after hash-verified677 cop
 tracked667 publication/validation remains. No new public release or hardware
 qualification. Next: integrate final evidence, normal all5 synchronization, then
 Start fallback icon/recent-caption centering using the new native comparison.
+
+2026-11-22 Start parity slice: all5 remote heads synchronized at6e82a9b after
+PR16 merged9fab796; root/shared integration CI passed. Build677 remains current
+hardware-test. Native overlay exposed a two-pixel font-origin difference with
+identical162 caption pixels. New launcher_title_top accounts for it and centers
+one/two/three lines; empty label now matches DE. Title art geometry56x37 at30,48;
+Box geometry/fallback asset remain next. Start body uses size optimization while
+cached pages/header hot paths remain unchanged. Partial Chis ELF passes budget:
+EWRAM256824/257024, IWRAM15576; no new buffers/raised limits.
+Native fixture --recent-title bakes only a bounded read-only recent record into
+unused ROM; actual renderer, no launch/art IO claims. All4 caption cases match
+every original DE glyph pixel/position in stock mGBA. Host profile/clock and
+corner/navigation checks pass. Registered caption oracle in full verifier.
+Next: clean source checkpoint, full all3/native/mGBA/hosted gates, then replace
+hardware-test677 only after those pass. Current partial ELF is dirty, not a test
+firmware. Owner lock/private BIOS/session scratch/full artwork archive retained.

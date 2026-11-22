@@ -44,6 +44,7 @@ for board in sd lite chis; do
 done
 bash "$project_root/scripts/test-native-settings-mgba.sh"
 bash "$project_root/scripts/test-native-menu-visuals-mgba.sh"
+bash "$project_root/scripts/test-start-caption-mgba.sh"
 bash "$project_root/scripts/test-plugin-preview-mgba.sh"
 python3 "$project_root/tools/pack-dssmm-resources.py" --check
 make -C "$project_root/tests" clean

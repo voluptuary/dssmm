@@ -846,3 +846,9 @@ physical qualification. Exact candidate record: docs/build-677-validation.json.
 Removed only the failed generated NOR-debug ROM directory after preserving its
 cause/results; retained native fixtures/current3 packages, full artwork ZIP,
 owner lock, private BIOS and session scratch.
+
+2026-11-22: Finished graceful recovery, merged PR16 and synchronized all5 heads;
+shared integration CI passed. Continued Start caption/Title geometry parity.
+Actual native four-case caption replay matches every DE font/position pixel;
+partial Chis RAM gate passes with200B free EWRAM. Added bounded ROM recent-record
+fixture and verifier registration. Clean all3/full gates pending;677 frozen.
