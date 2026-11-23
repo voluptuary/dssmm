@@ -48,6 +48,9 @@ CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-B$(DEPSDIR)/../layout/ -g $(ARCH) -Wl,-Map,$(notdir $*.map) \
 	-Wl,--gc-sections -Wl,--defsym,__sp_usr=0x0203F000 -Wl,--defsym,__eheap_end=0x0203C000
+ifneq ($(strip $(PREVIEW_SCENE)),)
+LDFLAGS += $(PREVIEW_LAUNCH_FLAGS)
+endif
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
