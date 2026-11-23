@@ -3091,3 +3091,19 @@ Native9-scene stock mGBA run and normal full project verifier passed. Added
 Start clock draw used by the real native Start loop and retested scene0. Exact
 capture/source hashes and limits: docs/native-menu-preview-validation.json.
 No production behavior/driver changes or hardware qualification.
+
+## 2026-11-23 — Reproduced silent SD launch refusal without FAT alias
+
+- Native mGBA actual launch UI/path replay: SFN case reaches all phases, exFAT-
+  style alias-free long name silently returns before load. FatFs confirms no SFN
+  on exFAT. Corrected optional-alias/canonical paths and clipped-name lookup by
+  recorded directory entry; file/PSRAM record sizes and hardware protocols stay.
+- Added production-helper sanitizer and native mGBA launch fixtures. FAT/exFAT,
+  long filename and quick-clean pass; disabled-addon fallback oracle now accounts
+  for its intentionally absent patch stage. Full validation is next. Reports are
+  not physically qualified, and no release has changed.
+
+- Full local production verifier passed, including stock-size image/layout and
+  existing suites. All5 native mGBA launch cases now reach expected handoff;
+  disabled-addon quick mode correctly skips patching. Sanitized actual path
+  helpers pass. Proceed with project-only commit/push/PR and hosted checks.
