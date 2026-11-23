@@ -2014,3 +2014,12 @@ First sourceCI45094608412/PR18BLUE job caught runner log redirection before the
 ignored build directory existed on a clean checkout. Added mkdir before any log
 redirection; no production code changed. Local populated cache had hidden this
 fixture setup error. Push correction and require fresh source/all4 CI passes.
+
+PR18 merged980ba8f after sourceCI45095029573/all4 integration45095035057 passed
+atf88a7bd. Fresh forced production build/layout and sealed2124252-byte packaging
+passed. Root hardware-test/ezfblue-sd-launch-f88a7bd.bin (SHA256b1d5d601ba8ebfbc16ff0470b147b82468dee4a8b36d978d4b65e6b48ca22e9f)
+is an ignored BLUE-only test candidate, with separate JSON/README evidence.
+No BLUE release/tag/FPGA update changed. All EZ lanes synchronized normally to
+980ba8f; SuperFW stays on its active clean build until its all3 checks finish.
+This fixes the reproduced alias-free exFAT path; physical launch/timing and any
+additional hardware causes are still unqualified. Preserve existing warnings.
