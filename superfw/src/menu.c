@@ -97,6 +97,7 @@ enum {
 #define HI_COLOR         19
 #define TOP_BG          246
 #define TOP_TEXT        247
+#define TOP_SELECT      255
 #define SELECTED_TEXT   236
 #define IGM_PAL_FG      240
 #define IGM_PAL_BG      241
@@ -1048,10 +1049,15 @@ void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
   else {
     progress_action=ProgressPrepareEmulator;loadrom_progress(0,1);
     unsigned plugin_error=load_extemu_rom(fn,fs,&pogo_plugin_loader,loadpogo_progress);
+    const char *portable_failure=0;
     if(plugin_error!=ERR_LOAD_NOEMU) {
-      recover_emu_browser();
       write_log("emulator",plugin_error,"bytes=%lu game=%s",(unsigned long)fs,fn);
-      spop.alert_msg=plugin_load_error();return;
+      portable_failure=plugin_load_error();
+      /* Keep the native PCE fallback when a portable plugin cannot load. */
+      if(ldinfo!=get_emu_info("pce"))
+      {
+        recover_emu_browser();spop.alert_msg=portable_failure;return;
+      }
     }
     // Try to load the emu and ROM, keep trying if there's more than one emulatior option.
     unsigned errcode = ERR_LOAD_NOEMU;
@@ -1059,15 +1065,17 @@ void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
 
       progress_action=ProgressGame;
       errcode = load_extemu_rom(fn, fs, ldinfo, loadrom_progress);
-      if (errcode && errcode != ERR_LOAD_NOEMU)
+      if (errcode && errcode != ERR_LOAD_NOEMU) {
+        write_log("native-emu",errcode,"core=%s",ldinfo->emu_name);
         break;
+      }
       ldinfo++;
     }
     recover_emu_browser();
     write_log("emulator",errcode,"bytes=%lu game=%s",(unsigned long)fs,fn);
     unsigned errmsg = (errcode == ERR_LOAD_NOEMU) ? MSG_ERR_NOEMU :
                                                     MSG_ERR_READ;
-    spop.alert_msg = msgs[lang_id][errmsg];
+    spop.alert_msg = portable_failure && errcode==ERR_LOAD_NOEMU?portable_failure:msgs[lang_id][errmsg];
   }
 }
 
@@ -1415,7 +1423,7 @@ static void draw_lined_panel(volatile uint8_t *frame) {
     row[1] = (p[0] & 15) | ((p[0] >> 4) << 8);
     row[117] = (p[2] & 15) | ((p[2] >> 4) << 8);
     row[118] = (p[3] & 15) | ((p[3] >> 4) << 8);
-    if(y>=23 && y<=149)row[2]&=0xff00; /* Thin black inner left outline. */
+    if(y>=23 && y<=149)row[2]=(row[2]&0xff00)|(dark?11:0); /* Match the dark frame contrast. */
   }
 }
 
@@ -2313,6 +2321,8 @@ void render_ui_settings(volatile uint8_t *frame) {
   if(ds_style)render_dssmm_settings_background(frame,"Interface");
   const unsigned value_x=ds_style?119:128;
   const unsigned rows=ui_visible_rows(),line_h=ds_style?(menu_font==FONT_STYLE_DSSMM?14:18):18;
+  if(smenu.uiset.seloff>0)draw_central_text("⯅",frame,ds_style?230:120,ds_style?20:15);
+  if(smenu.uiset.seloff+rows<=UiSetMAX)draw_central_text("⯆",frame,ds_style?230:120,ds_style?136:125);
   char tmpbuf[64];
   const char * const labels[UiSetSave] = {
     msgs[lang_id][MSG_UIS_THEME], "Font", "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
@@ -2335,7 +2345,7 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetWrap: value=carousel_wrap?"On":"Off";break;
     case UiSetClock: value=menu_clock_24?"24 hour":"12 hour";break;
     case UiSetClean: value=msgs[lang_id][clean_list?MSG_KNOB_ENABLED:MSG_KNOB_DISABLED];break;
-    case UiSetTopBar: value=accent_names[menu_topbar<ACCENT_COUNT?menu_topbar:0];break;
+    case UiSetTopBar: value=topbar_names[menu_topbar<TOPBAR_COUNT?menu_topbar:0];break;
     case UiSetAccent: value = accent_names[menu_accent < ACCENT_COUNT ? menu_accent : 0]; break;
     }
     if (ds_style && (int)option == smenu.uiset.selector)
@@ -2438,19 +2448,19 @@ void render_tools(volatile uint8_t *frame) {
 }
 
 static unsigned topbar_index(unsigned shade) {
-  return shade==3?TOP_BG:249+shade-(shade>3);
+  return shade==3?TOP_BG:249+MIN(shade,6)-(shade>3);
 }
 static uint16_t topbar_shade(uint16_t base,unsigned shade) {
   unsigned result=0;
   for(unsigned shift=0;shift<15;shift+=5) {
-    int value=(int)((base>>shift)&31)+3-(int)shade;
+    int value=(int)((base>>shift)&31)+(3-(int)shade)*3/2;
     result|=(unsigned)MIN(31,MAX(0,value))<<shift;
   }
   return result;
 }
 static void render_topbar_styled(volatile uint8_t *frame) {
   for(unsigned y=0;y<16;++y) {
-    unsigned shade=y/2,next=shade+((y&1) && shade<7);
+    unsigned shade=MIN(y/2,6),next=shade+((y&1) && shade<6);
     dma_memset16(frame+y*240,topbar_index(shade)|(topbar_index(next)<<8),120);
   }
 }
@@ -2471,10 +2481,12 @@ void reload_theme(unsigned thnum) {
   MEM_PALETTE[BG_COLOR] = colors.bg_color;
   MEM_PALETTE[FT_COLOR] = colors.ft_color;
   MEM_PALETTE[HI_COLOR] = colors.hi_color;
-  MEM_PALETTE[TOP_BG]=menu_topbar?menu_theme_colors(thnum,menu_topbar).hi_color:themes[THEME_DSSMM_LIGHT].fg_color;
+  MEM_PALETTE[TOP_BG]=menu_topbar==ACCENT_COUNT?0x318c:
+      menu_topbar?menu_theme_colors(thnum,menu_topbar).hi_color:themes[THEME_DSSMM_LIGHT].fg_color;
   MEM_PALETTE[TOP_TEXT]=menu_topbar?0x7fff:0;
+  MEM_PALETTE[TOP_SELECT]=menu_topbar?0x7fff:colors.hi_color;
   uint16_t topbar_base=MEM_PALETTE[TOP_BG];
-  for(unsigned shade=0;shade<8;++shade)
+  for(unsigned shade=0;shade<7;++shade)
     MEM_PALETTE[topbar_index(shade)]=topbar_shade(topbar_base,shade);
   MEM_PALETTE[SELECTED_TEXT]=0x7fff;
   // In-game menu palette
@@ -2502,7 +2514,7 @@ static void launcher_corner_span(volatile uint8_t *frame,unsigned x,unsigned y,u
   for(unsigned px=x&~1u;px<x+width;px+=2) {
     volatile uint16_t *dest=(volatile uint16_t *)(frame+y*240+px);
     unsigned mask=(px>=x?255:0)|((px+1<x+width)?0xff00:0);
-    *dest=(*dest&~mask)|(dup8(y<16 && menu_topbar?TOP_TEXT:HI_COLOR)&mask);
+    *dest=(*dest&~mask)|(dup8(y<16?TOP_SELECT:HI_COLOR)&mask);
   }
 }
 static void launcher_corners(volatile uint8_t *frame,unsigned x,unsigned y,unsigned w,unsigned h) {
@@ -2566,7 +2578,7 @@ static void render_start(volatile uint8_t *frame) {
 #else
   draw_central_text("Recents",frame,168,106);
 #endif
-  const unsigned boxes[4][4]={{24,42,192,48},{24,92,96,46},{120,92,96,46},{109,142,23,16}};
+  const unsigned boxes[4][4]={{24,42,192,48},{24,91,96,47},{120,91,96,47},{109,142,23,16}};
   const unsigned *box=boxes[launcher_selected<4?launcher_selected:0];
   if(launcher_selected<4)launcher_corners(frame,box[0],box[1]+(launcher_selected==0),box[2],box[3]-(launcher_selected==0));
 }
@@ -3900,7 +3912,7 @@ static void keypress_menu_uisettings(unsigned newkeys) {
     }
 
     else if (smenu.uiset.selector == UiSetTopBar)
-      menu_topbar = MIN(ACCENT_COUNT-1,menu_topbar+1);
+      menu_topbar = MIN(TOPBAR_COUNT-1,menu_topbar+1);
     else if (smenu.uiset.selector == UiSetAccent)
       menu_accent = MIN(ACCENT_COUNT - 1, menu_accent + 1);
     else if (smenu.uiset.selector == UiSetASpd)

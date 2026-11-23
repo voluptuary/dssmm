@@ -27,6 +27,9 @@ Path(sys.argv[2]).write_text('''#include <stdint.h>
 #define SaveLoadReset 0
 #define SaveReboot 0
 const t_emu_loader pogo_plugin_loader={"pogo:",0};
+static const t_emu_loader pce_native[]={{"pceadvance",0},{"vfs:PCEA",0},{0,0}};
+const t_emu_loader *get_emu_info(const char *ext){return !strcmp(ext,"pce")?pce_native:0;}
+static const char *active_rom="/Games/Dr. Mario (USA).gg";
 static const char *msgs[1][4]={{"save read","save write","no emulator","read"}};
 static unsigned lang_id,loads,reloads,records,save_error,plugin_error,native_error;
 static bool recent_ok=true;
@@ -34,7 +37,7 @@ typedef unsigned t_sram_load_policy;
 static struct {struct {char savefn[256];} l;} load;
 static struct {const char *alert_msg;struct {typeof(load) load;} p;} spop;
 static struct {struct {unsigned filecount,dispentries;int selector,seloff;} browser;} smenu;
-static bool insert_recent_flush(const char *fn,unsigned flags){assert(!strcmp(fn,"/Games/Dr. Mario (USA).gg")&&!flags);records++;return recent_ok;}
+static bool insert_recent_flush(const char *fn,unsigned flags){assert(!strcmp(fn,active_rom)&&!flags);records++;return recent_ok;}
 static void sram_filename_calc(const char *rom,char *save){(void)rom;strcpy(save,"/SYSTEM/SAVER/Dr. Mario (USA).sav");}
 bool check_file_exists(const char *fn){(void)fn;return false;}
 static unsigned prepare_sram_based_savegame(unsigned a,unsigned b,const char *c){(void)a;(void)b;(void)c;return save_error;}
@@ -43,7 +46,7 @@ static void loadpogo_progress(unsigned a,unsigned b){(void)a;(void)b;}
 static const char *plugin_load_error(void){return msgs[0][MSG_ERR_READ];}
 #define write_log(...) ((void)0)
 static unsigned load_extemu_rom(const char *fn,unsigned fs,const t_emu_loader *ld,void(*cb)(unsigned,unsigned)){
- assert(!strcmp(fn,"/Games/Dr. Mario (USA).gg")&&fs==1234&&cb==(ld==&pogo_plugin_loader?loadpogo_progress:loadrom_progress));loads++;
+ assert(!strcmp(fn,active_rom)&&fs==1234&&cb==(ld==&pogo_plugin_loader?loadpogo_progress:loadrom_progress));loads++;
  return ld==&pogo_plugin_loader?plugin_error:native_error;
 }
 static void browser_invalidate_artwork(void){}
@@ -63,6 +66,13 @@ int main(void){const t_emu_loader native[]={{"sms",0},{0,0}};
  loads=records=reloads=0;save_error=0;recent_ok=false;
  start_emu_game(native,"/Games/Dr. Mario (USA).gg",1234);
  assert(!loads&&records==1&&!reloads&&spop.alert_msg);
+ loads=records=reloads=0;recent_ok=true;save_error=0;plugin_error=3;native_error=3;
+ active_rom="/Games/Native PCE (USA).pce";
+ start_emu_game(pce_native,active_rom,1234);
+ assert(loads==2&&records==1&&reloads==3&&spop.alert_msg==msgs[0][MSG_ERR_READ]);
+ loads=records=reloads=0;native_error=ERR_LOAD_NOEMU;
+ start_emu_game(pce_native,active_rom,1234);
+ assert(loads==3&&records==1&&reloads==3&&spop.alert_msg==msgs[0][MSG_ERR_READ]);
  puts("Production failed emulator loads rebuild overwritten SDRAM tables; save/recent failures stop safely.");}
 ''')
 PY

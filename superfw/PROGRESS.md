@@ -872,3 +872,62 @@ symbol/ABI guards after a sync-source CI failed13 despite integration success.
 - Focused host and ARM tests pass; native loading screenshots pass with poisoned
   external fonts. All-board full verification and a clean numbered hardware-test
   replacement are next. Build677 remains the delivered image until then.
+
+- Build746/source43065c9a completed full all3/local/native ARM/mGBA and sourceCI
+  45039947282/all4 integration45039951109. PR17 mergedccff55c; Chis746 is the
+  validated local hardware-test replacement for677. Exact evidence/limits are in
+  docs/build-746-validation.json. No new physical or public-release claim.
+- Owner asks for SD headroom and removal of genuinely unsupported board media.
+  Existing board guards already exclude NOR/extended fonts/extra emulators as
+  appropriate. Lossless compression trials are underway; no features removed.
+
+## 2026-11-23 — Recovery and owner746 follow-up
+
+- Recovered intact pending compression work; prior full746/all4 CI remains valid.
+  Owner confirms GG/SMS operation. PCE still fails physically.
+- Added Start corner adjustments, solid independent header-selector palette,
+  stronger bar shading, persisted Dark header choice and contrasted Dark frame
+  outline. Focused host suites pass; native mGBA/all3 validation is pending.
+- SD prototype gains31232bytes via lossless font packing; optimized halfword
+  decoder and exact boot-resource replay are pending final all3 checks. Startup
+  CPU tradeoff and rejected experiments are recorded in BOOT-RESOURCE-COMPRESSION.
+- MiGoomba integration/PCE investigation precede NOR view/artwork work and the
+  next requested normal release. BLUE launch audit stays in its own lane.
+
+- Delivered Chis749 after full all3/native/host/mGBA and sourceCI45092221448.
+  Additional Dark Info/System and light/dark solid-header-selector checks pass.
+  Corrected a6px-versus8px corner sampling oracle; firmware stayed749. Permanent
+  verifier now retains those cases. SD30KiB/Lite46KiB margins are verified. Next:
+  MiGoomba generic integration and continued PCE diagnosis before NOR features.
+
+- Prepared MiGoomba v0.1 generic/pinned4b401e2 integration for all3 boards,
+  preserving native save paths and external overrides. Exact payload/header gate
+  and generated GB/GBC stripe-cartridge mGBA smoke both pass. Added native ARM
+  packaged-core/append/reset-boundary cases; clean all3/full verification is next.
+
+## 2026-11-23 — Build751 and native emulator transfer correction
+
+Build751/source d1e0e8d passed full all3/native ARM/host/mGBA verification and
+source CI45095410222; Chis751 is in hardware-test with exact hash recorded in
+docs/build-751-validation.json. Generic MiGoomba executes generated GB/GBC
+programs; SD/Lite remain physically unqualified.
+
+Native PCE replay exposed a word-sized header write into cartridge memory in
+751. Native headers now stage in aligned internal RAM and transfer by halfword.
+Native file copies use exact read lengths, aligned padded tails, file size and
+close checks. Old-source host/ARM tests reproduce the defect; corrected host
+transfer/recovery and actual linked Chis PCE replay pass (9040B stack peak).
+PCE portable-load errors can try the existing native core; working portable
+plugins retain priority. This is not confirmation of the physical PCE cause.
+Full clean all3 verification is next, then normal integration/release before
+NOR carousel work. Preserve BLUE candidate and private session artifacts.
+
+## Build758 validation and owner751 follow-up
+
+Clean source3e51917a/Build758 passed full all3/ARM/host/mGBA verifier and all4
+PR19 checks45098710443. Chis758 replaces751 in hardware-test; SHA
+7fca9fc6c79833369c4ae795997d89e3433acd36363f4e58135803d058941946.
+Owner751 PCE says Plugin format unsupported;751 predates native transfer/fallback
+corrections. Physical resolution remains unconfirmed. Added Interface overflow
+arrows matching Games and a lighter neutral Dark header base0x318c. Header
+shading host bounds pass; validate revised native scenes/build before publishing.

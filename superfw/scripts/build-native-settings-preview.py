@@ -3,7 +3,7 @@
 from pathlib import Path
 import argparse,struct,subprocess,os,json,re,hashlib
 root=Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(15),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");p.add_argument("--progress-action",type=int,choices=range(10),default=0);p.add_argument("--recent-title",help="Read-only synthetic recent filename; Start caption test only");a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(16),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");p.add_argument("--progress-action",type=int,choices=range(10),default=0);p.add_argument("--recent-title",help="Read-only synthetic recent filename; Start caption test only");p.add_argument('--theme',type=int,choices=(6,7),default=6);p.add_argument('--topbar',type=int,choices=range(6),default=0);a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
 elf=a.elf.read_bytes();nm=subprocess.check_output(['arm-none-eabi-nm',str(a.elf)],text=True)
 syms={r.split()[-1]:int(r.split()[0],16) for r in nm.splitlines() if len(r.split())==3}
 if a.scene in (4,13) and 'nor_write_progress' not in syms:p.error('NOR scene is unavailable in this linked board image')
@@ -24,7 +24,7 @@ for i in range(count):
 text+='static const struct {uint32_t address,filesz,memsz;const uint8_t *source;} native_segments[]={\n'
 for address,filesz,memsz,source in segments:text+=f'{{0x{address:x},{filesz},{memsz},{source}}},\n'
 text+='};\n'
-for name in ['FatFs','sdfs','load_settings','settings_save_flush','settings_save_request','settings_save_pending','settings_save_poll','launcher_page','launcher_selected','f_mkdir','f_stat','sdcard_read_blocks','sdcard_write_blocks','menu_keypress','menu_render','menu_flip','reload_theme','smenu','spop','menu_theme','menu_accent','browser_view','artwork_mode','menu_font','frame_count','framen','font_base_addr','menu_username','progress_action','loadrom_progress']:
+for name in ['FatFs','sdfs','load_settings','settings_save_flush','settings_save_request','settings_save_pending','settings_save_poll','launcher_page','launcher_selected','f_mkdir','f_stat','sdcard_read_blocks','sdcard_write_blocks','menu_keypress','menu_render','menu_flip','reload_theme','smenu','spop','menu_theme','menu_accent','browser_view','artwork_mode','menu_font','frame_count','framen','menu_topbar','font_base_addr','menu_username','progress_action','loadrom_progress']:
  text+='#define NATIVE_'+name+f' 0x{syms[name]:08x}u\n'
 if a.reference:
  for name in ['clock_seconds','clock_frame']:
@@ -69,6 +69,7 @@ def field_offset(obj,path):
 for obj,f in fields:text+='#define OFFSET_'+obj+'_'+f.replace('.','_')+' '+str(field_offset(obj,f))+'\n'
 # Preserve existing concise Interface field names for the persistence fixture.
 for f in ['menu_tab','uiset_selector','uiset_seloff']:text+='#define OFFSET_'+f+' OFFSET_smenu_'+f+'\n'
+text+='#define TEST_THEME '+str(a.theme)+'\n#define TEST_TOPBAR '+str(a.topbar)+'\n'
 text+='#define TEST_PROGRESS_ACTION '+str(a.progress_action)+'\n'
 text+='#define TEST_RECENT '+str(int(bool(a.recent_title)))+'\n'
 text+='#define TEST_REFERENCE '+str(int(a.reference))+'\n#define TEST_SCENE '+str(a.scene)+'\n#define TEST_FONT '+str(a.font)+'\n'

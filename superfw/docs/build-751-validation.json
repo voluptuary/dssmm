@@ -1,0 +1,53 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 751,
+  "boards": [
+    {
+      "source_tree_sha256": "c3755043046e8b298681b35012d7e3dce09604327d76df119dc41af8e45a0321",
+      "board": "sd",
+      "dssmm_build": 751,
+      "source_commit": "d1e0e8dbbd04762ba455542aaf7a981ecec15ffc",
+      "source_dirty": false,
+      "firmware_sha256": "6dfa1d33758c8effbd6e92dddd4f37fac31ad63f8b09d6b32ffe9d83184b3c86",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496128,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 28160
+    },
+    {
+      "source_tree_sha256": "c3755043046e8b298681b35012d7e3dce09604327d76df119dc41af8e45a0321",
+      "board": "lite",
+      "dssmm_build": 751,
+      "source_commit": "d1e0e8dbbd04762ba455542aaf7a981ecec15ffc",
+      "source_dirty": false,
+      "firmware_sha256": "bd70427130571a867ef9aa75056d8be363588d3b8ac4a9a9985636f9f0f3d044",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496128,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 11776
+    },
+    {
+      "source_tree_sha256": "c3755043046e8b298681b35012d7e3dce09604327d76df119dc41af8e45a0321",
+      "board": "chis",
+      "dssmm_build": 751,
+      "source_commit": "d1e0e8dbbd04762ba455542aaf7a981ecec15ffc",
+      "source_dirty": false,
+      "firmware_sha256": "9603e17634de3dcb2283382d52e9c35262e28ba7a60bddb9a7146933e8ff85c5",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "source": "d1e0e8dbbd04762ba455542aaf7a981ecec15ffc",
+  "tests": {
+    "full_local": "all3 clean/boot-resource/settings/Pogoshell/native-MiGoomba/IGM ARM checks, full host, mGBA2 boots+28 scenes+dark Info/System+flat selectors+4 caption cases+plugin Exit+GB/GBC synthetic stripe smoke passed",
+    "source_ci": 45095410222
+  },
+  "limits": {
+    "physical": "MiGoomba integration and751 changes not yet hardware-qualified; only earlier Chis owner tests; SD/Lite untested",
+    "pce": "Portable PCE physical report remains; native-header/partial-tail corrections and fallback are subsequent work, absent here"
+  },
+  "native_core": "MiGoomba v0.1 generic pinned4b401e2, exact81892-byte payloada2e3fa5a...",
+  "integration": "Not yet merged; later private-loader corrections remain under development"
+}

@@ -634,99 +634,69 @@ static unsigned load_pogo_plugin(const char *fn, uint32_t fs, progress_fn progre
 }
 
 // Generic-emulator (ie. NES, SMS, ...) loader
-NOINLINE
-unsigned load_extemu_rom(const char *fn, uint32_t fs, const t_emu_loader *ldinfo, progress_fn progress) {
-  if(ldinfo==&pogo_plugin_loader)return load_pogo_plugin(fn,fs,progress);
-  FIL fd;
-  uint8_t *ptr = (uint8_t*)(GBA_ROM_ADDR);
-  if (fs > 8*1024*1024)
-    return ERR_LOAD_BADROM;
-
-  // Try to find a valid and existing emulator.
-  if (!memcmp(ldinfo->emu_name, "vfs:", 4)) {
-    // Look the emulator up in the VFS
-
-    set_supercard_mode(MAPPED_SDRAM, true, false);
-    const void *emupload = get_vfile_ptr(&ldinfo->emu_name[4]);
-    if (!emupload) {
-      // In case the emulator is not bundled in.
-      set_supercard_mode(MAPPED_SDRAM, true, true);
-      return ERR_LOAD_NOEMU;
-    }
-    ptr += upkr_unpack16(ptr, emupload);
-    set_supercard_mode(MAPPED_SDRAM, true, true);
+/* Read only requested bytes; the caller owns the file and final close check. */
+static bool native_emulator_copy(FIL *file,void *destination,uint32_t size,progress_fn progress) {
+  uint32_t buffer[LOAD_BS/4];
+  for(uint32_t offset=0;offset<size;) {
+    unsigned count=size-offset<LOAD_BS?size-offset:LOAD_BS;UINT got=0;
+    if(f_read(file,buffer,count,&got)!=FR_OK || got!=count)return false;
+    unsigned padded=(count+3)&~3u;
+    memset((uint8_t*)buffer+count,0,padded-count);
+    if(progress && !(offset&65535))progress(offset,size);
+    set_supercard_mode(MAPPED_SDRAM,true,false);
+    if(use_slowld)rom_write16_exact((uint8_t*)destination+offset,buffer,padded);
+    else dma_memcpy32((uint8_t*)destination+offset,buffer,padded/4);
+    set_supercard_mode(MAPPED_SDRAM,true,true);
+    offset+=count;
   }
-  else {
-    char emupath[64];
-    strcpy(emupath, EMULATORS_PATH);
-    strcat(emupath, ldinfo->emu_name);
-    strcat(emupath, ".gba");
-
-    // Load the emulator from disk, check whether it exists tho.
-    if (FR_OK != f_open(&fd, emupath, FA_READ))
-      return ERR_LOAD_NOEMU;
-
-    while (1) {
-      UINT rdbytes;
-      uint32_t tmp[LOAD_BS/4];
-      if (FR_OK != f_read(&fd, tmp, LOAD_BS, &rdbytes)) {
-        f_close(&fd);
-        return ERR_LOAD_NOEMU;
-      }
-      if (!rdbytes)
-        break;
-
-      // Copy data into the ROM (disable SD interface to avoid collisions!)
-      set_supercard_mode(MAPPED_SDRAM, true, false);
-      if (use_slowld)
-        rom_copy_write16(ptr, tmp, rdbytes);
-      else
-        dma_memcpy32(ptr, tmp, rdbytes/4);
-      set_supercard_mode(MAPPED_SDRAM, true, true);
-      ptr += rdbytes;
-    }
-    f_close(&fd);
-  }
-
-  // Generate rom header and what not.
-  if (ldinfo->hndlr)
-    ptr += ldinfo->hndlr(ptr, fn, fs);
-
-  // Proceed to load the ROM now.
-  if (FR_OK != f_open(&fd, fn, FA_READ))
-    return ERR_LOAD_BADROM;
-
-  for (uint32_t offset = 0; offset < fs; offset += LOAD_BS) {
-    if (progress && (offset & (64*1024-1)) == 0)
-      progress(offset, fs);
-
-    UINT rdbytes;
-    uint32_t tmp[LOAD_BS/4];
-    if (FR_OK != f_read(&fd, tmp, LOAD_BS, &rdbytes)) {
-      f_close(&fd);
-      return ERR_LOAD_BADROM;
-    }
-
-    // Copy data into the ROM (disable SD interface to avoid collisions!)
-    set_supercard_mode(MAPPED_SDRAM, true, false);
-    if (use_slowld)
-      rom_copy_write16(ptr, tmp, LOAD_BS);
-    else
-      dma_memcpy32(ptr, tmp, LOAD_BS/4);
-    set_supercard_mode(MAPPED_SDRAM, true, true);
-    ptr += LOAD_BS;
-  }
-
-  // Close the file, not super necessary really :P
-  f_close(&fd);
-
-  // Set the ROM into read only mode, disable SD card reader as well.
-  set_supercard_mode(MAPPED_SDRAM, false, false);
-
-  REG_WAITCNT = 0x4000;   // Default timings + prefetch
-  launch_reset(false, use_fastew);
-
-  return 0;
+  if(progress)progress(size,size);
+  return true;
 }
 
-
+NOINLINE
+unsigned load_extemu_rom(const char *fn,uint32_t fs,const t_emu_loader *ldinfo,progress_fn progress) {
+  if(ldinfo==&pogo_plugin_loader)return load_pogo_plugin(fn,fs,progress);
+  enum { PayloadLimit=14*1024*1024 };
+  if(!fs || fs>8*1024*1024 || !ldinfo || !ldinfo->emu_name)return ERR_LOAD_BADROM;
+  unsigned room=PayloadLimit-((fs+3)&~3u)-EMU_HEADER_MAX_BYTES;
+  uint32_t emulator_size;FIL file;
+  if(!memcmp(ldinfo->emu_name,"vfs:",4)) {
+    set_supercard_mode(MAPPED_SDRAM,true,false);
+    const void *payload=get_vfile_ptr(ldinfo->emu_name+4);
+    if(!payload){set_supercard_mode(MAPPED_SDRAM,true,true);return ERR_LOAD_NOEMU;}
+    emulator_size=upkr_unpack16(GBA_ROM_ADDR,payload);
+    set_supercard_mode(MAPPED_SDRAM,true,true);
+    if(!emulator_size || emulator_size>room || ((emulator_size+3)&~3u)>room)return ERR_LOAD_BADROM;
+  } else {
+    char path[64];
+    if(strlen(EMULATORS_PATH)+strlen(ldinfo->emu_name)+sizeof(".gba")>sizeof(path))return ERR_LOAD_BADROM;
+    strcpy(path,EMULATORS_PATH);strcat(path,ldinfo->emu_name);strcat(path,".gba");
+    FRESULT opened=f_open(&file,path,FA_READ);
+    if(opened!=FR_OK)return opened==FR_NO_FILE || opened==FR_NO_PATH?ERR_LOAD_NOEMU:ERR_LOAD_BADROM;
+    FSIZE_t bytes=f_size(&file);
+    bool copied=false;
+    if(bytes && bytes<=room && (((uint32_t)bytes+3)&~3u)<=room)
+      copied=native_emulator_copy(&file,GBA_ROM_ADDR,(uint32_t)bytes,0);
+    FRESULT closed=f_close(&file);
+    if(!copied || closed!=FR_OK)return ERR_LOAD_BADROM;
+    emulator_size=(uint32_t)bytes;
+  }
+  uint8_t *destination=GBA_ROM_ADDR+((emulator_size+3)&~3u);
+  if(ldinfo->hndlr) {
+    uint32_t header[EMU_HEADER_MAX_BYTES/4]={0};
+    unsigned bytes=ldinfo->hndlr((uint8_t*)header,fn,fs);
+    if(!bytes || bytes>sizeof(header) || (bytes&3))return ERR_LOAD_BADROM;
+    set_supercard_mode(MAPPED_SDRAM,true,false);
+    rom_write16_exact(destination,header,bytes);
+    set_supercard_mode(MAPPED_SDRAM,true,true);
+    destination+=bytes;
+  }
+  if(f_open(&file,fn,FA_READ)!=FR_OK)return ERR_LOAD_BADROM;
+  bool copied=f_size(&file)==fs && native_emulator_copy(&file,destination,fs,progress);
+  FRESULT closed=f_close(&file);
+  if(!copied || closed!=FR_OK)return ERR_LOAD_BADROM;
+  set_supercard_mode(MAPPED_SDRAM,false,false);
+  REG_WAITCNT=0x4000;
+  launch_reset(false,use_fastew);
+  return 0;
+}

@@ -346,9 +346,12 @@ _main_end:
     bl sdram_copy                      @ Copy compressed fonts to scratch area.
     mov r0, $0x5
     bl set_sd_mode                     @ Map SDRAM so we can unpack it.
-    mov r0, $HISCRATCH_ADDR
-    ldr r1, =FONT_BASE_ADDR
-    bl apunpack16                      @ Unpack font assets
+    .global boot_fonts_unpack, boot_fonts_unpack_end
+boot_fonts_unpack:
+    ldr r0, =FONT_BASE_ADDR
+    mov r1, $HISCRATCH_ADDR
+    bl upkr_unpack                     @ Same lossless codec; SDRAM-safe stores
+boot_fonts_unpack_end:
   #else
     mov r2, $(((font_end - font_start + 8191) / 8192) * 4)
     ldr r1, =FONT_BASE_ADDR
@@ -694,10 +697,11 @@ setup_bg2_regs:
 
 @ Include decompression routines here
 
-#define _APPACK_HWORD_VERSION
-#include "src/unpack.S"
-
-#include "src/upkrunpack.S"
+#if defined(COMPRESS_FONTS) || defined(COMPRESS_PATCHES) || defined(COMPRESS_FIRMWARE)
+@ One halfword-safe decoder serves fonts, patches and firmware on compressed boards.
+#include "src/upkrunpack16.S"
+.set upkr_unpack, upkr_unpack16
+#endif
 
 @ Place constants here.
 .pool
@@ -728,7 +732,7 @@ patches_end:
 
 font_start:
   #if defined(COMPRESS_FONTS)
-    .incbin "res/fonts-dssmm.pack.comp"
+    .incbin "res/fonts-dssmm.pack.upkr"
   #elif defined(FONTS_EXT)
     .incbin "res/fonts-ext-dssmm.pack"
   #else
@@ -739,10 +743,10 @@ font_end:
 
 assets_start:
   #ifdef BUNDLE_GBC_EMULATOR
-  .ascii "GCEM"                                        @ GB/C emulator (GoombaColor)
+  .ascii "GCEM"                                        @ Generic MiGoomba GB/C core; no EZ-FLASH hardware variant
   .word (goomba_emu_end - goomba_emu_start)            @ Payload size
   goomba_emu_start:
-    .incbin "emu/jagoombacolor_v0.5.gba.comp"
+    .incbin "emu/migoomba_v0.1_generic.gba.comp"
   goomba_emu_end:
   .balign 4
   #endif

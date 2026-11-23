@@ -1537,3 +1537,102 @@ LTO removes that guard. Replay now supplies the actual loadpogo_progress callbac
 intercepts only final rendering, and verifies both game/emulator phases. All six
 SD plugin cases pass with10528B stack. No production loader workaround or ABI
 flag change was needed. Restart full validation on the corrected checkpoint.
+
+## 2026-11-22 — Build746 delivered; PR17 integrated
+
+Clean source43065c9a / Build746 passes full all3/native settings/plugins/IGM ARM,
+host suites, mGBA2 boots/28 scenes/4 pixel-exact Start captions and plugin Exit.
+SourceCI45039947282 and all4 PR17 CI45039951109 pass. PR17 mergedccff55c;
+normal FF synchronization/push of all5 lanes follows (verify remote refs).
+Root hardware-test now contains hash-verified superfw-chis-build746.fw and
+build746.json; superseded local677 files removed after hash validation.
+Tracked docs/build-746-validation.json preserves all3 identities and limits.
+Chis main254704/257024, IWRAM15592 with16KiB stack, boot3056/3072 bytes.
+SD524288/524288, Lite492032/507904, Chis1671680/2097152 bytes. Physical PCE
+failure and GG/SMS Exit timing remain unqualified; no public release changed.
+
+Owner now prioritizes SD flash headroom and clean omission of unsupported
+board-specific media. Existing guards already omit Chis NOR code/icon/extended
+fonts on SD/Lite, all bundled emulators on Lite, and the five extra emulators
+on SD. Shared GBA menu graphics remain supported on all boards. Investigate
+measurable lossless compression before dropping supported languages/features.
+Offline study in ignored build/compression-study: default apultra font pack
+308252 bytes; UPKR level9 patch DB48085 (vs48944 at4), GB/C32143 (vs32395 at4).
+Font UPKR4/9 trials still running; compare exact roundtrips, decoder size, ARM
+halfword writes and boot time before any format change. Do not run make clean
+until these processes finish (tools live in project intermediates). Scratch
+/tmp/dssmm-context-scratch.md remains session-only, <=1GiB; BIOS/owner ZIP retained.
+
+## 2026-11-23 — Recovery and Build746 owner notes
+
+All prior compressors/verifiers ended; no lingering build/mGBA processes. PR17
+is merged; all5 remotes were verified atccff55c before SuperFW journal8704341.
+Default-branch CI45040890887 passed. Chis746 remains the validated hardware-test.
+Owner confirms GG/SMS now work correctly; keep this separate from remaining PCE
+failure. New work: SD/NOR Start upper corners-1y, flat topbar selector palette,
+slightly stronger gradient, optional Dark bar and visible Dark inner panel line.
+MiGoomba generic integration is requested next (same pinned core as DE, never
+its DE-specific payload). Finish these and PCE investigation before NOR carousel
+and NOR Last Played artwork. Then publish a normal release with folder-art.zip,
+previous note style/credits/hardware limits. BLUE SD GBA launch audit is an added
+separate lane task in /tmp/dssmm-blue-preview; no BLUE edits yet.
+
+Pending compression prototype is preserved, not delivered: UPKR4 fonts734296→
+277868 vs apultra308252; exact SD boot fonts/patches/firmware ARM replay passes,
+prototype493056/524288 bytes. New inline halfword decoder reduces UPKR font
+instructions71.7M→52.1M, still above apultra10.1M; startup tradeoff is documented
+in docs/BOOT-RESOURCE-COMPRESSION.md. Chis raw fonts are unaffected. Distinct
+.pack.upkr names avoid stale incremental codec data. Boot media checks assert
+SD=GCEM only, Lite=none, Chis=all six. Alternate transforms/windows were larger;
+run compressor studies serially (three parallel benchmark OOM kills, no loss).
+Updated UI host topbar/corner/panel/settings tests pass. New native theme/topbar
+flags and scene15 check flat clock corners; full compilation/mGBA/all3 still due.
+
+749 full verifier and sourceCI45092221448 pass. All3 clean identities are in
+ docs/build-749-validation.json. Extra dark Info/System scenes and flat clock
+selectors on both fonts pass; light default clock selectors pass too. The first
+clock oracle sampled8px arms while actual16px-high corners use6px; corrected
+only the oracle and replayed the same749 ELF. Added native Dark/selector cases
+to the permanent verifier and a direct Dark topbar parser assertion. Chis749
+hash-verified hardware-test replaces746; no MiGoomba change is in749 yet. Owner
+746 GG/SMS confirmation remains valid for that tested source only. PCE stays open.
+BLUE audit has independently reproduced and corrected an exFAT alias assumption
+in its own worktree; no BLUE code belongs in this lane.
+
+MiGoomba work after750 is pending/unvalidated: copied exact upstream generic
+81892-byte payload (SHAa2e3fa5a..., pinned4b401e2). Never use ezode binary.
+SD/Chis GCEM changes to MiGoomba; Lite also enables native GB/GBC with its new
+resource margin. Packed core35330bytes vs old32395: estimated SD27KiB/Lite11KiB
+free; must remeasure clean packages. Existing external-plugin precedence and
+SRAM save/reboot paths remain. Old Jagoomba reference is not bundled twice.
+Native ARM plugin fixture has --native-gbc mode for actual packaged VFS decode,
+exact core/game append and launch_reset boundary; build.sh runs it on all3.
+New GB/GBC synthetic stripe-core mGBA smoke is in progress; see project scripts.
+PCE stays open; do not start NOR view work before this queue/release checkpoint.
+
+## 2026-11-23 — Build751 and native emulator transfer correction
+
+Build751/source d1e0e8d passed full all3/native ARM/host/mGBA verification and
+source CI45095410222; Chis751 is in hardware-test with exact hash recorded in
+docs/build-751-validation.json. Generic MiGoomba executes generated GB/GBC
+programs; SD/Lite remain physically unqualified.
+
+Native PCE replay exposed a word-sized header write into cartridge memory in
+751. Native headers now stage in aligned internal RAM and transfer by halfword.
+Native file copies use exact read lengths, aligned padded tails, file size and
+close checks. Old-source host/ARM tests reproduce the defect; corrected host
+transfer/recovery and actual linked Chis PCE replay pass (9040B stack peak).
+PCE portable-load errors can try the existing native core; working portable
+plugins retain priority. This is not confirmation of the physical PCE cause.
+Full clean all3 verification is next, then normal integration/release before
+NOR carousel work. Preserve BLUE candidate and private session artifacts.
+
+## Build758 validation and owner751 follow-up
+
+Clean source3e51917a/Build758 passed full all3/ARM/host/mGBA verifier and all4
+PR19 checks45098710443. Chis758 replaces751 in hardware-test; SHA
+7fca9fc6c79833369c4ae795997d89e3433acd36363f4e58135803d058941946.
+Owner751 PCE says Plugin format unsupported;751 predates native transfer/fallback
+corrections. Physical resolution remains unconfirmed. Added Interface overflow
+arrows matching Games and a lighter neutral Dark header base0x318c. Header
+shading host bounds pass; validate revised native scenes/build before publishing.

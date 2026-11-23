@@ -22,6 +22,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/* Native wrappers are built in RAM before cartridge-safe transfer. */
+#define EMU_HEADER_MAX_BYTES 64u
+
 typedef unsigned(*t_loader_handler)(uint8_t *buffer, const char *fn, unsigned fs);
 
 typedef struct {

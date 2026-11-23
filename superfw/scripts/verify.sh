@@ -5,6 +5,7 @@ project_root="$(cd "$(dirname "$0")/.." && pwd)"
 for tool in arm-none-eabi-gcc arm-none-eabi-g++ gcc g++ lcov; do
   command -v "$tool" >/dev/null || { echo "Missing required validation tool: $tool" >&2; exit 2; }
 done
+python3 "$project_root/scripts/test-migoomba-bundle.py"
 bash "$project_root/scripts/test-theme-settings.sh"
 bash "$project_root/scripts/test-settings-io.sh"
 bash "$project_root/scripts/test-clean-list.sh"
@@ -15,6 +16,7 @@ bash "$project_root/scripts/test-nds-loader.sh"
 bash "$project_root/scripts/test-loader-layout.sh"
 bash "$project_root/scripts/test-nor-launch.sh"
 bash "$project_root/scripts/test-pogo-plugins.sh"
+bash "$project_root/scripts/test-native-emulator-transfer.sh"
 python3 "$project_root/scripts/test-pogo-adapters.py"
 python3 "$project_root/scripts/test-pogo-reset-arm.py"
 python3 "$project_root/scripts/test-pogo-return-arm.py"
@@ -46,8 +48,11 @@ for board in sd lite chis; do
 done
 bash "$project_root/scripts/test-native-settings-mgba.sh"
 bash "$project_root/scripts/test-native-menu-visuals-mgba.sh"
+DSSMM_PREVIEW_THEME=7 DSSMM_PREVIEW_TOPBAR=5 DSSMM_PREVIEW_SCENES="1 2 15" bash "$project_root/scripts/test-native-menu-visuals-mgba.sh"
+DSSMM_PREVIEW_THEME=6 DSSMM_PREVIEW_TOPBAR=0 DSSMM_PREVIEW_SCENES=15 bash "$project_root/scripts/test-native-menu-visuals-mgba.sh"
 bash "$project_root/scripts/test-start-caption-mgba.sh"
 bash "$project_root/scripts/test-plugin-preview-mgba.sh"
+bash "$project_root/scripts/test-migoomba-mgba.sh"
 python3 "$project_root/tools/pack-dssmm-resources.py" --check
 make -C "$project_root/tests" clean
 make -C "$project_root/tests" all

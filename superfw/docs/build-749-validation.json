@@ -1,0 +1,57 @@
+{
+  "validation": "candidate identity and integrity passed; hardware not qualified",
+  "build": 749,
+  "boards": [
+    {
+      "source_tree_sha256": "848c867d08f7e4664b1bd8c3d82f77d35aefabb5b05d13648690e61484f9a1a3",
+      "board": "sd",
+      "dssmm_build": 749,
+      "source_commit": "6a2c474075315661c708a6d0dc2c48fe522d678d",
+      "source_dirty": false,
+      "firmware_sha256": "411bfe19d9e46cd14622e8429491a9b56edbf0509474892ccb024e6f32ec8c7f",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 493568,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 30720
+    },
+    {
+      "source_tree_sha256": "848c867d08f7e4664b1bd8c3d82f77d35aefabb5b05d13648690e61484f9a1a3",
+      "board": "lite",
+      "dssmm_build": 749,
+      "source_commit": "6a2c474075315661c708a6d0dc2c48fe522d678d",
+      "source_dirty": false,
+      "firmware_sha256": "956482328197cbb18091b9385f10b179977d4a8631ea95fd377757221fd1ca1e",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 460800,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 47104
+    },
+    {
+      "source_tree_sha256": "848c867d08f7e4664b1bd8c3d82f77d35aefabb5b05d13648690e61484f9a1a3",
+      "board": "chis",
+      "dssmm_build": 749,
+      "source_commit": "6a2c474075315661c708a6d0dc2c48fe522d678d",
+      "source_dirty": false,
+      "firmware_sha256": "37a21be1a44df3f8d3643750d913bfa6ac4c77fe697f944775bb46c33b5f61ed",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "source": "6a2c474075315661c708a6d0dc2c48fe522d678d",
+  "tests": {
+    "local_full": "all3 builds/native ARM boot resources/settings/plugins/IGM, full host suites, mGBA two boots/28 scenes/four caption cases/SMS-GG-PCE Exit passed",
+    "dark": "Info/System both fonts and flat clock selectors both fonts; light default clock selectors both fonts passed",
+    "source_ci": 45092221448,
+    "fixture_correction": "Clock corner oracle samples six-pixel arms for a16px selector; initial8px sample included background. Same749 ELF passes corrected oracle."
+  },
+  "limits": {
+    "chis_ewram": "254984/257024 bytes",
+    "chis_iwram": "15592; native16KiB stack retained",
+    "chis_boot": "1824/3072; stage1=460/1024",
+    "sd_lite_boot": "2296/3072; stage1=420/1024",
+    "physical": "Owner746 confirms GG/SMS works; new749 changes require card retest; PCE remains unresolved; SD/Lite not hardware-tested"
+  },
+  "pending": "MiGoomba, PCE investigation and next normal release; NOR features follow these"
+}
