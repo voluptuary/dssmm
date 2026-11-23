@@ -1982,3 +1982,35 @@ Native9-scene stock mGBA run and normal full project verifier passed. Added
 Start clock draw used by the real native Start loop and retested scene0. Exact
 capture/source hashes and limits: docs/native-menu-preview-validation.json.
 No production behavior/driver changes or hardware qualification.
+
+## 2026-11-23 — SD A-launch audit and reproduced exFAT refusal
+
+Owner has multiple SD launch/no-action reports; NOR works, no owner card for
+qualification. Work is confined to ezfblue/ in /tmp/dssmm-blue-preview branch
+ ezfblue. Actual native SD_list_MENU mGBA replay reaches handoff with SFN, but
+alias-free long-name replay atccff55c returns silently before loading (SRAM
+ d701ee). Local FatFs get_fileinfo explicitly clears altname for exFAT. Corrected
+optional-alias handling and related canonical paths; clipped exFAT names resolve
+by recorded dirent offset with type/size/prefix/bounds checks. Added visible file
+error on resolution failure. No hardware/reset/transfer protocol changes.
+
+New sanitized production-helper tests pass, and mGBA FAT/alias-free/clipped-long/
+quick-clean cases pass. Preferred-addon/no-switches correctly skips patching;
+its oracle was corrected fromFF toBF, not a production change. Full project
+verification and clean commit/CI still pending. See docs/SD-LAUNCH-AUDIT.md for
+explicit fixture seams. Before-fix SRAM is ignored build/native-launch/
+before-fix-noalias.sav. Do not infer all hardware reports are fixed. Public
+BLUE release unchanged; no physical validation. Integrate through dssmm only.
+
+Full local verify-blue-port.sh completed successfully on the corrected tree:
+production build/checks/stock-size seal/layout, all existing UI/save/OEM/payload/
+boot/NOR suites, new production path sanitizer cases and all5 native mGBA launch
+cases. SFN/exFAT/clipped-long/quick-clean traceFF; disabled-addon quick fallback
+traceBF (no patch intended). Stock SDLmGBA0.10.1/Xvfb, no BIOS. Commit this
+project-only checkpoint, push and run hosted integration checks. No hardware
+qualification or public release; trace records/captures stay ignored/rebuildable.
+
+First sourceCI45094608412/PR18BLUE job caught runner log redirection before the
+ignored build directory existed on a clean checkout. Added mkdir before any log
+redirection; no production code changed. Local populated cache had hidden this
+fixture setup error. Push correction and require fresh source/all4 CI passes.

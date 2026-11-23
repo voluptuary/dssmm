@@ -1,0 +1,70 @@
+{
+  "status": "local corrected-tree validation; physical card not qualified",
+  "kernel_source_sha256": "f36f5e57952f58bc3e8c3e182b595ecb70fdc099fc8056c7d3d6f866becd8db3",
+  "baseline_commit": "ccff55c6b024fb47d10fbdc7101c776fb4aac397",
+  "before_fix": "alias-free native mGBA trace d701ee: returned before ROM menu/load; same SFN fixture reaches d7ffaa",
+  "local_verifier": "bash scripts/verify-blue-port.sh exit0; production build/checks/layout+existing suites+new sanitizer/native launch cases",
+  "cases": {
+    "fat-sfn": {
+      "mode": 0,
+      "no_alias": false,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "ccff55c6b024fb47d10fbdc7101c776fb4aac397",
+      "source_sha256": "f36f5e57952f58bc3e8c3e182b595ecb70fdc099fc8056c7d3d6f866becd8db3",
+      "rom_sha256": "3ea473fcbc5fb69a687b41ff493aa55347f0b9ea566cda5638229ee815b72232",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7ffaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    "quick-addon": {
+      "mode": 2,
+      "no_alias": true,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "ccff55c6b024fb47d10fbdc7101c776fb4aac397",
+      "source_sha256": "f36f5e57952f58bc3e8c3e182b595ecb70fdc099fc8056c7d3d6f866becd8db3",
+      "rom_sha256": "65fef837b3598adb1b4d343536a7b026fdacea0811043d0d075bdc3301750714",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7bfaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    "exfat": {
+      "mode": 0,
+      "no_alias": true,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "ccff55c6b024fb47d10fbdc7101c776fb4aac397",
+      "source_sha256": "f36f5e57952f58bc3e8c3e182b595ecb70fdc099fc8056c7d3d6f866becd8db3",
+      "rom_sha256": "62e6f052b4afa1a8b8e6b22349471b2ea170640ba2fa2fe89e5d0736ada7a4f0",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7ffaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    "exfat-long": {
+      "mode": 0,
+      "no_alias": true,
+      "name": "Native long filename AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (USA).gba",
+      "source_commit": "ccff55c6b024fb47d10fbdc7101c776fb4aac397",
+      "source_sha256": "f36f5e57952f58bc3e8c3e182b595ecb70fdc099fc8056c7d3d6f866becd8db3",
+      "rom_sha256": "e1109966fb7e5fd9617b23b9dd5383d3b7751fec06390550059a3b011b6af574",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7ffaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    "quick-clean": {
+      "mode": 1,
+      "no_alias": true,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "ccff55c6b024fb47d10fbdc7101c776fb4aac397",
+      "source_sha256": "f36f5e57952f58bc3e8c3e182b595ecb70fdc099fc8056c7d3d6f866becd8db3",
+      "rom_sha256": "a080888b73d5e5965975669fc8dfacaa1700d5c1e621ea902fc59c14f7888928",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7ffaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    }
+  },
+  "limits": "native storage/save/transfer/patch/boot seams; no actual FPGA SD DMA or physical card qualification; no public release changed"
+}

@@ -2,6 +2,7 @@
 set -euo pipefail
 repo_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_dir"
+python3 tests/test-blue-launch-paths.py
 python3 tests/test-migoomba-payload.py
 make
 make check
@@ -39,3 +40,5 @@ irq_gap = symbols['__sp_irq'] - iwram_end
 print(f'BLUE static layout: EWRAM heap {heap_end - heap_start}; IWRAM-to-IRQ-SP gap {irq_gap}.')
 print('Not a runtime allocation/stack bound or hardware compatibility result.')
 PY
+
+bash scripts/test-native-launch-mgba.sh

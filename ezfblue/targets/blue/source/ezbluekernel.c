@@ -3952,13 +3952,16 @@ static u32 Launcher_ResolveDirectoryEntry(const TCHAR *path, const TCHAR *compon
 			memcpy(out_name, launcher_path_resolve_info.fname, length + 1);
 			length = strlen(launcher_path_resolve_info.altname[0] ?
 				launcher_path_resolve_info.altname : launcher_path_resolve_info.fname);
-			if(length >= out_alias_size)
+			/* exFAT has no SFN. Preserve the full name even when its optional
+			   short-alias output cannot hold that component. */
+			if(length < out_alias_size)
+				memcpy(out_alias, launcher_path_resolve_info.altname[0] ?
+					launcher_path_resolve_info.altname : launcher_path_resolve_info.fname, length + 1);
+			else if(launcher_path_resolve_info.altname[0])
 			{
 				out_name[0] = '\0';
 				break;
 			}
-			memcpy(out_alias, launcher_path_resolve_info.altname[0] ?
-				launcher_path_resolve_info.altname : launcher_path_resolve_info.fname, length + 1);
 			if(out_size)
 				*out_size = launcher_path_resolve_info.fsize;
 			if(out_attributes)
@@ -3968,6 +3971,12 @@ static u32 Launcher_ResolveDirectoryEntry(const TCHAR *path, const TCHAR *compon
 	}
 	close_result = f_closedir(&launcher_path_resolve_dir);
 	return found && !ambiguous && result == FR_OK && close_result == FR_OK;
+}
+
+/* Prefer stable FAT aliases; exFAT paths must retain their full component. */
+static const TCHAR *Launcher_PathIdentity(const TCHAR *name, const TCHAR *alias)
+{
+	return alias[0] ? alias : name;
 }
 
 static int Launcher_ResolveArtworkDirectoryComponent(void *context,
@@ -4066,7 +4075,7 @@ static u32 Launcher_ResolveFullPath(const TCHAR *full_path, u32 stored_path_capa
 		}
 
 		if(!(entry_attributes & AM_DIR) ||
-			!Launcher_BuildFullPath(out_path, entry_alias, next_path, sizeof(next_path)) ||
+			!Launcher_BuildFullPath(out_path, Launcher_PathIdentity(entry_name, entry_alias), next_path, sizeof(next_path)) ||
 			strlen(next_path) >= out_path_size)
 			return 0;
 		strcpy(out_path, next_path);
@@ -4168,7 +4177,7 @@ static void Launcher_LoadFavourites(void)
 				Launcher_ResolveFullPath(buf, LAUNCHER_FAVOURITE_PATH_LEN,
 					resolved_path, sizeof(resolved_path), resolved_name, sizeof(resolved_name),
 					resolved_alias, sizeof(resolved_alias), 0) &&
-				Launcher_BuildFullPath(resolved_path, resolved_alias, canonical, sizeof(canonical)) &&
+				Launcher_BuildFullPath(resolved_path, Launcher_PathIdentity(resolved_name, resolved_alias), canonical, sizeof(canonical)) &&
 				strlen(canonical) < LAUNCHER_FAVOURITE_PATH_LEN - 1)
 			{
 				strcpy(Launcher_FavouritesBuffer()[launcher_favourite_count], canonical);
@@ -4248,7 +4257,7 @@ static s32 Launcher_FindFavouriteFullPath(const char *fullpath)
 		if(Launcher_ResolveFullPath(Launcher_FavouritesBuffer()[index], LAUNCHER_FAVOURITE_PATH_LEN,
 			resolved_path, sizeof(resolved_path), resolved_name, sizeof(resolved_name),
 			resolved_alias, sizeof(resolved_alias), 0) &&
-			Launcher_BuildFullPath(resolved_path, resolved_alias, canonical, sizeof(canonical)) &&
+			Launcher_BuildFullPath(resolved_path, Launcher_PathIdentity(resolved_name, resolved_alias), canonical, sizeof(canonical)) &&
 			strcmp(fullpath, canonical) == 0)
 			return (s32)index;
 	}
@@ -4636,7 +4645,7 @@ static u32 Launcher_StartPreviewIndexPath(u32 index, TCHAR *out_path, u32 out_pa
 		return 0;
 	if(!Launcher_ResolveFullPath(Launcher_FavouritesBuffer()[index], LAUNCHER_FAVOURITE_PATH_LEN,
 		out_path, out_path_size, out_name, out_name_size, alias, sizeof(alias), 0) ||
-		!Launcher_BuildFullPath(out_path, alias, canonical, sizeof(canonical)))
+		!Launcher_BuildFullPath(out_path, Launcher_PathIdentity(out_name, alias), canonical, sizeof(canonical)))
 		return 0;
 	if(out_full && out_full_size)
 	{
@@ -4780,7 +4789,7 @@ static u32 Build_favourites_virtual_list(void)
 			path_part, sizeof(path_part), resolved_name, sizeof(resolved_name),
 			resolved_alias, sizeof(resolved_alias), &size))
 			continue;
-		if(!Launcher_BuildFullPath(path_part, resolved_alias, canonical_path, sizeof(canonical_path)))
+		if(!Launcher_BuildFullPath(path_part, Launcher_PathIdentity(resolved_name, resolved_alias), canonical_path, sizeof(canonical_path)))
 			continue;
 		strncpy(p_recently_play[count], canonical_path, sizeof(p_recently_play[count]) - 1);
 		p_recently_play[count][sizeof(p_recently_play[count]) - 1] = '\0';
@@ -4837,7 +4846,7 @@ static u32 Build_recent_virtual_list(void)
 		{
 			if(!Launcher_ResolveDirectoryEntry(full_path, name, resolved_name, sizeof(resolved_name),
 				resolved_alias, sizeof(resolved_alias), &size, 0) ||
-				!Launcher_BuildFullPath(full_path, resolved_alias, canonical_path, sizeof(canonical_path)))
+				!Launcher_BuildFullPath(full_path, Launcher_PathIdentity(resolved_name, resolved_alias), canonical_path, sizeof(canonical_path)))
 				continue;
 			strncpy(name, resolved_name, sizeof(name) - 1);
 			name[sizeof(name) - 1] = '\0';
@@ -4957,7 +4966,7 @@ void Make_recently_play_file(TCHAR* path,TCHAR* gamefilename)
 	memset(buf,0x00,512);
 	if(!Launcher_ResolveDirectoryEntry(path, gamefilename, full_name, sizeof(full_name),
 		alias, sizeof(alias), 0, 0) ||
-		!Launcher_BuildFullPath(path, alias, buf, sizeof(buf)) ||
+		!Launcher_BuildFullPath(path, Launcher_PathIdentity(full_name, alias), buf, sizeof(buf)) ||
 		LauncherPathMayBeLegacyTruncated(buf, sizeof(p_recently_play[0])))
 		return;
 
@@ -9962,7 +9971,7 @@ static u32 Apply_last_played_selection(u32 *show_offset, u32 *file_select)
 		return 0;
 	for(i = 0; i < game_total_SD; i++)
 	{
-		if(strcasecmp(Launcher_FileIdentityName(&pFilename_buffer[i]), alias) == 0)
+		if(strcasecmp(Launcher_FileIdentityName(&pFilename_buffer[i]), Launcher_PathIdentity(resolved_name, alias)) == 0)
 		{
 			absolute_index = folder_total + i;
 			if(absolute_index < 10)
@@ -13168,7 +13177,7 @@ static u32 Launcher_PrepareLastPlayedForMenu(void)
 		alias, sizeof(alias), &size, 0))
 		return 0;
 	memset(p_recently_play[0], 0x00, sizeof(p_recently_play[0]));
-	if(!Launcher_BuildFullPath(recent_path, alias, p_recently_play[0], sizeof(p_recently_play[0])))
+	if(!Launcher_BuildFullPath(recent_path, Launcher_PathIdentity(full_name, alias), p_recently_play[0], sizeof(p_recently_play[0])))
 		return 0;
 
     return (p_recently_play[0][0] == '/') ? 1 : 0;
@@ -17073,6 +17082,42 @@ static u32 Launcher_LoadTrimSize(TCHAR *filename, u32 romsize, u32 mode, BYTE sa
 	return 1;
 }
 //---------------------------------------------------------------
+/* Clipped exFAT names have no alias: resolve their retained directory offset,
+ * never a potentially colliding display prefix. Reuse existing RAM scratch. */
+static u32 Launcher_ResolveIndexedLaunchName(u32 index, TCHAR *name, u32 capacity)
+{
+	TCHAR alias[13];
+	DWORD wanted, offset;
+	FRESULT result, closed;
+	u32 found = 0;
+	if(index >= game_total_SD) return 0;
+	dmaCopy(&pFilename_buffer[index], &pFilename_temp, sizeof(pFilename_temp));
+	if(!(pFilename_temp.flags & FM_ENTRY_ALIAS_DISPLAY) || pFilename_temp.altname[0])
+		return Launcher_ResolveDirectoryEntry(currentpath,
+			Launcher_FileIdentityName(&pFilename_temp), name, capacity,
+			alias, sizeof(alias), 0, 0);
+	wanted = pFilename_dirent_offset[index];
+	if(wanted == LAUNCHER_FILE_DIRENT_INVALID ||
+		f_opendir(&launcher_path_resolve_dir, currentpath) != FR_OK) return 0;
+	while((result = f_readdir_with_offset(&launcher_path_resolve_dir,
+		&launcher_path_resolve_info, &offset)) == FR_OK && launcher_path_resolve_info.fname[0])
+	{
+		if(offset != wanted) continue;
+		if(!(launcher_path_resolve_info.fattrib & AM_DIR) &&
+			launcher_path_resolve_info.fsize == pFilename_temp.filesize &&
+			!strncmp(launcher_path_resolve_info.fname, pFilename_temp.filename,
+				strlen(pFilename_temp.filename)) &&
+			strlen(launcher_path_resolve_info.fname) < capacity)
+		{
+			strcpy(name, launcher_path_resolve_info.fname);
+			found = 1;
+		}
+		break;
+	}
+	closed = f_closedir(&launcher_path_resolve_dir);
+	return found && result == FR_OK && closed == FR_OK;
+}
+
 u8 SD_list_MENU(u32 show_offset,	u32 file_select,u32 play_re )
 {
 	u32 res;
@@ -17105,15 +17150,15 @@ u8 SD_list_MENU(u32 show_offset,	u32 file_select,u32 play_re )
 	//press A, show boot MENU;
 	if(play_re==0xBB){
 		u32 absolute_index = show_offset + file_select;
-		TCHAR alias[13];
-		u32 file_size;
 		if((absolute_index < folder_total) ||
 		   ((absolute_index - folder_total) >= game_total_SD))
 			return 0;
-		if(!Launcher_ResolveDirectoryEntry(currentpath,
-			Launcher_FileIdentityName(&pFilename_buffer[absolute_index - folder_total]),
-			current_filename, sizeof(current_filename), alias, sizeof(alias), &file_size, 0))
+		if(!Launcher_ResolveIndexedLaunchName(absolute_index - folder_total,
+			current_filename, sizeof(current_filename)))
+		{
+			Show_error_num(1);
 			return 0;
+		}
 		pfilename = current_filename;
 	}
 	else{
