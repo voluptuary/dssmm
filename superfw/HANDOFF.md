@@ -1646,3 +1646,15 @@ notes match. DE latest unchanged;667 retained. Chis759 is current hardware-test.
 Owner751 format rejection remains physically unconfirmed; fallback is new here.
 Interface arrows and lighter Dark bar pass visual checks. Next: sync branches,
 then NOR carousel/last-played art, preserving RAM/flash budgets and card isolation.
+
+## NOR Last Played artwork continuation
+
+Normal759 release and all5 remote refs verified at b1781072. New work enables
+CUSTOM/filename art for NOR Last Played, then Title fallback from stored NOR
+metadata, independent of an SD ROM. Shared artwork_load_named/gamecode helpers
+preserve ordering and avoid reading a replacement SD ROM header for NOR.
+Focused sanitized adapter/bus tests and production routing tests pass for
+NOR/non-NOR, priority, missing entries, Box and file-close failure. Partial
+Chis link before helper extraction used255520/257024 EWRAM; final clean all3
+validation is next.759 remains public/local hardware-test until replacement
+passes. NOR carousel itself is not implemented yet.

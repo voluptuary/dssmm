@@ -2529,6 +2529,29 @@ static void launcher_corners(volatile uint8_t *frame,unsigned x,unsigned y,unsig
   }
 }
 
+/* NOR uses metadata codes; filename overrides never require the old SD ROM. */
+__attribute__((optimize("Os")))
+static bool recent_artwork_load(const t_rentry *entry) {
+  bool valid;
+  valid=((entry->flags&FLAG_RECENT_NOR)?artwork_load_named:artwork_load)(entry->fpath,artwork_mode-1,
+    (uint8_t *)sdr_state->artwork_pixels,ARTWORK_MAX_PIXELS,
+    sdr_state->artwork_bmp_buffer,sizeof(sdr_state->artwork_bmp_buffer),&preview_info);
+#ifdef SUPPORT_NORGAMES
+  if(!valid && artwork_mode==1 && (entry->flags&FLAG_RECENT_NOR)) {
+    for(unsigned i=0;i<sdr_state->nordata.gamecnt;++i) {
+      const t_flash_game_entry *game=&sdr_state->nordata.games[i];
+      if(strcmp(entry->fpath,game->game_name))continue;
+      char code[4];memcpy(code,&game->gamecode,sizeof(code));
+      valid=artwork_load_gamecode(code,(uint8_t *)sdr_state->artwork_pixels,
+        ARTWORK_MAX_PIXELS,sdr_state->artwork_bmp_buffer,
+        sizeof(sdr_state->artwork_bmp_buffer),&preview_info);
+      break;
+    }
+  }
+#endif
+  return valid;
+}
+
 /* SD/Lite substitute Recents for the Chis-only NOR shortcut. */
 __attribute__((optimize("Os")))
 static void render_start(volatile uint8_t *frame) {
@@ -2541,12 +2564,10 @@ static void render_start(volatile uint8_t *frame) {
     if(clean_list)clean_display_name(title_buffer,sizeof(title_buffer),entry->fpath);
     else {char *extension=strrchr(title_buffer,'.');if(extension)*extension=0;}
     title=title_buffer;
-    if(artwork_mode && !(entry->flags&FLAG_RECENT_NOR)) {
+    if(artwork_mode) {
       if(!artwork_cached || artwork_cached_mode!=artwork_mode || strcmp(artwork_rom,entry->fpath)) {
         strbcpy(artwork_rom,entry->fpath,sizeof(artwork_rom));artwork_cached_mode=artwork_mode;
-        artwork_valid=artwork_load(entry->fpath,artwork_mode-1,
-          (uint8_t *)sdr_state->artwork_pixels,ARTWORK_MAX_PIXELS,
-          sdr_state->artwork_bmp_buffer,sizeof(sdr_state->artwork_bmp_buffer),&preview_info);
+        artwork_valid=recent_artwork_load(entry);
         artwork_cached=true;
       }
       if(artwork_valid)artwork_blit_scaled_cropped((volatile uint16_t *)frame,

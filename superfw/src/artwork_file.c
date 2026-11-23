@@ -127,7 +127,24 @@ static bool artwork_decode_file(FIL *file, uint8_t *bmp, size_t bmp_capacity,
   }
   return artwork_decode(read_buffer, &input, (uint32_t)file_size, pixels, capacity, info);
 }
-bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capacity,
+/* NOR metadata supplies the same four-byte code without reopening an SD ROM. */
+bool artwork_load_gamecode(const char code[4],uint8_t *pixels,size_t capacity,
+                          uint8_t *bmp,size_t bmp_capacity,artwork_info *info) {
+  char path[288];
+  for(unsigned candidate=0;candidate<2;++candidate) {
+    bool valid=candidate?artwork_gamecode_root_path(path,sizeof(path),code):
+                         artwork_gamecode_path(path,sizeof(path),code);
+    if(!valid)continue;
+    FIL file;
+    if(f_open(&file,path,FA_READ)!=FR_OK)continue;
+    bool ok=artwork_decode_file(&file,bmp,bmp_capacity,pixels,capacity,info,true);
+    FRESULT closed=f_close(&file);
+    if(ok && closed==FR_OK && info->width==120)return true;
+  }
+  return false;
+}
+
+bool artwork_load_named(const char *rom, unsigned style, uint8_t *pixels, size_t capacity,
                   uint8_t *bmp, size_t bmp_capacity, artwork_info *info) {
   char path[288];
   if (!artwork_path(path, sizeof(path), rom, style, 0)) return false;
@@ -139,6 +156,12 @@ bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capac
     FRESULT closed = f_close(&file);
     if (ok && closed == FR_OK && info->width == (style ? 80 : 120)) return true;
   }
+  return false;
+}
+
+bool artwork_load(const char *rom,unsigned style,uint8_t *pixels,size_t capacity,
+                  uint8_t *bmp,size_t bmp_capacity,artwork_info *info) {
+  if(artwork_load_named(rom,style,pixels,capacity,bmp,bmp_capacity,info))return true;
   /* EZ-FLASH title artwork is indexed by the four-byte GBA game code. */
   if (rom && style == 0) {
     const char *dot = strrchr(rom, '.');
@@ -150,23 +173,7 @@ bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capac
         bool read_ok = f_lseek(&source, 0xAC) == FR_OK &&
                        f_read(&source, gamecode, sizeof(gamecode), &got) == FR_OK && got == sizeof(gamecode);
         (void)f_close(&source);
-        if (read_ok) {
-          char code_paths[2][288];
-          bool have_paths[2] = {
-            artwork_gamecode_path(code_paths[0], sizeof(code_paths[0]), gamecode),
-            artwork_gamecode_root_path(code_paths[1], sizeof(code_paths[1]), gamecode)
-          };
-          for (unsigned candidate = 0; candidate < 2; ++candidate) {
-            if (!have_paths[candidate]) continue;
-            memcpy(path, code_paths[candidate], strlen(code_paths[candidate]) + 1);
-            FIL file;
-            if (f_open(&file, path, FA_READ) == FR_OK) {
-              bool ok = artwork_decode_file(&file, bmp, bmp_capacity, pixels, capacity, info, true);
-              FRESULT closed = f_close(&file);
-              if (ok && closed == FR_OK && info->width == 120) return true;
-            }
-          }
-        }
+        if(read_ok && artwork_load_gamecode(gamecode,pixels,capacity,bmp,bmp_capacity,info))return true;
       }
     }
   }
