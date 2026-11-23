@@ -62,7 +62,7 @@ static const t_flash_game_entry sample_nor = {
 };
 static void visual_scene(void) {
   if (!TEST_SCENE)return;
-  if(TEST_SCENE==10 || TEST_SCENE==11) {
+  if(TEST_SCENE==10 || TEST_SCENE==11 || TEST_SCENE==15) {
 #if TEST_RECENT
     VAR32(NATIVE_smenu+OFFSET_smenu_recent_maxentries)=1;
     VAR8(NATIVE_artwork_mode)=0; /* Caption-only fixture does not claim art I/O. */
@@ -126,16 +126,16 @@ static uint16_t panel_pair(uint8_t packed) {
   return (packed&15)|((packed>>4)<<8);
 }
 static bool frame_intact(void) {
-  if (!TEST_SCENE || TEST_SCENE==9 || TEST_SCENE==10)return true;
+  if (!TEST_SCENE || TEST_SCENE==9 || TEST_SCENE==10 || TEST_SCENE==15)return true;
   volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));
   for(unsigned y=21;y<152;y++) {
-    const uint8_t *p=dssmm_panel_profile[0][y-21];
+    const uint8_t *p=dssmm_panel_profile[TEST_THEME==7][y-21];
     if(back[y*120+1]!=panel_pair(p[0]) || back[y*120+117]!=panel_pair(p[2]) ||
        back[y*120+118]!=panel_pair(p[3]))return false;
-    if(y>=23 && y<=149 && (back[y*120+2]&255))return false;
+    if(y>=23 && y<=149 && (back[y*120+2]&255)!=(TEST_THEME==7?11:0))return false;
     if(y<23 || y>=149)for(unsigned x=2;x<117;x++) {
       unsigned expected=p[1]|(p[1]<<8);
-      if(x==2 && y==149)expected&=0xff00;
+      if(x==2 && y==149)expected=(expected&0xff00)|(TEST_THEME==7?11:0);
       if(back[y*120+x]!=expected)return false;
     }
   }
@@ -167,7 +167,8 @@ int main(void) {
     ok=ok&&((bool(*)(void))(NATIVE_settings_save_pending|1u))();
     ok=ok&&((bool(*)(void))(NATIVE_settings_save_flush|1u))() && restored();bootstrap();ok=ok&&restored();
   } else ok=restored();
-  VAR8(NATIVE_menu_font)=TEST_FONT;select_option(2);
+  VAR8(NATIVE_menu_font)=TEST_FONT;VAR8(NATIVE_menu_theme)=TEST_THEME;
+  VAR8(NATIVE_menu_topbar)=TEST_TOPBAR;select_option(2);
   ((void(*)(unsigned))(NATIVE_reload_theme|1u))(VAR8(NATIVE_menu_theme));
 #if TEST_REFERENCE
   const char reference_name[]="Test User";
@@ -183,7 +184,7 @@ int main(void) {
     VAR32(NATIVE_clock_seconds)=12*3600+34*60+56;
     VAR32(NATIVE_clock_frame)=VAR32(NATIVE_frame_count);
 #endif
-    if(TEST_SCENE && (TEST_SCENE!=10 || !(seeded_pages&(1u<<VAR8(NATIVE_framen))))) {
+    if(TEST_SCENE && ((TEST_SCENE!=10 && TEST_SCENE!=15) || !(seeded_pages&(1u<<VAR8(NATIVE_framen))))) {
       seeded_pages|=1u<<VAR8(NATIVE_framen);
       REG16(0x050001d6)=0x7c1f; /* Detect stale artwork behind native modal panels. */
       volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));

@@ -12,6 +12,7 @@ Path(sys.argv[2]).write_text('''#include <stdint.h>
 #include <assert.h>
 #define HI_COLOR 19
 #define TOP_TEXT 247
+#define TOP_SELECT 255
 static unsigned menu_topbar;
 #define dup8(x) ((x)|((x)<<8))
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -25,8 +26,8 @@ int main(void) {
   uint8_t *frame=(uint8_t *)&image[8];
   unsigned x=boxes[box][0],y=boxes[box][1],w=boxes[box][2],h=boxes[box][3];
   launcher_corners(frame,x,y,w,h);
-  assert(frame[y*240+x]==(y<16 && menu_topbar?247:19) && frame[y*240+x+w-1]==(y<16 && menu_topbar?247:19));
-  assert(frame[(y+h-1)*240+x]==(y<16 && menu_topbar?247:19) && frame[(y+h-1)*240+x+w-1]==(y<16 && menu_topbar?247:19));
+  assert(frame[y*240+x]==(y<16?255:19) && frame[y*240+x+w-1]==(y<16?255:19));
+  assert(frame[(y+h-1)*240+x]==(y<16?255:19) && frame[(y+h-1)*240+x+w-1]==(y<16?255:19));
   assert(frame[(y+h/2)*240+x]==0xee && frame[(y+h/2)*240+x+w-1]==0xee);
   assert(frame[y*240+x+w/2]==0xee && frame[(y+h-1)*240+x+w/2]==0xee);
   for(unsigned yy=0;yy<160;++yy)for(unsigned xx=0;xx<240;++xx)

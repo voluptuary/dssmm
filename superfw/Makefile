@@ -53,7 +53,7 @@ endif
 
 ifeq ($(COMPRESS_FIRMWARE),1)
   GLOBAL_DEFINES += -DCOMPRESS_FONTS -DCOMPRESS_PATCHES -DCOMPRESS_FIRMWARE
-  FWBINFILES := $(addsuffix .comp,$(FWBINFILES))
+  FWBINFILES := $(addsuffix .comp,$(filter-out res/fonts-dssmm.pack,$(FWBINFILES))) res/fonts-dssmm.pack.upkr
 endif
 
 ifeq ($(BUNDLE_GBC_EMULATOR),1)
@@ -222,8 +222,8 @@ firmware.ewram.gba.comp:	firmware.ewram.gba ./upkr.elf
 %.db.comp:	%.db ./upkr.elf
 	./upkr.elf -l $(COMPRESSION_RATIO) $< $@
 
-%.pack.comp:	%.pack apultra.elf
-	./apultra.elf $< $@
+%.pack.upkr:	%.pack ./upkr.elf
+	./upkr.elf -l $(COMPRESSION_RATIO) $< $@
 
 %.ld.i:	%.ld
 	cpp $< -o $@
@@ -235,7 +235,7 @@ upkr.elf:	tools/upkr.cc
 	g++ -o $@ $< -O3 -ffast-math
 
 clean:
-	rm -f ldscripts/*.i *.gba *.elf *.payload *.map res/*.comp emu/*.comp *.comp src/menu_messages.h src/messages_data.h
+	rm -f ldscripts/*.i *.gba *.elf *.payload *.map res/*.comp res/*.upkr emu/*.comp *.comp src/menu_messages.h src/messages_data.h
 
 
 # Optional DSSMM bitmap/renderer metadata are shared by kernel and in-game payload.

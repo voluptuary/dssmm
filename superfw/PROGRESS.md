@@ -880,3 +880,16 @@ symbol/ABI guards after a sync-source CI failed13 despite integration success.
 - Owner asks for SD headroom and removal of genuinely unsupported board media.
   Existing board guards already exclude NOR/extended fonts/extra emulators as
   appropriate. Lossless compression trials are underway; no features removed.
+
+## 2026-11-23 — Recovery and owner746 follow-up
+
+- Recovered intact pending compression work; prior full746/all4 CI remains valid.
+  Owner confirms GG/SMS operation. PCE still fails physically.
+- Added Start corner adjustments, solid independent header-selector palette,
+  stronger bar shading, persisted Dark header choice and contrasted Dark frame
+  outline. Focused host suites pass; native mGBA/all3 validation is pending.
+- SD prototype gains31232bytes via lossless font packing; optimized halfword
+  decoder and exact boot-resource replay are pending final all3 checks. Startup
+  CPU tradeoff and rejected experiments are recorded in BOOT-RESOURCE-COMPRESSION.
+- MiGoomba integration/PCE investigation precede NOR view/artwork work and the
+  next requested normal release. BLUE launch audit stays in its own lane.

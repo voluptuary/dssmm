@@ -50,6 +50,9 @@ const t_theme_colors themes[THEME_COUNT] = {
 const char * const accent_names[ACCENT_COUNT] = {
   "Default", "Blue", "Green", "Orange", "Purple"
 };
+const char * const topbar_names[TOPBAR_COUNT] = {
+  "Default", "Blue", "Green", "Orange", "Purple", "Dark"
+};
 static const uint16_t accent_colors[ACCENT_COUNT - 1][2] = {
   { RGB2GBA(0x80b8e8), RGB2GBA(0x6098c8) },
   { RGB2GBA(0x88c898), RGB2GBA(0x589868) },
@@ -314,7 +317,7 @@ static void parse_ui_settings(void *usr, const char *var, const char *value) {
       { "theme",       &menu_theme,  THEME_COUNT },
       { "font",&menu_font, FONT_STYLE_COUNT },
       { "accent",      &menu_accent, ACCENT_COUNT },
-      { "topbar", &menu_topbar, ACCENT_COUNT },
+      { "topbar", &menu_topbar, TOPBAR_COUNT },
       { "carousel_wrap", &carousel_wrap, 2 },
       { "artwork",     &artwork_mode, 3 },
       { "browser_view",&browser_view, 3 },

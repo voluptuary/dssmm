@@ -21,7 +21,7 @@ int main(int argc,char **argv) {
   for(unsigned y=0;y<16;y++)for(unsigned x=0;x<240;x++)assert(frame[y*240+x]==0xee);
   for(unsigned y=21;y<152;y++)for(unsigned x=2;x<238;x++) {
    unsigned sx=x<4?x+12:x<234?120:x-10;
-   assert(palette[frame[y*240+x]]==((x==4 && y>=23 && y<=149)?0:original[y*240+sx]));
+   assert(palette[frame[y*240+x]]==((x==4 && y>=23 && y<=149)?(dark?0x3def:0):original[y*240+sx]));
   }
   for(unsigned i=0;i<8;i++)assert(image[i]==0xeeee&&image[19208+i]==0xeeee);
  }

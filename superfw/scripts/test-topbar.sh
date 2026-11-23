@@ -40,7 +40,7 @@ int main(void) {
   for(unsigned i=16*240;i<240*160;++i)assert(pixels[i]==0xee);
   for(unsigned i=0;i<16*240;++i) {
    if(theme<6)assert(pixels[i]==FG_COLOR);
-   else assert(pixels[i]==TOP_BG || pixels[i]>=249);
+   else assert(pixels[i]==TOP_BG || (pixels[i]>=249 && pixels[i]<=254));
   }
   if(theme>=6) {
    assert(pixels[0]!=pixels[15*240]);

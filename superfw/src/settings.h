@@ -48,6 +48,8 @@ enum {
 };
 extern const t_theme_colors themes[THEME_COUNT];
 #define ACCENT_COUNT 5
+#define TOPBAR_COUNT (ACCENT_COUNT+1)
+extern const char * const topbar_names[TOPBAR_COUNT];
 extern const char * const accent_names[ACCENT_COUNT];
 extern uint8_t menu_accent;
 extern uint8_t carousel_wrap;

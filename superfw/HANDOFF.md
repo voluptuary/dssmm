@@ -1562,3 +1562,28 @@ Font UPKR4/9 trials still running; compare exact roundtrips, decoder size, ARM
 halfword writes and boot time before any format change. Do not run make clean
 until these processes finish (tools live in project intermediates). Scratch
 /tmp/dssmm-context-scratch.md remains session-only, <=1GiB; BIOS/owner ZIP retained.
+
+## 2026-11-23 — Recovery and Build746 owner notes
+
+All prior compressors/verifiers ended; no lingering build/mGBA processes. PR17
+is merged; all5 remotes were verified atccff55c before SuperFW journal8704341.
+Default-branch CI45040890887 passed. Chis746 remains the validated hardware-test.
+Owner confirms GG/SMS now work correctly; keep this separate from remaining PCE
+failure. New work: SD/NOR Start upper corners-1y, flat topbar selector palette,
+slightly stronger gradient, optional Dark bar and visible Dark inner panel line.
+MiGoomba generic integration is requested next (same pinned core as DE, never
+its DE-specific payload). Finish these and PCE investigation before NOR carousel
+and NOR Last Played artwork. Then publish a normal release with folder-art.zip,
+previous note style/credits/hardware limits. BLUE SD GBA launch audit is an added
+separate lane task in /tmp/dssmm-blue-preview; no BLUE edits yet.
+
+Pending compression prototype is preserved, not delivered: UPKR4 fonts734296→
+277868 vs apultra308252; exact SD boot fonts/patches/firmware ARM replay passes,
+prototype493056/524288 bytes. New inline halfword decoder reduces UPKR font
+instructions71.7M→52.1M, still above apultra10.1M; startup tradeoff is documented
+in docs/BOOT-RESOURCE-COMPRESSION.md. Chis raw fonts are unaffected. Distinct
+.pack.upkr names avoid stale incremental codec data. Boot media checks assert
+SD=GCEM only, Lite=none, Chis=all six. Alternate transforms/windows were larger;
+run compressor studies serially (three parallel benchmark OOM kills, no loss).
+Updated UI host topbar/corner/panel/settings tests pass. New native theme/topbar
+flags and scene15 check flat clock corners; full compilation/mGBA/all3 still due.

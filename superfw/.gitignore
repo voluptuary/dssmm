@@ -18,3 +18,5 @@ src/messages_data.h
 
 /res/fonts-dssmm.pack
 /res/fonts-ext-dssmm.pack
+
+/res/*.pack.upkr
