@@ -1708,3 +1708,14 @@ oracle. Drafts are session scratch only, not committed/applied to769.
 GitHub /latest unexpectedly selected759 despite CLI --latest=false. Explicit
 REST make_latest=true on DE release443130065 restored verified v8.4.0;759
 notes/assets unchanged. Publication record now captures this follow-up.
+
+## Owner-requested Build769 normal publication
+
+Published superfw-build769 at validated37c9e06, using the already-validated
+three firmware files and full folder-art.zip. All4 downloads and canonical
+body verified. Owner specifically requested cumulative additions/upstream fixes
+since the SuperFW fork, so769 uses that catalog instead of new/past delta
+sections; internal port regressions are omitted. Normal759/667 retained.
+DE /latest explicitly restored/verified v8.4.0 after create --latest=false did
+not preserve it. See releases/superfw-build769-publication.json. No new hardware
+qualification;769 remains in hardware-test. Continue Start37x37 alignment next.
