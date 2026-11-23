@@ -1693,3 +1693,18 @@ isolated. ARM cache and artwork adapter bus tests pass (halfwords/alignment).
 Cold artwork file/path Os, with row-copy O2 retained, saves232bytes: Chis partial
 link256032/257024 EWRAM, unchanged15592 IWRAM and16KiB user stack. No physical
 NOR qualification. Next clean all3/CI before replacing hardware-test765.
+
+## Build769 validated NOR carousel checkpoint
+
+Clean37c9e06/Build769 passed full all3/native ARM/host/mGBA, sourceCI45181742291
+and all4 PR21 CI45181773686. All8 actual-ELF NOR Title/Box horizontal/vertical
+cases pass across bothfonts, including neighbor pixels/wrap/frame reuse.
+Chis769 replaces765 in hardware-test with exact hash in build-769-validation.json.
+No physical NOR/new-build qualification; PCE remains open. Public759 unchanged.
+Next: Start Box art parity37x37 at39,48 (DE source confirmed), Title56x37 at30,48
+already matches; add masked halfword odd-edge compositor and native Start art
+oracle. Drafts are session scratch only, not committed/applied to769.
+
+GitHub /latest unexpectedly selected759 despite CLI --latest=false. Explicit
+REST make_latest=true on DE release443130065 restored verified v8.4.0;759
+notes/assets unchanged. Publication record now captures this follow-up.
