@@ -65,7 +65,7 @@ such as its NOR library, remain specific to that card.
 Prime v1.0. The owner confirms artwork, five-image lookahead and settings
 persistence in earlier builds. New Build 769 changes still need physical
 testing; SD and Lite remain physically untested. GG/SMS operation is reported working,
-PCE loading remains unresolved, and other plugin compatibility varies. Full EZ-FLASH DSSMM appearance and responsiveness are
+PCE games load but Exit currently restarts the emulated game; other plugin compatibility varies. Full EZ-FLASH DSSMM appearance and responsiveness are
 in progress. Choose your exact card’s file and back up saves and current firmware.
 Follow [SuperFW’s installation and recovery guide](https://superfw.davidgf.net/docs/install/flash/).
 Use only the matching SuperCard-family build; the OMEGA downloads above target

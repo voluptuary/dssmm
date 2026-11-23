@@ -3315,3 +3315,12 @@ Publication --latest=false did not preserve GitHub /latest (it selected769).
 Explicit REST make_latest=true on DE release443130065 restored verifiedv8.4.0.
 Never infer latest status from the create flag; verify the endpoint. Notes and
 assets of DE/BLUE/OMEGA unchanged. Normal all5 synchronization follows.
+
+## Build769 hardware-note correction
+
+Owner confirms PCE games load on Chis769, but Exit restarts the emulated game;
+PCE file icon is still generic. Updated the current release known-issue note
+and README; prior exact body is archived privately under superfw/docs/history/
+releases and publication hash updated. Firmware/assets/tags unchanged. DE latest
+verifiedv8.4.0. The next native-return/icon candidate and Atari investigation
+remain SuperFW-only work; no new physical return/SD-Lite qualification.
