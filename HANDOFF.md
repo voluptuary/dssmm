@@ -2219,3 +2219,19 @@ BLUE SD audit PR18 merged980ba8f after source45095029573/all4 CI45095035057.
 Alias-free exFAT rejection fixed; permanent five-case mGBA launch fixture and
 local sealed candidate retained. No BLUE release/baseline or physical claim.
 Normal all5 branch synchronization follows this checkpoint.
+
+## 2026-11-23 — SuperFW769 publication checkpoint
+
+Owner requested normal Build769 publication with cumulative additions and
+upstream fixes since the SuperFW fork, replacing the delta/past split for this
+release. Source37c9e06 passed all3/full ARM/host/mGBA and all4 PR21 CI45181773686
+(source45181742291); PR21 merged28dd73b. The permanent NOR renderer fixture is
+tracked; stock mGBA/no BIOS or environment change. All4 downloaded assets and
+canonical notes match, including full folder-art.zip.759/667 normal releases
+remain. Only prior Chis physical observations; new769/NOR/SD-Lite/PCE remain
+unqualified/open. Root README and only SuperFW validated baseline refreshed.
+
+Publication --latest=false did not preserve GitHub /latest (it selected769).
+Explicit REST make_latest=true on DE release443130065 restored verifiedv8.4.0.
+Never infer latest status from the create flag; verify the endpoint. Notes and
+assets of DE/BLUE/OMEGA unchanged. Normal all5 synchronization follows.

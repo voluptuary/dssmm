@@ -231,3 +231,10 @@ Normal merge/sync follows this publication checkpoint; no other kernel inputs
 changed. Chis667 is current ignored hardware-test image; owner lock/private BIOS,
 session scratch and full artwork archive are retained. Project journals govern
 further single-project work; recover RAM headroom before substantial additions.
+
+Release latest verification: query GitHub `/repos/voluptuary/dssmm/releases/latest`
+after publishing; `--latest=false` alone is not proof. Preserve DEv8.4.0 as
+latest unless the owner changes that policy; explicitly set its `make_latest`
+to `true` via REST if needed, then verify the endpoint again. Build769 follows
+the owner's cumulative SuperFW-fork catalog request instead of delta/past
+sections; its canonical notes and publication record document the exception.
