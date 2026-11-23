@@ -210,5 +210,8 @@ int main(void) {
   fail_close=1;
   assert(!artwork_load_gamecode("BPRE",pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
   assert(rom_opens==before_folder_rom);
+  unsigned invalid_opens=opens;
+  assert(!artwork_load("/../Game.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(opens==invalid_opens);
   return 0;
 }

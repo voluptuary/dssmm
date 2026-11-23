@@ -953,3 +953,9 @@ NOR/non-NOR, priority, missing entries, Box and file-close failure. Partial
 Chis link before helper extraction used255520/257024 EWRAM; final clean all3
 validation is next.759 remains public/local hardware-test until replacement
 passes. NOR carousel itself is not implemented yet.
+
+Build764 full all3/local/ARM/mGBA and all4 PR20 CI45175890006 passed, but
+was intentionally not delivered: review found invalid named paths could fall
+through to an SD ROM-header probe. Added initial canonical validation plus
+no-file-opens traversal regression (fails764, passes correction). Build765
+clean verification follows.759 public/hardware-test remains current.

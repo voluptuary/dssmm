@@ -161,6 +161,8 @@ bool artwork_load_named(const char *rom, unsigned style, uint8_t *pixels, size_t
 
 bool artwork_load(const char *rom,unsigned style,uint8_t *pixels,size_t capacity,
                   uint8_t *bmp,size_t bmp_capacity,artwork_info *info) {
+  char checked_path[288];
+  if(!artwork_path(checked_path,sizeof(checked_path),rom,style,0))return false;
   if(artwork_load_named(rom,style,pixels,capacity,bmp,bmp_capacity,info))return true;
   /* EZ-FLASH title artwork is indexed by the four-byte GBA game code. */
   if (rom && style == 0) {
