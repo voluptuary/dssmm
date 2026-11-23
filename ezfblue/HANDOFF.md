@@ -2009,3 +2009,8 @@ cases. SFN/exFAT/clipped-long/quick-clean traceFF; disabled-addon quick fallback
 traceBF (no patch intended). Stock SDLmGBA0.10.1/Xvfb, no BIOS. Commit this
 project-only checkpoint, push and run hosted integration checks. No hardware
 qualification or public release; trace records/captures stay ignored/rebuildable.
+
+First sourceCI45094608412/PR18BLUE job caught runner log redirection before the
+ignored build directory existed on a clean checkout. Added mkdir before any log
+redirection; no production code changed. Local populated cache had hidden this
+fixture setup error. Push correction and require fresh source/all4 CI passes.

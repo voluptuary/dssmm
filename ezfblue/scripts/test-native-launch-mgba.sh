@@ -2,6 +2,7 @@
 set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 out="$root/build/native-launch"
+mkdir -p "$out"
 for case in fat-sfn exfat exfat-long quick-clean quick-addon; do
  flags=()
  case "$case" in
