@@ -62,6 +62,21 @@ static const t_flash_game_entry sample_nor = {
 };
 static void visual_scene(void) {
   if (!TEST_SCENE)return;
+#if TEST_NOR_CAROUSEL
+  if(TEST_SCENE>=16) {
+    for(unsigned i=0;i<sizeof(native_cache_seed)/sizeof(*native_cache_seed);++i)
+      REG16(NATIVE_carousel_meta+i*2)=native_cache_seed[i];
+    VAR8(NATIVE_launcher_page)=0;VAR8(NATIVE_smenu+OFFSET_menu_tab)=TEST_UI_TAB-2;
+    VAR32(NATIVE_smenu+OFFSET_smenu_fbrowser_maxentries)=5;
+    VAR32(NATIVE_smenu+OFFSET_smenu_fbrowser_selector)=0;
+    VAR32(NATIVE_smenu+OFFSET_smenu_fbrowser_seloff)=0;
+    VAR8(NATIVE_carousel_wrap)=1;VAR8(NATIVE_browser_view)=(TEST_SCENE&1)?2:1;
+    VAR8(NATIVE_artwork_mode)=TEST_SCENE>=18?2:1;
+    if(TEST_SCENE==17 || TEST_SCENE==18)key(32); /* First -> last through real input. */
+    return;
+  }
+#endif
+
   if(TEST_SCENE==10 || TEST_SCENE==11 || TEST_SCENE==15) {
 #if TEST_RECENT
     VAR32(NATIVE_smenu+OFFSET_smenu_recent_maxentries)=1;
@@ -126,7 +141,7 @@ static uint16_t panel_pair(uint8_t packed) {
   return (packed&15)|((packed>>4)<<8);
 }
 static bool frame_intact(void) {
-  if (!TEST_SCENE || TEST_SCENE==9 || TEST_SCENE==10 || TEST_SCENE==15)return true;
+  if (TEST_SCENE>=16 || !TEST_SCENE || TEST_SCENE==9 || TEST_SCENE==10 || TEST_SCENE==15)return true;
   volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));
   for(unsigned y=21;y<152;y++) {
     const uint8_t *p=dssmm_panel_profile[TEST_THEME==7][y-21];
@@ -184,7 +199,7 @@ int main(void) {
     VAR32(NATIVE_clock_seconds)=12*3600+34*60+56;
     VAR32(NATIVE_clock_frame)=VAR32(NATIVE_frame_count);
 #endif
-    if(TEST_SCENE && ((TEST_SCENE!=10 && TEST_SCENE!=15) || !(seeded_pages&(1u<<VAR8(NATIVE_framen))))) {
+    if(TEST_SCENE && ((TEST_SCENE<16 && TEST_SCENE!=10 && TEST_SCENE!=15) || !(seeded_pages&(1u<<VAR8(NATIVE_framen))))) {
       seeded_pages|=1u<<VAR8(NATIVE_framen);
       REG16(0x050001d6)=0x7c1f; /* Detect stale artwork behind native modal panels. */
       volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));

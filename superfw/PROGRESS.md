@@ -969,3 +969,22 @@ uses CUSTOM/filename art and stored-code Title fallback without the SD ROM.
 No new physical qualification; PCE still needs card testing.764 was held for
 its path-guard correction and never delivered. Next: shared NOR carousel
 prototype and permanent synthetic cached-art native fixture; no extra cache pool.
+
+## Shared NOR carousel prototype
+
+After765 integration/sync b8dcd3b, implemented source helpers so NOR shares SD
+cache/layout/rendering, motion and fast page reuse. NOR list and launch/delete
+backends remain; carousel movement is one entry with existing wrap setting.
+Partial Chis link uses256264/257024 mainEWRAM, original stack unchanged.
+Source-routing host tests pass NOR/non-NOR. New actual-ELF cached-art mGBA
+scenes16–19 pass DSSMM-font horizontal/vertical Title/Box, neighbor colors,
+first->last wrap, stale-frame and stable-page checks. Native-font cases running.
+See NATIVE-NOR-CAROUSEL.md for the read-only ROM cache fixture limit. Full clean
+all3/ARM/mGBA/CI remains required before replacing hardware-test765.
+
+Native-font NOR scenes16–19 also pass (all8 cases across bothfonts). Updated
+cache/fast-page fixtures retain production helpers; SD/NOR page identities stay
+isolated. ARM cache and artwork adapter bus tests pass (halfwords/alignment).
+Cold artwork file/path Os, with row-copy O2 retained, saves232bytes: Chis partial
+link256032/257024 EWRAM, unchanged15592 IWRAM and16KiB user stack. No physical
+NOR qualification. Next clean all3/CI before replacing hardware-test765.

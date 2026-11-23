@@ -1506,9 +1506,12 @@ void render_recent(volatile uint8_t *frame) {
     render_icon_trans(i, (smenu.recent.selector - smenu.recent.seloff + 1)*16, 63);
 }
 
+static void render_browser_carousel(volatile uint8_t *frame,bool vertical);
+
 #ifdef SUPPORT_NORGAMES
 void render_flashbrowser(volatile uint8_t *frame) {
-  // NOR currently uses the list browser layout on every theme.
+  if(browser_view){render_browser_carousel(frame,browser_view==2);return;}
+  // List mode retains NOR capacity and management controls.
   dma_memset16(&frame[240*144],dup8(FG_COLOR),240*16/2);
 
   // Render the list from memory.
@@ -1634,16 +1637,88 @@ static unsigned browser_entry_icon(const t_centry *entry) {
          (entry->attr & AM_DIR) ? ICON_FOLDER : guessicon(entry->fname);
 }
 
+/* SD and NOR share one five-image cache and renderer. */
+#pragma GCC push_options
+#pragma GCC optimize ("Os")
+static bool carousel_source_nor(void) {
+#ifdef SUPPORT_NORGAMES
+  return smenu.menu_tab==MENUTAB_NORBROWSE;
+#else
+  return false;
+#endif
+}
+static bool carousel_source_active(void) {
+  return smenu.menu_tab==MENUTAB_ROMBROWSE || carousel_source_nor();
+}
+static unsigned carousel_source_count(void) {
+#ifdef SUPPORT_NORGAMES
+  if(carousel_source_nor())return smenu.fbrowser.maxentries;
+#endif
+  return smenu.browser.dispentries;
+}
+static int carousel_source_selected(void) {
+#ifdef SUPPORT_NORGAMES
+  if(carousel_source_nor())return smenu.fbrowser.selector;
+#endif
+  return smenu.browser.selector;
+}
+static const char *carousel_entry_name(unsigned index) {
+#ifdef SUPPORT_NORGAMES
+  if(carousel_source_nor()) {
+    const t_flash_game_entry *game=&sdr_state->nordata.games[index];
+    return game->game_name+game->bnoffset;
+  }
+#endif
+  return sdr_state->filefilter[index]->fname;
+}
+static bool carousel_entry_path(unsigned index,char *path,size_t capacity) {
+#ifdef SUPPORT_NORGAMES
+  if(carousel_source_nor()) {
+    const char *name=sdr_state->nordata.games[index].game_name;
+    if(strlen(name)>=capacity)return false;
+    strbcpy(path,name,capacity);return true;
+  }
+#endif
+  int n=npf_snprintf(path,capacity,"%s%s",smenu.browser.cpath,sdr_state->filefilter[index]->fname);
+  return n>0 && (unsigned)n<capacity;
+}
+static unsigned carousel_entry_icon(unsigned index) {
+#ifdef SUPPORT_NORGAMES
+  if(carousel_source_nor())return ICON_GBACART;
+#endif
+  return browser_entry_icon(sdr_state->filefilter[index]);
+}
+static bool carousel_entry_directory(unsigned index) {
+#ifdef SUPPORT_NORGAMES
+  if(carousel_source_nor())return false;
+#endif
+  return sdr_state->filefilter[index]->attr&AM_DIR;
+}
+static bool carousel_entry_art(unsigned index,const char *path,uint8_t *pixels,artwork_info *info) {
+#ifdef SUPPORT_NORGAMES
+  if(carousel_source_nor()) {
+    if(artwork_load_named(path,artwork_mode-1,pixels,ARTWORK_MAX_PIXELS,
+        sdr_state->artwork_bmp_buffer,sizeof(sdr_state->artwork_bmp_buffer),info))return true;
+    if(artwork_mode!=1)return false;
+    char code[4];memcpy(code,&sdr_state->nordata.games[index].gamecode,sizeof(code));
+    return artwork_load_gamecode(code,pixels,ARTWORK_MAX_PIXELS,
+        sdr_state->artwork_bmp_buffer,sizeof(sdr_state->artwork_bmp_buffer),info);
+  }
+#endif
+  return (carousel_entry_directory(index)?artwork_load_directory:artwork_load)(path,artwork_mode-1,
+    pixels,ARTWORK_MAX_PIXELS,sdr_state->artwork_bmp_buffer,sizeof(sdr_state->artwork_bmp_buffer),info);
+}
+
+#pragma GCC pop_options
+
 /* One bounded SD read per settled frame; hot drawing stays in the renderer. */
 __attribute__((optimize("Os")))
 static void browser_cache_prepare(const int candidates[ARTWORK_CACHE_SLOTS]) {
   for (unsigned c = 0; c < ARTWORK_CACHE_SLOTS; ++c) {
     int index = candidates[c];
-    if (index < 0 || index >= smenu.browser.dispentries) continue;
-    const t_centry *entry = sdr_state->filefilter[index];
+    if (index < 0 || (unsigned)index >= carousel_source_count()) continue;
     char rom[MAX_FN_LEN];
-    int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
-    if (n <= 0 || (unsigned)n >= sizeof(rom)) continue;
+    if(!carousel_entry_path(index,rom,sizeof(rom)))continue;
     unsigned slot=carousel_find_slot(index);
     if(slot<ARTWORK_CACHE_SLOTS && carousel_meta[slot].mode==artwork_mode &&
         !strcmp(carousel_meta[slot].rom,rom))continue;
@@ -1659,10 +1734,8 @@ static void browser_cache_prepare(const int candidates[ARTWORK_CACHE_SLOTS]) {
     carousel_meta[slot].index=index;
     strbcpy(carousel_meta[slot].rom, rom, MAX_FN_LEN);
     carousel_meta[slot].mode = artwork_mode;
-    carousel_meta[slot].valid = ((entry->attr & AM_DIR) ? artwork_load_directory : artwork_load)(rom, artwork_mode - 1,
-        (uint8_t *)sdr_state->carousel_art[slot].pixels, ARTWORK_MAX_PIXELS,
-        sdr_state->artwork_bmp_buffer, sizeof(sdr_state->artwork_bmp_buffer),
-        &carousel_meta[slot].info);
+    carousel_meta[slot].valid=carousel_entry_art(index,rom,
+        (uint8_t *)sdr_state->carousel_art[slot].pixels,&carousel_meta[slot].info);
     carousel_meta[slot].cached = true;
     if (index==candidates[0] || index==candidates[1] || index==candidates[2]) {
       browser_fast_reuse = false;
@@ -1673,6 +1746,8 @@ static void browser_cache_prepare(const int candidates[ARTWORK_CACHE_SLOTS]) {
 }
 
 static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
+  unsigned count=carousel_source_count();
+  int selected=carousel_source_selected();
   if (!browser_fast_reuse) {
     /* DS backgrounds were drawn once by menu_render before the header. */
     if(menu_theme<THEME_DSSMM_LIGHT)
@@ -1686,28 +1761,26 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
     if(menu_theme<THEME_DSSMM_LIGHT)dma_memset16(frame+144*240,dup8(BG_COLOR),240*16/2);
   }
 
-  if (!smenu.browser.dispentries) {
+  if (!count) {
     draw_central_text(msgs[lang_id][MSG_BROW_EMPTY], frame, 120, 72);
   } else {
-    int selected = smenu.browser.selector;
     browser_carousel_item items[3];
     unsigned item_count = browser_carousel_layout(vertical, selected,
-        smenu.browser.dispentries, browser_motion_offset, carousel_wrap, items);
+        count, browser_motion_offset, carousel_wrap, items);
     /* Populate one missing slot per settled frame, selected entry first. */
     int candidates[ARTWORK_CACHE_SLOTS] = {selected, selected-1, selected+1, selected-2, selected+2};
     for(unsigned c=0;c<ARTWORK_CACHE_SLOTS;++c)
-      candidates[c]=browser_carousel_index(candidates[c],smenu.browser.dispentries,carousel_wrap);
+      candidates[c]=browser_carousel_index(candidates[c],count,carousel_wrap);
     if(artwork_mode && browser_motion_offset==0)browser_cache_prepare(candidates);
     int focus_index = selected;
     for (unsigned i = 0; i < item_count; ++i) {
       const browser_carousel_item *item = &items[i];
-      const t_centry *entry = sdr_state->filefilter[item->index];
       if (item->focused) focus_index = item->index;
       unsigned slot=carousel_find_slot(item->index);
       char rom[MAX_FN_LEN];
-      int n = npf_snprintf(rom, sizeof(rom), "%s%s", smenu.browser.cpath, entry->fname);
+      bool have_path=carousel_entry_path(item->index,rom,sizeof(rom));
       bool drawn = false;
-      if (artwork_mode && n > 0 && (unsigned)n < sizeof(rom) &&
+      if (artwork_mode && have_path &&
           slot<ARTWORK_CACHE_SLOTS && carousel_meta[slot].cached && carousel_meta[slot].valid &&
           carousel_meta[slot].mode == artwork_mode &&
           !strcmp(carousel_meta[slot].rom, rom)) {
@@ -1740,13 +1813,12 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         unsigned icon_x = MAX(0, MIN(224, item->x + item->w/2 - 8));
         unsigned icon_y = MAX(16, MIN(128, item->y + item->h/2 - 8));
 
-        render_icon(icon_x, icon_y, browser_entry_icon(entry));
+        render_icon(icon_x, icon_y, carousel_entry_icon(item->index));
       }
     }
-    const t_centry *focus = sdr_state->filefilter[focus_index];
 
-    char display[MAX_FN_LEN];const char *shown=focus->fname;
-    if(clean_list && !(focus->attr&AM_DIR)){clean_display_name(display,sizeof(display),shown);shown=display;}
+    char display[MAX_FN_LEN];const char *shown=carousel_entry_name(focus_index);
+    if(clean_list && !carousel_entry_directory(focus_index)){clean_display_name(display,sizeof(display),shown);shown=display;}
     if (vertical)
       draw_text_ovf_rotate(shown, frame, 98, 85,
                            136, &smenu.anim_state);
@@ -1757,11 +1829,11 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
   }
 
   if(menu_theme<THEME_DSSMM_LIGHT) {
-  draw_text_leftovf(smenu.browser.cpath, frame, 8, 144, SCREEN_WIDTH - 88);
+  draw_text_leftovf(carousel_source_nor()?"NOR Flash":smenu.browser.cpath, frame, 8, 144, SCREEN_WIDTH - 88);
   draw_rightj_text(menu_theme>=THEME_DSSMM_LIGHT?"Start: Home":"Start: Art", frame, SCREEN_WIDTH - 2, 144);
   }
   char selinfo[16];
-  npf_snprintf(selinfo, sizeof(selinfo), "%u/%d", smenu.browser.selector + 1, smenu.browser.dispentries);
+  npf_snprintf(selinfo, sizeof(selinfo), "%u/%u", (unsigned)(selected+1), count);
   draw_rightj_text(selinfo, frame, SCREEN_WIDTH - 1, 1);
 }
 
@@ -2727,7 +2799,7 @@ void menu_render(unsigned fcnt) {
     render_restart_required(frame);
     return;
   }
-  if (smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view)
+  if (carousel_source_active() && browser_view)
     browser_motion_offset = browser_motion_advance(browser_motion_offset, fcnt);
   else
     browser_motion_offset = 0;
@@ -2740,24 +2812,24 @@ void menu_render(unsigned fcnt) {
   if(!(launcher && launcher_page==1 && launcher_valid[framen]))
     render_topbar_background(frame);
 
-  bool fast_carousel = !launcher && smenu.menu_tab == MENUTAB_ROMBROWSE && browser_view &&
+  bool fast_carousel = !launcher && carousel_source_active() && browser_view &&
       browser_motion_offset == 0 && !spop.qpop.message && !spop.rtcpop.callback &&
       !spop.pop_num && !spop.alert_msg;
   if (!fast_carousel) browser_fast_valid[0] = browser_fast_valid[1] = false;
   browser_fast_reuse = fast_carousel && browser_fast_valid[framen] &&
-      browser_fast_selection[framen] == smenu.browser.selector &&
-      browser_fast_view[framen] == browser_view && browser_fast_mode[framen] == artwork_mode;
+      browser_fast_selection[framen] == carousel_source_selected() &&
+      browser_fast_view[framen] == (browser_view|(carousel_source_nor()?4:0)) && browser_fast_mode[framen] == artwork_mode;
   // Preserve stable artwork in each Mode 4 page; text is refreshed separately.
   if (!browser_fast_reuse && !(launcher && launcher_valid[framen])) {
     if(ds_style && !launcher) {
       if(smenu.menu_tab==MENUTAB_RECENT || (smenu.menu_tab==MENUTAB_ROMBROWSE && !browser_view)
 #ifdef SUPPORT_NORGAMES
-          || smenu.menu_tab==MENUTAB_NORBROWSE
+          || (smenu.menu_tab==MENUTAB_NORBROWSE && !browser_view)
 #endif
         )
         dssmm_background_clear(frame,menu_theme==THEME_DSSMM_DARK,0,16,240,144);
       else {
-        unsigned kind=smenu.menu_tab==MENUTAB_ROMBROWSE?(browser_view==2?DSSMM_BG_VERTICAL:DSSMM_BG_HORIZONTAL):
+        unsigned kind=carousel_source_active()?(browser_view==2?DSSMM_BG_VERTICAL:DSSMM_BG_HORIZONTAL):
                       DSSMM_BG_GRID;
         dssmm_background_draw(frame,menu_theme==THEME_DSSMM_DARK,kind);
         render_topbar_background(frame);
@@ -2813,8 +2885,8 @@ void menu_render(unsigned fcnt) {
 
   if (fast_carousel) {
     browser_fast_valid[framen] = true;
-    browser_fast_selection[framen] = smenu.browser.selector;
-    browser_fast_view[framen] = browser_view;
+    browser_fast_selection[framen] = carousel_source_selected();
+    browser_fast_view[framen] = browser_view|(carousel_source_nor()?4:0);
     browser_fast_mode[framen] = artwork_mode;
   }
 
@@ -3775,17 +3847,18 @@ static void keypress_menu_browse(unsigned newkeys) {
 
 #ifdef SUPPORT_NORGAMES
 static void keypress_menu_norbrowse(unsigned newkeys) {
+  int old_selector=smenu.fbrowser.selector;
   if (smenu.fbrowser.maxentries) {
     if (newkeys & KEY_BUTTUP)
-      smenu.fbrowser.selector = MAX(0, smenu.fbrowser.selector - 1);
+      smenu.fbrowser.selector = browser_carousel_step(smenu.fbrowser.selector,smenu.fbrowser.maxentries,-1,browser_view && carousel_wrap);
     if (newkeys & KEY_BUTTDOWN)
-      smenu.fbrowser.selector = MIN(smenu.fbrowser.maxentries - 1, smenu.fbrowser.selector + 1);
+      smenu.fbrowser.selector = browser_carousel_step(smenu.fbrowser.selector,smenu.fbrowser.maxentries,1,browser_view && carousel_wrap);
     if (newkeys & KEY_BUTTLEFT) {
-      smenu.fbrowser.selector = MAX(0, smenu.fbrowser.selector - NORGAMES_ROWS);
+      smenu.fbrowser.selector = browser_view?browser_carousel_step(smenu.fbrowser.selector,smenu.fbrowser.maxentries,-1,carousel_wrap):MAX(0,smenu.fbrowser.selector-NORGAMES_ROWS);
       smenu.fbrowser.seloff   = MAX(0, smenu.fbrowser.seloff - NORGAMES_ROWS);
     }
     if (newkeys & KEY_BUTTRIGHT) {
-      smenu.fbrowser.selector = MIN(smenu.fbrowser.maxentries - 1, smenu.fbrowser.selector + NORGAMES_ROWS);
+      smenu.fbrowser.selector = browser_view?browser_carousel_step(smenu.fbrowser.selector,smenu.fbrowser.maxentries,1,carousel_wrap):MIN(smenu.fbrowser.maxentries-1,smenu.fbrowser.selector+NORGAMES_ROWS);
       smenu.fbrowser.seloff   = MIN(smenu.fbrowser.maxentries - 1, smenu.fbrowser.seloff   + NORGAMES_ROWS);
     }
 
@@ -3821,6 +3894,13 @@ static void keypress_menu_norbrowse(unsigned newkeys) {
     else if (smenu.fbrowser.selector >= smenu.fbrowser.seloff + NORGAMES_ROWS)
       smenu.fbrowser.seloff = smenu.fbrowser.selector - NORGAMES_ROWS + 1;
   }
+  if(browser_view && old_selector!=smenu.fbrowser.selector &&
+      (newkeys&(KEY_BUTTUP|KEY_BUTTDOWN|KEY_BUTTLEFT|KEY_BUTTRIGHT))) {
+    int direction=(newkeys&(KEY_BUTTDOWN|KEY_BUTTRIGHT))?1:-1;
+    browser_motion_offset=browser_motion_retarget(browser_motion_offset,direction);
+    artwork_cached=false;carousel_hot_valid=false;
+  }
+
 }
 #endif
 
