@@ -904,3 +904,20 @@ symbol/ABI guards after a sync-source CI failed13 despite integration success.
   preserving native save paths and external overrides. Exact payload/header gate
   and generated GB/GBC stripe-cartridge mGBA smoke both pass. Added native ARM
   packaged-core/append/reset-boundary cases; clean all3/full verification is next.
+
+## 2026-11-23 — Build751 and native emulator transfer correction
+
+Build751/source d1e0e8d passed full all3/native ARM/host/mGBA verification and
+source CI45095410222; Chis751 is in hardware-test with exact hash recorded in
+docs/build-751-validation.json. Generic MiGoomba executes generated GB/GBC
+programs; SD/Lite remain physically unqualified.
+
+Native PCE replay exposed a word-sized header write into cartridge memory in
+751. Native headers now stage in aligned internal RAM and transfer by halfword.
+Native file copies use exact read lengths, aligned padded tails, file size and
+close checks. Old-source host/ARM tests reproduce the defect; corrected host
+transfer/recovery and actual linked Chis PCE replay pass (9040B stack peak).
+PCE portable-load errors can try the existing native core; working portable
+plugins retain priority. This is not confirmation of the physical PCE cause.
+Full clean all3 verification is next, then normal integration/release before
+NOR carousel work. Preserve BLUE candidate and private session artifacts.

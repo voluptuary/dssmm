@@ -34,6 +34,7 @@ typedef struct {
   uint32_t flags2;
   uint32_t padding;
 } t_pocketnes_header;
+_Static_assert(sizeof(t_pocketnes_header)<=EMU_HEADER_MAX_BYTES,"Native emulator header exceeds RAM staging");
 
 unsigned pocket_nes_header(uint8_t *buffer, const char *fn, unsigned fs) {
   // Copy the base filename into the name buffer
@@ -62,6 +63,7 @@ typedef struct {
   uint32_t padding[4];
   char title[32];
 } t_smsadv_header;
+_Static_assert(sizeof(t_smsadv_header)<=EMU_HEADER_MAX_BYTES,"Native emulator header exceeds RAM staging");
 
 unsigned smsadvance_header(uint8_t *buffer, const char *fn, unsigned fs) {
   // Copy the base filename into the name buffer
@@ -144,6 +146,7 @@ typedef struct {
   uint32_t padding[3];
   char title[32];
 } t_wasabigba_header;
+_Static_assert(sizeof(t_wasabigba_header)<=EMU_HEADER_MAX_BYTES,"Native emulator header exceeds RAM staging");
 
 unsigned wasabigba_header(uint8_t *buffer, const char *fn, unsigned fs) {
   // Copy the base filename into the name buffer
@@ -174,6 +177,7 @@ typedef struct {
   uint8_t padding[15];
   char title[32];
 } t_ngpgba_header;
+_Static_assert(sizeof(t_ngpgba_header)<=EMU_HEADER_MAX_BYTES,"Native emulator header exceeds RAM staging");
 
 unsigned ngpgba_header(uint8_t *buffer, const char *fn, unsigned fs) {
   // Copy the base filename into the name buffer
@@ -205,6 +209,7 @@ typedef struct {
   uint32_t nes_sig;
   char padding2[12];
 } t_pceadvance_header;
+_Static_assert(sizeof(t_pceadvance_header)<=EMU_HEADER_MAX_BYTES,"Native emulator header exceeds RAM staging");
 
 unsigned pceadvance_header(uint8_t *buffer, const char *fn, unsigned fs) {
   // Probably some bad copy paste made them parse the ROM as a NES ROM.

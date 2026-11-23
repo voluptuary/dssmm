@@ -1049,10 +1049,15 @@ void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
   else {
     progress_action=ProgressPrepareEmulator;loadrom_progress(0,1);
     unsigned plugin_error=load_extemu_rom(fn,fs,&pogo_plugin_loader,loadpogo_progress);
+    const char *portable_failure=0;
     if(plugin_error!=ERR_LOAD_NOEMU) {
-      recover_emu_browser();
       write_log("emulator",plugin_error,"bytes=%lu game=%s",(unsigned long)fs,fn);
-      spop.alert_msg=plugin_load_error();return;
+      portable_failure=plugin_load_error();
+      /* Keep the native PCE fallback when a portable plugin cannot load. */
+      if(ldinfo!=get_emu_info("pce"))
+      {
+        recover_emu_browser();spop.alert_msg=portable_failure;return;
+      }
     }
     // Try to load the emu and ROM, keep trying if there's more than one emulatior option.
     unsigned errcode = ERR_LOAD_NOEMU;
@@ -1060,15 +1065,17 @@ void start_emu_game(const t_emu_loader *ldinfo, const char *fn, uint32_t fs) {
 
       progress_action=ProgressGame;
       errcode = load_extemu_rom(fn, fs, ldinfo, loadrom_progress);
-      if (errcode && errcode != ERR_LOAD_NOEMU)
+      if (errcode && errcode != ERR_LOAD_NOEMU) {
+        write_log("native-emu",errcode,"core=%s",ldinfo->emu_name);
         break;
+      }
       ldinfo++;
     }
     recover_emu_browser();
     write_log("emulator",errcode,"bytes=%lu game=%s",(unsigned long)fs,fn);
     unsigned errmsg = (errcode == ERR_LOAD_NOEMU) ? MSG_ERR_NOEMU :
                                                     MSG_ERR_READ;
-    spop.alert_msg = msgs[lang_id][errmsg];
+    spop.alert_msg = portable_failure && errcode==ERR_LOAD_NOEMU?portable_failure:msgs[lang_id][errmsg];
   }
 }
 

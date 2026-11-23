@@ -4,7 +4,7 @@ from pathlib import Path
 import argparse,struct,subprocess
 from unicorn import Uc,UC_ARCH_ARM,UC_MODE_ARM,UC_HOOK_CODE,UC_HOOK_MEM_WRITE
 from unicorn.arm_const import *
-root=Path(__file__).resolve().parents[1];p=argparse.ArgumentParser();p.add_argument('--native-gbc',action='store_true');p.add_argument('--pack',type=Path);p.add_argument('--extension');p.add_argument('--game-bytes',type=int,default=32768);a=p.parse_args();assert 0<a.game_bytes<=3*1024*1024
+root=Path(__file__).resolve().parents[1];p=argparse.ArgumentParser();p.add_argument('--native-gbc',action='store_true');p.add_argument('--native-pce',action='store_true');p.add_argument('--pack',type=Path);p.add_argument('--extension');p.add_argument('--game-bytes',type=int,default=32768);a=p.parse_args();assert 0<a.game_bytes<=3*1024*1024
 elf=(root/'firmware.ewram.elf').read_bytes()
 version=struct.pack('<I',int(subprocess.check_output(['git','rev-parse','--short=8','HEAD'],cwd=root,text=True).strip(),16))
 if (root/'superfw.gba').exists():version=(root/'superfw.gba').read_bytes()[0xc8:0xcc]
@@ -12,13 +12,21 @@ syms={r.split()[-1]:int(r.split()[0],16) for r in subprocess.check_output(['arm-
 entry=next(v for k,v in syms.items() if k.startswith('load_extemu_rom'))
 sms=(root/'emu/smsadvance-v2.5-scptch.gba.bin').read_bytes();pce=(root/'emu/pceadvance-v7.5-scptch.gba.bin').read_bytes()
 cases=[('sms','mb',sms),('gg','mb',sms),('pce','mb',pce),('nsf','mbz',bytes([0x10,64,0,0,0x78,0x42,0xf0,0,0xf0,0,0xf0,0,0x60,0])),('txt','bin',struct.pack('<I',0xea00002e)+bytes(252)),('jpg','gba',struct.pack('<I',0xea00002e)+bytes(252))]
-if a.native_gbc:
+if a.native_gbc or a.native_pce:
+ assert not(a.native_gbc and a.native_pce),'Select one native core'
  assert not a.pack,'Native GB/GBC uses the pinned built-in payload'
- payload=(root/'emu/migoomba_v0.1_generic.gba.bin').read_bytes()
- cases=[('gb','gba',payload),('gbc','gba',payload)]
+ payload=(root/('emu/migoomba_v0.1_generic.gba.bin' if a.native_gbc else 'emu/pceadvance-v7.5-scptch.gba.bin')).read_bytes()
+ cases=[('gb','gba',payload),('gbc','gba',payload)] if a.native_gbc else [('pce','gba',payload)]
  boot_syms={r.split()[-1]:int(r.split()[0],16) for r in subprocess.check_output(['arm-none-eabi-nm',str(root/'firmware.elf')],text=True).splitlines() if len(r.split())==3}
  boot=(root/'superfw.gba').read_bytes()
  assets=boot[boot_syms['assets_start']-0x08000000:boot_syms['assets_end']-0x08000000]
+ tags=set();position=0
+ while position+8<=len(assets):
+  tag=assets[position:position+4];size=struct.unpack_from('<I',assets,position+4)[0]
+  if not size:break
+  tags.add(tag);position+=8+((size+3)&~3)
+ if a.native_pce and b'PCEA' not in tags:
+  print('Native PCE core is not bundled on this board; portable plugin tests remain mandatory.');raise SystemExit(0)
 if a.pack:
  cases=[(path.stem,path.suffix[1:],path.read_bytes()) for path in sorted(a.pack.iterdir()) if path.suffix in ('.mb','.mbz','.gba','.bin') and path.stat().st_size<0x40000]
 if a.extension:cases=[case for case in cases if case[0]==a.extension]
@@ -54,19 +62,25 @@ for extension,suffix,payload in cases:
  cpu.mem_write(0x098000a0,b'SUPERFW\0');cpu.mem_write(0x098000c8,version+struct.pack('<I',512));cpu.mem_write(0x09a00004,b'DSRT')
  name=('/Smoke.'+extension).encode()+b'\0';cpu.mem_write(0x0203ff00,name)
  cpu.reg_write(UC_ARM_REG_R0,0x0203ff00);cpu.reg_write(UC_ARM_REG_R1,len(game));cpu.reg_write(UC_ARM_REG_R2,syms['pogo_plugin_loader']);cpu.reg_write(UC_ARM_REG_R3,syms['loadpogo_progress']|1)
- if a.native_gbc:
+ if a.native_gbc or a.native_pce:
   cpu.mem_write(0x09e00000,assets)
-  cpu.mem_write(0x0203fe80,struct.pack('<II',0x0203fea0,0));cpu.mem_write(0x0203fea0,b'vfs:GCEM\0')
+  cpu.mem_write(0x0203fe80,struct.pack('<II',0x0203fea0,syms['pceadvance_header']|1 if a.native_pce else 0));cpu.mem_write(0x0203fea0,b'vfs:PCEA\0' if a.native_pce else b'vfs:GCEM\0')
   cpu.mem_write(syms['use_slowld'],b'\1')
   cpu.reg_write(UC_ARM_REG_R2,0x0203fe80);cpu.reg_write(UC_ARM_REG_R3,syms['loadrom_progress']|1)
  cpu.reg_write(UC_ARM_REG_SP,0x03007f00);cpu.reg_write(UC_ARM_REG_LR,0x01000001)
  state={'launched':False,'minimum':0x03007f00,'phases':set()}
  def code(uc,address,size,user):
   state['minimum']=min(state['minimum'],uc.reg_read(UC_ARM_REG_SP))
-  if a.native_gbc and address==syms['launch_reset']:
+  if (a.native_gbc or a.native_pce) and address==syms['launch_reset']:
    assert uc.reg_read(UC_ARM_REG_R0)==0,'Native GB/GBC reset policy changed'
-   assert bytes(uc.mem_read(0x08000000,len(payload)))==payload,'Bundled MiGoomba differs after decode'
-   assert bytes(uc.mem_read(0x08000000+len(payload),len(game)))==game,'GB/GBC append offset/data differ'
+   assert bytes(uc.mem_read(0x08000000,len(payload)))==payload,'Bundled native core differs after decode'
+   offset=len(payload)
+   if a.native_pce:
+    header=bytes(uc.mem_read(0x08000000+offset,64))
+    assert struct.unpack_from('<II',header,32)==(len(game)+16,4) and struct.unpack_from('<I',header,48)[0]==0x1a53454e,'Native PCE wrapper differs'
+    offset+=64
+   assert bytes(uc.mem_read(0x08000000+offset,len(game)))==game,'Native game append offset/data differ'
+   assert bytes(uc.mem_read(0x08000000+offset+((len(game)+3)&~3),16))==bytes(16),'Native game tail overwrote its boundary'
    state['launched']=True;uc.emu_stop();return
   if address==syms['launch_pogo_reset']:
    mode,size=(uc.reg_read(r) for r in (UC_ARM_REG_R1,UC_ARM_REG_R2));assert mode==(1 if suffix in ('mb','mbz') else 0)
@@ -78,7 +92,7 @@ for extension,suffix,payload in cases:
    state['launched']=True;uc.emu_stop();return
   if address==syms.get('loadrom_progress'):
    state['phases'].add(cpu.mem_read(syms['progress_action'],1)[0])
-   assert uc.reg_read(UC_ARM_REG_R0)<=uc.reg_read(UC_ARM_REG_R1)==(len(game) if a.native_gbc else len(payload)+len(game))
+   assert uc.reg_read(UC_ARM_REG_R0)<=uc.reg_read(UC_ARM_REG_R1)==(len(game) if (a.native_gbc or a.native_pce) else len(payload)+len(game))
    uc.reg_write(UC_ARM_REG_PC,uc.reg_read(UC_ARM_REG_LR));return
   if address not in (syms['sdcard_read_blocks'],syms['sdcard_write_blocks']):return
   buf,sector,count=(uc.reg_read(r)for r in (UC_ARM_REG_R0,UC_ARM_REG_R1,UC_ARM_REG_R2));assert count and sector+count<=8192
@@ -92,7 +106,7 @@ for extension,suffix,payload in cases:
  except Exception:
   print(f'{extension}: PC={cpu.reg_read(UC_ARM_REG_PC):08x} LR={cpu.reg_read(UC_ARM_REG_LR):08x} SP={cpu.reg_read(UC_ARM_REG_SP):08x}')
   raise
- assert state['phases']==({0} if a.native_gbc else {0,1}),'Plugin/game progress phases missing'
+ assert state['phases']==({0} if (a.native_gbc or a.native_pce) else {0,1}),'Plugin/game progress phases missing'
  assert state['launched'],(extension,suffix,'Native loader returned',cpu.reg_read(UC_ARM_REG_R0))
  assert state['minimum']>=syms['__IWRAM_END__']+128,'Native plugin stack crossed live globals'
  print(f'Native {extension}.{suffix} '+('MiGoomba ' if a.native_gbc else '')+f'loader/FatFs/ABI/cart bus passed; stack peak {0x03007f00-state["minimum"]}B.')
