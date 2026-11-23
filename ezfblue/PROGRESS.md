@@ -3107,3 +3107,9 @@ No production behavior/driver changes or hardware qualification.
   existing suites. All5 native mGBA launch cases now reach expected handoff;
   disabled-addon quick mode correctly skips patching. Sanitized actual path
   helpers pass. Proceed with project-only commit/push/PR and hosted checks.
+
+- PR18 merged980ba8f after clean source45095029573 and all4 integration45095035057
+  passed. Forced local production rebuild, layout and sealed stock-size package
+  pass. Ignored BLUE-only hardware-test imagef88a7bd and JSON are ready; no public
+  release/tag/FPGA changes or hardware qualification. Normal lane synchronization
+  preserves the full tree and the separate active SuperFW build.
