@@ -195,5 +195,23 @@ int main(void) {
   folder_box=folder_title=false;
   assert(!artwork_load_directory("/Game Boy Advance",1,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
   assert(rom_opens==before_folder_rom);
+  /* NOR can resolve Title art from metadata even after its SD ROM is removed. */
+  put32(18,120);put32(22,(uint32_t)-80);put32(34,19200);
+  bmp[26]=1;bmp[27]=0;put32(28,16);put32(30,0);
+  gamecode_art=1;gamecode_flat_art=0;
+  assert(!artwork_load_named("/Removed.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(rom_opens==before_folder_rom);
+  assert(artwork_load_gamecode("BPRE",pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(!strcmp(last_path,"/SYSTEM/IMGS/B/P/BPRE.bmp") && info.width==120);
+  gamecode_art=0;gamecode_flat_art=1;
+  assert(artwork_load_gamecode("BPRE",pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(!strcmp(last_path,"/SYSTEM/IMGS/BPRE.bmp"));
+  assert(!artwork_load_gamecode("../X",pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  fail_close=1;
+  assert(!artwork_load_gamecode("BPRE",pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(rom_opens==before_folder_rom);
+  unsigned invalid_opens=opens;
+  assert(!artwork_load("/../Game.gba",0,pixels,sizeof(pixels),bmp_buffer,BMP_BUFFER_SIZE,&info));
+  assert(opens==invalid_opens);
   return 0;
 }

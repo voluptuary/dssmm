@@ -1,6 +1,6 @@
 # Native GB/GBC emulator
 
-The pending SuperFW integration uses MiGoomba v0.1 by michyprima, based on Jaga's
+SuperFW Build759 and later use MiGoomba v0.1 by michyprima, based on Jaga's
 Jagoomba Color, Dwedit's Goomba Color and FluBBa's Goomba. It is the same pinned
 core revision used by DSSMM's EZ-FLASH builds, but the generic hardware variant:
 https://github.com/michyprima/migoomba/tree/4b401e2ac7876aed9f89face867fd43d89ce189d
@@ -19,8 +19,9 @@ loader tests decode the actual packaged GCEM asset, compare the complete core,
 verify GB/GBC append offsets/data and check the native reset boundary. Synthetic
 homebrew GB/GBC stripe programs run the exact generic core in stock SDL mGBA;
 no commercial games, private BIOS or SuperCard emulation are involved. Keep the
- distinction between core smoke tests, loader models and physical save timing.
-Clean all-board/CI and integration hardware validation are still required.
+distinction between core smoke tests, loader models and physical save timing.
+Build759 clean all-board, ARM, mGBA and integration CI passed; physical
+save timing and SD/Lite hardware operation remain unqualified.
 
 The previous Jagoomba binary remains an upstream/reference input, not an extra
 firmware asset. MiGoomba foundations/acknowledgments retain their original

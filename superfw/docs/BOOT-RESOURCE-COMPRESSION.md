@@ -6,7 +6,7 @@ artwork and languages; board guards omit Chis-only NOR data/icons and extended
 fonts on SD/Lite. SD/Lite bundle only GB/GBC after MiGoomba integration;
 Chis retains its additional supported emulators.
 
-The pending change packs SD/Lite fonts/backgrounds with the existing UPKR codec
+Build749 and later pack SD/Lite fonts/backgrounds with the existing UPKR codec
 at level4. A distinct `.pack.upkr` filename prevents incremental builds from
 mistaking older apultra data for the new format. The decoded FO font prefix,
 DBR2 backgrounds and ICN1 icon bytes remain identical. One cartridge-safe

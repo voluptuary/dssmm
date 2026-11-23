@@ -11,4 +11,10 @@ bool artwork_load_directory(const char *directory, unsigned style, uint8_t *pixe
                             uint8_t *bmp_buffer, size_t bmp_capacity, artwork_info *info);
 bool artwork_load(const char *rom, unsigned style, uint8_t *pixels, size_t capacity,
                   uint8_t *bmp_buffer, size_t bmp_capacity, artwork_info *info);
+/* CUSTOM/filename lookup without opening the source ROM (NOR browsing). */
+bool artwork_load_named(const char *rom, unsigned style, uint8_t *pixels, size_t capacity,
+                        uint8_t *bmp_buffer, size_t bmp_capacity, artwork_info *info);
+/* Title-only ROM-code fallback; four bytes, no terminating NUL required. */
+bool artwork_load_gamecode(const char code[4], uint8_t *pixels, size_t capacity,
+                          uint8_t *bmp_buffer, size_t bmp_capacity, artwork_info *info);
 #endif
