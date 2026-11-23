@@ -931,3 +931,13 @@ Owner751 PCE says Plugin format unsupported;751 predates native transfer/fallbac
 corrections. Physical resolution remains unconfirmed. Added Interface overflow
 arrows matching Games and a lighter neutral Dark header base0x318c. Header
 shading host bounds pass; validate revised native scenes/build before publishing.
+
+## Build759 normal release published
+
+Full all3/local/native ARM/mGBA and source45172727651/all4 PR19
+45172737715 passed. PR19 merged c0c6b52. Published superfw-build759 at clean
+67b20b57 with all3 firmware files and full folder-art.zip; all4 downloads and
+notes match. DE latest unchanged;667 retained. Chis759 is current hardware-test.
+Owner751 format rejection remains physically unconfirmed; fallback is new here.
+Interface arrows and lighter Dark bar pass visual checks. Next: sync branches,
+then NOR carousel/last-played art, preserving RAM/flash budgets and card isolation.

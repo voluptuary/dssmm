@@ -1,0 +1,48 @@
+{
+  "build": 759,
+  "source_commit": "67b20b5780af6789fb3569de69cd31f204498e64",
+  "boards": [
+    {
+      "source_tree_sha256": "11175e4c8ed7d3b62019454d7f23099401eb1d4cd70e77aebf5318801dc9f1a0",
+      "board": "sd",
+      "dssmm_build": 759,
+      "source_commit": "67b20b5780af6789fb3569de69cd31f204498e64",
+      "source_dirty": false,
+      "firmware_sha256": "4e3c3127fdff2743f03421c79967d9332244dd5c28d4313b8a193b7825dba37b",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496640,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 27648
+    },
+    {
+      "source_tree_sha256": "11175e4c8ed7d3b62019454d7f23099401eb1d4cd70e77aebf5318801dc9f1a0",
+      "board": "lite",
+      "dssmm_build": 759,
+      "source_commit": "67b20b5780af6789fb3569de69cd31f204498e64",
+      "source_dirty": false,
+      "firmware_sha256": "8813cfb3c97708e86e7818c76b43801b71d9c2b24056fc6da1c7a6fb09bce512",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496640,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 11264
+    },
+    {
+      "source_tree_sha256": "11175e4c8ed7d3b62019454d7f23099401eb1d4cd70e77aebf5318801dc9f1a0",
+      "board": "chis",
+      "dssmm_build": 759,
+      "source_commit": "67b20b5780af6789fb3569de69cd31f204498e64",
+      "source_dirty": false,
+      "firmware_sha256": "0bc871252010e241a98da1c6829897eb96ea458cfdd13be046c56fa5544194cc",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "local_verifier": "DSSMM_ARM_IGM=1 UBSAN_OPTIONS=halt_on_error=1 make verify-superfw; exit0",
+  "source_ci": 45172727651,
+  "integration_ci": 45172737715,
+  "integration_pr": 19,
+  "extra_pce_pack": "actual EZ-FLASH pce.mb with2621952-byte synthetic ROM passed production ARM/FatFs loader",
+  "hardware_limits": "No new physical qualification; only prior Chis observations; PCE failure remains unconfirmed."
+}
