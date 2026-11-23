@@ -3115,3 +3115,17 @@ Native9-scene stock mGBA run and normal full project verifier passed. Added
 Start clock draw used by the real native Start loop and retested scene0. Exact
 capture/source hashes and limits: docs/native-menu-preview-validation.json.
 No production behavior/driver changes or hardware qualification.
+
+## 2026-11-23 — DE SD-launch regression investigation
+
+Owner prioritizes this before SuperFW porting. Frankie8.2 referencecff4b2f
+copies the record filename; DSSMM resolver rejects long alias-free names before
+opening the launch menu. exFAT altname is empty by design. Actual DE native
+mGBA reproduces before d701ee (directory only), FAT control d7ffaa. Corrected
+optional aliases, canonical paths and bounded offset-based clipped-name lookup
+pass all5 native cases and sanitized host paths. No driver/save/transfer/fragment
+guards changed. Full DE verifier running next; no physical confirmation/release.
+See SD-LAUNCH-AUDIT.md and sd-launch-validation.json. BLUE already has this
+pure-path correction; OMEGA clipped-name audit and SuperFW gates follow.
+
+Full DE verifier passed (43 host scripts, native five-case mGBA launch, production build, browser and memory checks). Removed duplicate native invocation; host-suite discovery retains it. Owner authorizes corrective release8.4.1; physical affected-card confirmation pending. OMEGA/BLUE audit/publication follows.

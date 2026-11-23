@@ -3,6 +3,7 @@ set -euo pipefail
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root"
 python3 tests/test-migoomba-payload.py
+python3 tests/test-de-launch-paths.py
 make
 bash scripts/run-host-test-suite.sh
 node tests/browser-installer.mjs
