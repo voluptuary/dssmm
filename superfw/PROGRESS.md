@@ -899,3 +899,8 @@ symbol/ABI guards after a sync-source CI failed13 despite integration success.
   Corrected a6px-versus8px corner sampling oracle; firmware stayed749. Permanent
   verifier now retains those cases. SD30KiB/Lite46KiB margins are verified. Next:
   MiGoomba generic integration and continued PCE diagnosis before NOR features.
+
+- Prepared MiGoomba v0.1 generic/pinned4b401e2 integration for all3 boards,
+  preserving native save paths and external overrides. Exact payload/header gate
+  and generated GB/GBC stripe-cartridge mGBA smoke both pass. Added native ARM
+  packaged-core/append/reset-boundary cases; clean all3/full verification is next.

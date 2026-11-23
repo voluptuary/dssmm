@@ -16,6 +16,7 @@ python3 scripts/test-boot-resources-arm.py
 python3 scripts/check-carousel-memory.py firmware.ewram.elf
 python3 scripts/test-native-settings-arm.py
 python3 scripts/test-native-plugins-arm.py
+python3 scripts/test-native-plugins-arm.py --native-gbc
 python3 scripts/check-ingame-package.py
 if [[ "${DSSMM_ARM_IGM:-0}" == 1 ]]; then
   python3 scripts/check-ingame-package.py --arm

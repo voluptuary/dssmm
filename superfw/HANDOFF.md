@@ -1598,3 +1598,14 @@ hash-verified hardware-test replaces746; no MiGoomba change is in749 yet. Owner
 746 GG/SMS confirmation remains valid for that tested source only. PCE stays open.
 BLUE audit has independently reproduced and corrected an exFAT alias assumption
 in its own worktree; no BLUE code belongs in this lane.
+
+MiGoomba work after750 is pending/unvalidated: copied exact upstream generic
+81892-byte payload (SHAa2e3fa5a..., pinned4b401e2). Never use ezode binary.
+SD/Chis GCEM changes to MiGoomba; Lite also enables native GB/GBC with its new
+resource margin. Packed core35330bytes vs old32395: estimated SD27KiB/Lite11KiB
+free; must remeasure clean packages. Existing external-plugin precedence and
+SRAM save/reboot paths remain. Old Jagoomba reference is not bundled twice.
+Native ARM plugin fixture has --native-gbc mode for actual packaged VFS decode,
+exact core/game append and launch_reset boundary; build.sh runs it on all3.
+New GB/GBC synthetic stripe-core mGBA smoke is in progress; see project scripts.
+PCE stays open; do not start NOR view work before this queue/release checkpoint.

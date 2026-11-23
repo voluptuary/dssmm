@@ -19,6 +19,7 @@ BOARD ?= sd
 
 ifeq ($(BOARD),lite)
   GLOBAL_DEFINES += -DSUPERCARD_LITE_IO
+  BUNDLE_GBC_EMULATOR = 1
   COMPRESS_FIRMWARE = 1
   MAXFSIZE = 496
   FWFLAVOUR = "Lite"
@@ -58,7 +59,7 @@ endif
 
 ifeq ($(BUNDLE_GBC_EMULATOR),1)
   GLOBAL_DEFINES += -DBUNDLE_GBC_EMULATOR
-  BIEMUFILES += emu/jagoombacolor_v0.5.gba.comp
+  BIEMUFILES += emu/migoomba_v0.1_generic.gba.comp
 endif
 
 ifeq ($(BUNDLE_OTHER_EMULATORS),1)

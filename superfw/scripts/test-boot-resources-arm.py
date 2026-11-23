@@ -17,7 +17,7 @@ while offset+8<=limit:
  if not size:break
  assert tag not in assets and offset+size<=limit,'Invalid bundled asset directory'
  assets[tag.decode('ascii')]=size;offset+=(size+3)&~3
-expected={'sd':{'GCEM'},'lite':set(),'chis':{'GCEM','PNES','WASA','NGPG','PCEA','SMSA'}}
+expected={'sd':{'GCEM'},'lite':{'GCEM'},'chis':{'GCEM','PNES','WASA','NGPG','PCEA','SMSA'}}
 assert set(assets)==expected[board],f'{board}: unexpected board-specific media {assets}'
 print(f'{board} bundled media: {assets}; unsupported board assets excluded.')
 

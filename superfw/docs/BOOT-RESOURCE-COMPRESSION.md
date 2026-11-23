@@ -3,7 +3,8 @@
 SD and Lite need compressed firmware/resources to fit their original flash
 limits. Chis retains raw resources. All three retain the same supported menu
 artwork and languages; board guards omit Chis-only NOR data/icons and extended
-fonts on SD/Lite. Lite has no bundled emulators; SD bundles only GB/GBC.
+fonts on SD/Lite. SD/Lite bundle only GB/GBC after MiGoomba integration;
+Chis retains its additional supported emulators.
 
 The pending change packs SD/Lite fonts/backgrounds with the existing UPKR codec
 at level4. A distinct `.pack.upkr` filename prevents incremental builds from

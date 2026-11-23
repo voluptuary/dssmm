@@ -1,0 +1,20 @@
+{
+  "upstream": "https://github.com/michyprima/migoomba",
+  "upstream_commit": "4b401e2ac7876aed9f89face867fd43d89ce189d",
+  "version": "v0.1",
+  "variant": "generic",
+  "bytes": 81892,
+  "sha256": "a2e3fa5abd47d7b9318d879af712524d4677807239c439f57b951b0047f1def3",
+  "payload": "emu/migoomba_v0.1_generic.gba.bin",
+  "build": "make (no VARIANT)",
+  "compiler": "devkitARM16.1.0",
+  "source_modified": false,
+  "authors": [
+    "michyprima",
+    "Jaga / EvilJagaGenius",
+    "Dwedit",
+    "FluBBa"
+  ],
+  "hardware_status": "SuperFW integration not hardware qualified; generic core, never the DE-specific payload",
+  "previous_payload": "emu/jagoombacolor_v0.5.gba.bin retained as upstream/reference input, not bundled"
+}

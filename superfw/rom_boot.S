@@ -743,10 +743,10 @@ font_end:
 
 assets_start:
   #ifdef BUNDLE_GBC_EMULATOR
-  .ascii "GCEM"                                        @ GB/C emulator (GoombaColor)
+  .ascii "GCEM"                                        @ Generic MiGoomba GB/C core; no EZ-FLASH hardware variant
   .word (goomba_emu_end - goomba_emu_start)            @ Payload size
   goomba_emu_start:
-    .incbin "emu/jagoombacolor_v0.5.gba.comp"
+    .incbin "emu/migoomba_v0.1_generic.gba.comp"
   goomba_emu_end:
   .balign 4
   #endif

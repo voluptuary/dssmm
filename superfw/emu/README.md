@@ -1,3 +1,11 @@
+The bundled GB/GBC core is MiGoomba v0.1 by michyprima, based on Jaga's
+Jagoomba Color, Dwedit's Goomba Color and FluBBa's Goomba. This is the generic
+build from upstream commit4b401e2ac7876aed9f89face867fd43d89ce189d:
+https://github.com/michyprima/migoomba/tree/4b401e2ac7876aed9f89face867fd43d89ce189d
+See docs/plugins/migoomba.json for source, build and payload identity. No EZ-FLASH
+hardware variant is imported. The older Jagoomba binary remains a reference and
+is not included in firmware assets.
+
 
 Goombacolor was downloaded as a binary from
 https://github.com/EvilJagaGenius/jagoombacolor/releases/tag/v0.5
