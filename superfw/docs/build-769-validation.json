@@ -1,0 +1,52 @@
+{
+  "build": 769,
+  "source_commit": "37c9e069c1f44c2d53ea633fa1bdcf97e788dcd4",
+  "boards": [
+    {
+      "source_tree_sha256": "b96af88b2fd2f84b3a0b5388cd96ef1c12c466c6af862642097ef15f029b990f",
+      "board": "sd",
+      "dssmm_build": 769,
+      "source_commit": "37c9e069c1f44c2d53ea633fa1bdcf97e788dcd4",
+      "source_dirty": false,
+      "firmware_sha256": "89786c48771c8df7b73c2009af4db74699a7147bafad1d2c21e39acd74d6fecf",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496640,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 27648
+    },
+    {
+      "source_tree_sha256": "b96af88b2fd2f84b3a0b5388cd96ef1c12c466c6af862642097ef15f029b990f",
+      "board": "lite",
+      "dssmm_build": 769,
+      "source_commit": "37c9e069c1f44c2d53ea633fa1bdcf97e788dcd4",
+      "source_dirty": false,
+      "firmware_sha256": "476e9d5fef4b07cc2b3a59476bae7692ea7405ab41fb92166489778b5a48c283",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496640,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 11264
+    },
+    {
+      "source_tree_sha256": "b96af88b2fd2f84b3a0b5388cd96ef1c12c466c6af862642097ef15f029b990f",
+      "board": "chis",
+      "dssmm_build": 769,
+      "source_commit": "37c9e069c1f44c2d53ea633fa1bdcf97e788dcd4",
+      "source_dirty": false,
+      "firmware_sha256": "7fa0e67e66345b05d6ffe9896c2dfc10f0095877e4b2cd8664ad13e15d999d24",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "local_verifier": "full all3/native ARM/host/mGBA exit0; eight new NOR scenes included",
+  "source_ci": 45181742291,
+  "integration_ci": 45181773686,
+  "integration_pr": 21,
+  "native_nor_cases": 8,
+  "main_ewram_bytes": 256032,
+  "main_ewram_limit_bytes": 257024,
+  "iwram_bytes": 15592,
+  "user_stack_bytes": 16384,
+  "limits": "No new physical qualification. NOR fixture seeds cached synthetic art/records, not card storage. PCE remains unconfirmed."
+}

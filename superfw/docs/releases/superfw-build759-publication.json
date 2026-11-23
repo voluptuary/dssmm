@@ -34,5 +34,7 @@
   "integration_pr": 19,
   "integration_merge": "c0c6b52",
   "validation_report": "superfw/docs/build-759-validation.json",
-  "limits": "Prior Chis only physical observations; new changes and SD/Lite unqualified; PCE remains open; no NOR carousel yet."
+  "limits": "Prior Chis only physical observations; new changes and SD/Lite unqualified; PCE remains open; no NOR carousel yet.",
+  "latest_tag_verified": "v8.4.0",
+  "latest_followup": "Explicit REST make_latest=true on DE release443130065 restored /latest after CLI --latest=false did not preserve it; assets and notes unchanged."
 }
