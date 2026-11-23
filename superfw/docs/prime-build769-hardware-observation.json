@@ -1,0 +1,13 @@
+{
+  "build": 769,
+  "source_commit": "37c9e069c1f44c2d53ea633fa1bdcf97e788dcd4",
+  "reported_by": "owner",
+  "hardware": "SuperChis Prime (same owner setup; no new board revision stated)",
+  "observations": [
+    "PCE games now load",
+    "PCE Exit restarts the emulated game instead of returning to firmware",
+    "PCE files use the default icon"
+  ],
+  "backend": "Not identified by the report; native fallback is a plausible cause under investigation.",
+  "limits": "No NOR carousel, complete gameplay/save or SD/Lite qualification implied."
+}

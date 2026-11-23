@@ -28,7 +28,7 @@
       "download_matches": true
     }
   ],
-  "body_sha256": "2e24f036a012a502b44a55c38cec1f9d56f383a50bd5cd4eb8b8f036352f8cad",
+  "body_sha256": "f6aeb0452d342a1a451cc2635d04f8dcc8c406a24f0aee8f737850dcd8b64e2b",
   "notes_scope": "Owner-requested cumulative additions and fixes to upstream SuperFW since the fork; no last-build delta or internal port-regression catalog.",
   "source_ci": 45181742291,
   "integration_ci": 45181773686,
@@ -38,5 +38,12 @@
   "latest_tag_verified": "v8.4.0",
   "latest_followup": "CLI --latest=false did not preserve latest endpoint; explicitly restored DE release443130065 with REST make_latest=true.",
   "retention": "Normal759/667 releases retained; no prerelease pruning.",
-  "hardware": "Only prior Chis observations; new769/NOR changes and SD/Lite physical operation unqualified; PCE remains open."
+  "hardware": "Chis769 PCE loading confirmed by owner; Exit restarts game. NOR carousel/new changes and SD/Lite remain unqualified.",
+  "notes_updates": [
+    {
+      "reason": "Owner hardware report: PCE loads on Chis769, Exit restarts emulated game; PCE icon absent.",
+      "previous_body_sha256": "2e24f036a012a502b44a55c38cec1f9d56f383a50bd5cd4eb8b8f036352f8cad",
+      "archive": "superfw/docs/history/releases/superfw-build769-before-pce-hardware-note.json"
+    }
+  ]
 }

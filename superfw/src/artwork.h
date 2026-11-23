@@ -27,6 +27,7 @@ bool artwork_blit_frame(volatile uint16_t *frame, const uint16_t *pixels,
 /* Native-size image clipped to the browser body (y=16..143). */
 bool artwork_blit_cropped(volatile uint16_t *frame, const uint16_t *pixels,
                           const artwork_info *info, int x, int y);
+/* Odd destination edges preserve their neighboring VRAM byte via halfwords. */
 bool artwork_blit_scaled_cropped(volatile uint16_t *frame, const uint16_t *pixels,
                                  const artwork_info *info, int x, int y,
                                  unsigned width, unsigned height);

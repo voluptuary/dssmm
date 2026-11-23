@@ -270,3 +270,10 @@ marker. Same-image SDRAM return may reuse the firmware snapshot; other sources
 and mismatches must refresh it. The ROM-only boot helper returns Z/R0 explicitly;
 keep its ARM regression and the original3KiB boot limit. Native tests do not
 qualify physical plugin Exit timing or the outstanding hardware PCE failure.
+
+Owner769 follow-up: PCE loads on Chis but Exit restarts its game; add the same
+verified return adapter to native PCE without patching game data/MiGoomba. Add
+a native HuCard icon, keep all board artwork resources synchronized and preserve
+flash/RAM/16KiB stack budgets. Atari2600 is an additional investigation: no a26
+core exists in the current pack. Read ATARI2600-PORT-PLAN.md; use a standalone
+prototype and generated homebrew before claiming support or adding a binary.

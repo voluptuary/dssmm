@@ -8,7 +8,7 @@ root=Path(__file__).resolve().parents[1]
 subprocess.run([sys.executable,str(root/'tools/pack-dssmm-resources.py')],check=True)
 with tempfile.TemporaryDirectory() as tmp:
  out=Path(tmp);source=out/'probe.c'
- source.write_text('#include <stdint.h>\n#include "dssmm_background.h"\n#include "res/icons.h"\nvoid *font_base_addr=(void*)0x08e80000;\nuintptr_t main(unsigned size){return (uintptr_t)dssmm_icon_pixels(size);}\n')
+ source.write_text('#include <stdint.h>\n#include "dssmm_background.h"\n#include "res/icons.h"\n#include "res/icon-gamegear.h"\n#include "res/icon-pce.h"\nconst void *icon_oracle[]={icons_img,gamegear_pixels,pce_pixels};\nvoid *font_base_addr=(void*)0x08e80000;\nuintptr_t main(unsigned size){return (uintptr_t)dssmm_icon_pixels(size);}\n')
  for flavor,flags in [('standard',[]),('extended',['-DFONTS_EXT','-DSUPPORT_NORGAMES'])]:
   elf=out/'probe.elf'
   subprocess.run(['arm-none-eabi-gcc','-O2','-mthumb','-mcpu=arm7tdmi','-DDSSMM_EXTERNAL_BACKGROUNDS',*flags,'-I',str(root/'src'),str(source),str(root/'src/dssmm_background.c'),'-nostartfiles','-Wl,-Ttext=0x02000000','-Wl,-e,main','-specs=nosys.specs','-o',str(elf)],check=True)
@@ -17,7 +17,7 @@ with tempfile.TemporaryDirectory() as tmp:
   native=root/('res/fonts-ext.pack' if flags else 'res/fonts.pack');packed=native.with_name(native.stem+'-dssmm.pack').read_bytes()
   assert packed[:native.stat().st_size]==native.read_bytes(),'Native font prefix changed'
   tag=packed.rfind(b'ICN1');size=struct.unpack_from('<I',packed,tag+4)[0]
-  assert size==(4352 if flags else 4096) and tag+8+size==len(packed)
+  assert size==(4864 if flags else 4608) and tag+8+size==len(packed)
   bg=(native.stat().st_size+3)&~3
   for case in ('valid','bad-bg','bad-icon','bad-size','wrong-request'):
    cpu=Uc(UC_ARCH_ARM,UC_MODE_THUMB)
@@ -35,7 +35,7 @@ with tempfile.TemporaryDirectory() as tmp:
    result=cpu.reg_read(UC_ARM_REG_R0)
    if case=='valid':
     assert result==0x08e80000+tag+8
-    actual=bytes(cpu.mem_read(result,size));expected=bytes(cpu.mem_read(symbols['icons_img'],size))
+    actual=bytes(cpu.mem_read(result,size));expected=bytes(cpu.mem_read(symbols['icons_img'],size-512))+bytes(cpu.mem_read(symbols['gamegear_pixels'],256))+bytes(cpu.mem_read(symbols['pce_pixels'],256))
     assert actual==expected,(flavor,hex(symbols['icons_img']),next((i,a,b)for i,(a,b)in enumerate(zip(actual,expected))if a!=b))
    else:assert not result,(flavor,case,hex(result))
- print('Native board-specific4096/4352 icon bytes match the C tile oracle in read-only standard/extended resources; corrupt tags/sizes and wrong requests rejected.')
+ print('Native board-specific4608/4864 icon bytes including Game Gear/PCE match the C tile oracle in read-only standard/extended resources; corrupt tags/sizes and wrong requests rejected.')

@@ -1,6 +1,6 @@
 **SUPERCARD SD, SUPERCARD LITE AND SUPERCHIS ONLY.** Choose the firmware for your exact card.
 
-Only Chis has been tested on hardware, on SuperChis Prime. SD and Lite remain physically untested; Build 769’s changes still need hardware testing. Back up saves and firmware before updating.
+Only Chis has been tested on hardware, on SuperChis Prime. SD and Lite remain physically untested; The new NOR carousel changes still need hardware testing. Back up saves and firmware before updating.
 
 ### Features added since the SuperFW fork
 
@@ -26,7 +26,7 @@ Only Chis has been tested on hardware, on SuperChis Prime. SD and Lite remain ph
 ### Known issues and hardware testing
 
 - **Only Chis has hardware testing.** Builds, ARM replay and mGBA checks do not qualify SD/Lite operation or physical flash/save timing.
-- **PCE loading remains unconfirmed on hardware.** Native transfer corrections and a fallback are included, but the reported plugin-format failure still needs card testing. Other plugins may depend on unsupported card behavior.
+- **PCE games load on Chis in the owner’s Build 769 test, but Exit restarts the emulated game.** Other plugins may depend on unsupported card behavior.
 - Full EZ-FLASH DSSMM appearance and responsiveness remain in progress. Some Start artwork sizing and fallback icons still differ; SD operations can briefly stall a frame. Compressed-resource startup on SD/Lite needs hardware testing.
 - Old emulator save states are not guaranteed compatible; prefer in-game battery saves when changing emulators. The menu clock does not advance while powered off.
 - Confirming NOR replacement removes existing games; a later write failure cannot restore them.

@@ -158,8 +158,8 @@ IWRAM_CODE NOINLINE bool artwork_blit_scaled_cropped(volatile uint16_t *frame, c
                                  const artwork_info *info, int x, int y,
                                  unsigned width, unsigned height) {
   if (!frame || !pixels || !info || ((uintptr_t)frame&1) || ((uintptr_t)pixels&1) ||
-      (x&1) || x < -240 || x > 240 || y < -160 || y > 160 ||
-      !width || width>240 || (width&1) || !height || height>160 ||
+      x < -240 || x > 240 || y < -160 || y > 160 ||
+      !width || width>240 || !height || height>160 ||
       (info->width!=80 && info->width!=120) || info->height!=80) return false;
   int left=x<0 ? -x : 0, right=x+(int)width>240 ? 240-x : (int)width;
   int top=y<16 ? 16-y : 0, bottom=y+(int)height>160 ? 160-y : (int)height;
@@ -182,7 +182,13 @@ IWRAM_CODE NOINLINE bool artwork_blit_scaled_cropped(volatile uint16_t *frame, c
     }
     const uint8_t *src=(const uint8_t *)pixels+sy*info->width;
     volatile uint16_t *dst=frame+(y+row)*120+(x+left)/2;
-    for (int col=left;col<right;col+=2) {
+    int col=left;
+    if((x+col)&1) {
+      unsigned value=src[sample[col++]];
+      if(value)*dst=(*dst&255)|(value<<8);
+      ++dst;
+    }
+    for (;col+1<right;col+=2) {
       unsigned lo=src[sample[col]], hi=src[sample[col+1]];
       uint16_t pair=lo|(hi<<8);
       if (!lo || !hi) {
@@ -191,6 +197,10 @@ IWRAM_CODE NOINLINE bool artwork_blit_scaled_cropped(volatile uint16_t *frame, c
         if (!hi) pair|=bg&0xff00;
       }
       *dst++=pair;
+    }
+    if(col<right) {
+      unsigned value=src[sample[col]];
+      if(value)*dst=(*dst&0xff00)|value;
     }
     yerror+=80;
     while(yerror>=height){yerror-=height;++sy;}

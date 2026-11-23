@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """Actual linked plugin loader/FatFs with FAT16 sectors and a halfword-only cart."""
 from pathlib import Path
-import argparse,struct,subprocess
+import argparse,struct,subprocess,tempfile,ctypes
 from unicorn import Uc,UC_ARCH_ARM,UC_MODE_ARM,UC_HOOK_CODE,UC_HOOK_MEM_WRITE
 from unicorn.arm_const import *
 root=Path(__file__).resolve().parents[1];p=argparse.ArgumentParser();p.add_argument('--native-gbc',action='store_true');p.add_argument('--native-pce',action='store_true');p.add_argument('--pack',type=Path);p.add_argument('--extension');p.add_argument('--game-bytes',type=int,default=32768);a=p.parse_args();assert 0<a.game_bytes<=3*1024*1024
 elf=(root/'firmware.ewram.elf').read_bytes()
 version=struct.pack('<I',int(subprocess.check_output(['git','rev-parse','--short=8','HEAD'],cwd=root,text=True).strip(),16))
-if (root/'superfw.gba').exists():version=(root/'superfw.gba').read_bytes()[0xc8:0xcc]
 syms={r.split()[-1]:int(r.split()[0],16) for r in subprocess.check_output(['arm-none-eabi-nm',str(root/'firmware.ewram.elf')],text=True).splitlines() if len(r.split())==3}
 entry=next(v for k,v in syms.items() if k.startswith('load_extemu_rom'))
 sms=(root/'emu/smsadvance-v2.5-scptch.gba.bin').read_bytes();pce=(root/'emu/pceadvance-v7.5-scptch.gba.bin').read_bytes()
@@ -31,6 +30,14 @@ if a.pack:
  cases=[(path.stem,path.suffix[1:],path.read_bytes()) for path in sorted(a.pack.iterdir()) if path.suffix in ('.mb','.mbz','.gba','.bin') and path.stat().st_size<0x40000]
 if a.extension:cases=[case for case in cases if case[0]==a.extension]
 assert cases,'No matching plugin cases'
+def adapted_native_pce(payload):
+ with tempfile.TemporaryDirectory() as temp:
+  library=Path(temp)/'adapter.so'
+  subprocess.run(['gcc','-shared','-fPIC','-O2','-I'+str(root/'src'),str(root/'src/pogo_plugin.c'),'-o',str(library)],check=True)
+  adapter=ctypes.CDLL(str(library));adapter.pogo_adapt_image.argtypes=[ctypes.c_void_p,ctypes.c_uint,ctypes.c_uint]
+  buffer=(ctypes.c_uint32*((len(payload)+3)//4))();ctypes.memmove(buffer,payload,len(payload))
+  assert adapter.pogo_adapt_image(buffer,len(payload),0x09a00000)==1,'Pinned PCE Exit body differs'
+  return bytes(buffer)[:len(payload)]
 for extension,suffix,payload in cases:
  plugin_key='sms' if extension=='gg' else extension
  disk=bytearray(8192*512)
@@ -73,7 +80,8 @@ for extension,suffix,payload in cases:
   state['minimum']=min(state['minimum'],uc.reg_read(UC_ARM_REG_SP))
   if (a.native_gbc or a.native_pce) and address==syms['launch_reset']:
    assert uc.reg_read(UC_ARM_REG_R0)==0,'Native GB/GBC reset policy changed'
-   assert bytes(uc.mem_read(0x08000000,len(payload)))==payload,'Bundled native core differs after decode'
+   expected=adapted_native_pce(payload) if a.native_pce else payload
+   assert bytes(uc.mem_read(0x08000000,len(payload)))==expected,'Native core changed beyond its verified Exit/timing adaptation'
    offset=len(payload)
    if a.native_pce:
     header=bytes(uc.mem_read(0x08000000+offset,64))

@@ -1,5 +1,20 @@
 # Emulator plugins
 
+## Build769 hardware follow-up and native PCE candidate
+
+Owner reports GG/SMS operation working at746. At769 PCE games load, but Exit
+restarts the emulated game. The report does not identify which backend ran.
+The bundled native PCE path lacked the verified return adapter already used
+by portable plugins. The candidate applies it only to recognized PCE cores,
+scanning only emulator bytes and using the existing validated firmware snapshot
+and return stub. MiGoomba and unknown reset patterns remain untouched.
+
+The actual linked loader/FatFs replay checks the adapted core and exact game
+append. `DSSMM_PLUGIN_SYSTEMS=pce-native bash scripts/test-plugin-preview-mgba.sh`
+boots the native ROM/header layout and checks menu Exit reaches a marker in
+stock mGBA. Firmware restoration is covered separately by the production ARM
+return tests. These checks do not qualify physical PCE Exit/save timing.
+
 SuperFW DSSMM can launch extension-named Pogoshell plugins from `SYSTEM/PLUG`.
 For example, a `nes.gba` plugin handles `.nes` games, and `sms.mb` handles `.sms`
 games. Copy your existing plugin files into that directory; keep their names.

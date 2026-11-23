@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Run a supplied portable RAM plugin with a synthetic ROM in stock mGBA."""
+"""Run a native emulator or portable plugin with a synthetic ROM in stock mGBA."""
 from pathlib import Path
 import argparse,ctypes as C,subprocess,struct,tempfile
-p=argparse.ArgumentParser();p.add_argument('plugin',type=Path);p.add_argument('--system',choices=['sms','gg','pce'],default='sms');p.add_argument('--out',type=Path,required=True);a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('plugin',type=Path);p.add_argument('--system',choices=['sms','gg','pce'],default='sms');p.add_argument('--out',type=Path,required=True);p.add_argument("--native-pce",action="store_true");a=p.parse_args();assert not a.native_pce or a.system=="pce";a.out.mkdir(parents=True,exist_ok=True)
 root=Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as tmp:
  lib=Path(tmp)/'pogo.so';subprocess.run(['gcc','-shared','-fPIC','-O2','-I'+str(root/'src'),str(root/'src/pogo_plugin.c'),'-o',str(lib)],check=True)
@@ -78,5 +78,13 @@ int main(void) {{
 ''')
  subprocess.run(['arm-none-eabi-gcc','-O2','-marm','-mcpu=arm7tdmi','-specs=gba.specs','-Wl,--section-start=.pogo_exit=0x08080000','-Wl,-u,exit_marker',str(a.out/'main.c'),str(a.out/'data.S'),'-o',str(a.out/'preview.elf')],check=True)
  subprocess.run(['arm-none-eabi-objcopy','--change-section-lma','.pogo_exit=0x08080000','-O','binary',str(a.out/'preview.elf'),str(a.out/'preview.gba')],check=True)
+ if a.native_pce:
+  # Keep the compiled Exit marker; boot the actual ROM core and native wrapper.
+  marker=(a.out/'preview.gba').read_bytes()[0x80000:];assert marker and len(buf)*4+64+len(game)<0x80000
+  header=filename.encode().ljust(32,b'\0')+struct.pack('<5I',len(game)+16,4,0,0,0x1a53454e)+b'@          \0'
+  assert len(header)==64
+  image=bytearray(bytes(buf)+header+game);image+=b'\xff'*(0x80000-len(image));image+=marker
+  image[0xb2]=0x96;image[0xbd]=(-sum(image[0xa0:0xbd])-0x19)&255
+  (a.out/'preview.gba').write_bytes(image)
  assert (a.out/'preview.gba').stat().st_size<32*1024*1024
  print(a.out/'preview.gba',f'({hooks} exact exit hooks; generated {a.system} ROM, no commercial game)')

@@ -29,6 +29,14 @@ static void launch_reset(bool hard,bool fast){assert(!hard&&fast==use_fastew&&!s
 static unsigned make_header(uint8_t *dst,const char *name,unsigned size){(void)name;(void)size;
  assert((uintptr_t)dst<(uintptr_t)GBA_ROM_ADDR||(uintptr_t)dst>=(uintptr_t)GBA_ROM_ADDR+sizeof(cart_words));
  memset(dst,0x5a,64);return 64;}
+const t_emu_loader *get_emu_info(const char *extension){(void)extension;return 0;}
+#define POGO_BACKUP_IMAGE ((const uint32_t*)0)
+#define POGO_STUB_IMAGE ((const uint32_t*)0)
+#define POGO_RETURN_STUB 0x09a00000u
+#define VERSION_SLUG_WORD 0
+#define FW_MAX_SIZE_KB 2048
+static bool pogo_return_available(const uint32_t *a,const uint32_t *b,uint32_t c,uint32_t d){(void)a;(void)b;(void)c;(void)d;assert(!"Non-PCE loader reached return adapter");return false;}
+static unsigned pogo_adapt_image(uint32_t *a,uint32_t b,uint32_t c){(void)a;(void)b;(void)c;assert(!"Non-PCE loader adapted its payload");return 0;}
 #include "native-emulator.h"
 static void no_handles(void){for(unsigned i=0;i<8;i++)assert(!handles[i]);}
 static void binary_file(const char *name,unsigned size){char q[1024];path(q,name);FILE *f=fopen(q,"wb");assert(f);for(unsigned i=0;i<size;i++)assert(fputc((i*31+7)&255,f)!=EOF);assert(!fclose(f));}
