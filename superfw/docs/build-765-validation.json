@@ -1,0 +1,47 @@
+{
+  "build": 765,
+  "source_commit": "3c8588ecdfa76337b6f0696a3869e0be0c95ac9a",
+  "boards": [
+    {
+      "source_tree_sha256": "689545210a17b46840cf1f7d41c2dc72f4757fe2c3dfbb16096457513cbe2c18",
+      "board": "sd",
+      "dssmm_build": 765,
+      "source_commit": "3c8588ecdfa76337b6f0696a3869e0be0c95ac9a",
+      "source_dirty": false,
+      "firmware_sha256": "5582455c1d7bb0f40704414734bc55f57c731a646945d9ba0938582ac44dd4d5",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496640,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 27648
+    },
+    {
+      "source_tree_sha256": "689545210a17b46840cf1f7d41c2dc72f4757fe2c3dfbb16096457513cbe2c18",
+      "board": "lite",
+      "dssmm_build": 765,
+      "source_commit": "3c8588ecdfa76337b6f0696a3869e0be0c95ac9a",
+      "source_dirty": false,
+      "firmware_sha256": "ff332893ef0e9bfc2378e5800d4f8a77920a1caa9f98566d99407c2ba1b2d6df",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496640,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 11264
+    },
+    {
+      "source_tree_sha256": "689545210a17b46840cf1f7d41c2dc72f4757fe2c3dfbb16096457513cbe2c18",
+      "board": "chis",
+      "dssmm_build": 765,
+      "source_commit": "3c8588ecdfa76337b6f0696a3869e0be0c95ac9a",
+      "source_dirty": false,
+      "firmware_sha256": "a3063517df40d6b63ef4efbe26a28736e7a8e7e20952aa07d6f71b0fb793c8e0",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "local_verifier": "full all3/native ARM/mGBA/host verifier exit0",
+  "source_ci": 45178247462,
+  "integration_ci": 45178256596,
+  "integration_pr": 20,
+  "limits": "No new physical qualification; NOR Last Played added, NOR carousel absent; PCE remains unconfirmed."
+}

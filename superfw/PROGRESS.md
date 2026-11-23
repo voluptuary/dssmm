@@ -959,3 +959,13 @@ was intentionally not delivered: review found invalid named paths could fall
 through to an SD ROM-header probe. Added initial canonical validation plus
 no-file-opens traversal regression (fails764, passes correction). Build765
 clean verification follows.759 public/hardware-test remains current.
+
+## Build765 validated hardware-test checkpoint
+
+Clean source3c8588ec passed full all3/ARM/host/mGBA verifier, source CI
+45178247462 and all4 PR20 CI45178256596. Chis765 replaces759 only in the local
+hardware-test folder. Public normal759 stays unchanged. NOR Last Played now
+uses CUSTOM/filename art and stored-code Title fallback without the SD ROM.
+No new physical qualification; PCE still needs card testing.764 was held for
+its path-guard correction and never delivered. Next: shared NOR carousel
+prototype and permanent synthetic cached-art native fixture; no extra cache pool.
