@@ -2321,6 +2321,8 @@ void render_ui_settings(volatile uint8_t *frame) {
   if(ds_style)render_dssmm_settings_background(frame,"Interface");
   const unsigned value_x=ds_style?119:128;
   const unsigned rows=ui_visible_rows(),line_h=ds_style?(menu_font==FONT_STYLE_DSSMM?14:18):18;
+  if(smenu.uiset.seloff>0)draw_central_text("⯅",frame,ds_style?230:120,ds_style?20:15);
+  if(smenu.uiset.seloff+rows<=UiSetMAX)draw_central_text("⯆",frame,ds_style?230:120,ds_style?136:125);
   char tmpbuf[64];
   const char * const labels[UiSetSave] = {
     msgs[lang_id][MSG_UIS_THEME], "Font", "Artwork", "Browser view", msgs[lang_id][MSG_UIS_LANG],
@@ -2479,7 +2481,7 @@ void reload_theme(unsigned thnum) {
   MEM_PALETTE[BG_COLOR] = colors.bg_color;
   MEM_PALETTE[FT_COLOR] = colors.ft_color;
   MEM_PALETTE[HI_COLOR] = colors.hi_color;
-  MEM_PALETTE[TOP_BG]=menu_topbar==ACCENT_COUNT?themes[THEME_DSSMM_DARK].fg_color:
+  MEM_PALETTE[TOP_BG]=menu_topbar==ACCENT_COUNT?0x318c:
       menu_topbar?menu_theme_colors(thnum,menu_topbar).hi_color:themes[THEME_DSSMM_LIGHT].fg_color;
   MEM_PALETTE[TOP_TEXT]=menu_topbar?0x7fff:0;
   MEM_PALETTE[TOP_SELECT]=menu_topbar?0x7fff:colors.hi_color;

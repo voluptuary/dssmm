@@ -921,3 +921,13 @@ PCE portable-load errors can try the existing native core; working portable
 plugins retain priority. This is not confirmation of the physical PCE cause.
 Full clean all3 verification is next, then normal integration/release before
 NOR carousel work. Preserve BLUE candidate and private session artifacts.
+
+## Build758 validation and owner751 follow-up
+
+Clean source3e51917a/Build758 passed full all3/ARM/host/mGBA verifier and all4
+PR19 checks45098710443. Chis758 replaces751 in hardware-test; SHA
+7fca9fc6c79833369c4ae795997d89e3433acd36363f4e58135803d058941946.
+Owner751 PCE says Plugin format unsupported;751 predates native transfer/fallback
+corrections. Physical resolution remains unconfirmed. Added Interface overflow
+arrows matching Games and a lighter neutral Dark header base0x318c. Header
+shading host bounds pass; validate revised native scenes/build before publishing.
