@@ -23,6 +23,7 @@ preamble=r'''
 #include "browser_carousel.h"
 #include "util.h"
 #define MAX_FN_LEN 256
+#define MENUTAB_ROMBROWSE 1
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define AM_DIR 16
@@ -49,7 +50,7 @@ static unsigned carousel_wrap;
 #define npf_snprintf snprintf
 #define strbcpy(d,s,n) snprintf(d,n,"%s",s)
 typedef struct { unsigned attr; char fname[32]; } t_centry;
-static struct { struct { int selector,dispentries; char cpath[64]; } browser; } smenu;
+static struct { unsigned menu_tab;struct { int selector,dispentries; char cpath[64]; } browser; } smenu={.menu_tab=MENUTAB_ROMBROWSE};
 static struct state {
  CAROUSEL_STORAGE
  uint8_t artwork_bmp_buffer[ARTWORK_BMP_MAX_SIZE];
@@ -197,6 +198,10 @@ if 'static void render_artwork_placeholder(' in source:
  preamble+='\n#define render_artwork_placeholder(...) ((void)0)\n'
 a=source.index('static unsigned carousel_find_slot(');b=source.index('\n}',a)+2
 preamble+=source[a:b]+'\n'
+if 'static bool carousel_source_nor(' in source:
+ a=source.index('static bool carousel_source_nor(');b=source.index('#pragma GCC pop_options',a)
+ preamble+=source[a:b]+'\n'
+ tests=tests.replace('int main(void) {','int main(void) {\n assert(carousel_source_active());')
 Path(sys.argv[2]).write_text(preamble+function('browser_cache_prepare')+'\n'+function('browser_invalidate_artwork')+'\n'+function('render_browser_carousel')+'\n'+tests)
 PY
 if [[ -n "${CAROUSEL_TEST_SOURCE:-}" ]]; then exit 0; fi

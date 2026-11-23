@@ -8,6 +8,8 @@ _Static_assert(offsetof(FATFS, win)%4 == 0, "FatFS sector cache must be word ali
 #else
 _Static_assert(offsetof(FIL, buf)%4 == 0, "FatFS file cache must be word aligned");
 #endif
+/* File/path handling is cold; pixel conversion stays in artwork.c. */
+#pragma GCC optimize ("Os")
 /* No truncated candidate opens, path traversal or directory scans. */
 static bool artwork_named_path(char *out, size_t capacity, const char *rom, unsigned style, unsigned candidate, bool directory) {
   if (!out || !capacity || !rom || rom[0] != '/' || !rom[1] || style > 1 || candidate > 1) return false;
@@ -72,6 +74,7 @@ typedef struct {
   const uint8_t *bytes;
   bool legacy, legacy_marked;
 } artwork_buffer;
+__attribute__((optimize("O2")))
 static bool read_buffer(void *context, uint32_t offset, void *data, size_t size) {
   const artwork_buffer *input = context;
   const uint8_t *buffer = input->bytes;
