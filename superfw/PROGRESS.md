@@ -893,3 +893,9 @@ symbol/ABI guards after a sync-source CI failed13 despite integration success.
   CPU tradeoff and rejected experiments are recorded in BOOT-RESOURCE-COMPRESSION.
 - MiGoomba integration/PCE investigation precede NOR view/artwork work and the
   next requested normal release. BLUE launch audit stays in its own lane.
+
+- Delivered Chis749 after full all3/native/host/mGBA and sourceCI45092221448.
+  Additional Dark Info/System and light/dark solid-header-selector checks pass.
+  Corrected a6px-versus8px corner sampling oracle; firmware stayed749. Permanent
+  verifier now retains those cases. SD30KiB/Lite46KiB margins are verified. Next:
+  MiGoomba generic integration and continued PCE diagnosis before NOR features.

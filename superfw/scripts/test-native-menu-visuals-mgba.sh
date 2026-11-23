@@ -50,7 +50,7 @@ for x,y,sx in points:
  assert tuple(rows[y][x*3:x*3+3])==expected,f'Scene{scene}: text/selection crossed frame at{x},{y}'
 if scene==15:
  rgb=lambda x,y:tuple(rows[y][x*3:x*3+3])
- colors={rgb(x,y)for y in (0,15)for x in (*range(178,186),*range(232,240))}
+ colors={rgb(x,y)for y in (0,15)for x in (*range(178,184),*range(234,240))}
  assert len(colors)==1,'Topbar selector inherited gradient colors'
 if scene in (13,14):
  # At 50%, the corrected 200px fill begins at (20,78), including its top/left edges.

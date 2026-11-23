@@ -1587,3 +1587,14 @@ SD=GCEM only, Lite=none, Chis=all six. Alternate transforms/windows were larger;
 run compressor studies serially (three parallel benchmark OOM kills, no loss).
 Updated UI host topbar/corner/panel/settings tests pass. New native theme/topbar
 flags and scene15 check flat clock corners; full compilation/mGBA/all3 still due.
+
+749 full verifier and sourceCI45092221448 pass. All3 clean identities are in
+ docs/build-749-validation.json. Extra dark Info/System scenes and flat clock
+selectors on both fonts pass; light default clock selectors pass too. The first
+clock oracle sampled8px arms while actual16px-high corners use6px; corrected
+only the oracle and replayed the same749 ELF. Added native Dark/selector cases
+to the permanent verifier and a direct Dark topbar parser assertion. Chis749
+hash-verified hardware-test replaces746; no MiGoomba change is in749 yet. Owner
+746 GG/SMS confirmation remains valid for that tested source only. PCE stays open.
+BLUE audit has independently reproduced and corrected an exFAT alias assumption
+in its own worktree; no BLUE code belongs in this lane.

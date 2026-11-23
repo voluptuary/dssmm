@@ -46,6 +46,8 @@ for board in sd lite chis; do
 done
 bash "$project_root/scripts/test-native-settings-mgba.sh"
 bash "$project_root/scripts/test-native-menu-visuals-mgba.sh"
+DSSMM_PREVIEW_THEME=7 DSSMM_PREVIEW_TOPBAR=5 DSSMM_PREVIEW_SCENES="1 2 15" bash "$project_root/scripts/test-native-menu-visuals-mgba.sh"
+DSSMM_PREVIEW_THEME=6 DSSMM_PREVIEW_TOPBAR=0 DSSMM_PREVIEW_SCENES=15 bash "$project_root/scripts/test-native-menu-visuals-mgba.sh"
 bash "$project_root/scripts/test-start-caption-mgba.sh"
 bash "$project_root/scripts/test-plugin-preview-mgba.sh"
 python3 "$project_root/tools/pack-dssmm-resources.py" --check

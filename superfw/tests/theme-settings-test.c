@@ -120,5 +120,7 @@ int main(void) {
   read_setting("Theme","Dark");assert(menu_theme==THEME_DSSMM_DARK);
   read_setting("Clean list","On");assert(clean_list==1);
   read_setting("View mode","Horizontal");assert(shared_view==1);
+  parse_ui_settings(0,"topbar","5");assert(menu_topbar==5);
+  assert(!strcmp(topbar_names[menu_topbar],"Dark"));
   return 0;
 }
