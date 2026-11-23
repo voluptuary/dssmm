@@ -2204,3 +2204,18 @@ validation/journals retain all3 builds/nativeARM/IGM/mGBA26/plugin Exit evidence
 and physical limits. No public release changed. Normal all5 synchronization
 follows this checkpoint; do not refresh source baselines outside a release.
 Continue SuperFW Start fallback/title-centering parity in its owning lane.
+
+## 2026-11-23 — SuperFW759 release / BLUE launch audit integration
+
+SuperFW normal release superfw-build759/source67b20b57 published after all3
+local/native ARM/mGBA, source45172727651 and all4 PR19 CI45172737715 passed.
+PR19 merged c0c6b52; publication docs integrated normally. All4 downloaded assets
+match, including full folder-art.zip;667 and stable DE latest preserved. Root
+README and only SuperFW release baseline updated. Only prior Chis physical
+observations qualify hardware; PCE remains open. Project journals govern NOR
+carousel continuation. No emulator/environment changes or private BIOS added.
+
+BLUE SD audit PR18 merged980ba8f after source45095029573/all4 CI45095035057.
+Alias-free exFAT rejection fixed; permanent five-case mGBA launch fixture and
+local sealed candidate retained. No BLUE release/baseline or physical claim.
+Normal all5 branch synchronization follows this checkpoint.

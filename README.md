@@ -44,9 +44,9 @@ and follow that release's installation instructions.
 
 ## SuperCard and SuperChis
 
-**[Download SuperFW Build 667](https://github.com/voluptuary/dssmm/releases/tag/superfw-build667)**
+**[Download SuperFW Build 759](https://github.com/voluptuary/dssmm/releases/tag/superfw-build759)**
 for SuperChis/SuperChis Prime, SuperCard SD or SuperCard Lite. The release also
-includes the optional folder-art pack. Build 667 replaces the withdrawn Test 6.
+includes the optional folder-art pack. Choose the firmware for your exact card.
 
 DSSMM SuperFW is a developing DS Style menu port for SuperCard-family flashcards, built on
 [David Guillen Fandos’s SuperFW](https://github.com/davidgfnet/superfw). It adds
@@ -63,15 +63,14 @@ such as its NOR library, remain specific to that card.
 
 **Hardware testing:** only Chis has been tested on hardware, on one SuperChis
 Prime v1.0. The owner confirms artwork, five-image lookahead and settings
-persistence in earlier builds. New Build 667 changes still need physical
-testing; SD and Lite remain physically untested. GG/SMS plugin Exit can crash,
+persistence in earlier builds. New Build 759 changes still need physical
+testing; SD and Lite remain physically untested. GG/SMS operation is reported working,
 PCE loading remains unresolved, and other plugin compatibility varies. Full EZ-FLASH DSSMM appearance and responsiveness are
 in progress. Choose your exact card’s file and back up saves and current firmware.
 Follow [SuperFW’s installation and recovery guide](https://superfw.davidgf.net/docs/install/flash/).
 Use only the matching SuperCard-family build; the OMEGA downloads above target
 different hardware. Prime has no hardware RTC or rumble, and this port offers
-manual themes rather than automatic switching. Its bundled emulators remain
-upstream versions; MiGoomba is currently an OMEGA-family update.
+manual themes rather than automatic switching. Native MiGoomba GB/GBC emulation is included on all three variants.
 
 ### Make and add artwork
 

@@ -22,7 +22,7 @@
     "superfw": {
       "directory": "superfw",
       "branch": "superfw",
-      "baseline_commit": "a7259a8357d850c86744a074e305c0f8f39e1849",
+      "baseline_commit": "67b20b5780af6789fb3569de69cd31f204498e64",
       "baseline_directory": "superfw"
     }
   },
