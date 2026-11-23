@@ -1049,3 +1049,18 @@ These counts are not physical timing. Current focused36-case compositor,
 Start art/font4cases, native PCE loader+Exit mGBA, shared icon resource oracle
 and all3 icon checks pass. Final partial link256056/257024 EWRAM,15752 IWRAM.
 Next: clean commit/build all3 and integration before replacing hardware-test769.
+
+## Recovery / DE launch audit takes priority
+
+Build776 stopped cleanly at Lite link: IWRAM16160 exceeded unchanged stack
+start0x03003f00 by32B. Nothing776 was delivered. Moved the fully written-per-frame
+512B sprite command buffer to GBA EWRAM (full64 capacity kept, hot pixel code
+and16KiB stack unchanged). Partial Lite link nowIWRAM15648/EWRAM241944; memory
+guard and36 actual ARM odd-edge cases pass. Full clean777+all3/CI remains pending.
+Public/hardware-test769 remains frozen. Source776 includes PCE return/icon and
+Start fixes with focused tests; no new physical Exit qualification.
+
+Owner now prioritizes DE SD-launch regression versus Frankie8.2 before other
+porting. No interrupted process remains. Continue that audit in ezfomegade lane;
+then resume clean SuperFW gates and Atari source prototype. Preserve ownerlock,
+private BIOS, artwork archive and session scratch.

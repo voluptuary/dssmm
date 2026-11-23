@@ -23,10 +23,10 @@ assert size == 9600 and kind.lower() == 'b'
 assert 0x02000000 <= address < address+size <= 0x03000000, 'hot image outside GBA EWRAM'
 print(f'Selected artwork: {size} bytes in GBA EWRAM at {address:#010x}.')
 
-# Cold text uses byte-writable EWRAM, leaving the native16KiB IWRAM stack intact.
+# Text/settings and sprite records use GBA EWRAM; preserve the native16KiB IWRAM stack.
 symbol_rows=[line.split() for line in subprocess.check_output(
     ['arm-none-eabi-nm','-S',sys.argv[1]],text=True).splitlines()]
-for name,expected in [('artwork_rom',256),('shared_values',576),('original',8192)]:
+for name,expected in [('artwork_rom',256),('shared_values',576),('original',8192),('fobjs',512)]:
     matches=[row for row in symbol_rows if row[-1:]==[name]]
     assert len(matches)==1 and len(matches[0])==4,f'Missing cold cache {name}'
     address,size,kind,_=matches[0];address,size=int(address,16),int(size,16)
@@ -34,4 +34,4 @@ for name,expected in [('artwork_rom',256),('shared_values',576),('original',8192
     assert 0x02000000<=address<address+size<=0x03000000,f'{name} outside GBA EWRAM'
 stack=[row for row in symbol_rows if row[-1:]==['__STACK_USR_SIZE__']]
 assert len(stack)==1 and int(stack[0][0],16)>=16384,'Native user stack reserve reduced'
-print('Cold filename/settings caches are in EWRAM; native16KiB user stack retained.')
+print('Filename/settings caches and sprite records are in EWRAM; native16KiB stack retained.')

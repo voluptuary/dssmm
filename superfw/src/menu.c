@@ -434,7 +434,8 @@ static update_unlock_state update_unlock;
 static uint16_t fresh_keys;
 static unsigned framen = 0;
 static unsigned objnum = 0;
-static t_oamobj fobjs[64];
+/* Written before use each frame; keep pixel code and the full stack in IWRAM. */
+static t_oamobj fobjs[64] __attribute__((section(".sbss"),aligned(4)));
 
 #pragma GCC optimize ("Os")
 
