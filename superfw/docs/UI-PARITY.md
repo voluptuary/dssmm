@@ -113,3 +113,22 @@ centering, then compare category/settings/dialog spacing against native captures
 NOR/Recents carousel support and hardware performance remain separate goals.
 Owner585/657 confirmed artwork/cache and settings persistence on Chis; the new
 plugin return path, PCE loading, SD/Lite and new menus remain physically unqualified.
+
+## Settings row alignment checkpoint
+
+Native scenes20/21/22 now cover Settings home, Games and Hardware, entering
+categories through the real menu handler. They need no NOR feature and run on
+all three variants. Existing seeded-page/frame checks also cover these pages.
+Comparing the common Interface label with the DE native Settings capture shows
+the same glyph bitmap with two additional rows of top padding in the SuperFW
+16px font path. Settings text now compensates for that padding; the highlight
+uses DE's13px fill within a14px row, starting at y24. Native SuperFW font keeps
+its existing spacing. Settings home, Interface, Games and Hardware share the
+corrected baseline. No cache, hardware protocol or persistent setting changes.
+
+The mGBA scene20 check compares the exact common-label black-pixel mask against
+an independent DE native capture (SHA256 of mask:
+7c10f263ca3e5e76f53f76eec576d96f115e6409b5359f22f235aed9719ff7a8).
+The mask covers x23..110,y24..37 and deliberately excludes palette-dependent
+selection/header colors. Full native visual/build validation follows before
+replacing the current hardware-test kernel.

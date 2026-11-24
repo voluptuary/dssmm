@@ -1190,3 +1190,13 @@ and exact independently rebuilt corresponding-source ZIP/notes/JSON. No sound,
 physical Exit, broad games or cycle-exact emulation qualification; Chis799 and
 public769 remain unchanged. Resume menu parity comparisons after committing this
 checkpoint; no user input needed. Preserve current plugin+source in cleanup.
+
+## 2026-11-24 — Settings visual parity candidate
+
+Compared native DE Settings/Games captures against linked Chis799. Add native
+scenes20/21/22 for Settings home/Games/Hardware via actual category input, without
+requiring NOR. Correct DSSMM-font text baseline and13px selection fill/14px row
+against the common DE Interface-label pixel mask. Native font spacing remains.
+Host highlight bounds pass; full clean all3/native/mGBA gates must pass before
+replacing hardware-test Chis799. Atari current plugin/source remain delivered
+separately; public769 unchanged. Continue without waiting for hardware feedback.

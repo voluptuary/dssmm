@@ -62,6 +62,14 @@ static const t_flash_game_entry sample_nor = {
 };
 static void visual_scene(void) {
   if (!TEST_SCENE)return;
+  if(TEST_SCENE>=20) {
+    VAR8(NATIVE_launcher_page)=2;
+    VAR8(NATIVE_launcher_category)=0;
+    if(TEST_SCENE>=21)key(128);
+    if(TEST_SCENE==22)key(128);
+    if(TEST_SCENE>=21)key(1); /* Traverse the real Settings category handler. */
+    return;
+  }
 #if TEST_NOR_CAROUSEL
   if(TEST_SCENE>=16) {
     for(unsigned i=0;i<sizeof(native_cache_seed)/sizeof(*native_cache_seed);++i)

@@ -10,7 +10,7 @@ fi
 python3 "$root/scripts/build-native-settings-preview.py" --scene 0 >/dev/null
 nor_supported=$(python3 -c 'import json,sys;print(int(json.load(open(sys.argv[1]))["nor_supported"]))' "$out/fixture.json")
 for font in ${DSSMM_PREVIEW_FONTS:-1 0}; do
-for scene in ${DSSMM_PREVIEW_SCENES:-1 2 3 4 5 6 7 8 9 10 11 12 13 14}; do
+for scene in ${DSSMM_PREVIEW_SCENES:-1 2 3 4 5 6 7 8 9 10 11 12 13 14 20 21 22}; do
  if [[ ( "$scene" = 4 || "$scene" = 13 ) && "$nor_supported" = 0 ]]; then continue; fi
  python3 "$root/scripts/build-native-settings-preview.py" --scene "$scene" --font "$font" --theme "${DSSMM_PREVIEW_THEME:-6}" --topbar "${DSSMM_PREVIEW_TOPBAR:-0}"
  SDL_AUDIODRIVER=dummy xvfb-run -a bash -c '
@@ -26,7 +26,7 @@ for scene in ${DSSMM_PREVIEW_SCENES:-1 2 3 4 5 6 7 8 9 10 11 12 13 14}; do
  ' _ "$out" "$emulator"
  python3 - "$out" "$root" "$scene" "$font" "${DSSMM_PREVIEW_THEME:-6}" <<'PY'
 from pathlib import Path
-import struct,sys
+import hashlib,struct,sys
 out,root=map(Path,sys.argv[1:3]);scene=int(sys.argv[3]);font=int(sys.argv[4]);dark=int(sys.argv[5])==7;sys.path.insert(0,str(root/'tests'))
 from png_reader import read_rgb_png
 path=max(out.glob('native-settings-*.png'),key=lambda p:p.stat().st_mtime)
@@ -37,7 +37,7 @@ source=struct.unpack('<38400H',(root/('assets/backgrounds/'+('dark' if dark else
 points=[]
 if scene in (10,15):
  points=[]
-elif scene==9:
+elif scene in (9,20,21,22):
  points=[(x,y,x) for y in (149,150,151) for x in range(112,224)]
 else:
  for y in range(21,152):
@@ -48,6 +48,10 @@ else:
 for x,y,sx in points:
  pixel=source[y*240+sx];expected=tuple((((pixel>>b)&31)<<3)|(((pixel>>b)&31)>>2) for b in (0,5,10))
  assert tuple(rows[y][x*3:x*3+3])==expected,f'Scene{scene}: text/selection crossed frame at{x},{y}'
+if scene==20 and font==1 and not dark:
+ # Independent DE native capture: identical "Interface" glyphs/coordinates.
+ ink=bytes(tuple(rows[y][x*3:x*3+3])==(0,0,0) for y in range(24,38) for x in range(23,111))
+ assert hashlib.sha256(ink).hexdigest()=='7c10f263ca3e5e76f53f76eec576d96f115e6409b5359f22f235aed9719ff7a8','Settings label baseline differs from DE reference'
 if scene==15:
  rgb=lambda x,y:tuple(rows[y][x*3:x*3+3])
  colors={rgb(x,y)for y in (0,15)for x in (*range(178,184),*range(234,240))}
