@@ -1,3 +1,9 @@
+# DS Style Merkin Mix 8.4.1
+
+- Fixed SD launch paths without short-name aliases, including exFAT and clipped long filenames.
+- Full project and native mGBA launch checks passed; physical confirmation of affected cards remains pending.
+- [Release notes](docs/releases/v8.4.1.md).
+
 # DS Style Merkin Mix 8.4.0
 
 **EZ-FLASH OMEGA Definitive Edition Rev. A/B only.**
