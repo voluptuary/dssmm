@@ -33,6 +33,6 @@ fixes and therefore can report a newer SuperFW build number. Baselines in
 source. Hardware-specific protocols remain isolated in their project folders.
 
 Atari plugin development now lives at [a26.gba](https://github.com/voluptuary/a26.gba).
-Historical DSSMM recipes and the owner's original ZIP remain in SuperFW history;
-they are not the latest emulator. The optional newer card-bus harness is not a
+Historical DSSMM recipes remain in SuperFW; the owner authorized removing the
+obsolete ZIP. They are not the latest emulator. The optional newer card-bus harness is not a
 replacement for DSSMM's native launch/render tests or physical qualification.

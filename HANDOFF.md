@@ -2295,3 +2295,6 @@ all kernel journals/releases remain. Atari development moved to voluptuary/a26.g
 current tests/hardware observations and native harness review stay project-owned.
 Fresh-clone builds and branch synchronization follow; do not claim completion
 before checking those results. Release metadata/assets remain unchanged.
+
+Owner subsequently authorized deletion of the obsolete a26.zip; the temporary
+SuperFW archival copy is removed too. Original Git history is retained.
