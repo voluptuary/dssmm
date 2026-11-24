@@ -1,10 +1,10 @@
-# DS Style Merkin Mix — Original EZ-FLASH OMEGA
+# DS Style Merkin's Mix — Original EZ-FLASH OMEGA
 
-Merkin Mix adds artwork transparency and name-matched artwork for supported systems beyond GBA, alongside highly optimized artwork lookup and menu rendering that retains transparency compatibility. This branch builds on **FrankieT19's Original OMEGA DS Style v8.0 fork**, with the EZ-FLASH and Sterophonick kernel foundations.
+Merkin's Mix adds artwork transparency and name-matched artwork for supported systems beyond GBA, alongside highly optimized artwork lookup and menu rendering that retains transparency compatibility. This branch builds on **FrankieT19's Original OMEGA DS Style v8.0 fork**, with the EZ-FLASH and Sterophonick kernel foundations.
 
 **Original EZ-FLASH OMEGA only. Hardware untested.** These builds are incompatible with the older OMEGA Definitive Edition Rev. A/B and the newer OMEGA Definitive Edition B / BLUE. Those targets have separate [ezfomegade](https://github.com/voluptuary/dssmm/tree/ezfomegade) and [ezfblue](https://github.com/voluptuary/dssmm/tree/ezfblue) branches.
 
-The current release identifies itself as `Merkin Mix 8.4.0-omega-test4`. It has source, build and host-test validation only. Installation, booting, gameplay, saving, plugins, cheats/save states and NOR operations still need testing on an Original OMEGA cartridge. [Original OMEGA Test 4](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-omega-test4) is the current hardware-untested prerelease.
+The current release identifies itself as `Merkin's Mix 8.4.0-omega-test4`. It has source, build and host-test validation only. Installation, booting, gameplay, saving, plugins, cheats/save states and NOR operations still need testing on an Original OMEGA cartridge. [Original OMEGA Test 4](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-omega-test4) is the current hardware-untested prerelease.
 
 Features include:
 
@@ -21,7 +21,7 @@ Download the Original OMEGA **`ezkernel.bin`** from its explicitly labeled prere
 
 See the [platform status](docs/porting/OMEGA_STATUS.md) for additional compatibility and testing limitations.
 
-Thanks to **FrankieT19** for the Original OMEGA DS Style adaptation and interface work, **Sterophonick** and **EZ-FLASH** for the foundations, **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above, **aidiadayo** for Thai support, **Kekun** for the case-sensitive font include correction in the lineage, and **ChaN** for FatFs. Merkin Mix artwork and port work is maintained by **Merkin / voluptuary**, with AI assistance. [Detailed credits and provenance](CREDITS.md).
+Thanks to **FrankieT19** for the Original OMEGA DS Style adaptation and interface work, **Sterophonick** and **EZ-FLASH** for the foundations, **exploitz86** and **SkillerCMP** for the cheat-menu contributions described above, **aidiadayo** for Thai support, **Kekun** for the case-sensitive font include correction in the lineage, and **ChaN** for FatFs. Merkin's Mix artwork and port work is maintained by **Merkin / voluptuary**, with AI assistance. [Detailed credits and provenance](CREDITS.md).
 
 ## GB/GBC emulator
 
