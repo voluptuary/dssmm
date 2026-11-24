@@ -1837,3 +1837,71 @@ PocketStella pin1e299b9 has disabled/absent core/video/audio; existing MikeDX na
 startup/ROM/render tests are the practical starting point. No a26 binary delivered.
 Native Info screenshot also exposes an overlong unlock hint at the bottom; fix
 its wrapping/alignment in the subsequent menu parity pass, preserving exact words.
+
+## 2026-11-24 — Atari classic menu prototype
+
+Implemented owner-requested L+R/D-pad/A/B classic emulator menus in the separate
+source recipe: Controller, Display, Other Settings, Help, Resume, Restart, Exit.
+L alone no longer resets. mGBA exposed stale menu pixels on Restart; restoring
+the saved framebuffer fixes it. Ten real SDLmGBA0.10.1/Xvfb interaction checks
+pass, including Exit to a deliberately substituted return marker (not physical
+firmware remapping). No BIOS or emulator changes. Actual ARM startup +21 loader
+cases,12 F8/F6 bank hotspots and7 invalid/valid return-header cases pass. Original
+6502 exact-pixel diagnostic passes. Native evidence is in atari2600-prototype-
+validation.json; replay tools are tracked under tools/.
+
+Runtime remains a source-only experiment: no sound, only the generated diagnostic
+qualified, other Atari bank formats unsupported, upstream COPYING/provenance
+review and physical compatibility/Exit remain. No plugin distributed; Chis799
+hardware-test and public769 stay unchanged. Continue Atari source/license/core
+compatibility review, then supply an explicitly experimental external a26 plugin;
+subsequent menu parity pass should fix the native Info unlock-hint clipping.
+
+## 2026-11-24 — Experimental Atari hardware-test plugin delivered
+
+Owner explicitly requested the plugin in hardware-test. Delivered
+SYSTEM/PLUG/a26.gba (SHAe5cdd3ed708fb6ad59f205299878fbff1ef13998c745032b4e19df0c77d5ca7b),
+setup/limits text, validation JSON and exact prepared-source ZIP with original
+notices/CREDITS, GPLv3 text and standalone rebuild script. Independently extracting
+and rebuilding the source ZIP gives the identical binary. Runtime2K/4K/F8/F6,
+L+R menu, no sound; only generated diagnostics qualified. Actual runtime image
+with fixed-ABI cold-boot seeding passes exact pixels and ten mGBA menu/Exit-marker
+checks, plus21 input/12 bank-hotspot/7 return-header ARM checks. No public release
+or firmware change, no physical-card or broad game/Exit/speed qualification.
+
+Current local kernel remains Chis799. Generic extension loader already supports
+this external asset. Preserve it alongside its source/notes during cleanup. Owner
+will test when convenient; continue Atari compatibility/performance and DSSMM
+porting autonomously. Local source archive is not a GitHub firmware source asset;
+do not upload it through release tooling. Tracked packaging/runtime replay tools
+make this environment reproducible without private BIOS or old prebuilt objects.
+
+## 2026-11-24 — Atari timer/WSYNC corrections
+
+The unfinished core read an uninitialized timer value and subtracted time during
+WSYNC. Replaced countdown/underflow/status logic, advance clocks in all beam
+states, keep palette declarations256 entries, and poll menu every64 emulated
+instructions instead of each instruction (still works without video sync).
+Actual ARM passes64 timer boundaries including32-bit wrap,20 WSYNC cases and20
+real TIA/RIOT input-port cases; original21 input/12 bank/7 return checks retain
+passes. Actual runtime mGBA exact picture/menu10 passes; a new original6502 ROM
+waits for RIOT underflow before drawing: olde5cdd3ed fails, corrected1b344401 passes.
+No private BIOS/card emulation. Counted keypad reads fall5000→79 per5000 emulated
+instructions; this is not an FPS/hardware speed claim. Extra correct WSYNC work
+increases total cost relative to the broken baseline; no net speed claim.
+
+Updated hardware-test/SYSTEM/PLUG/a26.gba SHA1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a
+and exact independently rebuilt corresponding-source ZIP/notes/JSON. No sound,
+physical Exit, broad games or cycle-exact emulation qualification; Chis799 and
+public769 remain unchanged. Resume menu parity comparisons after committing this
+checkpoint; no user input needed. Preserve current plugin+source in cleanup.
+
+## 2026-11-24 — Settings visual parity candidate
+
+Compared native DE Settings/Games captures against linked Chis799. Add native
+scenes20/21/22 for Settings home/Games/Hardware via actual category input, without
+requiring NOR. Correct DSSMM-font text baseline and13px selection fill/14px row
+against the common DE Interface-label pixel mask. Native font spacing remains.
+Host highlight bounds pass; full clean all3/native/mGBA gates must pass before
+replacing hardware-test Chis799. Atari current plugin/source remain delivered
+separately; public769 unchanged. Continue without waiting for hardware feedback.

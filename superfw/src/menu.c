@@ -1913,7 +1913,8 @@ void render_sav_menu_popup(volatile uint8_t *frame) {
 /* Framebuffer selection leaves text crisp and avoids the native tiled OAM bar. */
 static void draw_menu_selection(volatile uint8_t *frame, unsigned y,
                                 unsigned left, unsigned right) {
-  unsigned height=menu_font==FONT_STYLE_DSSMM?14:16;
+  /* DE uses a 13px highlight within each 14px settings row. */
+  unsigned height=menu_font==FONT_STYLE_DSSMM?13:16;
   unsigned bottom=menu_theme>=THEME_DSSMM_LIGHT?149:160;
   for(unsigned row=0;row<height && y+row<bottom;++row)
     dma_memset16(frame+(y+row)*SCREEN_WIDTH+left,dup8(HI_COLOR),(right-left)/2);
@@ -2268,10 +2269,10 @@ void render_settings(volatile uint8_t *frame) {
   const unsigned maxrows = visible;
   unsigned optnum = 0, optcnt = 0;
   const unsigned value_x = ds_style?119:128;
-  const unsigned offy = ds_style?(menu_font==FONT_STYLE_DSSMM?23:24):29;
+  const unsigned offy = ds_style?(menu_font==FONT_STYLE_DSSMM?22:24):29;
   const unsigned rowh = ds_style?(menu_font==FONT_STYLE_DSSMM?14:18):20;
   if (menu_theme >= THEME_DSSMM_LIGHT)
-    draw_menu_selection(frame,offy+(position-baseopt)*rowh,112,224);
+    draw_menu_selection(frame,offy+(position-baseopt)*rowh+(menu_font==FONT_STYLE_DSSMM?2:0),112,224);
 
   if (settings_row_visible(optnum++,baseopt) && optcnt < maxrows)
     draw_text_ovf(msgs[lang_id][MSG_SET_TITL1], frame, ds_style?23:8, offy + rowh*optcnt++, ds_style?88:224);
@@ -2413,7 +2414,7 @@ void render_ui_settings(volatile uint8_t *frame) {
   for (unsigned row = 0; row < rows; ++row) {
     unsigned option = smenu.uiset.seloff + row;
     if(option>UiSetMAX)break;
-    unsigned y=(ds_style?(menu_font==FONT_STYLE_DSSMM?23:24):20)+row*line_h;
+    unsigned y=(ds_style?(menu_font==FONT_STYLE_DSSMM?22:24):20)+row*line_h;
     const char *value = "";
     switch (option) {
     case UiSetTheme: value = theme_names[menu_theme < THEME_COUNT ? menu_theme : 0]; break;
@@ -2431,7 +2432,7 @@ void render_ui_settings(volatile uint8_t *frame) {
     case UiSetAccent: value = accent_names[menu_accent < ACCENT_COUNT ? menu_accent : 0]; break;
     }
     if (ds_style && (int)option == smenu.uiset.selector)
-      draw_menu_selection(frame,y,112,224);
+      draw_menu_selection(frame,y+(menu_font==FONT_STYLE_DSSMM?2:0),112,224);
     draw_text_ovf(labels[option],frame,ds_style?23:8,y,ds_style?88:116);
     /* Localized native knob labels may already include their arrows. */
     npf_snprintf(tmpbuf, sizeof(tmpbuf), value[0] == '<' ? "%s" : "< %s >", value);
@@ -2751,8 +2752,8 @@ static void render_settings_home(volatile uint8_t *frame) {
   render_dssmm_settings_background(frame,"Settings");
   unsigned line_h=menu_font==FONT_STYLE_DSSMM?14:18;
   for(unsigned i=0;i<5;++i) {
-    unsigned y=24+i*line_h;
-    if(i==launcher_category)draw_menu_selection(frame,y,112,224);
+    unsigned y=(menu_font==FONT_STYLE_DSSMM?22:24)+i*line_h;
+    if(i==launcher_category)draw_menu_selection(frame,y+(menu_font==FONT_STYLE_DSSMM?2:0),112,224);
     draw_text_ovf(labels[i],frame,23,y,88);
     draw_text_ovf_color(">",frame,119,y,104,i==launcher_category?SELECTED_TEXT:FT_COLOR);
   }

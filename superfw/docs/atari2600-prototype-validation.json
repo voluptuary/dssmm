@@ -3,16 +3,99 @@
   "purpose": "emulator-only generated diagnostic",
   "sha256": {
     "diagnostic.a26": "d01da6830f59800530310d04bdaa796a999c38de5067a62e23c020a16e4c6b67",
-    "prototype.gba": "adb3b0ab37652b3096e466dafe0470e62f17d67ea9fbbe573ed5979b289381dd"
+    "prototype.gba": "7e40752ba20e7c193891a07223211df8f16628ed4aaebca42d259b6d4e0d8f89"
   },
-  "limits": "Not a runtime plugin or hardware-safe startup; no compatibility claim.",
+  "limits": "Experimental 2K/4K/F8/F6 core: no sound, broad compatibility or physical-card qualification.",
   "screenshot_sha256": "8403f79ff4cb38a24e403aa6bcea98ada9eda6ef54d2aca47bad9684db013424",
   "test": "stock SDL mGBA0.10.1/Xvfb, no BIOS; exact 160x96 diagnostic rectangle",
   "runtime_input": {
+    "timer_boundary_cases": 64,
+    "wsync_cases": 20,
+    "control_port_cases": 20,
+    "status": "bus-offset, underflow flag/read-clear and reset checks passed",
+    "runtime_sha256": "1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a",
+    "limits": "CPU/bus model, not physical SuperCard or game compatibility qualification",
     "startup": "actual ARM startup preserves all 96 ABI bytes and unowned EWRAM; owned VRAM/BSS cleared, data copied, WAITCNT=0x4000",
-    "cartridge_cases": 19,
-    "result": "passed",
-    "limits": "CPU/bus model, not physical SuperCard or game compatibility qualification"
+    "cartridge_cases": 21,
+    "bank_hotspots": 12,
+    "return_header_cases": 7,
+    "result": "passed"
   },
-  "packaging": "Source recipe only; no Atari binary/core bundled in firmware or release assets."
+  "packaging": "Owner-requested local experimental a26.gba plus exact corresponding prepared source ZIP, original notices, CREDITS, GPLv3 text and standalone rebuild. Source ZIP independently reproduces the plugin byte-for-byte; no public release/bundling or physical qualification.",
+  "menu": {
+    "emulator": "stock SDL mGBA 0.10.1; private Xvfb; no BIOS",
+    "passed": [
+      "L alone leaves game running",
+      "L+R opens menu",
+      "A opens Controller",
+      "A toggles controller option",
+      "B returns to parent",
+      "D-pad selects Display",
+      "Left changes frame skip",
+      "B restores exact game frame",
+      "Restart returns to diagnostic",
+      "Exit reaches validated return marker"
+    ],
+    "limits": "Original generated 4K diagnostic only; Return marker substitutes physical firmware remapping; game compatibility and audio unqualified."
+  },
+  "hardware_test": {
+    "upstream_commit": "2eb18dd8a5b832c939efe510b4e493ad4cf25437",
+    "purpose": "runtime input experiment",
+    "sha256": {
+      "diagnostic.a26": "d01da6830f59800530310d04bdaa796a999c38de5067a62e23c020a16e4c6b67",
+      "prototype.gba": "1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a"
+    },
+    "limits": "Experimental 2K/4K/F8/F6 input and L+R menu; audio, broad game compatibility, physical Exit remain pending.",
+    "hardware_test": "Experimental local trial only; no physical qualification.",
+    "assets": {
+      "SYSTEM/PLUG/a26.gba": "1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a",
+      "atari2600-test-source.zip": "e895e65feb3b74a881ae2995e6e5aa6d27d2d938bbaed634139028962b014779"
+    },
+    "timing_checks": {
+      "timer_boundary_cases": 64,
+      "wsync_cases": 20,
+      "control_port_cases": 20,
+      "status": "bus-offset, underflow flag/read-clear and reset checks passed",
+      "runtime_sha256": "1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a",
+      "limits": "Linked ARM model; legacy instruction-level core is not a cycle-exact TIA/RIOT implementation."
+    },
+    "runtime_checks": {
+      "emulator": "stock SDL mGBA 0.10.1; private Xvfb; no BIOS",
+      "passed": [
+        "L alone leaves game running",
+        "L+R opens menu",
+        "A opens Controller",
+        "A toggles controller option",
+        "B returns to parent",
+        "D-pad selects Display",
+        "Left changes frame skip",
+        "B restores exact game frame",
+        "Restart returns to diagnostic",
+        "Exit reaches validated return marker"
+      ],
+      "limits": "Original generated 4K diagnostic only; Return marker substitutes physical firmware remapping; game compatibility and audio unqualified."
+    }
+  },
+  "runtime_timer_fixture": {
+    "purpose": "fixed-ABI cold-boot seam, actual runtime plugin code",
+    "runtime_sha256": "1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a",
+    "limits": "Argument seeding substitutes filesystem/card launch; no physical SuperCard emulation.",
+    "screenshot_sha256": "8403f79ff4cb38a24e403aa6bcea98ada9eda6ef54d2aca47bad9684db013424",
+    "test": "stock SDL mGBA0.10.1/Xvfb, no BIOS; exact 160x96 diagnostic rectangle"
+  },
+  "timer_regression": {
+    "before_runtime_sha256": "e5cdd3ed708fb6ad59f205299878fbff1ef13998c745032b4e19df0c77d5ca7b",
+    "before_result": "RIOT-gated diagnostic fails to reach expected picture",
+    "after_runtime_sha256": "1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a",
+    "after_result": "same original 6502 diagnostic reaches exact expected picture",
+    "reference": "https://www.atarihq.com/danb/files/stella.pdf"
+  },
+  "menu_polling": {
+    "baseline_instructions": 1573881,
+    "baseline_keypad_reads": 5000,
+    "bounded_poll_instructions_before_timing_fix": 1559354,
+    "bounded_poll_keypad_reads": 79,
+    "workload": "5000 emulated instructions; original generated ROM",
+    "limits": "Unicorn instruction/read counts, not FPS or physical performance. WSYNC corrections add necessary work and change later totals."
+  }
 }

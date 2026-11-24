@@ -25,7 +25,7 @@ int main(void) {
  for(menu_font=0;menu_font<2;++menu_font) {
   for(unsigned i=0;i<19216;++i)memory[i]=0xeeee;
   volatile uint8_t *frame=(volatile uint8_t*)&memory[8];
-  unsigned y=menu_font?136:132,height=menu_font?14:16;
+  unsigned y=menu_font?136:132,height=menu_font?13:16;
   draw_menu_selection(frame,y,112,224);
   for(unsigned row=0;row<160;++row)for(unsigned x=0;x<240;++x)
    assert(frame[row*240+x]==((row>=y && row<y+height && row<149 && x>=112 && x<224)?19:0xee));

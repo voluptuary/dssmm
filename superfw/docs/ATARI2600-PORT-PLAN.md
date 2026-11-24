@@ -93,3 +93,78 @@ already supports SYSTEM/PLUG/a26.bin/.gba/.mb/.mbz, so finish and qualify that
 external asset rather than pretending an icon or extension registration is an
 emulator. Safe Exit, ROM banking and source/license completeness precede the
 hardware-test plugin. Keep progressing without requesting owner input.
+
+## Classic menu and banked-input checkpoint
+
+The source prototype now opens its classic black/white/cyan menu with **L+R**;
+L alone keeps running. D-pad selects, A confirms and B returns/resumes. Items are
+Controller, Display, Other Settings, Help, Resume, Restart and Exit. Unsupported
+link/multiboot/save features are omitted. Controller swaps players, Display changes
+frame skip, and Other Settings selects the emulated color/BW console switch.
+Settings are session-only; audio is not implemented in the underlying core.
+Restart restores the framebuffer before restarting the core, preventing stale
+menu text when the renderer reuses cached pixels.
+
+The bounded loader also accepts standard8KiB F8 and16KiB F6 cartridges, starting
+in the final4KiB bank. These sizes do not identify every Atari mapping; E0, FA,
+Superchip and other variants are not claimed. The native ARM test checks all12
+read/write hotspots using distinct bank data,21 valid/invalid input cases and7
+return-image header cases. Exit validates the existing SuperFW backup/stub before
+calling it; an unavailable return path shows an explicit power-off message.
+
+```sh
+python3 superfw/tools/test-atari2600-menu-mgba.py
+```
+
+Ten stock mGBA interaction checks pass: L alone, L+R entry, submenu entry/change,
+B back, Display selection/change, exact game-frame resume, Restart and Exit.
+The Exit test substitutes a green marker for physical cartridge remapping; it
+checks the real plugin validation/jump, not firmware restoration or card timing.
+The generated diagnostic remains the only tested game. Keep Build799 unchanged;
+no a26 plugin is delivered until core compatibility and licensing are reviewed.
+
+## Owner-requested local plugin trial
+
+The owner explicitly requested placing the plugin in hardware-test. It is now at
+`hardware-test/SYSTEM/PLUG/a26.gba`, with `atari2600-test.txt` instructions and
+`atari2600-test-source.zip` containing the exact prepared source, original
+notices/CREDITS, GPLv3 text and a standalone devkitARM rebuild script. The source
+archive independently rebuilds the identical binary. No old object, commercial
+ROM or BIOS is included. This is a local experimental artifact, not a public
+release or a bundled firmware emulator. Source-only packaging restrictions in
+older checkpoints are superseded by this explicit owner request and the current
+runtime checks/source delivery.
+
+Copy it to `SYSTEM/PLUG/a26.gba`; an old `a26.bin` must be removed because `.bin`
+is preferred. Existing Build799 can load it without a firmware update. Source
+`tools/package-atari2600-test.py` reproduces the local delivery after validation.
+`tools/test-atari2600-runtime-mgba.py` runs the actual runtime binary with only a
+fixed-ABI cold-boot argument seed, then checks the exact diagnostic pixels and
+ten menu interactions. This covers the runtime build, not merely the separately
+compiled standalone diagnostic. Card remapping, physical Exit, broader games,
+speed and sound remain outside these tests; no sound implementation exists yet.
+
+## Timer/clock regression and current local trial
+
+The original RIOT function reads an uninitialized local, and WSYNC subtracts
+remaining line time. The adapter now computes countdown/underflow/status from
+emulated clocks and advances WSYNC through visible/blanking periods. It does not
+make the legacy instruction-level TIA/RIOT cycle-exact. References: the original
+[Stella Programmer's Guide](https://www.atarihq.com/danb/files/stella.pdf) describes
+WSYNC waiting for horizontal blank and the RIOT dividers; current
+[Stella RIOT source](https://github.com/stella-emu/stella/blob/master/src/emucore/M6532.cxx)
+provides an independent timing-boundary comparison. No Stella code is imported.
+
+`python3 superfw/tools/test-atari2600-timing-arm.py` checks64 timer boundaries,
+20 WSYNC writes and20 real joystick/fire/console port cases. Run
+`python3 superfw/tools/test-atari2600-runtime-mgba.py --timer` to require actual
+6502 timer underflow before the diagnostic can draw. The earlier local plugin
+fails this new regression; the current local trial passes. The ordinary runtime
+picture and ten L+R menu checks also pass. Details/hashes are in the validation
+JSON. Source ZIP still independently rebuilds the delivered binary exactly.
+
+Menu polling is bounded to once per64 emulated instructions, independent of ROM
+video synchronization. Optional `tools/benchmark-atari2600-arm.py` counts actual
+ARM instructions/keypad reads for a fixed diagnostic workload. It reports no FPS
+or physical GBA cycle timing. Correct WSYNC handling costs extra work relative to
+the broken baseline; do not present the polling change as a net speed guarantee.
