@@ -204,6 +204,7 @@ int main(void) {
   for(;;) {
     unsigned held=(~REG16(0x04000130))&0x3ff,pressed=held&~previous;previous=held;
     if(!TEST_SCENE && pressed)key(pressed & (16|32|64|128|2));
+    if(TEST_SHOWCASE && TEST_SCENE>=16 && pressed)key(pressed & (16|32|64|128));
     VAR32(NATIVE_frame_count)++;
 #if TEST_REFERENCE
     VAR32(NATIVE_clock_seconds)=12*3600+34*60+56;

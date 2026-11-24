@@ -1797,3 +1797,26 @@ no new dependency/BIOS. Continue with safe startup before runtime Pogo arguments
 Exit and controlled timing/controls/bank tests; resolve missing COPYING before
 binary distribution. Chis777 remains the validated physical-test candidate;
 this optional prototype does not create a replacement firmware build.
+
+2026-11-24 continuation: Atari custom ROM startup preserves fixed96B ABI,
+clears owned BSS/VRAM only and establishes safe WAITCNT/bitmap state. SDK whole
+EWRAM clear, not an established fast-wait write, was the confirmed startup issue.
+Linked ARM startup +19 runtime2/4KiB copy/mirror/bounds cases pass; mGBA exact
+6502 diagnostic passes through the same loader. No runtime Atari binary supplied:
+Exit/banked formats/audio/controls/performance/licensing still pending.
+
+Owner reports PCE Exit now works; recorded without assuming an explicit test
+build/backend. Reworked HuCard portrait silhouette after viewing online photos;
+added reference-informed NGP/NGPC and Atari cartridge icons, original pixels,
+existing palette/read-only stream, no photo assets. Host all3/resource ARM checks
+pass; native full clean build follows. Added opt-in D-pad showcase mode to existing
+native NOR fixture, with synthetic landscape artwork and no launch keys, for
+owner-requested README GIFs. Default regression scenes remain unchanged.
+
+Clean799/source30ff43a7 full all3/ARM/host/mGBA/nativeIGM passed; sourceCI45303504271
+and all4 PR26 CI45303565021 passed. Chis799 delivered in root hardware-test after
+checking/removing superseded777 hash. All boards clean, Chis EWRAM256600/257024
+(424B free), IWRAM15240;16KiB stack unchanged. No Atari binary included, public769
+unchanged. Owner PCEExit report retained without assuming build/backend.
+README GIF work follows with opt-in original sample art; do not rebuild firmware
+just for fixture/doc changes. Preserve799 as the current physical-test candidate.

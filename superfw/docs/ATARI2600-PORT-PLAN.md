@@ -52,9 +52,22 @@ embedded-game selector, fixes a 255-entry palette indexed through255, keeps the
 bounded half-height renderer and moves large buffers to EWRAM. It is optional;
 normal builds and CI do not fetch or bundle the external source.
 
-This is not an installable plugin. Standard `gba.specs` startup must be made safe
-before any SuperCard hardware trial; setting WAITCNT in main is too late to
-qualify startup. Runtime cartridge arguments, safe Exit, controls, sound, bank
-selection, speed and full licensing/provenance review remain. Upstream headers
-refer to a missing COPYING file; resolve that before distributing an emulator
-binary. Keep this prototype out of hardware-test and public release assets.
+The prototype now has a ROM-only startup that keeps all96 Pogoshell argument
+bytes, clears only owned RAM/VRAM, establishes the bitmap transform and writes
+safe default WAITCNT0x4000 before copying cartridge data. The SDK startup did
+not establish the suspected fast-wait setting; its whole-EWRAM clear was the
+confirmed ABI problem. The experimental loader accepts only2KiB/4KiB input,
+validates magic/count/address/size and mirrors2KiB cartridges. It contains no
+embedded game in runtime mode.
+
+```sh
+python3 superfw/tools/build-atari2600-prototype.py --source /path/to/2600_gba --runtime --out superfw/build/atari2600-runtime
+python3 superfw/tools/test-atari2600-input-arm.py
+```
+
+Actual linked ARM startup and19 copy/mirror/invalid-input cases pass; the
+standalone mGBA diagnostic also passes through this runtime loader. These are
+software checks, not physical-card qualification. Safe Exit, controls, sound,
+bank selection, speed and full licensing/provenance review remain. Upstream
+headers refer to a missing COPYING file; resolve that before distributing an
+emulator binary. Keep this prototype out of hardware-test and public assets.

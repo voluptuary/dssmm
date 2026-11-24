@@ -48,6 +48,9 @@
 #include "res/icons.h"
 #include "res/icon-gamegear.h"
 #include "res/icon-pce.h"
+#include "res/icon-ngp.h"
+#include "res/icon-ngpc.h"
+#include "res/icon-a26.h"
 #include "res/logo.h"
 #include "res/dssmm-panel.h"
 
@@ -1329,6 +1332,10 @@ static unsigned guessicon(const char *path) {
       {"sms", ICON_SMSCART},
       {"gg", ICON_GGCART},
       {"pce", ICON_PCECARD},
+      {"ngp", ICON_NGPCART},
+      {"ngc", ICON_NGPCCART},
+      {"ngpc", ICON_NGPCCART},
+      {"a26", ICON_A26CART},
       {"fw",  ICON_UPDFILE},
     };
     for (unsigned i = 0; i < sizeof(exticon)/sizeof(exticon[0]); i++)
@@ -2947,7 +2954,7 @@ void menu_init(int sram_testres) {
   smenu.menu_tab = (recent_menu && smenu.recent.maxentries) ? MENUTAB_RECENT : MENUTAB_ROMBROWSE;
 
   // One read-only tile stream; extended cards reuse the native palette.
-  enum { MenuIconBytes=sizeof(icons_img)+sizeof(gamegear_pixels)+sizeof(pce_pixels) };
+  enum { MenuIconBytes=sizeof(icons_img)+sizeof(gamegear_pixels)+sizeof(pce_pixels)+sizeof(ngp_pixels)+sizeof(ngpc_pixels)+sizeof(a26_pixels) };
 #ifdef DSSMM_EXTERNAL_BACKGROUNDS
   const uint8_t *icon_pixels=dssmm_icon_pixels(MenuIconBytes);
   if(icon_pixels)dma_memcpy16(MEM_VRAM_OBJS,icon_pixels,MenuIconBytes/2);
@@ -2956,6 +2963,9 @@ void menu_init(int sram_testres) {
   dma_memcpy16(MEM_VRAM_OBJS,icons_img,sizeof(icons_img)/2);
   dma_memcpy16(MEM_VRAM_OBJS+sizeof(icons_img),gamegear_pixels,sizeof(gamegear_pixels)/2);
   dma_memcpy16(MEM_VRAM_OBJS+sizeof(icons_img)+sizeof(gamegear_pixels),pce_pixels,sizeof(pce_pixels)/2);
+  dma_memcpy16(MEM_VRAM_OBJS+sizeof(icons_img)+sizeof(gamegear_pixels)+sizeof(pce_pixels),ngp_pixels,sizeof(ngp_pixels)/2);
+  dma_memcpy16(MEM_VRAM_OBJS+sizeof(icons_img)+sizeof(gamegear_pixels)+sizeof(pce_pixels)+sizeof(ngp_pixels),ngpc_pixels,sizeof(ngpc_pixels)/2);
+  dma_memcpy16(MEM_VRAM_OBJS+sizeof(icons_img)+sizeof(gamegear_pixels)+sizeof(pce_pixels)+sizeof(ngp_pixels)+sizeof(ngpc_pixels),a26_pixels,sizeof(a26_pixels)/2);
 #endif
   dma_memcpy16(&MEM_PALETTE[256], icons_pal, sizeof(icons_pal) / 2);
   dma_memcpy16(&MEM_PALETTE[256+sizeof(icons_pal)/2],gamegear_palette,sizeof(gamegear_palette)/2);

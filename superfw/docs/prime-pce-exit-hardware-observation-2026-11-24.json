@@ -1,0 +1,9 @@
+{
+  "reported_by": "owner",
+  "date": "2026-11-24",
+  "context_hardware_test_build": 777,
+  "explicit_test_build": null,
+  "hardware": "Owner SuperChis setup; no new hardware revision stated",
+  "observation": "PCE emulator now exits correctly",
+  "limits": "Report does not explicitly identify the build or backend. No complete save/gameplay/SD-Lite qualification implied."
+}

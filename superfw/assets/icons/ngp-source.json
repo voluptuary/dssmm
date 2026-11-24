@@ -1,0 +1,46 @@
+{
+  "credit": "Original DSSMM Neo Geo Pocket cartridge pixel art in the native SuperFW style. Reference photos guide silhouette only; no label artwork or photographs are included. Upstream icon authors retain their credits.",
+  "license": "GPL-3.0-or-later",
+  "dimensions": [
+    16,
+    16
+  ],
+  "sprite_canvas": [
+    16,
+    16
+  ],
+  "placement": "Landscape14x12 cartridge with top grip ridges, inset label, lower emboss pads and insertion arrow; gray shell and plain label.",
+  "references": [
+    "https://gamesdb.launchbox-app.com/games/images/17910-pocket-tennis-color"
+  ],
+  "pixels_sha256": "7d69ae19cd1b6f2c2addbe1279838f5fe5da95aa8e25071c3c386447ecdbd425",
+  "pixel_rows": [
+    "................",
+    "................",
+    "..oooooooooooo..",
+    ".ohwwwwwwwwwwho.",
+    ".ohooooooooooho.",
+    ".ohwwwwwwwwwwho.",
+    ".ohwbbbbbbwwwho.",
+    ".ohwwwwwwwwwwho.",
+    ".ohwhhhhhhhwwho.",
+    ".ohwwwwwwwwwwho.",
+    ".ohwwwwwwwwwwho.",
+    ".ohhhhhoohhhhho.",
+    ".ooooohhohooooo.",
+    ".oooooooooooooo.",
+    "................",
+    "................"
+  ],
+  "rgb555_palette": {
+    ".": "0000",
+    "o": "18c6",
+    "w": "7fff",
+    "h": "6b5a",
+    "b": "2108",
+    "m": "1cb0",
+    "s": "6aab",
+    "g": "226a",
+    "y": "239e"
+  }
+}

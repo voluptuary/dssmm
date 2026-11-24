@@ -1,5 +1,5 @@
 {
-  "credit": "Original DSSMM PC Engine HuCard pixel art matching native SuperFW cartridge bevels and palette. Upstream icon authors retain their credits.",
+  "credit": "Original DSSMM PC Engine HuCard cartridge pixel art in the native SuperFW style. Reference photos guide silhouette only; no label artwork or photographs are included. Upstream icon authors retain their credits.",
   "license": "GPL-3.0-or-later",
   "dimensions": [
     16,
@@ -9,24 +9,27 @@
     16,
     16
   ],
-  "placement": "14x10 white card, maroon label header, abstract landscape and gold contacts; transparent surrounding canvas.",
-  "pixels_sha256": "ba44fb4a93be8039b678b3a8cc279248de50e2f632dd641944c7051223ac3e5c",
+  "placement": "Portrait9x14 white HuCard; black upper contact area and gold top pins, lower label; transparent canvas.",
+  "references": [
+    "https://www.retrogame-shop.com/fr/hucard/25530-fighting-run-pc-engine.html"
+  ],
+  "pixels_sha256": "49f70911d85596e4b1270d57b19709be597ec61028e0b284a913c313274ba168",
   "pixel_rows": [
     "................",
-    "................",
-    "................",
-    ".oooooooooooooo.",
-    ".ohwwwwwwwwwwwo.",
-    ".ohmmmmmmmmmmwo.",
-    ".ohbssssssssbwo.",
-    ".ohbsssssyysbwo.",
-    ".ohbggyyygggbwo.",
-    ".ohbbbbbbbbbbwo.",
-    ".ohwwwwwwwwwwwo.",
-    ".ohyoyoyoyoyowo.",
-    ".oooooooooooooo.",
-    "................",
-    "................",
+    "....ooooooo.....",
+    "...oybybybyo....",
+    "...oybybybyo....",
+    "...obbbbbbbo....",
+    "...obbbbbbbo....",
+    "...owwwwwwwo....",
+    "...ommmmmmmo....",
+    "...ossssssso....",
+    "...osssssyyo....",
+    "...ogggggggo....",
+    "...obbyyybbo....",
+    "...obbbbbbbo....",
+    "...owwwwwwwo....",
+    "....ooooooo.....",
     "................"
   ],
   "rgb555_palette": {

@@ -1,0 +1,46 @@
+{
+  "credit": "Original DSSMM Neo Geo Pocket Color cartridge pixel art in the native SuperFW style. Reference photos guide silhouette only; no label artwork or photographs are included. Upstream icon authors retain their credits.",
+  "license": "GPL-3.0-or-later",
+  "dimensions": [
+    16,
+    16
+  ],
+  "sprite_canvas": [
+    16,
+    16
+  ],
+  "placement": "Landscape14x12 cartridge with top grip ridges, inset label, lower emboss pads and insertion arrow; color label/rainbow stripe.",
+  "references": [
+    "https://retromtl.com/en/products/biomotor-unitron-2-jp-import-neo-geo-pocket-color"
+  ],
+  "pixels_sha256": "e75f319a6d7036f9f4964f82f6954d35aa2d490ab06687618f851ad34df1202f",
+  "pixel_rows": [
+    "................",
+    "................",
+    "..oooooooooooo..",
+    ".obhhhhhhhhhhbo.",
+    ".oboooooooooobo.",
+    ".obwwwwwmygssbo.",
+    ".obwwwwwwwwwwbo.",
+    ".obwsssssssswbo.",
+    ".obwggggyyggwbo.",
+    ".obwggggggggwbo.",
+    ".obwwwwwwwwwwbo.",
+    ".obbbbboobbbbbo.",
+    ".ooooobbobooooo.",
+    ".oooooooooooooo.",
+    "................",
+    "................"
+  ],
+  "rgb555_palette": {
+    ".": "0000",
+    "o": "18c6",
+    "w": "7fff",
+    "h": "6b5a",
+    "b": "2108",
+    "m": "1cb0",
+    "s": "6aab",
+    "g": "226a",
+    "y": "239e"
+  }
+}
