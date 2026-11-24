@@ -22,9 +22,9 @@ cartridge model before downloading or flashing an update.**
 
 | Your cartridge | Kernel download | Update file | Status |
 | --- | --- | --- | --- |
-| EZ-FLASH OMEGA **Definitive Edition Rev. A or Rev. B** | [DSSMM 8.4.0](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0) | `ezkernelnew.bin` | Stable release |
-| **Original EZ-FLASH OMEGA** | [DSSMM 8.4.0 — OMEGA Test 4](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0-omega-test4) | `ezkernel.bin` | Experimental; not hardware-verified |
-| Newer EZ-FLASH OMEGA **Definitive Edition B / BLUE** | [DSSMM 8.4.1 — BLUE Test 4](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-blue-test4) | `ezbluekernel.bin` | Experimental; not hardware-verified |
+| EZ-FLASH OMEGA **Definitive Edition Rev. A or Rev. B** | [DSSMM 8.4.1](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1) | `ezkernelnew.bin` | Stable release |
+| **Original EZ-FLASH OMEGA** | [DSSMM 8.4.1 — OMEGA Test 5](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-omega-test5) | `ezkernel.bin` | Experimental; not hardware-verified |
+| Newer EZ-FLASH OMEGA **Definitive Edition B / BLUE** | [DSSMM 8.4.2 — BLUE Test 5](https://github.com/voluptuary/dssmm/releases/tag/v8.4.2-blue-test5) | `ezbluekernel.bin` | Experimental; not hardware-verified |
 
 **The older Definitive Edition Rev. B and the newer Definitive Edition B / BLUE
 are different cards.** The Rev. A/B release is also incompatible with the original
@@ -34,7 +34,7 @@ and follow that release's installation instructions.
 > [!WARNING]
 > **The Original OMEGA and BLUE ports have not been tested on physical hardware.**
 > Installation, booting, gameplay, saving, plugins, cheats/save states and NOR
-> operations still need hardware verification. BLUE's larger update image has
+> operations still need hardware verification. BLUE's sealed update image has
 > also not been verified with its updater. Software checks do not establish
 > that these builds will work correctly on a cartridge.
 >

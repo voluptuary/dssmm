@@ -1,0 +1,47 @@
+{
+  "verified_utc": "2026-11-24T00:14:55.245516+00:00",
+  "latest": "v8.4.1",
+  "releases": [
+    {
+      "project": "ezfomegade",
+      "tag": "v8.4.1",
+      "source_commit": "a948b936c11bc984ca8a84d141dc1b7ea81751a6",
+      "source_run": 45293394157,
+      "all_four_pr_run": 45293418303,
+      "release_id": 456149957,
+      "assets": {
+        "ezkernelnew.bin": "fd03222c5a518c96d70a26b687caf7122dcfc52decd406152867701e4b2bd71b",
+        "folder-art.zip": "b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5"
+      },
+      "downloads_match": true
+    },
+    {
+      "project": "ezfomega",
+      "tag": "v8.4.1-omega-test5",
+      "source_commit": "29bbb055b26968468cadf7358bdffd340209a355",
+      "source_run": 45293950432,
+      "all_four_pr_run": 45293960062,
+      "release_id": 456151802,
+      "assets": {
+        "ezkernel.bin": "f1cdb1b9c4801c7087e9f8960cf7b64dc215aad5e2efb394422bd017e864fa77",
+        "folder-art.zip": "b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5"
+      },
+      "downloads_match": true
+    },
+    {
+      "project": "ezfblue",
+      "tag": "v8.4.2-blue-test5",
+      "source_commit": "9bc24e04efe4fa815c6a2d83bf319ec9ebbcd278",
+      "source_run": 45293538639,
+      "all_four_pr_run": 45293549636,
+      "release_id": 456150186,
+      "assets": {
+        "ezbluekernel.bin": "ce6e5a4a2e61dae80a05668b9d58a73119daa647f5bff30bfe078f856f31a902",
+        "folder-art.zip": "b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5"
+      },
+      "downloads_match": true
+    }
+  ],
+  "retention_archive": "docs/history/releases/prerelease-retention-sd-launch-2026-11-24.json",
+  "limits": "No affected physical-card qualification; Original OMEGA and BLUE remain hardware-untested."
+}

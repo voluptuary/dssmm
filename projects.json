@@ -4,19 +4,19 @@
     "ezfomegade": {
       "directory": "ezfomegade",
       "branch": "ezfomegade",
-      "baseline_commit": "893456b7a965df6a899f02d5d49f0d37f951212f",
+      "baseline_commit": "a948b936c11bc984ca8a84d141dc1b7ea81751a6",
       "baseline_directory": "ezfomegade"
     },
     "ezfomega": {
       "directory": "ezfomega",
       "branch": "ezfomega",
-      "baseline_commit": "9baf8a627bad546d40267cd566e6314f3f473ca9",
+      "baseline_commit": "29bbb055b26968468cadf7358bdffd340209a355",
       "baseline_directory": "ezfomega"
     },
     "ezfblue": {
       "directory": "ezfblue",
       "branch": "ezfblue",
-      "baseline_commit": "1406cee33e3df7cddd7d11cb0c186faea44e7906",
+      "baseline_commit": "9bc24e04efe4fa815c6a2d83bf319ec9ebbcd278",
       "baseline_directory": "ezfblue"
     },
     "superfw": {

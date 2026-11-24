@@ -3320,7 +3320,26 @@ assets of DE/BLUE/OMEGA unchanged. Normal all5 synchronization follows.
 
 Owner confirms PCE games load on Chis769, but Exit restarts the emulated game;
 PCE file icon is still generic. Updated the current release known-issue note
-and README; prior exact body is archived privately under superfw/docs/history/
+and README; prior exact body is archived under superfw/docs/history/
 releases and publication hash updated. Firmware/assets/tags unchanged. DE latest
 verifiedv8.4.0. The next native-return/icon candidate and Atari investigation
 remain SuperFW-only work; no new physical return/SD-Lite qualification.
+
+## 2026-11-24 — EZ SD-launch corrective releases
+
+DEv8.4.1/sourcea948b936 stable/latest, Original OMEGAv8.4.1-omega-test5/source29bbb05
+and BLUEv8.4.2-blue-test5/source9bc24e0 prereleases published after each full
+local/source/all4 PR23/25/24 CI passed. DE/BLUE optional-alias failure and OMEGA
+clipped-name failure reproduced/fixed with actual native mGBA launch fixtures;
+card save/transfer/reset protocols remain separate and unchanged. All6 downloaded
+assets match, including full folder-art.zip on each; canonical four-section notes
+match. BLUE keeps sealed stock2124252B format/official FPGA requirement.
+No affected-card physical confirmation; Original/BLUE remain hardware-untested.
+DEv8.4.1 latest endpoint explicitly verified, old DE stable history retained.
+Prior OMEGA/BLUE prerelease pages/assets removed only after exact archive and
+replacement download verification; git tags retained. Root retention archive:
+docs/history/releases/prerelease-retention-sd-launch-2026-11-24.json.
+Refreshed only these3 validated input baselines and end-user download links.
+Normal hardware PR merges and publication-doc merges preserve lane ancestry;
+normal all5 synchronization next. Project journals retain detailed evidence.
+SuperFW777 pending clean local gate in its own lane;769 public unchanged.

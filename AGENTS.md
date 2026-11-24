@@ -238,3 +238,22 @@ latest unless the owner changes that policy; explicitly set its `make_latest`
 to `true` via REST if needed, then verify the endpoint again. Build769 follows
 the owner's cumulative SuperFW-fork catalog request instead of delta/past
 sections; its canonical notes and publication record document the exception.
+
+## 2026-11-24 — EZ SD-launch corrective releases
+
+DEv8.4.1/sourcea948b936 stable/latest, Original OMEGAv8.4.1-omega-test5/source29bbb05
+and BLUEv8.4.2-blue-test5/source9bc24e0 prereleases published after each full
+local/source/all4 PR23/25/24 CI passed. DE/BLUE optional-alias failure and OMEGA
+clipped-name failure reproduced/fixed with actual native mGBA launch fixtures;
+card save/transfer/reset protocols remain separate and unchanged. All6 downloaded
+assets match, including full folder-art.zip on each; canonical four-section notes
+match. BLUE keeps sealed stock2124252B format/official FPGA requirement.
+No affected-card physical confirmation; Original/BLUE remain hardware-untested.
+DEv8.4.1 latest endpoint explicitly verified, old DE stable history retained.
+Prior OMEGA/BLUE prerelease pages/assets removed only after exact archive and
+replacement download verification; git tags retained. Root retention archive:
+docs/history/releases/prerelease-retention-sd-launch-2026-11-24.json.
+Refreshed only these3 validated input baselines and end-user download links.
+Normal hardware PR merges and publication-doc merges preserve lane ancestry;
+normal all5 synchronization next. Project journals retain detailed evidence.
+SuperFW777 pending clean local gate in its own lane;769 public unchanged.
