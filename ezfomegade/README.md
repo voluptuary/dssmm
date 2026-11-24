@@ -1,6 +1,6 @@
-# DS Style Merkin Mix
+# DS Style Merkin's Mix
 
-DS Style Merkin Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Edition**, maintained by [Merkin](https://github.com/voluptuary). This Merkin Mix fork builds on [FrankieT19's DS Style fork](https://github.com/FrankieT19/omega-de-ds-style-kernel). Its main addition is name-matched game artwork with selective transparency, allowing artwork for games on all systems supported by the kernel rather than only the GBA game artwork in the original kernels. Merkin Mix also contributes fixes and enhancements to the cheat system and updates to the cartridge's SD and NOR workflows and management.
+DS Style Merkin's Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Edition**, maintained by [Merkin](https://github.com/voluptuary). This Merkin's Mix fork builds on [FrankieT19's DS Style fork](https://github.com/FrankieT19/omega-de-ds-style-kernel). Its main addition is name-matched game artwork with selective transparency, allowing artwork for games on all systems supported by the kernel rather than only the GBA game artwork in the original kernels. Merkin's Mix also contributes fixes and enhancements to the cheat system and updates to the cartridge's SD and NOR workflows and management.
 
 > [!WARNING]
 > **Supported hardware:** EZ-FLASH OMEGA Definitive Edition rev. A and rev. B only.
@@ -9,7 +9,7 @@ DS Style Merkin Mix is a custom kernel for the **EZ-FLASH OMEGA Definitive Editi
 
 ## Download and install
 
-Get the stable [DS Style Merkin Mix 8.4.0 release](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0). Copy `ezkernelnew.bin` to the root of the SD card, then start the cartridge while holding **R** to install the kernel. Back up saves before updating.
+Get the stable [DS Style Merkin's Mix 8.4.0 release](https://github.com/voluptuary/dssmm/releases/tag/v8.4.0). Copy `ezkernelnew.bin` to the root of the SD card, then start the cartridge while holding **R** to install the kernel. Back up saves before updating.
 
 ## What it offers
 
@@ -32,7 +32,7 @@ Transparent thumbnails require the `DST1` marker in BMP header bytes 6–9. Use 
 
 ## Credits and license
 
-Merkin Mix is maintained by Merkin and builds on FrankieT19's DS Style v7.5 foundation and selected, separately authored v8.0 interface work. Merkin contributed the refreshed splash screens and system icons in the v8.0 lineage, along with Merkin Mix artwork and kernel improvements. EZ-FLASH, Sterophonick, Copilot, exploitz86 and SkillerCMP also contributed to the project's foundations and features; [CREDITS.md](CREDITS.md) records the specific provenance.
+Merkin's Mix is maintained by Merkin and builds on FrankieT19's DS Style v7.5 foundation and selected, separately authored v8.0 interface work. Merkin contributed the refreshed splash screens and system icons in the v8.0 lineage, along with Merkin's Mix artwork and kernel improvements. EZ-FLASH, Sterophonick, Copilot, exploitz86 and SkillerCMP also contributed to the project's foundations and features; [CREDITS.md](CREDITS.md) records the specific provenance.
 
 The repository includes the [Apache License 2.0](../LICENSE). Retain individual component licenses and attribution notices.
 

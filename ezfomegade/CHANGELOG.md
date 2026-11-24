@@ -1,10 +1,10 @@
-# DS Style Merkin Mix 8.4.1
+# DS Style Merkin's Mix 8.4.1
 
 - Fixed SD launch paths without short-name aliases, including exFAT and clipped long filenames.
 - Full project and native mGBA launch checks passed; physical confirmation of affected cards remains pending.
 - [Release notes](docs/releases/v8.4.1.md).
 
-# DS Style Merkin Mix 8.4.0
+# DS Style Merkin's Mix 8.4.0
 
 **EZ-FLASH OMEGA Definitive Edition Rev. A/B only.**
 
@@ -22,7 +22,7 @@ Thanks to **michyprima**, **Jaga / EvilJagaGenius**, **Dwedit** and **FluBBa** f
 
 # Changelog
 
-## DS Style Merkin Mix 8.3.1
+## DS Style Merkin's Mix 8.3.1
 
 ### New features and improvements
 
@@ -51,7 +51,7 @@ The PSRAM audit build was tested by the owner on both supported Omega Definitive
 - Added mirrored artwork lookup, built-in and custom thumbnail fallbacks, marked-thumbnail transparency, console icons, wide and square system artwork, and the `CUSTOM Only` rounded-corner option.
 - Added optional Remember cheats with localized labels through **exploitz86**, and collapsible cheat groups based on **SkillerCMP's** work and adapted by **exploitz86**. Remember cheats is off by default.
 - Added browser wrap settings, Clean list and List folders controls, 12/24-hour clock options, Hide system files, and support for installing kernels from `/SYSTEM/KERNELS`.
-- Added Thai and Chinese language support, customizable launcher text and Start screen layouts, full-screen theme support, and the DS Style Merkin Mix build number.
+- Added Thai and Chinese language support, customizable launcher text and Start screen layouts, full-screen theme support, and the DS Style Merkin's Mix build number.
 - Added configurable Start screen sources and shortcuts, empty-folder/favorites messages, folder and file custom thumbnails, and built-in guidance for settings and menus.
 - Added multi-language settings/help categories, cheat-screen refinements, and improved menu, pop-up, carousel, list, sound and input behavior across the DS Style lineage.
 
