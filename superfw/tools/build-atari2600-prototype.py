@@ -86,10 +86,19 @@ def prepare(source, output, fixture):
     text = path.read_text().split("void * memcpy(")[0]
     text = text.replace("void C_Entry(void)", "int main(void)")
     text = text.replace("MODE_3 | BG2_ENABLE | OBJ_ENABLE | OBJ_MAP_1D", "MODE_3 | BG2_ENABLE")
-    text = text.replace("loadCart(file);", "if (loadCart(file) != 0) {\n"
-                        "  unsigned n; for(n=0;n<240*160;n++) VideoBuffer[n]=31;\n"
-                        "  for(;;) {}\n}")
+    text = '#include "ui.h"\n' + text
+    text = text.replace("loadCart(file);", "if (loadCart(file) != 0) atari_bad_rom();")
     path.write_text(text + "\n" + "\n".join(globals_once) + "\n")
+
+    path = output / "cpu.c"
+    text = path.read_text()
+    old = "while (!(!((*KEYS) & KEY_L)))  {"
+    assert old in text
+    path.write_text('#include "ui.h"\n' + text.replace(old,
+        "while (1) {\n"
+        "  if (((~(*KEYS)) & 0x300) == 0x300 && atari_menu()) return;"))
+    for name in ("ui.c", "ui.h"):
+        shutil.copy2(ROOT / "tools/atari2600" / name, output / name)
 
     # Replace the embedded-ROM selector with bounded runtime input.
     path = output / "files.c"
@@ -119,7 +128,7 @@ def main():
     prepare(source, output, not args.runtime)
     devkit = Path(os.environ.get("DEVKITARM", "/opt/devkitpro/devkitARM"))
     tools = Path(os.environ.get("DEVKITPRO", "/opt/devkitpro")) / "tools/bin"
-    files = "main collisio cpu display files keyboard misc mouse raster table vmachine memory".split()
+    files = "main collisio cpu display files keyboard misc mouse raster table vmachine memory ui".split()
     command = [str(devkit / "bin/arm-none-eabi-gcc"), "-std=gnu89", "-O2", "-mthumb",
                "-mthumb-interwork", "-mcpu=arm7tdmi", "-ffunction-sections", "-fdata-sections",
                "-fwrapv", "-fno-strict-aliasing", "-fcommon", "-Wno-implicit-int",
@@ -135,7 +144,7 @@ def main():
     record = {"upstream_commit": PIN, "purpose": "runtime input experiment" if args.runtime else "emulator-only generated diagnostic",
               "sha256": {name: hashlib.sha256((output / name).read_bytes()).hexdigest()
                          for name in ("diagnostic.a26", "prototype.gba")},
-              "limits": "Experimental input only; safe Exit, banked formats, audio, compatibility and physical qualification remain pending."}
+              "limits": "Experimental 2K/4K/F8/F6 input and L+R menu; audio, broad game compatibility, physical Exit and licensing review remain pending."}
     (output / "prototype.json").write_text(json.dumps(record, indent=2) + "\n")
     print(output / "prototype.gba")
 

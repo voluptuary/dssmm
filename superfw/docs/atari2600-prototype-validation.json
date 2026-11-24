@@ -3,16 +3,34 @@
   "purpose": "emulator-only generated diagnostic",
   "sha256": {
     "diagnostic.a26": "d01da6830f59800530310d04bdaa796a999c38de5067a62e23c020a16e4c6b67",
-    "prototype.gba": "adb3b0ab37652b3096e466dafe0470e62f17d67ea9fbbe573ed5979b289381dd"
+    "prototype.gba": "7e40752ba20e7c193891a07223211df8f16628ed4aaebca42d259b6d4e0d8f89"
   },
-  "limits": "Not a runtime plugin or hardware-safe startup; no compatibility claim.",
+  "limits": "Experimental 2K/4K/F8/F6 core: no sound, broad compatibility or physical-card qualification.",
   "screenshot_sha256": "8403f79ff4cb38a24e403aa6bcea98ada9eda6ef54d2aca47bad9684db013424",
   "test": "stock SDL mGBA0.10.1/Xvfb, no BIOS; exact 160x96 diagnostic rectangle",
   "runtime_input": {
     "startup": "actual ARM startup preserves all 96 ABI bytes and unowned EWRAM; owned VRAM/BSS cleared, data copied, WAITCNT=0x4000",
-    "cartridge_cases": 19,
+    "cartridge_cases": 21,
+    "bank_hotspots": 12,
+    "return_header_cases": 7,
     "result": "passed",
     "limits": "CPU/bus model, not physical SuperCard or game compatibility qualification"
   },
-  "packaging": "Source recipe only; no Atari binary/core bundled in firmware or release assets."
+  "packaging": "Source recipe only; no Atari binary/core bundled in firmware or release assets. Upstream COPYING/provenance review remains before distribution.",
+  "menu": {
+    "emulator": "stock SDL mGBA 0.10.1; private Xvfb; no BIOS",
+    "passed": [
+      "L alone leaves game running",
+      "L+R opens menu",
+      "A opens Controller",
+      "A toggles controller option",
+      "B returns to parent",
+      "D-pad selects Display",
+      "Left changes frame skip",
+      "B restores exact game frame",
+      "Restart returns to diagnostic",
+      "Exit reaches validated return marker"
+    ],
+    "limits": "Original generated 4K diagnostic only; Return marker substitutes physical firmware remapping; game compatibility and audio unqualified."
+  }
 }

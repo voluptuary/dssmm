@@ -1837,3 +1837,22 @@ PocketStella pin1e299b9 has disabled/absent core/video/audio; existing MikeDX na
 startup/ROM/render tests are the practical starting point. No a26 binary delivered.
 Native Info screenshot also exposes an overlong unlock hint at the bottom; fix
 its wrapping/alignment in the subsequent menu parity pass, preserving exact words.
+
+## 2026-11-24 — Atari classic menu prototype
+
+Implemented owner-requested L+R/D-pad/A/B classic emulator menus in the separate
+source recipe: Controller, Display, Other Settings, Help, Resume, Restart, Exit.
+L alone no longer resets. mGBA exposed stale menu pixels on Restart; restoring
+the saved framebuffer fixes it. Ten real SDLmGBA0.10.1/Xvfb interaction checks
+pass, including Exit to a deliberately substituted return marker (not physical
+firmware remapping). No BIOS or emulator changes. Actual ARM startup +21 loader
+cases,12 F8/F6 bank hotspots and7 invalid/valid return-header cases pass. Original
+6502 exact-pixel diagnostic passes. Native evidence is in atari2600-prototype-
+validation.json; replay tools are tracked under tools/.
+
+Runtime remains a source-only experiment: no sound, only the generated diagnostic
+qualified, other Atari bank formats unsupported, upstream COPYING/provenance
+review and physical compatibility/Exit remain. No plugin distributed; Chis799
+hardware-test and public769 stay unchanged. Continue Atari source/license/core
+compatibility review, then supply an explicitly experimental external a26 plugin;
+subsequent menu parity pass should fix the native Info unlock-hint clipping.
