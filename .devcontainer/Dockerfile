@@ -10,5 +10,5 @@ ENV PATH="${DEVKITARM}/bin:${DEVKITPRO}/tools/bin:${PATH}"
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc g++ git gh make cmake cppcheck curl unzip zlib1g-dev libssl-dev lcov \
     mgba-sdl xvfb xauth xdotool \
-    python3 python3-unicorn python3-setuptools python3-yaml nodejs \
+    python3 python3-pil python3-unicorn python3-setuptools python3-yaml nodejs \
     && rm -rf /var/lib/apt/lists/*

@@ -1,0 +1,19 @@
+{
+  "sources": [
+    {
+      "name": "ezflash-horizontal.gif",
+      "sha256": "1031a70e931e60f25e618cb9aafe36a2b07614e69a583ae6c3a6465a22cc6279"
+    },
+    {
+      "name": "ezflash-vertical.gif",
+      "sha256": "a9eac2ee2aab517c951e15e230795e05b072100eaff5c34c8722734df265a46d"
+    }
+  ],
+  "size": [
+    480,
+    320
+  ],
+  "duration_ms": 12000,
+  "sha256": "a78e3aedbec25ab09addea98d983f2096f389f7e1106a3c859ff338e77c5d9e4",
+  "presentation": "Native menu captures; nearest-neighbor2x, no generated in-between frames"
+}

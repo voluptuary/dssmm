@@ -304,3 +304,19 @@ remain in each project's existing verifiers; visual fixtures do not qualify them
 The owner's unmodified audit suggestions were archived from root PATCHES.md and
 patches/ under docs/history/patch-review-2026-11-21/ to restore the existing shared
 root allowlist. Review decisions are in SuperFW's project documentation.
+
+## README menu GIFs
+
+`python3 scripts/record-menu-preview.py --rom /path/to/native-fixture.gba --out /tmp/menu.gif`
+records the real renderer with synthetic storage/artwork. It uses a private
+1024x768 Xvfb display, stock SDL mGBA0.10.1 at1x, xdotool input and Pillow9.4’s
+XCB window capture. A temporary XDG_CONFIG_HOME prevents reuse of personal BIOS
+or key settings. No BIOS is supplied, no emulator patch is used and capture
+frames are scaled2x with nearest-neighbor sampling; movement comes from native
+menu code rather than image interpolation. The standard container explicitly
+includes python3-pil for this optional documentation tool.
+
+Project-owned fixture builders remain inside their hardware directories.
+Showcase art is original fictional-game artwork in docs/media/demo-art/;
+prompts/provenance are retained there. GIF metadata records ROM/image hashes,
+inputs and capture times. These previews are not cartridge performance tests.

@@ -1,0 +1,19 @@
+{
+  "sources": [
+    {
+      "name": "superfw-horizontal.gif",
+      "sha256": "1beac980a4bf14d99c36bb58684ca3de1bf56b5aab2be27979fdec806f686ec8"
+    },
+    {
+      "name": "superfw-vertical.gif",
+      "sha256": "caeb0a3c07c880d0208c595a95603997e8dc811bd0eeefd7173fa6ee36e3013e"
+    }
+  ],
+  "size": [
+    480,
+    320
+  ],
+  "duration_ms": 12000,
+  "sha256": "449df025374e291805f2f1ae197020b5baeb6bf0b5e25d94cc03ea83b403f0bf",
+  "presentation": "Native menu captures; nearest-neighbor2x, no generated in-between frames"
+}

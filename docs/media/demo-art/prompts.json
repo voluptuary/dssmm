@@ -1,0 +1,70 @@
+{
+  "tool": "built-in image_gen",
+  "purpose": "Original fictional games for README native menu previews; no real ROMs or commercial cover assets.",
+  "reference_examples": [
+    "https://retrocatalog.com/games/golden-sun",
+    "https://www.mobygames.com/game/8093/konami-krazy-racers/"
+  ],
+  "assets": [
+    {
+      "name": "moonlit-box",
+      "prompt": "Square, flat front-cover artwork for an original fictional early-2000s handheld fantasy adventure game. Large readable title exactly 'MOONLIT TRAIL' in ornate bold cream-and-gold lettering across the upper third. Below: a young cloaked adventurer holding a lantern, a crescent moon, a blue woodland path and distant castle. Rich hand-painted anime game-cover illustration, polished retail game composition, strong silhouette readable at an 80x80 thumbnail. Square edge-to-edge canvas, NOT a photograph or 3D box, no surrounding objects, no existing game characters or copied logos, no publisher names or watermarks.",
+      "source_sha256": "d25146b7df6884e6c638be7589d16f6d3f7379bee88acdb68af6c92b77489c6e",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "thumbnail_sha256": "d2e146d8385426933c34512df383bbd8d134be06db8f0f7d09a63837ca72be43"
+    },
+    {
+      "name": "moonlit-title",
+      "prompt": "Landscape 3:2 pixel-art title screen for a fictional early-2000s handheld fantasy adventure game. Large readable ornate pixel logo exactly 'MOONLIT TRAIL' across the upper half, a crescent moon above a distant castle, blue forest, lantern-lit trail and tiny cloaked adventurer below. Small readable 'PRESS START' at the bottom. Authentic detailed 240x160-era pixel art, crisp pixel clusters, limited coherent palette, game screenshot rather than a modern poster, composition readable when reduced to120x80. Edge-to-edge landscape canvas, no monitor, no mockup, no existing game characters or copied logos.",
+      "source_sha256": "452365258decd3de40e164fd3f5a877ce91ad4ec2b1dc95eaf95a421c436cbcf",
+      "source_dimensions": [
+        1536,
+        1024
+      ],
+      "thumbnail_sha256": "ff07e4b8a32a6d747a6ff9917e832b132e952f23bd468481a6ee297617a8f0f4"
+    },
+    {
+      "name": "sunset-box",
+      "prompt": "Square flat front-cover artwork for an original fictional early-2000s handheld racing game. Title exactly 'SUNSET CIRCUIT' in very bold italic yellow-and-white racing lettering across upper third. Dynamic red sports car racing toward the viewer on a winding seaside road, orange sunset, blue ocean, palm trees and dramatic speed streaks. Polished illustrated retail game-cover composition, clear large car and readable logo at80x80 thumbnail size. Edge-to-edge square canvas, NOT a photo of a box or3D mockup, no existing car brands, existing game logos, publisher names or watermarks.",
+      "source_sha256": "d2c446343d94dfda605ad354d3cc80e089eb0813b2ed0478781a7da1b1c9cf75",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "thumbnail_sha256": "e28dbfbcc5fe212d7e453f586565ff826d45f6b514cf0a5adbe79afb535404f9"
+    },
+    {
+      "name": "sunset-title",
+      "prompt": "Landscape3:2 authentic pixel-art title screen for fictional early-2000s handheld racing game. Very large readable italic pixel logo exactly 'SUNSET CIRCUIT' across upper half. Red sports car seen in three-quarter view on a coastal road, orange sunset and blue sea with palm silhouettes. Small 'PRESS START' at bottom. Detailed 240x160-era pixel art, crisp coherent pixel clusters and bright arcade palette, a plausible game screenshot readable at120x80. Full-bleed landscape canvas, no monitor/mockup, no car brands or existing game logos.",
+      "source_sha256": "e4eb505cb5fa64410e1215ca8c2a238354ed6c7aef41e2e30fa058ae3c368319",
+      "source_dimensions": [
+        1536,
+        1024
+      ],
+      "thumbnail_sha256": "af3b8b82326cd5b7140e48b17f44119565ebd32a7ae3d73a90338f514a901933"
+    },
+    {
+      "name": "skybound-box",
+      "prompt": "Square flat front-cover artwork for an original fictional early-2000s handheld platform adventure. Large readable playful outlined title exactly 'SKYBOUND COURIER' across upper third. A cheerful young courier with aviator goggles, red scarf and mail satchel leaps between grassy floating islands, little airships, clouds and a vivid blue sky. Polished colorful anime retail-game illustration, readable character silhouette and title at80x80 thumbnail size. Square edge-to-edge canvas, NOT a photographed or3D box, no existing characters, publisher marks, copied game logos or watermark.",
+      "source_sha256": "297d8d1af4cff3e5b0d947e241a2a8bfe0645b9099c4e5fb9df74e481a10830c",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "thumbnail_sha256": "0cc45f952badc6c697fd763f4830c62eb0749575ef39672b39af4dc5aa4124d6"
+    },
+    {
+      "name": "skybound-title",
+      "prompt": "Landscape3:2 pixel-art title screen for a fictional early-2000s handheld platform adventure. Large readable playful pixel logo exactly 'SKYBOUND COURIER' across upper half. A tiny courier with aviator goggles, red scarf and mail satchel stands on a grassy floating island overlooking little airships and clouds in a vivid blue sky. Small 'PRESS START' at bottom. Authentic polished 240x160-era game screenshot, crisp pixel clusters, limited bright palette, readable composition reduced to120x80. Edge-to-edge landscape canvas, no device/mockup, no existing characters, copied logos or watermarks.",
+      "source_sha256": "0f12dad056137f1b00fc69c2d81bc341409313d9d26e5748e21c1558cec57163",
+      "source_dimensions": [
+        1536,
+        1024
+      ],
+      "thumbnail_sha256": "425e74ed78625dbb0102a36283ff3a35819ef8ca60c93627054a365024a3ae2a"
+    }
+  ]
+}

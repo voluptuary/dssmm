@@ -1,144 +1,133 @@
-# DS Style Merkin Mix (DSSMM)
+# DS Style Merkin's Mix (DSSMM)
 
-DSSMM is a Nintendo DS-inspired custom menu kernel family for EZ-FLASH OMEGA cards,
-maintained by [Merkin](https://github.com/voluptuary). The repository also includes
-the independent SuperFW project for SuperCard GBA flash carts. Merkin Mix
-builds on [FrankieT19's DS Style forks](https://github.com/FrankieT19), with
-foundations from EZ-FLASH and Sterophonick's SimpleLight kernel. On your
-handheld, it provides the cartridge menu for browsing the SD card, launching
-games and managing the card's supported save and NOR features.
+DSSMM brings a Nintendo DS-inspired game menu to EZ-FLASH OMEGA-family cards
+and, through the developing SuperFW port, SuperCard-family cards. Browse games
+by their artwork, return to favorites and recently played titles, and make the
+menu your own.
 
-Merkin Mix's main additions are **artwork transparency and name-matched game
-artwork**. This lets games from supported emulator and plugin systems have their
-own artwork, extending beyond the original kernels' GBA-only artwork lookup.
-It also brings highly optimized menu rendering, more browsing and customization
-options, remembered cheat selections, and improvements to saving and cartridge
-management. Available features depend on the card and its compatible plugins.
+Maintained by [Merkin](https://github.com/voluptuary), Merkin's Mix builds on
+[FrankieT19’s DS Style forks](https://github.com/FrankieT19), EZ-FLASH’s kernels
+and Sterophonick’s SimpleLight. The separate SuperCard port builds on
+[David Guillen Fandos’s SuperFW](https://github.com/davidgfnet/superfw).
+
+## What DSSMM offers
+
+- **A visual game library:** list, artwork list, horizontal and vertical carousel
+  views, with title screens or box covers and previews of neighboring games.
+- **Artwork for more than GBA:** match images by filename for supported emulator
+  systems, use existing GBA title packs, and give folders their own pictures.
+  Compatible transparent artwork blends into the menu background.
+- **Faster access to your games:** a Start screen, last-played shortcuts, recent
+  games and configurable startup behavior. OMEGA-family builds also offer favorites.
+- **A tidier library:** optional wrap-around navigation and Clean list names that
+  hide tags such as `(USA)` and `(En)` without renaming your files.
+- **Personal touches:** DS Style backgrounds, Light/Dark themes, accents and
+  artwork choices. OMEGA-family builds also support clock-based Auto themes;
+  SuperFW offers an optional DSSMM font and independent top-bar colors.
+- **Convenient game and card controls:** built-in MiGoomba GB/GBC emulation,
+  clearer NOR management where supported, and save/settings improvements.
+  OMEGA-family builds include optional remembered cheat selections and collapsible groups.
+
+Features and plugin compatibility depend on the card. SuperFW is still being
+ported toward the EZ-FLASH version’s appearance and behavior.
+
+## See it in action
+
+| | EZ-FLASH DSSMM | SuperFW DSSMM |
+| --- | --- | --- |
+| Artwork carousels | ![EZ-FLASH horizontal and vertical artwork carousels](docs/media/ezflash-carousels.gif) | ![SuperFW horizontal and vertical artwork carousels](docs/media/superfw-carousels.gif) |
+| Start and menus | ![EZ-FLASH Start and settings menus](docs/media/ezflash-menus.gif) | ![SuperFW Start, settings and game options](docs/media/superfw-menus.gif) |
+
+Development previews recorded from the actual menu renderers in mGBA, using
+original sample artwork for fictional games. They show the interface, not a
+measurement of physical-card performance; released builds may differ.
 
 ## Choose the kernel for your exact card
 
-**The three OMEGA-family kernels below are not interchangeable. Check your
-cartridge model before downloading or flashing an update.**
+**The three OMEGA-family kernels are not interchangeable. Check your card before
+installing an update.**
 
 | Your cartridge | Kernel download | Update file | Status |
 | --- | --- | --- | --- |
 | EZ-FLASH OMEGA **Definitive Edition Rev. A or Rev. B** | [DSSMM 8.4.1](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1) | `ezkernelnew.bin` | Stable release |
 | **Original EZ-FLASH OMEGA** | [DSSMM 8.4.1 — OMEGA Test 5](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-omega-test5) | `ezkernel.bin` | Experimental; not hardware-verified |
-| Newer EZ-FLASH OMEGA **Definitive Edition B / BLUE** | [DSSMM 8.4.2 — BLUE Test 5](https://github.com/voluptuary/dssmm/releases/tag/v8.4.2-blue-test5) | `ezbluekernel.bin` | Experimental; not hardware-verified |
+| Newer EZ-FLASH OMEGA **Definitive Edition B / BLUE** | [DSSMM 8.4.1 — BLUE Test 5](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-blue-test5) | `ezbluekernel.bin` | Experimental; not hardware-verified |
 
 **The older Definitive Edition Rev. B and the newer Definitive Edition B / BLUE
-are different cards.** The Rev. A/B release is also incompatible with the original
-OMEGA. Use only the kernel and supporting SYSTEM files intended for your model,
-and follow that release's installation instructions.
+are different cards.** Use only the kernel and supporting SYSTEM files intended
+for your model, and follow its release instructions.
 
 > [!WARNING]
 > **The Original OMEGA and BLUE ports have not been tested on physical hardware.**
-> Installation, booting, gameplay, saving, plugins, cheats/save states and NOR
-> operations still need hardware verification. BLUE's sealed update image has
-> also not been verified with its updater. Software checks do not establish
-> that these builds will work correctly on a cartridge.
->
-> **Use both experimental builds with caution and only at your own risk.**
-> Back up your SD card and save files before testing. Avoid powering off during
-> kernel updates, save writes or NOR operations.
+> Installation, booting, games, saves, plugins, cheats/save states and NOR still
+> need verification. BLUE’s sealed update image also needs updater verification.
+> **Use these experimental builds with caution and at your own risk.**
+> Back up the SD card and saves; avoid powering off during updates or writes.
 
 ## SuperCard and SuperChis
 
 **[Download SuperFW Build 769](https://github.com/voluptuary/dssmm/releases/tag/superfw-build769)**
-for SuperChis/SuperChis Prime, SuperCard SD or SuperCard Lite. The release also
-includes the optional folder-art pack. Choose the firmware for your exact card.
+for **SuperChis/SuperChis Prime**, **SuperCard SD** or **SuperCard Lite**. Choose
+the file for your exact card. The optional folder-art pack is included.
 
-DSSMM SuperFW is a developing DS Style menu port for SuperCard-family flashcards, built on
-[David Guillen Fandos’s SuperFW](https://github.com/davidgfnet/superfw). It adds
-Light/Dark themes, accents, horizontal/vertical SD and Chis NOR artwork carousels, an optional
-DSSMM font, and a Start screen with last-played artwork and a 12/24-hour clock.
-Choose top-bar color separately from the selection accent.
-Settings are grouped and save in background steps after leaving a menu, using
-`SYSTEM/SETTINGS.TXT`. Chis GBA launch screens let you switch between loading
-and writing to NOR with the D-pad; writes and replacing existing games require
-confirmation. Chis-only hardware features,
-such as its NOR library, remain specific to that card.
+This developing port adds DS Style backgrounds, horizontal/vertical artwork
+carousels, grouped settings, custom folder art and a Start screen with last-played
+artwork and a 12/24-hour clock. Choose a DSSMM font, theme, accent and top-bar color.
+Settings save when you leave their menu; artwork, settings, saves and plugins
+live under `SYSTEM`.
 
+Chis also supports an artwork carousel for its NOR library. When selecting a GBA
+game, use the D-pad to choose loading or writing to NOR; replacing games requires
+confirmation. Hardware-specific features stay with the cards that support them.
+Prime has no hardware RTC or rumble, so themes switch manually.
 
-
-**Hardware testing:** only Chis has been tested on hardware, on one SuperChis
-Prime v1.0. The owner confirms artwork, five-image lookahead and settings
-persistence in earlier builds. New Build 769 changes still need physical
-testing; SD and Lite remain physically untested. GG/SMS operation is reported working,
-PCE games load but Exit currently restarts the emulated game; other plugin compatibility varies. Full EZ-FLASH DSSMM appearance and responsiveness are
-in progress. Choose your exact card’s file and back up saves and current firmware.
-Follow [SuperFW’s installation and recovery guide](https://superfw.davidgf.net/docs/install/flash/).
-Use only the matching SuperCard-family build; the OMEGA downloads above target
-different hardware. Prime has no hardware RTC or rumble, and this port offers
-manual themes rather than automatic switching. Native MiGoomba GB/GBC emulation is included on all three variants.
+**Only SuperChis Prime v1.0 has owner hardware testing; SD and Lite remain
+untested.** Full EZ-FLASH menu parity and plugin compatibility are still in
+progress. Read the release’s known issues, back up saves/current firmware and
+follow [SuperFW’s installation and recovery guide](https://superfw.davidgf.net/docs/install/flash/).
+These files are for SuperCard-family hardware, not OMEGA-family cards.
 
 ### Make and add artwork
 
 1. Open [DS Style Card Companion (DSSCC)](https://github.com/voluptuary/dsscc/releases/latest),
-   use **Custom Pack → Scan SD Card…** (Custom Art in older versions), and select your SD-card root. Enable
-   **Include Game Boy Advance files** if wanted, and choose both thumbnail sizes.
-2. Check the images, choose **Mirrored** output and select **Build Pack**.
+   choose **Custom Pack → Scan SD Card…** (Custom Art in older versions), and
+   select the SD-card root. Enable **Include Game Boy Advance files** if wanted,
+   and choose both thumbnail sizes.
+2. Check the images, select **Mirrored** output and choose **Build Pack**.
 3. Copy the generated `IMGS` and `IMGS2` contents into `SYSTEM/IMGS` and
-   `SYSTEM/IMGS2` on the SD card, preserving all subfolders.
-4. Open **Start → Settings → Interface → Artwork** to choose List, Title or
-   Box, then leave the submenu to save. Title artwork is the default. **Start**
-   opens the Start screen while browsing games.
-5. For folder pictures, extract the release’s `folder-art.zip` (included with releases)
-   at the SD-card root and merge its `SYSTEM` folder. Keep your own same-named
-   CUSTOM pictures if preferred.
+   `SYSTEM/IMGS2`, preserving subfolders.
+4. On SuperFW, use **Start → Settings → Interface → Artwork** to choose Title
+   or Box, then leave the submenu to save. Title is the default. **Start** opens
+   the Start screen while browsing.
+5. For folder pictures, extract the release’s `folder-art.zip` at the SD-card
+   root and merge its `SYSTEM` folder. Keep your own same-named CUSTOM images
+   if preferred.
 
-See [the artwork setup guide](superfw/docs/ARTWORK-SETUP.md) for an exact folder
-example, custom images and troubleshooting. Current builds support mirrored and
-CUSTOM name-matched files, plus EZ-FLASH GBA game-code title art. CUSTOM folder pictures and letter folders are supported; the Start screen shows
-last-played artwork. NOR/recent browser previews are still limited. Older unversioned settings migrate to
-common defaults; versioned Test 2 choices remain intact. DSSCC DST1 transparency
-is supported, and artwork colors are reduced to fit the menu renderer.
+SuperFW checks CUSTOM images first, then filename-matched artwork; Title mode
+also supports GBA ROM-header artwork. Letter folders and custom folder pictures
+are supported. See [artwork setup](superfw/docs/ARTWORK-SETUP.md) for examples
+and troubleshooting; OMEGA-family owners can use their card’s guide below.
 
-## GB/GBC emulator update
+## GB/GBC games
 
-DSSMM 8.4.0 uses [MiGoomba](https://github.com/michyprima/migoomba)
-for GB/GBC games. Software regression and save-compatibility checks passed;
-this integration still needs hardware testing. Back up `.esv` saves before
-updating and do not assume old emulator save states are compatible.
+The kernels include [MiGoomba](https://github.com/michyprima/migoomba) for Game Boy
+and Game Boy Color. Back up `.esv` saves before updating; old emulator save states
+are not guaranteed compatible. Prefer in-game battery saves when moving between
+emulator versions.
 
-## What DSSMM offers
+## Guides
 
-- **Artwork beyond GBA:** name-matched images for supported systems, title or box
-  artwork, mirrored artwork folders and fallback images. Existing GBA artwork
-  lookup remains supported.
-- **Transparent artwork:** compatible marked thumbnails can blend into the menu
-  background. Menu rendering and artwork lookup are highly optimized while
-  retaining transparency compatibility.
-- **Several ways to browse:** list, List + Art, horizontal carousel and vertical
-  carousel views, with favorites, recent games and last-played shortcuts.
-- **A customizable DS-style menu:** Light, Dark and clock-based Auto themes,
-  accent colors, menu sounds, artwork presentation, language and browsing options.
-- **Remembered cheat choices:** optional per-game selections and collapsible
-  cheat groups. In-game cheat and save-state capabilities depend on the card's
-  own engine and the game or plugin being used.
-- **Clearer cartridge management:** themed NOR writing progress, artwork for NOR
-  library entries, and save/settings handling improvements adapted to each card.
-- **More convenient navigation:** configurable startup behavior, wrapping,
-  favorites shortcuts and access to the SYSTEM folder.
-
-Hardware capabilities remain different across the three OMEGA-family cards. A feature on one
-card does not add that hardware capability to another, and plugin compatibility
-still depends on the plugin. Flash operations and interrupted save or metadata
-writes retain known limitations, so keep backups even when using a stable build.
-
-For OMEGA-family features, artwork requirements and known limitations, see the
-[Definitive Edition Rev. A/B guide](ezfomegade/README.md),
-[Original OMEGA guide](ezfomega/README.md) or [BLUE guide](ezfblue/README.md).
-SuperCard setup is covered in [the artwork guide](superfw/docs/ARTWORK-SETUP.md) and
-[the SuperFW manual](https://superfw.davidgf.net/).
-[DS Style Card Companion](https://github.com/voluptuary/dsscc) is the separate
-companion application for finding and preparing artwork.
+- [Definitive Edition Rev. A/B](ezfomegade/README.md)
+- [Original OMEGA](ezfomega/README.md)
+- [Definitive Edition B / BLUE](ezfblue/README.md)
+- [SuperFW artwork and SD setup](superfw/docs/ARTWORK-SETUP.md) · [SuperFW manual](https://superfw.davidgf.net/)
+- [DS Style Card Companion](https://github.com/voluptuary/dsscc) for finding and preparing artwork
 
 ## Credits
 
 DSSMM builds on the work of the following contributors:
 
-- **Merkin** — Merkin Mix development and maintenance, artwork and
+- **Merkin** — Merkin's Mix development and maintenance, artwork and
   transparency support, refreshed splash screens and system icons, rendering
   optimizations, kernel fixes and the platform ports, with AI assistance.
 - **FrankieT19** — the DS Style foundations, animated carousels and launch
@@ -163,7 +152,7 @@ DSSMM builds on the work of the following contributors:
   upstream project under `superfw/`; its source retains upstream licenses and credits.
 - **Copilot, ChatGPT, and Claude** — contributions to interface integration, testing and
   release documentation. Other AI-assisted development work
-  are recorded in the project history.
+  is recorded in the project history.
 
 Thank you also to the upstream component authors, artwork/tool contributors,
 and everyone who has tested builds and reported problems. The platform

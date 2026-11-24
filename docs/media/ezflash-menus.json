@@ -1,0 +1,31 @@
+{
+  "sources": [
+    {
+      "name": "native-scene-0.png",
+      "sha256": "1128dbf338a62c76bf844bb5c03e7707d1e488ff0e0b83cd4e15cb75fd54e991"
+    },
+    {
+      "name": "native-scene-1.png",
+      "sha256": "43d3a5f9abd12f2fe7e9ecdb10b4bce06cd25e0452fc787931dc3e1a9a9c8966"
+    },
+    {
+      "name": "native-scene-2.png",
+      "sha256": "12057f0fb2220ab379135d5423525ce6885180c9a4a500d43fa6960ee2001d54"
+    },
+    {
+      "name": "native-scene-3.png",
+      "sha256": "2c0d3e7e1bf7526be958df80a4493e8c94130e21fbd376226619b14ea9b1d3a4"
+    },
+    {
+      "name": "native-scene-5.png",
+      "sha256": "8b06f226a955dfde9a2b1697bf2ff7e826483bec6eb53c178d31f5da29958fbd"
+    }
+  ],
+  "size": [
+    480,
+    320
+  ],
+  "duration_ms": 7000,
+  "sha256": "fa5ec04bd2be511d4c56351e088ffa69ada65c8020125f4673df3be6786ff8b6",
+  "presentation": "Native menu captures; nearest-neighbor2x, no generated in-between frames"
+}

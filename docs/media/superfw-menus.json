@@ -1,0 +1,27 @@
+{
+  "sources": [
+    {
+      "name": "superfw-menu-10.gif",
+      "sha256": "e1f79cd11f6e82cb60e6463c1956826f2cefe2493984b0f2d7abe5684ffed505"
+    },
+    {
+      "name": "superfw-menu-9.gif",
+      "sha256": "fad41cf97b9dd787aa05327963d445cf90a43048d29ea5c8217077d9c22ad3f5"
+    },
+    {
+      "name": "superfw-menu-7.gif",
+      "sha256": "38691cc88751ac1ebab7706e5bd6eca76928bedc48c5fdfc8cdd708768f19e4e"
+    },
+    {
+      "name": "superfw-menu-8.gif",
+      "sha256": "83a06cac218465f2123ae8aa74b17cce29601476af2eaa66245a18e13e9eb5a3"
+    }
+  ],
+  "size": [
+    480,
+    320
+  ],
+  "duration_ms": 5600,
+  "sha256": "45c906150f64a6847e8120eefd49762f0ac8b80620a820a0f69e20fe1afa3f36",
+  "presentation": "Native menu captures; nearest-neighbor2x, no generated in-between frames"
+}

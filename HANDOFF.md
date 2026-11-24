@@ -2263,3 +2263,22 @@ Refreshed only these3 validated input baselines and end-user download links.
 Normal hardware PR merges and publication-doc merges preserve lane ancestry;
 normal all5 synchronization next. Project journals retain detailed evidence.
 SuperFW777 pending clean local gate in its own lane;769 public unchanged.
+
+## 2026-11-24 — README showcases and canonical project name
+
+DSSMM expands to DS Style Merkin's Mix; use Merkin's Mix in current documentation.
+Exact historical journals, release bodies and publication metadata remain records
+of their time. Current guides were corrected within each owning hardware lane.
+Owner BLUE release relabel is8.4.1-blue-test5; same source/assets, preserve it.
+
+README now emphasizes major library/artwork/navigation/customization features and
+has four real native menu GIFs. Original fictional cover/title PNGs and built-in
+image_gen prompts/provenance are under docs/media/demo-art/. DE native9 scenes
+passed; SuperFW renderer799 uses opt-in original PNGs without test poison. Shared
+capture tools use stock SDLmGBA0.10.1, private Xvfb/XDG_CONFIG_HOME, xdotool and
+Pillow9.4 XCB; no BIOS, emulator modification or new kernel driver. Added python3-pil
+to the standard container for optional documentation capture. All3 shared layout/
+merge checks passed. Captures were visually inspected; not hardware/timing proof.
+Hardware-test Chis799 remains validated, no new public firmware release. Continue
+Atari plugin/menu and SuperFW parity work in its project; source-only prototypes
+do not supply a working a26 plugin. Do not stop at this documentation milestone.
