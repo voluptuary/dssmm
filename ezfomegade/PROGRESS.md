@@ -3131,3 +3131,8 @@ pure-path correction; OMEGA clipped-name audit and SuperFW gates follow.
 Full DE verifier passed (43 host scripts, native five-case mGBA launch, production build, browser and memory checks). Removed duplicate native invocation; host-suite discovery retains it. Owner authorizes corrective release8.4.1; physical affected-card confirmation pending. OMEGA/BLUE audit/publication follows.
 
 2026-11-24: v8.4.1 published at a948b936 after source45293394157 and all4 PR23 CI45293418303 passed; PR23 merged70f7230. Firmware and full folder-art.zip downloaded byte-identically; canonical notes match, GitHub latest explicitly verifiedv8.4.1. SD regression software-reproduced/fixed; affected physical-card confirmation pending. Publication JSON retained. Synchronize via dssmm; no other driver changed.
+
+2026-11-24: Added real carousel-motion input and optional original title/box
+artwork to native preview for owner-requested README GIFs. All9 native mGBA
+scenes pass, production code unchanged. L/R scene navigation remains; no game/
+flash launch path. Root capture tool/media remain universal on dssmm.
