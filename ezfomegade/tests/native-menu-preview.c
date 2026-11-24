@@ -17,20 +17,26 @@ FRESULT preview_f_open(FIL *file,const TCHAR *path,BYTE mode) {(void)file;(void)
 FRESULT preview_f_stat(const TCHAR *path,FILINFO *info) {(void)path;(void)info;return FR_NO_FILE;}
 FRESULT preview_f_chdir(const TCHAR *path) {(void)path;return FR_NO_PATH;}
 FRESULT preview_f_getcwd(TCHAR *path,UINT size) {if(size>1){path[0]='/';path[1]=0;}return FR_OK;}
+#include "../build-preview/preview-artwork.h"
 #ifndef PREVIEW_SCENE
 #define PREVIEW_SCENE 0
 #endif
-static void preview_artwork(void) {
+static void preview_artwork(unsigned center) {
     folder_total=0;game_total_SD=3;
-    launcher_active_page=SD_list;launcher_thumbnail_style=LAUNCHER_THUMB_STYLE_TITLE;
-    Launcher_ResetThumbCache();launcher_cache_center_index=1;
+    launcher_active_page=SD_list;launcher_thumbnail_style=PREVIEW_ART_STYLE;
+    Launcher_ResetThumbCache();launcher_cache_center_index=center;
     LauncherThumbCache *cache[]={&launcher_cache_prev,&launcher_cache_selected,&launcher_cache_next};
     for(unsigned tile=0;tile<3;++tile) {
         cache[tile]->valid=cache[tile]->has_thumbnail=cache[tile]->custom_thumbnail=1;
-        cache[tile]->absolute_index=tile;
+        unsigned index=(center+tile+2)%3;
+        cache[tile]->absolute_index=index;
         u16 *pixels=(u16*)cache[tile]->thumb_data;
+#if PREVIEW_EXTERNAL_ART
+        dmaCopy(preview_artwork_pixels[index],pixels,sizeof(preview_artwork_pixels[index]));
+#else
         for(unsigned y=0;y<80;++y)for(unsigned x=0;x<120;++x)
-            pixels[y*120+x]=RGB((x/8+tile*7)%32,(y/6+tile*9)%32,(x/12+y/8+tile*4)%32);
+            pixels[y*120+x]=RGB((x/8+index*7)%32,(y/6+index*9)%32,(x/12+y/8+index*4)%32);
+#endif
     }
 }
 static void preview_draw(unsigned scene,unsigned selected) {
@@ -47,9 +53,9 @@ static void preview_draw(unsigned scene,unsigned selected) {
     } else {
         gl_show_Thumbnail=scene==7?LAUNCHER_VIEW_HORIZONTAL:LAUNCHER_VIEW_VERTICAL;
         launcher_effective_show_thumbnail=gl_show_Thumbnail;
-        preview_artwork();Launcher_DrawThemeBGFull(Launcher_GetBGImage());
-        if(scene==7){Launcher_PreScaleHorzCache();Draw_ModernLauncher_SD(0,1,1);}
-        else {Launcher_PreScaleVertCache();Draw_ModernLauncher_SD_Vertical_State(0,1);}
+        preview_artwork(selected%3);Launcher_DrawThemeBGFull(Launcher_GetBGImage());
+        if(scene==7){Launcher_PreScaleHorzCache();Draw_ModernLauncher_SD(0,selected%3,1);}
+        else {Launcher_PreScaleVertCache();Draw_ModernLauncher_SD_Vertical_State(0,selected%3);}
         Launcher_DrawTopbarName(SD_list);Launcher_DrawTopbarTitle(SD_list,"SD Card");Launcher_DrawStartClock(1);
     }
     volatile u8 *status=(volatile u8*)0x0e000000;
@@ -65,16 +71,24 @@ int main(void) {
     LoadEnglish();
     strcpy(launcher_system_name,"Test User");
     launcher_theme_index=0;
-    unsigned scene=PREVIEW_SCENE,selected=0;
+    unsigned scene=PREVIEW_SCENE,selected=PREVIEW_SCENE>=7?1:0;
     const volatile u8 *request=(const volatile u8*)0x0e000000;
     if(request[0]==0xd6 && request[1]<9 && request[2]==0xaa)scene=request[1];
+    if(scene>=7)selected=1;
     preview_draw(scene,selected);
     while(1) {
         VBlankIntrWait();scanKeys();u16 keys=keysDown();
-        if(keys&KEY_R)scene=(scene+1)%9,selected=0;
-        if(keys&KEY_L)scene=(scene+8)%9,selected=0;
-        if(keys&KEY_DOWN)++selected;
-        if(keys&KEY_UP)selected=selected?selected-1:0;
+        if(keys&KEY_R)scene=(scene+1)%9,selected=scene>=7?1:0;
+        if(keys&KEY_L)scene=(scene+8)%9,selected=scene>=7?1:0;
+        if(scene>=7 && (keys&(KEY_DOWN|KEY_UP|KEY_LEFT|KEY_RIGHT))) {
+            int move=(keys&(KEY_DOWN|KEY_RIGHT))?1:-1;
+            unsigned next=(selected+3+move)%3;
+            Launcher_AnimateCarouselMove(move,next);
+            selected=next;
+        } else {
+            if(keys&KEY_DOWN)++selected;
+            if(keys&KEY_UP)selected=selected?selected-1:0;
+        }
         if(keys)preview_draw(scene,selected);
     }
 }

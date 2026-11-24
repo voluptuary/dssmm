@@ -1,4 +1,4 @@
-# Merkin Mix port exploration
+# Merkin's Mix port exploration
 
 Preparation only. No target firmware implementation or compatibility claim exists yet.
 
@@ -8,14 +8,14 @@ Preparation only. No target firmware implementation or compatibility claim exist
 | ezfomega | Original EZ-FLASH OMEGA | https://github.com/FrankieT19/omega-ds-style-kernel | ef30b8ba78147943d95653dfa82f721b52096f67 |
 | ezfblue | Omega Definitive Edition BLUE, as named by vendor source | https://github.com/ezflash-team/blue-kernel | 109f1a050d9c35008379ce61ae40d05dc528c614 |
 
-Both exploration branches start from the same Merkin Mix baseline. Their inherited source and Makefile still target Omega DE Rev. A/B. Branch names do not make these sources suitable for other cartridges. Each branch adds TARGET.md with its own exploration plan.
+Both exploration branches start from the same Merkin's Mix baseline. Their inherited source and Makefile still target Omega DE Rev. A/B. Branch names do not make these sources suitable for other cartridges. Each branch adds TARGET.md with its own exploration plan.
 
 ## Resume procedure
 
 1. Read AGENTS.md, HANDOFF.md, PROGRESS.md, and the branch TARGET.md.
 2. Re-fetch the target reference into a dedicated reference ref and verify the pinned commit. Do not merge upstream wholesale or infer code novelty from release numbers.
 3. Inventory hardware mappings, storage/save behavior, launch and reset protocols, IRQ/DMA ownership, RAM layout, image size limits and update packaging before selecting a target source baseline.
-4. Compare final Merkin Mix behavior with the target baseline. Record features already present, actual missing changes, dependencies, original authors and licenses. Preserve FrankieT19 and other contributors' attribution.
+4. Compare final Merkin's Mix behavior with the target baseline. Record features already present, actual missing changes, dependencies, original authors and licenses. Preserve FrankieT19 and other contributors' attribution.
 5. Plan small changes with host regression coverage and a target-specific hardware test matrix. Reuse pure policy/UI code only after checking dependencies. Keep hardware operations target-specific.
 6. Wait for the owner to resume actual porting before implementing changes, building target candidates, or publishing releases.
 
