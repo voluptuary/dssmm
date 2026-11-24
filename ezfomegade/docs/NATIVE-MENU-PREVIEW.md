@@ -27,3 +27,11 @@ flash/save timings, game launch or physical-card qualification. Compare commits
 by retaining their PNG/JSON outputs; metadata records source commit, dirtiness,
 fixture limits and ROM SHA-256. Generated outputs can be rebuilt and must not be
 committed as firmware or release assets.
+
+Carousel scenes now accept either D-pad axis and run the production five-step
+carousel compositor before redrawing the new selection. L/R still changes
+scenes; no launch action is exposed. Optional `--art-dir /path/to/sample-art`
+loads moonlit/sunset/skybound PNGs in Title120x80 or Box80x80 form; use
+`--art-style box` for square covers. These are visual-only decoded-cache inputs,
+not firmware assets or filesystem-driver changes. Root docs/media/demo-art
+contains the original fictional samples used in README captures.
