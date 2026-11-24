@@ -320,3 +320,7 @@ Project-owned fixture builders remain inside their hardware directories.
 Showcase art is original fictional-game artwork in docs/media/demo-art/;
 prompts/provenance are retained there. GIF metadata records ROM/image hashes,
 inputs and capture times. These previews are not cartridge performance tests.
+
+The current source/build checkpoint and all six build variants are listed in
+[current-builds.md](current-builds.md). The checked-in feature lock preserves the
+workspace’s devcontainer feature versions; no Codespace-only files are needed.

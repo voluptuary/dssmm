@@ -3362,3 +3362,16 @@ merge checks passed. Captures were visually inspected; not hardware/timing proof
 Hardware-test Chis799 remains validated, no new public firmware release. Continue
 Atari plugin/menu and SuperFW parity work in its project; source-only prototypes
 do not supply a working a26 plugin. Do not stop at this documentation milestone.
+
+## 2026-11-24 — Fork reproducibility and recovery synchronization
+
+Owner requests that a fresh fork retain the complete current build/test state.
+Commit the existing devcontainer feature lock unchanged, document all six board
+builds/checkpoint reproduction, and integrate current SuperFW source via normal
+hardware PR. Preserve owner uploadf635077 exactly in SuperFW history/imports;
+remove only its misplaced root a26.zip, which fails the existing isolation gate.
+No isolation exception or blanket driver is added. Historical upload commit and
+all kernel journals/releases remain. Atari development moved to voluptuary/a26.gba;
+current tests/hardware observations and native harness review stay project-owned.
+Fresh-clone builds and branch synchronization follow; do not claim completion
+before checking those results. Release metadata/assets remain unchanged.
