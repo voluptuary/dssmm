@@ -24,7 +24,7 @@ cartridge model before downloading or flashing an update.**
 | --- | --- | --- | --- |
 | EZ-FLASH OMEGA **Definitive Edition Rev. A or Rev. B** | [DSSMM 8.4.1](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1) | `ezkernelnew.bin` | Stable release |
 | **Original EZ-FLASH OMEGA** | [DSSMM 8.4.1 — OMEGA Test 5](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-omega-test5) | `ezkernel.bin` | Experimental; not hardware-verified |
-| Newer EZ-FLASH OMEGA **Definitive Edition B / BLUE** | [DSSMM 8.4.2 — BLUE Test 5](https://github.com/voluptuary/dssmm/releases/tag/v8.4.2-blue-test5) | `ezbluekernel.bin` | Experimental; not hardware-verified |
+| Newer EZ-FLASH OMEGA **Definitive Edition B / BLUE** | [DSSMM 8.4.1 — BLUE Test 5](https://github.com/voluptuary/dssmm/releases/tag/v8.4.1-blue-test5) | `ezbluekernel.bin` | Experimental; not hardware-verified |
 
 **The older Definitive Edition Rev. B and the newer Definitive Edition B / BLUE
 are different cards.** The Rev. A/B release is also incompatible with the original
