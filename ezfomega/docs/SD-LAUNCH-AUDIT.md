@@ -1,0 +1,7 @@
+# Original OMEGA SD launch audit
+
+The DE/BLUE mandatory-short-alias regression is absent here: ordinary exFAT-style names already launch. The browser stores 99 filename bytes, however, and clipped names without an alias were passed directly to extension detection/open. The real native mGBA fixture reproduces this: FAT alias and ordinary alias-free cases reach handoff (`d7feaa`), while the clipped name returns before opening (`d700ee`).
+
+The correction keeps the normal direct-copy path. Only clipped alias-free entries are recovered through the existing paired directory offset, validating file type, size, recorded prefix, output capacity and read/close results. Shared existing directory scratch is used before entering the launch menu; no new allocation or record format. The full-name launch buffer now holds 255 bytes plus terminator. Card transfer, reset, save and patch protocols are unchanged; handoff remains Original OMEGA page0x200.
+
+`tests/test-launch-name-resolution.py` sanitizes the extracted production helper against alias/full/244-byte names, stale offsets/type/size/prefix, capacity and I/O failures. `scripts/test-native-launch-mgba.sh` exercises actual SD_list_MENU and metadata control flow in five native ARM cases. Physical filesystem/save/transfer/patch/reset effects are explicit mocks; this is not hardware emulation or physical qualification. Stock SDL mGBA0.10.1/Xvfb, no BIOS or commercial ROM required.

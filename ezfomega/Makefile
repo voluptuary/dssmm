@@ -42,12 +42,13 @@ CFLAGS	+=	$(INCLUDE)
 
 ifneq ($(strip $(PREVIEW_SCENE)),)
 CFLAGS += -DPREVIEW_SCENE=$(PREVIEW_SCENE)
+PREVIEW_EXTRA_LDFLAGS := $(PREVIEW_LAUNCH_FLAGS)
 endif
 
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
-LDFLAGS	=	-g $(ARCH) -Wl,-Map,$(notdir $*.map)
+LDFLAGS	=	-g $(ARCH) -Wl,-Map,$(notdir $*.map) $(PREVIEW_EXTRA_LDFLAGS)
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
