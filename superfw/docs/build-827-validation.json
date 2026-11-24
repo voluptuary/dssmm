@@ -1,0 +1,57 @@
+{
+  "build": 827,
+  "source_commit": "db4e6405009ea2fd889a48afac23167077f1db25",
+  "boards": [
+    {
+      "source_tree_sha256": "8351d46ff136564fb27fae4d08ea13f89f0c6df34cf03b39407c5b7d579f7f06",
+      "board": "sd",
+      "dssmm_build": 827,
+      "source_commit": "db4e6405009ea2fd889a48afac23167077f1db25",
+      "source_dirty": false,
+      "firmware_sha256": "ee17e3a64a19be62df21af2dc97b70856f17349168bf82b27f52c5842e4ca894",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 497152,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 27136
+    },
+    {
+      "source_tree_sha256": "8351d46ff136564fb27fae4d08ea13f89f0c6df34cf03b39407c5b7d579f7f06",
+      "board": "lite",
+      "dssmm_build": 827,
+      "source_commit": "db4e6405009ea2fd889a48afac23167077f1db25",
+      "source_dirty": false,
+      "firmware_sha256": "c446653cb149a9c6ff8cb3a61b01dbdec167336d64dbfd4113e8e0cd362538ea",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 497152,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 10752
+    },
+    {
+      "source_tree_sha256": "8351d46ff136564fb27fae4d08ea13f89f0c6df34cf03b39407c5b7d579f7f06",
+      "board": "chis",
+      "dssmm_build": 827,
+      "source_commit": "db4e6405009ea2fd889a48afac23167077f1db25",
+      "source_dirty": false,
+      "firmware_sha256": "f6e2ecf6691bbbdd3921396572bce36a4c12a064251d9d90328b9da4fc59eb0b",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "main_ewram_bytes": 248504,
+  "main_ewram_limit_bytes": 257024,
+  "iwram_bytes": 15256,
+  "user_stack_minimum_bytes": 16384,
+  "native_settings_stack_peak_bytes": 14152,
+  "main_ewram_recovered_bytes": 8144,
+  "source_ci": 45402219616,
+  "integration_ci": 45402235990,
+  "local_recovery": {
+    "initial_run": "Full verifier reached the workspace-render fixture and failed its fixed-five-second completion marker. Earlier all3/ARM/42-menu/8-NOR checks passed.",
+    "repeated_old_fixture": "Five focused cases passed on recovery; no production code changed.",
+    "corrected_fixture": "Bounded completion-marker wait and distinct pending color; four simultaneous save/render cases passed across both fonts. Permanent red/incorrect art still fails.",
+    "remaining_checks": "Start captions/artwork, native SMS/GG/PCE Exit, MiGoomba, resources and host coverage completed successfully."
+  },
+  "limits": "Software validation; the original local failure is retained in the record. No new physical qualification. Atari development is frozen here and maintained separately."
+}

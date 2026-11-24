@@ -267,8 +267,12 @@ int main(void) {
 #if TEST_WORKSPACE_SAVE
     passed=passed&&workspace_checked;
 #endif
-    REG16(0x050001de)=passed?0x03e0:0x001f;
-    REG16(0x050001f0)=passed?0x7c00:0x001f;
+    uint16_t not_ready=0x001f;
+#if TEST_WORKSPACE_SAVE
+    if(ok && !workspace_checked)not_ready=0x03ff; /* Pending, not a failed check. */
+#endif
+    REG16(0x050001de)=passed?0x03e0:not_ready;
+    REG16(0x050001f0)=passed?0x7c00:not_ready;
     volatile uint16_t *front=(volatile uint16_t *)(0x06000000+((REG16(0x04000000)&16)?0xa000:0));
     for(unsigned y=1;y<7;y++)for(unsigned x=second?112:116;x<120;x++)front[y*120+x]=0xf8ef;
 #endif

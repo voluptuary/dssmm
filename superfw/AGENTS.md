@@ -277,3 +277,15 @@ a native HuCard icon, keep all board artwork resources synchronized and preserve
 flash/RAM/16KiB stack budgets. Atari2600 is an additional investigation: no a26
 core exists in the current pack. Read ATARI2600-PORT-PLAN.md; use a standalone
 prototype and generated homebrew before claiming support or adding a binary.
+
+## Atari project migration (owner direction)
+
+Atari2600 plugin development has moved to https://github.com/voluptuary/a26.gba.
+Do not resume the old Atari implementation/audit TODOs here or update the frozen
+local plugin as the latest version. Preserve historical source recipes/evidence;
+ordinary kernel Pogoshell compatibility and kernel harness work remain in scope.
+The separate repository has progressed beyond this snapshot. The owner's original
+root a26.zip is retained byte-for-byte under docs/history/imports/; use the active
+repository for current plugin work. Owner Build822 boots and loads/exits Atari
+on physical Chis; the plugin revision was not specified. This does not qualify
+Build827 memory sharing or SD/Lite hardware.

@@ -12,6 +12,7 @@ emulator="${MGBA_BIN:-/usr/games/mgba}"
 for font in ${DSSMM_PREVIEW_FONTS:-1 0}; do
  for scene in ${DSSMM_NOR_SCENES:-16 17 18 19}; do
   if [[ "${DSSMM_PREVIEW_SAVE_CAROUSEL:-0}" = 1 ]]; then rm -f "$out/native-settings.sav"; fi
+  rm -f "$out"/native-settings-*.png
   python3 "$root/scripts/build-native-settings-preview.py" --scene "$scene" --font "$font" --out "$out" "${extra[@]}"
   SDL_AUDIODRIVER=dummy xvfb-run -a bash -c '
    set -euo pipefail
@@ -20,10 +21,26 @@ for font in ${DSSMM_PREVIEW_FONTS:-1 0}; do
    emulator_pid=$!
    finish() { kill "$emulator_pid" 2>/dev/null || true; wait "$emulator_pid" 2>/dev/null || true; }
    trap finish EXIT
-   sleep 5
-   xdotool key F12
-   sleep 1
-  ' _ "$out" "$emulator"
+   # Wait for the ROM completion marker; wall-clock boot/write time varies.
+   for attempt in {1..20}; do
+    kill -0 "$emulator_pid"
+    sleep 1
+    xdotool key F12
+    sleep 0.2
+    if python3 - "$PWD" "$3" <<PYREADY
+from pathlib import Path
+import sys
+sys.path.insert(0,sys.argv[2])
+from png_reader import read_rgb_png
+screens=list(Path(sys.argv[1]).glob("native-settings-*.png"))
+if not screens:sys.exit(1)
+w,h,rows=read_rgb_png(max(screens,key=lambda p:p.stat().st_mtime_ns))
+ready=(w,h)==(240,160) and all(tuple(rows[y][3*x:3*x+3])==((0,255,0) if x%2==0 else (0,0,255)) for y in range(1,7) for x in range(232,240))
+sys.exit(0 if ready else 1)
+PYREADY
+    then break; fi
+   done
+  ' _ "$out" "$emulator" "$root/tests"
   python3 - "$out" "$root" "$scene" "$font" <<'PY'
 from pathlib import Path
 import hashlib,json,os,shutil,sys

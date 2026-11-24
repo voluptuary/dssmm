@@ -1257,3 +1257,28 @@ Freeze this source and run complete gates next. PR29 (head4fcc015) independently
 covers prior Atari guards and822 evidence; merge it only after checks pass, and
 do not change HEAD during the next three-board build sequence. Do not combine
 new View/submenu features before this memory/ownership checkpoint is validated.
+
+## Recovery, owner822 report and external Atari migration
+
+Recovered clean827/db4e640 all3 builds and passing sourceCI45402219616/all4
+integrationCI45402235990. Local full verifier stopped on the new workspace test's
+fixed5s marker; retained that failure, reran focused cases successfully, completed
+remaining Start/plugin/MiGoomba/resource/host checks, and added bounded completion
+polling with a distinct pending color. Bothfonts TitleH/BoxV simultaneous real
+save/reload/art checks pass. Kernel inputs/827 bytes unchanged by fixture fix;
+docs/build-827-validation.json records composed evidence and limits.
+
+Owner reports Chis822 boots and Atari games load/Exit successfully; exact plugin
+revision unspecified. Stop Atari development here: active repository is now
+https://github.com/voluptuary/a26.gba and is already ahead. Old recipes/journals
+are historical. Original owner a26.zip upload preserved exactly in project
+history/imports (SHA d1f97f8b...), removing the need for a root binary that fails
+isolation. No Atari engine changes made during this recovery.
+
+Read-only harness review at external66017dcb: added optional pinned mGBA-core
+SuperCard model, real image-backed Lite SD reads and memory-multiple callbacks.
+Chis NOR/non-Lite ports/plugin handoff remain unqualified. Do not substitute it
+for the existing native mocks or combine EZ drivers; retain as an optional future
+bus-testing extension. Current change improves SDL fixture completion readiness.
+Next: finish default-branch integration/sync and verify a fresh clone can build
+all kernels, then owner-requested19px SuperCard top bar and matching colors.

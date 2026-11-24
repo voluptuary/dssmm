@@ -1,4 +1,6 @@
-# Atari2600 investigation
+# Atari2600 investigation (historical)
+
+Development moved to [a26.gba](https://github.com/voluptuary/a26.gba) by owner direction. The work below is frozen historical evidence, not a current task list or the latest plugin. Do not duplicate the separate repository’s continuing work here.
 
 The current EZ-FLASH manager PLUG pack has no a26.bin/gba/mb/mbz. SuperFW can
 route extension-named external plugins, but that does not supply an Atari core.
