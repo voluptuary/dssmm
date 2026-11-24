@@ -42,3 +42,5 @@ reuse another card's variant. Run the focused payload/loader test and full
 project verifier for changes; preserve64KiB .esv handling and cache bounds.
 Do not claim old save-state compatibility or hardware qualification from mocks.
 DSSMM 8.4.0 includes MiGoomba; earlier releases retain their previous emulator.
+
+2026-11-24 current stable: v8.4.1, sourcea948b936, fixes reproduced alias-free/clipped-name SD launching. Full local/source/all4 native mGBA checks passed; no affected physical-card confirmation claimed. Preserve card-specific hardware protocols and release evidence under docs/releases/.
