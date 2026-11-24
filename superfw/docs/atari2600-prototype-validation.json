@@ -16,7 +16,7 @@
     "result": "passed",
     "limits": "CPU/bus model, not physical SuperCard or game compatibility qualification"
   },
-  "packaging": "Source recipe only; no Atari binary/core bundled in firmware or release assets. Upstream COPYING/provenance review remains before distribution.",
+  "packaging": "Owner-requested local experimental a26.gba plus exact corresponding prepared source ZIP, original notices, CREDITS, GPLv3 text and standalone rebuild. Source ZIP independently reproduces the plugin byte-for-byte; no public release/bundling or physical qualification.",
   "menu": {
     "emulator": "stock SDL mGBA 0.10.1; private Xvfb; no BIOS",
     "passed": [
@@ -32,5 +32,35 @@
       "Exit reaches validated return marker"
     ],
     "limits": "Original generated 4K diagnostic only; Return marker substitutes physical firmware remapping; game compatibility and audio unqualified."
+  },
+  "hardware_test": {
+    "upstream_commit": "2eb18dd8a5b832c939efe510b4e493ad4cf25437",
+    "purpose": "runtime input experiment",
+    "sha256": {
+      "diagnostic.a26": "d01da6830f59800530310d04bdaa796a999c38de5067a62e23c020a16e4c6b67",
+      "prototype.gba": "e5cdd3ed708fb6ad59f205299878fbff1ef13998c745032b4e19df0c77d5ca7b"
+    },
+    "limits": "Experimental 2K/4K/F8/F6 input and L+R menu; audio, broad game compatibility, physical Exit and licensing review remain pending.",
+    "hardware_test": "Experimental local trial only; no physical qualification.",
+    "assets": {
+      "SYSTEM/PLUG/a26.gba": "e5cdd3ed708fb6ad59f205299878fbff1ef13998c745032b4e19df0c77d5ca7b",
+      "atari2600-test-source.zip": "16da3d655fe429ce312bdfeb2e5a51144533667897568c73b50403efff145204"
+    },
+    "runtime_checks": {
+      "emulator": "stock SDL mGBA 0.10.1; private Xvfb; no BIOS",
+      "passed": [
+        "L alone leaves game running",
+        "L+R opens menu",
+        "A opens Controller",
+        "A toggles controller option",
+        "B returns to parent",
+        "D-pad selects Display",
+        "Left changes frame skip",
+        "B restores exact game frame",
+        "Restart returns to diagnostic",
+        "Exit reaches validated return marker"
+      ],
+      "limits": "Original generated 4K diagnostic only; Return marker substitutes physical firmware remapping; game compatibility and audio unqualified."
+    }
   }
 }

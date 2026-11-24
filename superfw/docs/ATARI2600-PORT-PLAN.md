@@ -122,3 +122,24 @@ The Exit test substitutes a green marker for physical cartridge remapping; it
 checks the real plugin validation/jump, not firmware restoration or card timing.
 The generated diagnostic remains the only tested game. Keep Build799 unchanged;
 no a26 plugin is delivered until core compatibility and licensing are reviewed.
+
+## Owner-requested local plugin trial
+
+The owner explicitly requested placing the plugin in hardware-test. It is now at
+`hardware-test/SYSTEM/PLUG/a26.gba`, with `atari2600-test.txt` instructions and
+`atari2600-test-source.zip` containing the exact prepared source, original
+notices/CREDITS, GPLv3 text and a standalone devkitARM rebuild script. The source
+archive independently rebuilds the identical binary. No old object, commercial
+ROM or BIOS is included. This is a local experimental artifact, not a public
+release or a bundled firmware emulator. Source-only packaging restrictions in
+older checkpoints are superseded by this explicit owner request and the current
+runtime checks/source delivery.
+
+Copy it to `SYSTEM/PLUG/a26.gba`; an old `a26.bin` must be removed because `.bin`
+is preferred. Existing Build799 can load it without a firmware update. Source
+`tools/package-atari2600-test.py` reproduces the local delivery after validation.
+`tools/test-atari2600-runtime-mgba.py` runs the actual runtime binary with only a
+fixed-ABI cold-boot argument seed, then checks the exact diagnostic pixels and
+ten menu interactions. This covers the runtime build, not merely the separately
+compiled standalone diagnostic. Card remapping, physical Exit, broader games,
+speed and sound remain outside these tests; no sound implementation exists yet.

@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import shlex
 import subprocess
 
 PIN = "2eb18dd8a5b832c939efe510b4e493ad4cf25437"
@@ -141,10 +142,28 @@ def main():
     subprocess.run([str(devkit / "bin/arm-none-eabi-objcopy"), "-O", "binary",
                     "prototype.elf", "prototype.gba"], cwd=output, check=True)
     subprocess.run([str(tools / "gbafix"), "prototype.gba"], cwd=output, check=True)
+    # Ship the exact normalized input and a standalone rebuild command alongside
+    # local hardware trials; no old objects or embedded commercial ROMs are used.
+    build_command = '"${DEVKITARM:-/opt/devkitpro/devkitARM}/bin/arm-none-eabi-gcc" ' + shlex.join(command[1:])
+    (output / "build.sh").write_text(
+        '#!/usr/bin/env bash\nset -euo pipefail\ncd "$(dirname "$0")"\n' + build_command + '\n' +
+        '"${DEVKITARM:-/opt/devkitpro/devkitARM}/bin/arm-none-eabi-objcopy" -O binary prototype.elf prototype.gba\n' +
+        '"${DEVKITPRO:-/opt/devkitpro}/tools/bin/gbafix" prototype.gba\n')
+    shutil.copy2(ROOT / "COPYING", output / "COPYING")
+    (output / "NOTICE.txt").write_text(
+        'Experimental DSSMM Atari2600 plugin, based on MikeDX/2600_gba\n'
+        'Upstream commit: ' + PIN + '\n'
+        'Virtual VCS/X2600: Alex Hornby, Daniel Boris and the x64 contributors.\n'
+        'See CREDITS and the notices retained in each source file.\n'
+        'Upstream C sources state the GNU GPL without a numbered version;\n'
+        'DSSMM adapters/menu are GPL-3.0-or-later. GPLv3 text is in COPYING.\n'
+        'No upstream prebuilt objects or commercial ROM payloads are used.\n'
+        'Rebuild this exact prepared source with bash build.sh and devkitARM.\n'
+        'Experimental: no sound; only generated diagnostics tested.\n')
     record = {"upstream_commit": PIN, "purpose": "runtime input experiment" if args.runtime else "emulator-only generated diagnostic",
               "sha256": {name: hashlib.sha256((output / name).read_bytes()).hexdigest()
                          for name in ("diagnostic.a26", "prototype.gba")},
-              "limits": "Experimental 2K/4K/F8/F6 input and L+R menu; audio, broad game compatibility, physical Exit and licensing review remain pending."}
+              "limits": "Experimental 2K/4K/F8/F6 input and L+R menu; audio, broad game compatibility, physical Exit remain pending."}
     (output / "prototype.json").write_text(json.dumps(record, indent=2) + "\n")
     print(output / "prototype.gba")
 

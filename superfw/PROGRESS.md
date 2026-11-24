@@ -1151,3 +1151,22 @@ review and physical compatibility/Exit remain. No plugin distributed; Chis799
 hardware-test and public769 stay unchanged. Continue Atari source/license/core
 compatibility review, then supply an explicitly experimental external a26 plugin;
 subsequent menu parity pass should fix the native Info unlock-hint clipping.
+
+## 2026-11-24 — Experimental Atari hardware-test plugin delivered
+
+Owner explicitly requested the plugin in hardware-test. Delivered
+SYSTEM/PLUG/a26.gba (SHAe5cdd3ed708fb6ad59f205299878fbff1ef13998c745032b4e19df0c77d5ca7b),
+setup/limits text, validation JSON and exact prepared-source ZIP with original
+notices/CREDITS, GPLv3 text and standalone rebuild script. Independently extracting
+and rebuilding the source ZIP gives the identical binary. Runtime2K/4K/F8/F6,
+L+R menu, no sound; only generated diagnostics qualified. Actual runtime image
+with fixed-ABI cold-boot seeding passes exact pixels and ten mGBA menu/Exit-marker
+checks, plus21 input/12 bank-hotspot/7 return-header ARM checks. No public release
+or firmware change, no physical-card or broad game/Exit/speed qualification.
+
+Current local kernel remains Chis799. Generic extension loader already supports
+this external asset. Preserve it alongside its source/notes during cleanup. Owner
+will test when convenient; continue Atari compatibility/performance and DSSMM
+porting autonomously. Local source archive is not a GitHub firmware source asset;
+do not upload it through release tooling. Tracked packaging/runtime replay tools
+make this environment reproducible without private BIOS or old prebuilt objects.
