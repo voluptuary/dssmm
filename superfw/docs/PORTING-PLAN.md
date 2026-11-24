@@ -12,7 +12,7 @@ Do not transplant OMEGA drivers, patch payloads, save-state formats or flash lay
 
 - Upstream Makefile enables SUPERCHIS_IO, SUPPORT_NORGAMES, extended fonts and bundled emulators for `chis`, with a 2 MiB firmware limit. src/supercard_driver.c implements SuperChis NOR mapping and SRAM banking; src/loader.c has native NOR launch/write paths. This is a substantial starting point, not proof of Prime v1.0 qualification.
 - The linked SuperChis repository describes a CPLD implementation, memory mapping and SD interface. Its README does not identify the owner’s exact Prime v1.0 revision or prove compatibility with our pinned firmware. Record installed firmware, board markings, console model, battery status, reported flash/SRAM identity and any vendor-specific recovery instructions before writes.
-- Sources: https://github.com/ChisBread/SuperChis and https://github.com/davidgfnet/superfw . Preserve David Guillen Fandos’s firmware attribution and ChisBread’s hardware attribution. SuperChis HDL is CC BY-NC-SA 4.0; consult it as protocol documentation and do not copy HDL into the GPL firmware. Audit DSSMM code/assets individually before reuse; preserve DS Style/Merkin Mix and third-party credits.
+- Sources: https://github.com/ChisBread/SuperChis and https://github.com/davidgfnet/superfw . Preserve David Guillen Fandos’s firmware attribution and ChisBread’s hardware attribution. SuperChis HDL is CC BY-NC-SA 4.0; consult it as protocol documentation and do not copy HDL into the GPL firmware. Audit DSSMM code/assets individually before reuse; preserve DS Style/Merkin's Mix and third-party credits.
 
 ## Feature disposition
 

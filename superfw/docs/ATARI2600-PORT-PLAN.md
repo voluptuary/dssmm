@@ -71,3 +71,25 @@ software checks, not physical-card qualification. Safe Exit, controls, sound,
 bank selection, speed and full licensing/provenance review remain. Upstream
 headers refer to a missing COPYING file; resolve that before distributing an
 emulator binary. Keep this prototype out of hardware-test and public assets.
+
+## Owner priorities and alternative review (2026-11-24)
+
+Owner allows either MikeDX/2600_gba or Sterophonick/PocketStella and requests
+familiar emulator menu style/structure, L+R entry, D-pad navigation, A select,
+B back, and normal Resume/Reset/Exit behavior. Prefer the already rendering
+MikeDX engine for the first working plugin; retain PocketStella as a frontend/
+engine reference with proper credit.
+
+PocketStella pin1e299b9e6c3197f6ad63a5a06eaf4db1c981bc43 was reviewed from source.
+Its src/6502.c is empty, CPU execution is commented out, a26Render/a26Sound are
+stubs and the Windows Makefile depends on libheart. build/m6502.s is a partial
+object disassembly, not a complete rebuildable core. Its doc/2600_gba.zip is
+reference source; do not use bundled prebuilt objects or doc/rom.bin. Public
+source: https://github.com/Sterophonick/PocketStella .
+
+Build799 includes an Atari icon only. Owner799 reports Unknown file type for
+.a26; no emulator file has been delivered. Generic extension plugin lookup
+already supports SYSTEM/PLUG/a26.bin/.gba/.mb/.mbz, so finish and qualify that
+external asset rather than pretending an icon or extension registration is an
+emulator. Safe Exit, ROM banking and source/license completeness precede the
+hardware-test plugin. Keep progressing without requesting owner input.

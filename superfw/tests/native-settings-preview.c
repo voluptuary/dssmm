@@ -73,6 +73,7 @@ static void visual_scene(void) {
     VAR8(NATIVE_carousel_wrap)=1;VAR8(NATIVE_browser_view)=(TEST_SCENE&1)?2:1;
     VAR8(NATIVE_artwork_mode)=TEST_SCENE>=18?2:1;
     if(TEST_SCENE==17 || TEST_SCENE==18)key(32); /* First -> last through real input. */
+    if(TEST_SHOWCASE)key(16); /* Begin on the middle of the three original samples. */
     return;
   }
 #endif
@@ -139,7 +140,7 @@ static void visual_scene(void) {
       VAR32(NATIVE_spop+OFFSET_spop_p_update_superfw_ver)=22;
     } else {
       VAR8(NATIVE_spop+OFFSET_spop_pop_num)=1;
-      const char *name="/Game Boy Advance/P/Native menu test ROM (USA).gba";
+      const char *name=TEST_SHOWCASE?"/Game Boy Advance/Moonlit Trail (USA).gba":"/Game Boy Advance/P/Native menu test ROM (USA).gba";
       volatile uint8_t *out=(volatile uint8_t *)(NATIVE_spop+OFFSET_spop_p_load_i_romfn);
       for(unsigned i=0;;i++){out[i]=name[i];if(!name[i])break;}
       VAR32(NATIVE_spop+OFFSET_spop_p_load_i_gcode)=0x54534554;
@@ -199,6 +200,7 @@ int main(void) {
   const char reference_name[]="Test User";
   for(unsigned i=0;i<sizeof(reference_name);++i)VAR8(NATIVE_menu_username+i)=reference_name[i];
 #endif
+  if(TEST_SHOWCASE)VAR8(NATIVE_clean_list)=1;
   visual_scene();
   unsigned previous=0,seeded_pages=0;
   for(;;) {
@@ -210,7 +212,7 @@ int main(void) {
     VAR32(NATIVE_clock_seconds)=12*3600+34*60+56;
     VAR32(NATIVE_clock_frame)=VAR32(NATIVE_frame_count);
 #endif
-    if(TEST_SCENE && ((TEST_SCENE<16 && TEST_SCENE!=10 && TEST_SCENE!=15) || !(seeded_pages&(1u<<VAR8(NATIVE_framen))))) {
+    if(!TEST_SHOWCASE && TEST_SCENE && ((TEST_SCENE<16 && TEST_SCENE!=10 && TEST_SCENE!=15) || !(seeded_pages&(1u<<VAR8(NATIVE_framen))))) {
       seeded_pages|=1u<<VAR8(NATIVE_framen);
       REG16(0x050001d6)=0x7c1f; /* Detect stale artwork behind native modal panels. */
       volatile uint16_t *back=(volatile uint16_t *)(0x06000000+(VAR8(NATIVE_framen)?0xa000:0));
