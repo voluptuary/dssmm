@@ -1,0 +1,77 @@
+{
+  "reference_commit": "cff4b2f4254158944e0a8b182e4b1cf4a22288ab",
+  "reference": "FrankieT19 DE8.2",
+  "before": {
+    "fat_alias": "d7ffaa",
+    "no_alias": "d701ee",
+    "meaning": "directory resolve only, no ROM open; native actual SD_list_MENU",
+    "published_tag": "v8.4.0",
+    "resolver_matches_published_tag": true,
+    "resolver_sha256": "ca95065978cc0dfb03e68aa73744a25c16a92d3fe63140b0623cd12336b8c366"
+  },
+  "after_native_cases": [
+    {
+      "mode": 0,
+      "no_alias": false,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "b6cdd29dfce397831e75d8288b4870dc4e786a81",
+      "source_sha256": "d8b8deaa006ce7b80a6ebff712de6eb9f89e6a2ebde7d792d48a017ec7be4c68",
+      "rom_sha256": "11b8c87af5921f9e1279d52b9538e887b872e4ef794c0e1ea4f8e5077a44c678",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7ffaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    {
+      "mode": 0,
+      "no_alias": true,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "b6cdd29dfce397831e75d8288b4870dc4e786a81",
+      "source_sha256": "d8b8deaa006ce7b80a6ebff712de6eb9f89e6a2ebde7d792d48a017ec7be4c68",
+      "rom_sha256": "7678ee672ee97bc18a63b90525612dbf7e5fad6f590debd31cda3af5ca9755be",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7ffaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    {
+      "mode": 0,
+      "no_alias": true,
+      "name": "Native long filename AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (USA).gba",
+      "source_commit": "b6cdd29dfce397831e75d8288b4870dc4e786a81",
+      "source_sha256": "d8b8deaa006ce7b80a6ebff712de6eb9f89e6a2ebde7d792d48a017ec7be4c68",
+      "rom_sha256": "515a405323eed0358494bbb13a60f6ab94e5a93c76cc374f43f1aedb7d7f89d4",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7ffaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    {
+      "mode": 1,
+      "no_alias": true,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "b6cdd29dfce397831e75d8288b4870dc4e786a81",
+      "source_sha256": "d8b8deaa006ce7b80a6ebff712de6eb9f89e6a2ebde7d792d48a017ec7be4c68",
+      "rom_sha256": "b97970ae10fc916af62331545b5ee63369f23c1fe9498a97ac3139ce5dd51bfb",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7ffaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    {
+      "mode": 2,
+      "no_alias": true,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "b6cdd29dfce397831e75d8288b4870dc4e786a81",
+      "source_sha256": "d8b8deaa006ce7b80a6ebff712de6eb9f89e6a2ebde7d792d48a017ec7be4c68",
+      "rom_sha256": "a9e8cc8f6ef997cf88f23f4e989a95ba100ede2c05d44f3ceea39dd4852bd716",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7bfaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    }
+  ],
+  "host_paths": "sanitized production helpers passed",
+  "validation": "Full DE verifier passed: production build, 43 host scripts (including five native mGBA launch cases), browser installer, placement and Cppcheck-input checks.",
+  "limits": "Filesystem of affected user unknown. Native fixture mocks physical side effects; no hardware qualification."
+}

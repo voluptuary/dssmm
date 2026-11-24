@@ -44,6 +44,7 @@ CFLAGS	:=	-g -Wall -O\
 CFLAGS	+=	$(INCLUDE)
 ifneq ($(strip $(PREVIEW_SCENE)),)
 CFLAGS += -DPREVIEW_SCENE=$(PREVIEW_SCENE)
+PREVIEW_EXTRA_LDFLAGS := $(PREVIEW_LAUNCH_FLAGS)
 endif
 
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
@@ -55,7 +56,7 @@ GBA_HEAP_END := 0x0203C000
 LDFLAGS	=	-g $(ARCH) -Wl,-Map,$(notdir $*.map) \
 		-Wl,--gc-sections \
 		-Wl,--defsym,__sp_usr=$(GBA_USER_STACK_TOP) \
-		-Wl,--defsym,__eheap_end=$(GBA_HEAP_END)
+		-Wl,--defsym,__eheap_end=$(GBA_HEAP_END) $(PREVIEW_EXTRA_LDFLAGS)
 KERNEL_SIZE_LIMIT := 2097152
 
 #---------------------------------------------------------------------------------
