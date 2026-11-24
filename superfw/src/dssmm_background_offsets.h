@@ -2,9 +2,9 @@
 #define DSSMM_BG_MAGIC 0x32524244u
 #define DSSMM_ICON_OFFSET 33320u
 #ifdef FONTS_EXT
-#define DSSMM_ICON_BYTES 4864u
+#define DSSMM_ICON_BYTES 5632u
 #else
-#define DSSMM_ICON_BYTES 4608u
+#define DSSMM_ICON_BYTES 5376u
 #endif
 static const uint32_t dssmm_stream_offsets[2][5] = {{4,3694,6400,9904,13124},{16644,20358,23064,26568,29800}};
 static const uint16_t dssmm_stream_lengths[2][5] = {{1845,1353,1752,1610,1760},{1857,1353,1752,1616,1760}};
