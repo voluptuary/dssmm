@@ -1,4 +1,4 @@
-# DS Style Merkin Mix (DSSMM)
+# DS Style Merkin's Mix (DSSMM)
 
 DSSMM is a Nintendo DS-inspired custom menu kernel family for EZ-FLASH OMEGA cards,
 maintained by [Merkin](https://github.com/voluptuary). The repository also includes
