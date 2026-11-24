@@ -3207,3 +3207,5 @@ full verify-ezfomega passed; production2055088B, heap19368/gap8312 static bytes.
 Native fixtures mock storage/save/transfer/patch/reset, not hardware qualification.
 Owner authorizes8.4.1-omega-test5 prerelease; source/all4 CI then publish with
 full folder-art.zip, archive/prune prior prerelease page only (retain tag).
+
+2026-11-24: v8.4.1-omega-test5 published at29bbb05 after source45293950432 and all4 PR25 CI45293960062 passed; PR25 merged7ea9e0e. Firmware and full folder-art.zip downloaded byte-identically; canonical notes match; latest remains stableDEv8.4.1. Physical Original OMEGA remains untested. Publication JSON retained; root archive/prune prior Test4 page, retain tag, synchronize via dssmm.

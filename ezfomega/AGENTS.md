@@ -42,3 +42,5 @@ reuse another card's variant. Run the focused payload/loader test and full
 project verifier for changes; preserve64KiB .esv handling and cache bounds.
 Do not claim old save-state compatibility or hardware qualification from mocks.
 DSSMM 8.4.0 includes MiGoomba; earlier releases retain their previous emulator.
+
+2026-11-24 current prerelease: v8.4.1-omega-test5/source29bbb05, fixes clipped alias-free SD launch names. Full local/source/all4 native mGBA checks passed; physical hardware untested. Evidence under docs/releases/. Keep Original OMEGA drivers and hardware limits isolated.

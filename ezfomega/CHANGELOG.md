@@ -1,3 +1,9 @@
+# DS Style Merkin Mix 8.4.1 — Original OMEGA Test 5
+
+- Fixed SD launching for clipped long filenames without short-name aliases.
+- Full local/native mGBA/software checks passed; physical Original OMEGA remains untested.
+- [Release notes](docs/releases/v8.4.1-omega-test5.md).
+
 # DS Style Merkin Mix 8.4.0 — Original OMEGA Test 4
 
 **ORIGINAL EZ-FLASH OMEGA ONLY — HARDWARE UNTESTED. UPDATE AT YOUR OWN RISK.**
