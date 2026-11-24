@@ -1217,3 +1217,24 @@ gate remains running; don't rebuild firmware for the external-tool change. CI PR
 head stays2f73b53 until its check/merge checkpoint; commit Atari follow-up locally
 and push after that merge to avoid restarting the same CI. Preserve prototype
 and current kernel/plugin artifacts, private BIOS/session scratch/ownerlock.
+
+## 2026-11-24 — Build822 validated and delivered
+
+Full local all3/nativeARM/host/mGBA/nativeIGM verifier exits0, including42 menu
+visual checks (Settings/Games/Hardware additions),8 NOR carousel checks, native
+save/reload and real plugin Exit/MiGoomba fixtures. Chis822/source2f73b53 is in
+hardware-test; old799 removed only after matching its recorded hash. All3 clean
+builds share source-tree8932bc31...; sizesSD497152/Lite496640/Chis1671680B.
+Chis EWRAM256648/257024 (376B free), IWRAM15240; minimum16KiB stack retained.
+SourceCI45395110531 and all4 PR28CI45395123043 pass; PR28 merged37d31fa. Report
+is docs/build-822-validation.json. No new physical qualification/public release;
+DEv8.4.1 latest verified. Atari plugin14d28e63 remains separate, with source ZIP.
+
+Root dssmm and EZ lanes synchronized normally to37d31fa; SuperFW8e54546 includes
+that integration plus the later Atari raster guards. Follow-up hardware PR next.
+Do not rebuild822 for tool/doc-only changes. Before adding sizeable UI features,
+recover main-EWRAM headroom: explore sharing the9600B selected-art cache with the
+8192B settings snapshot, with strict ownership/generation guards and full native
+save/navigation tests. Do not move byte-parsed settings into cartridge SDRAM or
+reduce settings capacity/stack. Current hardware-test artifact must remain until
+any future replacement passes the complete gates.
