@@ -47,6 +47,7 @@
 
 #include "res/icons.h"
 #include "res/icon-gamegear.h"
+#include "res/icon-pce.h"
 #include "res/logo.h"
 #include "res/dssmm-panel.h"
 
@@ -433,7 +434,8 @@ static update_unlock_state update_unlock;
 static uint16_t fresh_keys;
 static unsigned framen = 0;
 static unsigned objnum = 0;
-static t_oamobj fobjs[64];
+/* Written before use each frame; keep pixel code and the full stack in IWRAM. */
+static t_oamobj fobjs[64] __attribute__((section(".sbss"),aligned(4)));
 
 #pragma GCC optimize ("Os")
 
@@ -1326,6 +1328,7 @@ static unsigned guessicon(const char *path) {
       {"nes", ICON_NESCART},
       {"sms", ICON_SMSCART},
       {"gg", ICON_GGCART},
+      {"pce", ICON_PCECARD},
       {"fw",  ICON_UPDFILE},
     };
     for (unsigned i = 0; i < sizeof(exticon)/sizeof(exticon[0]); i++)
@@ -2643,7 +2646,7 @@ static void render_start(volatile uint8_t *frame) {
         artwork_cached=true;
       }
       if(artwork_valid)artwork_blit_scaled_cropped((volatile uint16_t *)frame,
-          sdr_state->artwork_pixels,&preview_info,preview_info.width==80?40:30,preview_info.width==80?46:48,preview_info.width==80?40:56,preview_info.width==80?40:37);
+          sdr_state->artwork_pixels,&preview_info,preview_info.width==80?39:30,48,preview_info.width==80?37:56,37);
       else draw_central_text("GBA",frame,60,60);
     }
   }
@@ -2943,16 +2946,18 @@ void menu_init(int sram_testres) {
 
   smenu.menu_tab = (recent_menu && smenu.recent.maxentries) ? MENUTAB_RECENT : MENUTAB_ROMBROWSE;
 
-  // Load icons into VRAM
+  // One read-only tile stream; extended cards reuse the native palette.
+  enum { MenuIconBytes=sizeof(icons_img)+sizeof(gamegear_pixels)+sizeof(pce_pixels) };
 #ifdef DSSMM_EXTERNAL_BACKGROUNDS
-  const uint8_t *icon_pixels=dssmm_icon_pixels(sizeof(icons_img));
-  if(icon_pixels)dma_memcpy16(MEM_VRAM_OBJS,icon_pixels,sizeof(icons_img)/2);
-  else {dma_memset16(MEM_VRAM_OBJS,0,sizeof(icons_img)/2);restart_required=true;}
+  const uint8_t *icon_pixels=dssmm_icon_pixels(MenuIconBytes);
+  if(icon_pixels)dma_memcpy16(MEM_VRAM_OBJS,icon_pixels,MenuIconBytes/2);
+  else {dma_memset16(MEM_VRAM_OBJS,0,MenuIconBytes/2);restart_required=true;}
 #else
   dma_memcpy16(MEM_VRAM_OBJS,icons_img,sizeof(icons_img)/2);
+  dma_memcpy16(MEM_VRAM_OBJS+sizeof(icons_img),gamegear_pixels,sizeof(gamegear_pixels)/2);
+  dma_memcpy16(MEM_VRAM_OBJS+sizeof(icons_img)+sizeof(gamegear_pixels),pce_pixels,sizeof(pce_pixels)/2);
 #endif
   dma_memcpy16(&MEM_PALETTE[256], icons_pal, sizeof(icons_pal) / 2);
-  dma_memcpy16(MEM_VRAM_OBJS+sizeof(icons_img),gamegear_pixels,sizeof(gamegear_pixels)/2);
   dma_memcpy16(&MEM_PALETTE[256+sizeof(icons_pal)/2],gamegear_palette,sizeof(gamegear_palette)/2);
   // Generate some icons (selector)
   dma_memset16(&MEM_VRAM_OBJS[63 * 256], dup8(SEL_COLOR), 256 / 2);

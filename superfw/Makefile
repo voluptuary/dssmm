@@ -244,5 +244,8 @@ firmware.ewram.gba ingamemenu.payload: src/fonts/dssmm_ascii.h src/fonts/font_re
 
 firmware.ewram.gba: src/dssmm_background_data.h src/dssmm_background.h src/dssmm_background_offsets.h res/fonts-dssmm.pack res/fonts-ext-dssmm.pack
 
-res/fonts-dssmm.pack res/fonts-ext-dssmm.pack src/dssmm_background_offsets.h &: res/fonts.pack res/fonts-ext.pack src/dssmm_background_data.h tools/pack-dssmm-resources.py
+src/res/icon-gamegear.h src/res/icon-pce.h &: assets/icons/gamegear-source.json assets/icons/gamegear.rgb555 assets/icons/pce-source.json assets/icons/pce.rgb555 tools/generate-cartridge-icons.py src/res/icons.h
+	python3 tools/generate-cartridge-icons.py
+
+res/fonts-dssmm.pack res/fonts-ext-dssmm.pack src/dssmm_background_offsets.h &: res/fonts.pack res/fonts-ext.pack src/dssmm_background_data.h tools/pack-dssmm-resources.py src/res/icons.h src/res/icon-gamegear.h src/res/icon-pce.h
 	python3 tools/pack-dssmm-resources.py

@@ -695,6 +695,14 @@ unsigned load_extemu_rom(const char *fn,uint32_t fs,const t_emu_loader *ldinfo,p
   bool copied=f_size(&file)==fs && native_emulator_copy(&file,destination,fs,progress);
   FRESULT closed=f_close(&file);
   if(!copied || closed!=FR_OK)return ERR_LOAD_BADROM;
+  /* Native PCE uses the same verified Exit body as its portable counterpart. */
+  const t_emu_loader *pce=get_emu_info("pce");
+  if(pce && ldinfo->hndlr==pce->hndlr) {
+    set_supercard_mode(MAPPED_SDRAM,true,false);
+    bool returning=pogo_return_available(POGO_BACKUP_IMAGE,POGO_STUB_IMAGE,
+      VERSION_SLUG_WORD,FW_MAX_SIZE_KB*1024u);
+    pogo_adapt_image((uint32_t*)GBA_ROM_ADDR,emulator_size,returning?POGO_RETURN_STUB:0);
+  }
   set_supercard_mode(MAPPED_SDRAM,false,false);
   REG_WAITCNT=0x4000;
   launch_reset(false,use_fastew);

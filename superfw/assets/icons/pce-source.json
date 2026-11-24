@@ -1,0 +1,43 @@
+{
+  "credit": "Original DSSMM PC Engine HuCard pixel art matching native SuperFW cartridge bevels and palette. Upstream icon authors retain their credits.",
+  "license": "GPL-3.0-or-later",
+  "dimensions": [
+    16,
+    16
+  ],
+  "sprite_canvas": [
+    16,
+    16
+  ],
+  "placement": "14x10 white card, maroon label header, abstract landscape and gold contacts; transparent surrounding canvas.",
+  "pixels_sha256": "ba44fb4a93be8039b678b3a8cc279248de50e2f632dd641944c7051223ac3e5c",
+  "pixel_rows": [
+    "................",
+    "................",
+    "................",
+    ".oooooooooooooo.",
+    ".ohwwwwwwwwwwwo.",
+    ".ohmmmmmmmmmmwo.",
+    ".ohbssssssssbwo.",
+    ".ohbsssssyysbwo.",
+    ".ohbggyyygggbwo.",
+    ".ohbbbbbbbbbbwo.",
+    ".ohwwwwwwwwwwwo.",
+    ".ohyoyoyoyoyowo.",
+    ".oooooooooooooo.",
+    "................",
+    "................",
+    "................"
+  ],
+  "rgb555_palette": {
+    ".": "0000",
+    "o": "18c6",
+    "w": "7fff",
+    "h": "6b5a",
+    "b": "2108",
+    "m": "1cb0",
+    "s": "6aab",
+    "g": "226a",
+    "y": "239e"
+  }
+}

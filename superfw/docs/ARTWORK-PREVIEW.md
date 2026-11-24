@@ -82,3 +82,16 @@ from emitting invalid cart byte stores at EOF, while preserving contiguous
 bulk-sector reads. The tail uses the already-cached final sector. Staging must
 be4-byte aligned; odd-length input requires an extra writable padding byte.
 See CAROUSEL-ARTWORK-MEMORY.md for the before/after ARM bus reproduction.
+
+## Start geometry and odd VRAM edges
+
+The candidate matches DE's Start thumb rectangle: Title56x37 at(30,48),
+Box37x37 at(39,48). Scaled composition masks the leading/trailing halfword lane
+for odd x/width, preserving its neighboring pixel and transparency. Hot paired
+pixel writes retain halfword access. Source pixels and metadata stay unchanged.
+
+`test-artwork-compositor-arm.py` runs the actual linked function against a
+division oracle in36 odd/even/clipped/transparent cases, with VRAM write-size,
+edge guards and stack bounds. `test-start-artwork-mgba.sh` seeds read-only
+synthetic cache pixels and checks the exact colored rectangle for both fonts
+and artwork styles. It tests rendering, not physical SD artwork reads.

@@ -32,7 +32,7 @@ a prefix. This is filename-helper
 validation, not physical emulator/save-cycle qualification or interchangeability
 of differing emulator state formats.
 
-Run `bash scripts/test-gamegear-icon.sh`, `bash scripts/test-pogo-plugins.sh` and
+Run `bash scripts/test-cartridge-icons.sh`, `bash scripts/test-pogo-plugins.sh` and
 `bash scripts/test-theme-settings.sh`. The icon test checks every cartridge pixel,
 transparent padding, palette/VRAM budgets and actual extension-icon lookup on all
 three variants. Plugin tests check shared GG/SMS resolution and native GG flags.

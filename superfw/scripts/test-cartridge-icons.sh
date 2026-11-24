@@ -3,7 +3,7 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
-python3 "$root/tools/generate-gamegear-icon.py" --check
+python3 "$root/tools/generate-cartridge-icons.py" --check
 python3 - "$root/src/menu.c" "$tmp/icon-lookup-under-test.h" <<'PY'
 from pathlib import Path
 import sys
@@ -13,7 +13,7 @@ PY
 for board in sd lite chis; do
  flags=();case "$board" in lite) flags=(-DSUPERCARD_LITE_IO);; chis) flags=(-DSUPPORT_NORGAMES);; esac
  gcc -O1 -g -fsanitize=address,undefined -fno-pie -no-pie -ffunction-sections -fdata-sections "${flags[@]}" \
-  -I "$tmp" -I "$root/src" "$root/tests/gamegear-icon-test.c" "$root/src/util.c" \
+  -I "$tmp" -I "$root/src" "$root/tests/cartridge-icons-test.c" "$root/src/util.c" \
   -Wl,--gc-sections -o "$tmp/test"
- "$tmp/test" "$root/assets/icons/gamegear.rgb555"
+ "$tmp/test" "$root/assets/icons/gamegear.rgb555" "$root/assets/icons/pce.rgb555"
 done

@@ -3,15 +3,18 @@
 set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 pack="${1:-$root/emu}"
-for system in sms gg pce; do
+for system in ${DSSMM_PLUGIN_SYSTEMS:-sms gg pce pce-native}; do
+ kind="${system%-native}"
+ options=(--system "$kind")
  plugin="$pack/sms.mb"
- [[ "$system" == pce ]] && plugin="$pack/pce.mb"
+ [[ "$kind" == pce ]] && plugin="$pack/pce.mb"
  if [[ ! -f "$plugin" ]]; then
   plugin="$root/emu/smsadvance-v2.5-scptch.gba.bin"
-  [[ "$system" == pce ]] && plugin="$root/emu/pceadvance-v7.5-scptch.gba.bin"
+  [[ "$kind" == pce ]] && plugin="$root/emu/pceadvance-v7.5-scptch.gba.bin"
  fi
+ if [[ "$system" == pce-native ]]; then plugin="$root/emu/pceadvance-v7.5-scptch.gba.bin"; options+=(--native-pce); fi
  out="$root/build/plugin-preview-$system"
- python3 "$root/scripts/build-plugin-preview.py" "$plugin" --system "$system" --out "$out"
+ python3 "$root/scripts/build-plugin-preview.py" "$plugin" "${options[@]}" --out "$out"
  # Reset only this generated fixture's SRAM so menu selection remains deterministic.
  python3 - "$out" <<'PY'
 from pathlib import Path

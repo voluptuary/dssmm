@@ -80,7 +80,17 @@ static void visual_scene(void) {
   if(TEST_SCENE==10 || TEST_SCENE==11 || TEST_SCENE==15) {
 #if TEST_RECENT
     VAR32(NATIVE_smenu+OFFSET_smenu_recent_maxentries)=1;
+#if TEST_START_ART
+    VAR8(NATIVE_artwork_mode)=TEST_START_ART;
+    VAR8(NATIVE_artwork_cached)=VAR8(NATIVE_artwork_valid)=1;
+    VAR32(NATIVE_artwork_cached_mode)=TEST_START_ART;
+    REG16(NATIVE_preview_info)=TEST_START_ART==2?80:120;
+    REG16(NATIVE_preview_info+2)=80;
+    VAR8(NATIVE_preview_info+4)=0;
+    for(unsigned i=0;i<sizeof(native_recent_path);++i)VAR8(NATIVE_artwork_rom+i)=native_recent_path[i];
+#else
     VAR8(NATIVE_artwork_mode)=0; /* Caption-only fixture does not claim art I/O. */
+#endif
 #endif
     VAR8(NATIVE_launcher_page)=1;VAR8(NATIVE_launcher_selected)=TEST_SCENE==10?1:4;
     if(TEST_SCENE==11)key(1);

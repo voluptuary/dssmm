@@ -3,7 +3,7 @@
 from pathlib import Path
 import argparse,struct,subprocess,os,json,re,hashlib
 root=Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(20),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");p.add_argument("--progress-action",type=int,choices=range(10),default=0);p.add_argument("--recent-title",help="Read-only synthetic recent filename; Start caption test only");p.add_argument('--theme',type=int,choices=(6,7),default=6);p.add_argument('--topbar',type=int,choices=range(6),default=0);a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(20),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");p.add_argument("--progress-action",type=int,choices=range(10),default=0);p.add_argument("--recent-title",help="Read-only synthetic recent filename; Start caption test only");p.add_argument('--theme',type=int,choices=(6,7),default=6);p.add_argument('--topbar',type=int,choices=range(6),default=0);p.add_argument("--recent-art",choices=("title","box"));a=p.parse_args();assert not a.recent_art or (a.scene==10 and a.recent_title),"Start art needs scene10 and --recent-title";a.out.mkdir(parents=True,exist_ok=True)
 elf=a.elf.read_bytes();nm=subprocess.check_output(['arm-none-eabi-nm',str(a.elf)],text=True)
 syms={r.split()[-1]:int(r.split()[0],16) for r in nm.splitlines() if len(r.split())==3}
 if a.scene in (4,13) and 'nor_write_progress' not in syms:p.error('NOR scene is unavailable in this linked board image')
@@ -91,12 +91,21 @@ if a.scene>=16:
    struct.pack_into('<'+fmt,cache,base+field_offset('carousel_meta[0]',field),value)
   name=('/NOR/Game '+chr(65+i)+'.gba').encode()+b'\0';off=base+field_offset('carousel_meta[0]','rom');cache[off:off+len(name)]=name
  text+='static const uint16_t native_cache_seed[]={'+','.join(hex(x[0]) for x in struct.iter_unpack('<H',cache))+'};\n'
+text+='#define TEST_START_ART '+str(0 if not a.recent_art else 2 if a.recent_art=='box' else 1)+'\n'
+if a.recent_art:
+ for name in ['artwork_cached','artwork_valid','artwork_cached_mode','artwork_rom','preview_info']:
+  text+='#define NATIVE_'+name+' '+hex(syms[name])+'u\n'
+ text+='static const char native_recent_path[]='+json.dumps('/Games/'+a.recent_title)+';\n'
 (a.out/'native-settings-image.h').write_text(text)
 objects=[str(x) for x in a.out.glob('native-segment-*.o')]
 subprocess.run(['arm-none-eabi-gcc','-Os','-fno-ipa-ra','-fno-builtin','-Wall','-Wextra','-Werror','-mthumb','-mcpu=arm7tdmi','-I',str(a.out),'-I',str(root/'src'),'-specs=gba.specs',str(root/'tests/native-settings-preview.c'),*objects,'-o',str(a.out/'native-settings.elf')],check=True)
 subprocess.run(['arm-none-eabi-objcopy','-O','binary',str(a.out/'native-settings.elf'),str(a.out/'native-settings.gba')],check=True)
 rom=bytearray((a.out/'native-settings.gba').read_bytes());assert len(rom)<0xe80000
 rom+=b'\xff'*(0xe80000-len(rom))
+def insert_record(position,data):
+ assert position+len(data)<=len(rom) and rom[position:position+len(data)]==b'\xff'*len(data),'Fixture record overlaps live ROM'
+ rom[position:position+len(data)]=data
+
 if a.recent_title:
  recent=('/Games/'+a.recent_title).encode('utf-8')+b'\0'
  max_name=int(re.search(r'^#define MAX_FN_LEN\s+(\d+)',(root/'src/config.h').read_text(),re.M)[1])
@@ -104,12 +113,8 @@ if a.recent_title:
  position=field_offset('sdr_state[0]','rentries')
  path_offset=field_offset('sdr_state[0].rentries[0]','fpath')
  record=struct.pack('<HH',0,7)+bytes(path_offset-4)+recent
- assert position+len(record)<=len(rom) and rom[position:position+len(record)]==b'\xff'*len(record),'Fixture recent record overlaps live ROM data'
- rom[position:position+len(record)]=record
+ insert_record(position,record)
 if a.scene>=16:
- def insert_record(position,data):
-  assert position+len(data)<=len(rom) and rom[position:position+len(data)]==b'\xff'*len(data),'NOR fixture overlaps live ROM'
-  rom[position:position+len(data)]=data
  position=field_offset('sdr_state[0]','nordata')
  games=field_offset('sdr_state[0]','nordata.games')-position
  game_size=debug_size('sdr_state[0].nordata.games[0]');record=bytearray(games+game_size*5)
@@ -123,9 +128,11 @@ if a.scene>=16:
  position=field_offset('sdr_state[0]','carousel_art');image_size=debug_size('sdr_state[0].carousel_art[0]')
  width=80 if a.scene>=18 else 120
  for i in range(5):insert_record(position+i*image_size,bytes([70+i*20])*(width*80)+bytes(image_size-width*80))
+if a.recent_art:
+ insert_record(field_offset('sdr_state[0]','artwork_pixels'),bytes([70])*(80 if a.recent_art=='box' else 120)*80)
 font=(root/('res/fonts-ext-dssmm.pack' if 'nor_write_progress' in syms else 'res/fonts-dssmm.pack')).read_bytes();rom+=font
 # Standard GBA header complement; commercial BIOS is not needed for the harness.
 rom[0xb2]=0x96;rom[0xbd]=(-sum(rom[0xa0:0xbd])-0x19)&255
 (a.out/'native-settings.gba').write_bytes(rom)
-(a.out/'fixture.json').write_text(json.dumps({'nor_carousel_fixture':a.scene>=16,'progress_action':a.progress_action,'recent_title':a.recent_title,'scene':a.scene,'font':a.font,'reference':a.reference,'native_elf_sha256':hashlib.sha256(elf).hexdigest(),'native_elf':str(a.elf),'nor_supported':'nor_write_progress' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
+(a.out/'fixture.json').write_text(json.dumps({'nor_carousel_fixture':a.scene>=16,'progress_action':a.progress_action,'recent_title':a.recent_title,'recent_art':a.recent_art,'scene':a.scene,'font':a.font,'reference':a.reference,'native_elf_sha256':hashlib.sha256(elf).hexdigest(),'native_elf':str(a.elf),'nor_supported':'nor_write_progress' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
 print(a.out/'native-settings.gba')

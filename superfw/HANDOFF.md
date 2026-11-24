@@ -1719,3 +1719,53 @@ sections; internal port regressions are omitted. Normal759/667 retained.
 DE /latest explicitly restored/verified v8.4.0 after create --latest=false did
 not preserve it. See releases/superfw-build769-publication.json. No new hardware
 qualification;769 remains in hardware-test. Continue Start37x37 alignment next.
+
+## Owner769 PCE follow-up / next candidate in progress
+
+Owner confirms PCE games load at769, but Exit restarts the emulated game and
+PCE has no cartridge icon. Recorded prime-build769-hardware-observation.json;
+updated current769 known-issue note after archiving its prior body. DE latest
+restored/verified v8.4.0; public769 assets unchanged. Backend is not established
+by the report. Native PCE lacked portable's known Exit adaptation; candidate
+now applies that adapter only to PCE emulator bytes with a validated return
+image. Actual native loader ARM and native ROM/header mGBA Exit pass; hardware
+return/save timing remains unqualified. GB/GBC bytes remain unchanged.
+
+Added HuCard-style PCE icon using existing shared palette. Unified cartridge
+generator/tests replace GG-only names. ICN1 includes both extra tiles; moving
+GG out of EWRAM recovers280bytes of data/upload code. Icon pixel/bounds/route
+tests pass all3, actual read-only ARM resource oracle passes. No owner ZIP edit.
+
+Start Box geometry now37x37 at39,48 (Title56x37 at30,48). Odd-edge compositor
+passes host oracle and36 actual ARM cases (halfword VRAM,332B function stack);
+all4 native Start art/style/font captures pass. Full clean all3/CI is next after
+focused review; hardware-test/public769 remain frozen. Partial link before
+loop-bound experiment used256056/257024 EWRAM and15752 IWRAM,16KiB stack kept.
+
+Atari2600 is now an additional owner goal. Current PLUG pack has no a26 core;
+found MikeDX/2600_gba pinned2eb18dd8, legacy Virtual VCS/X2600 GPL source.
+See ATARI2600-PORT-PLAN.md. Prototype stays outside tracked source until it
+builds and renders generated homebrew; do not ship missing embedded ROMs or
+old prebuilt objects. Continue this investigation during clean current-fix gates.
+
+Rejected pair_end scaling-loop variant:93,679 vs93,597 instructions and336 vs
+332B stack for the same linked120x80 opaque case; restored the prior form.
+These counts are not physical timing. Current focused36-case compositor,
+Start art/font4cases, native PCE loader+Exit mGBA, shared icon resource oracle
+and all3 icon checks pass. Final partial link256056/257024 EWRAM,15752 IWRAM.
+Next: clean commit/build all3 and integration before replacing hardware-test769.
+
+## Recovery / DE launch audit takes priority
+
+Build776 stopped cleanly at Lite link: IWRAM16160 exceeded unchanged stack
+start0x03003f00 by32B. Nothing776 was delivered. Moved the fully written-per-frame
+512B sprite command buffer to GBA EWRAM (full64 capacity kept, hot pixel code
+and16KiB stack unchanged). Partial Lite link nowIWRAM15648/EWRAM241944; memory
+guard and36 actual ARM odd-edge cases pass. Full clean777+all3/CI remains pending.
+Public/hardware-test769 remains frozen. Source776 includes PCE return/icon and
+Start fixes with focused tests; no new physical Exit qualification.
+
+Owner now prioritizes DE SD-launch regression versus Frankie8.2 before other
+porting. No interrupted process remains. Continue that audit in ezfomegade lane;
+then resume clean SuperFW gates and Atari source prototype. Preserve ownerlock,
+private BIOS, artwork archive and session scratch.
