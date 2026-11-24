@@ -64,6 +64,11 @@ state, *sdr_state=&state;
 #endif
 CAROUSEL_METADATA
 static uint16_t carousel_hot_pixels[ARTWORK_MAX_PIXELS/2];
+static unsigned carousel_hot_generation,workspace_generation;
+static bool workspace_busy;
+static uint16_t *menu_workspace_artwork(unsigned *generation) {
+ *generation=workspace_generation;return workspace_busy?NULL:carousel_hot_pixels;
+}
 static bool carousel_hot_valid;
 static int carousel_hot_index;
 static unsigned hot_copies;
@@ -177,6 +182,16 @@ int main(void) {
  render_browser_carousel(frame,false);assert(loads==cached_loads);
  browser_motion_offset=0;render_browser_carousel(frame,false);
  for(int i=14;i<=16;++i)assert(carousel_find_slot(i%16)<5);
+
+ /* A pending save owns the hot workspace; render from authoritative cart art. */
+ workspace_busy=true;memset(carousel_hot_pixels,0x5a,sizeof(carousel_hot_pixels));
+ unsigned borrowed_copies=hot_copies;
+ render_browser_carousel(frame,false);
+ assert(hot_copies==borrowed_copies);
+ for(unsigned i=0;i<sizeof(carousel_hot_pixels)/2;++i)assert(carousel_hot_pixels[i]==0x5a5a);
+ workspace_busy=false;++workspace_generation;
+ render_browser_carousel(frame,false);assert(hot_copies==borrowed_copies+1);
+ render_browser_carousel(frame,false);assert(hot_copies==borrowed_copies+1);
 
  return 0;
 }

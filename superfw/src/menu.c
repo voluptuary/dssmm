@@ -24,6 +24,7 @@
 #include "fatfs/ff.h"
 #include "common.h"
 #include "settings.h"
+#include "menu_workspace.h"
 #include "loader_layout.h"
 #include "artwork_file.h"
 #include "browser_carousel.h"
@@ -1221,9 +1222,8 @@ static struct {
   char rom[MAX_FN_LEN];
   artwork_info info;
 } carousel_meta[ARTWORK_CACHE_SLOTS];
-/* Selected artwork is sampled repeatedly during motion. Keep a hot copy in
- * EWRAM; the linker bounds this NOLOAD allocation on every board. */
-static uint16_t carousel_hot_pixels[ARTWORK_MAX_PIXELS/2] __attribute__((section(".sbss")));
+/* Settings may temporarily borrow the selected-artwork hot workspace. */
+static unsigned carousel_hot_generation;
 static bool carousel_hot_valid;
 static int carousel_hot_index;
 static int browser_motion_offset;
@@ -1797,12 +1797,18 @@ static void render_browser_carousel(volatile uint8_t *frame, bool vertical) {
         const artwork_info *info = &carousel_meta[slot].info;
         const uint16_t *pixels = sdr_state->carousel_art[slot].pixels;
         if (item->focused) {
-          if (!carousel_hot_valid || carousel_hot_index != item->index) {
-            dma_memcpy16(carousel_hot_pixels, pixels, info->width*info->height/2);
-            carousel_hot_index = item->index;
-            carousel_hot_valid = true;
+          unsigned generation;
+          uint16_t *hot_pixels=menu_workspace_artwork(&generation);
+          if (hot_pixels) {
+            if (!carousel_hot_valid || carousel_hot_index != item->index ||
+                carousel_hot_generation != generation) {
+              dma_memcpy16(hot_pixels, pixels, info->width*info->height/2);
+              carousel_hot_index = item->index;
+              carousel_hot_generation = generation;
+              carousel_hot_valid = true;
+            }
+            pixels = hot_pixels;
           }
-          pixels = carousel_hot_pixels;
         }
         int x = item->x;
         unsigned width = item->w, height = item->h;

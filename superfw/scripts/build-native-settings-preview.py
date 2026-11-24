@@ -3,7 +3,8 @@
 from pathlib import Path
 import argparse,struct,subprocess,os,json,re,hashlib
 root=Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(23),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");p.add_argument("--art-dir",type=Path,help="Optional original showcase PNGs");p.add_argument("--showcase",action="store_true",help="D-pad navigation with synthetic artwork; no launch actions");p.add_argument("--progress-action",type=int,choices=range(10),default=0);p.add_argument("--recent-title",help="Read-only synthetic recent filename; Start caption test only");p.add_argument('--theme',type=int,choices=(6,7),default=6);p.add_argument('--topbar',type=int,choices=range(6),default=0);p.add_argument("--recent-art",choices=("title","box"));a=p.parse_args();assert not a.recent_art or (a.scene==10 and a.recent_title),"Start art needs scene10 and --recent-title";a.out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(23),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");p.add_argument("--art-dir",type=Path,help="Optional original showcase PNGs");p.add_argument("--save-during-carousel",action="store_true",help="Exercise real settings IO while rendering cached NOR art");p.add_argument("--showcase",action="store_true",help="D-pad navigation with synthetic artwork; no launch actions");p.add_argument("--progress-action",type=int,choices=range(10),default=0);p.add_argument("--recent-title",help="Read-only synthetic recent filename; Start caption test only");p.add_argument('--theme',type=int,choices=(6,7),default=6);p.add_argument('--topbar',type=int,choices=range(6),default=0);p.add_argument("--recent-art",choices=("title","box"));a=p.parse_args();assert not a.recent_art or (a.scene==10 and a.recent_title),"Start art needs scene10 and --recent-title";a.out.mkdir(parents=True,exist_ok=True)
+if a.save_during_carousel and (not 16<=a.scene<20 or a.reference):p.error('save-during-carousel needs a non-reference NOR scene')
 def sample_pixels(index,mode):
  from PIL import Image
  name=('moonlit','sunset','skybound')[index%3];style='box' if mode==2 else 'title'
@@ -36,6 +37,9 @@ for address,filesz,memsz,source in segments:text+=f'{{0x{address:x},{filesz},{me
 text+='};\n'
 for name in ['FatFs','sdfs','load_settings','settings_save_flush','settings_save_request','settings_save_pending','settings_save_poll','launcher_page','launcher_selected','launcher_category','f_mkdir','f_stat','sdcard_read_blocks','sdcard_write_blocks','menu_keypress','menu_render','menu_flip','reload_theme','smenu','spop','menu_theme','clean_list','menu_accent','browser_view','artwork_mode','menu_font','frame_count','framen','menu_topbar','font_base_addr','menu_username','progress_action','loadrom_progress']:
  text+='#define NATIVE_'+name+f' 0x{syms[name]:08x}u\n'
+if a.save_during_carousel:
+ for name in ['settings_busy','menu_clock_24','browser_fast_valid']:
+  text+='#define NATIVE_'+name+f' 0x{syms[name]:08x}u\n'
 if a.reference:
  for name in ['clock_seconds','clock_frame']:
   text+='#define NATIVE_'+name+f' 0x{syms[name]:08x}u\n'
@@ -85,6 +89,7 @@ for f in ['menu_tab','uiset_selector','uiset_seloff']:text+='#define OFFSET_'+f+
 text+='#define TEST_THEME '+str(a.theme)+'\n#define TEST_TOPBAR '+str(a.topbar)+'\n'
 text+='#define TEST_PROGRESS_ACTION '+str(a.progress_action)+'\n'
 text+='#define TEST_RECENT '+str(int(bool(a.recent_title)))+'\n'
+text+='#define TEST_WORKSPACE_SAVE '+str(int(a.save_during_carousel))+'\n'
 text+='#define TEST_SHOWCASE '+str(int(a.showcase))+'\n'
 text+='#define TEST_REFERENCE '+str(int(a.reference))+'\n#define TEST_SCENE '+str(a.scene)+'\n#define TEST_FONT '+str(a.font)+'\n'
 text+='#define TEST_UI_TAB '+('4' if 'nor_write_progress' in syms else '3')+'\n'
@@ -160,5 +165,5 @@ font=(root/('res/fonts-ext-dssmm.pack' if 'nor_write_progress' in syms else 'res
 # Standard GBA header complement; commercial BIOS is not needed for the harness.
 rom[0xb2]=0x96;rom[0xbd]=(-sum(rom[0xa0:0xbd])-0x19)&255
 (a.out/'native-settings.gba').write_bytes(rom)
-(a.out/'fixture.json').write_text(json.dumps({'external_sample_art':bool(a.art_dir),'showcase':a.showcase,'nor_carousel_fixture':16<=a.scene<20,'progress_action':a.progress_action,'recent_title':a.recent_title,'recent_art':a.recent_art,'scene':a.scene,'font':a.font,'reference':a.reference,'native_elf_sha256':hashlib.sha256(elf).hexdigest(),'native_elf':str(a.elf),'nor_supported':'nor_write_progress' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
+(a.out/'fixture.json').write_text(json.dumps({'save_during_carousel':a.save_during_carousel,'external_sample_art':bool(a.art_dir),'showcase':a.showcase,'nor_carousel_fixture':16<=a.scene<20,'progress_action':a.progress_action,'recent_title':a.recent_title,'recent_art':a.recent_art,'scene':a.scene,'font':a.font,'reference':a.reference,'native_elf_sha256':hashlib.sha256(elf).hexdigest(),'native_elf':str(a.elf),'nor_supported':'nor_write_progress' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
 print(a.out/'native-settings.gba')

@@ -1,11 +1,16 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 #include "posix-fatfs-fixture.h"
+#include "menu_workspace.h"
+#include "artwork.h"
 static bool owned(const char *key){return !strcmp(key,"Theme")||!strcmp(key,"font")||!strcmp(key,"SuperFW.font");}
 static unsigned seen;
 static void parse(const char *key,const char *value){if(!strcmp(key,"Theme")){assert(!strcmp(value,"Dark"));seen++;}}
 int main(void){char tmp[]="/tmp/dssmm-settings-XXXXXX";assert(mkdtemp(tmp));strcpy(root,tmp);assert(f_mkdir("/SYSTEM")==FR_OK);
  write_file(SETTINGS_FILEPATH,"\xef\xbb\xbfTheme = Dark\r\n# keep my notes\nUnknown DE = keep\nSuperFW.future=retain\n");
+ unsigned generation,after;uint16_t *hot=menu_workspace_artwork(&generation);assert(hot);
+ memset(hot,0xa5,ARTWORK_MAX_PIXELS);
  bool exists=false;assert(settings_read_text(SETTINGS_FILEPATH,parse,&exists)&&exists&&seen==1);
+ assert(menu_workspace_artwork(&after)==hot && after!=generation);
  write_file(UISETTINGS_FILEPATH,"font=1\n# legacy notes\nLegacyFuture=yes\n");
  assert(settings_write_text("Theme = Light\n","SuperFW.font=1\n",owned));
  char text[10000],before[10000];unsigned n=read_file(SETTINGS_FILEPATH,text,sizeof(text));
@@ -19,8 +24,10 @@ int main(void){char tmp[]="/tmp/dssmm-settings-XXXXXX";assert(mkdtemp(tmp));strc
  /* Simulate navigation reads between background transaction steps. */
  assert(settings_write_start("Theme = Dark\n","SuperFW.font=0\n",owned));
  assert(settings_write_pending());
+ assert(!menu_workspace_artwork(&after));
  unsigned ticks=0;
  while(settings_write_pending()) {
+  assert(!menu_workspace_artwork(&after));
   assert(!settings_read_text(SETTINGS_FILEPATH,parse,&exists));
   FIL nav;UINT bytes;char scratch[16];
   assert(f_open(&nav,UISETTINGS_FILEPATH,FA_READ)==FR_OK);
@@ -29,6 +36,7 @@ int main(void){char tmp[]="/tmp/dssmm-settings-XXXXXX";assert(mkdtemp(tmp));strc
   assert(settings_write_step()>=0);assert(++ticks<128);
  }
  assert(ticks>10);
+ assert(menu_workspace_artwork(&after)==hot);memset(hot,0xa5,ARTWORK_MAX_PIXELS);
  read_file(SETTINGS_FILEPATH,text,sizeof(text));assert(strstr(text,"Theme = Dark"));
  assert(settings_write_text("Theme = Light\n","SuperFW.font=1\n",owned));
  corrupt_commit=1;assert(!settings_write_text("Theme = Dark\n","SuperFW.font=0\n",owned));corrupt_commit=0;
@@ -50,6 +58,7 @@ int main(void){char tmp[]="/tmp/dssmm-settings-XXXXXX";assert(mkdtemp(tmp));strc
  assert(fwrite("Theme=Dark\0Colour=Blue\n",1,23,binary)==23);assert(!fclose(binary));
  assert(!settings_read_text(SETTINGS_FILEPATH,parse,&exists));
  assert(!settings_write_text("Theme = Light\n","",owned));
+ assert(menu_workspace_artwork(&after)==hot); /* Failure paths release ownership. */
  for(unsigned i=0;i<8;i++)assert(!handles[i]);
  assert(f_unlink(SETTINGS_FILEPATH)==FR_OK);f_unlink("/SYSTEM/.sf-settings.tmp");f_unlink(UISETTINGS_FILEPATH);
  char q[1024];path(q,"/SYSTEM");assert(!rmdir(q));assert(!rmdir(root));

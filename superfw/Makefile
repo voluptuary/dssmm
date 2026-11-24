@@ -135,7 +135,7 @@ MENUFILES=src/ingame.S \
           ${FATFSFILES}
 
 INFILES=src/gba_ewram_crt0.S \
-        src/main.c src/settings_io.c src/system_layout.c src/launcher_profile.c src/update_unlock.c \
+        src/main.c src/menu_workspace.c src/settings_io.c src/system_layout.c src/launcher_profile.c src/update_unlock.c \
         src/log.c \
         src/cimpl.c \
         src/settings.c \

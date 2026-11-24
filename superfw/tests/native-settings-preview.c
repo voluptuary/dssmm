@@ -211,11 +211,38 @@ int main(void) {
   if(TEST_SHOWCASE)VAR8(NATIVE_clean_list)=1;
   visual_scene();
   unsigned previous=0,seeded_pages=0;
+#if TEST_WORKSPACE_SAVE
+  bool workspace_requested=false,workspace_seen=false,workspace_checked=false;
+  unsigned expected_clock=0;
+#endif
   for(;;) {
     unsigned held=(~REG16(0x04000130))&0x3ff,pressed=held&~previous;previous=held;
     if(!TEST_SCENE && pressed)key(pressed & (16|32|64|128|2));
     if(TEST_SHOWCASE && TEST_SCENE>=16 && pressed)key(pressed & (16|32|64|128));
     VAR32(NATIVE_frame_count)++;
+#if TEST_WORKSPACE_SAVE
+    if(VAR32(NATIVE_frame_count)==30) {
+      expected_clock=VAR8(NATIVE_menu_clock_24)^1;
+      VAR8(NATIVE_menu_clock_24)=expected_clock;
+      ((void(*)(void))(NATIVE_settings_save_request|1u))();
+      workspace_requested=true;
+    }
+    if(workspace_requested && !workspace_checked) {
+      ok=ok&&((bool(*)(void))(NATIVE_settings_save_poll|1u))();
+      if(VAR8(NATIVE_settings_busy)) {
+        workspace_seen=true;
+        /* Force art composition while the real snapshot/FIL occupies the lease. */
+        VAR8(NATIVE_browser_fast_valid)=VAR8(NATIVE_browser_fast_valid+1)=0;
+      }
+      if(!((bool(*)(void))(NATIVE_settings_save_pending|1u))()) {
+        VAR8(NATIVE_menu_clock_24)^=1;
+        ((void(*)(void))(NATIVE_load_settings|1u))();
+        ok=ok&&workspace_seen && VAR8(NATIVE_menu_clock_24)==expected_clock;
+        VAR8(NATIVE_browser_fast_valid)=VAR8(NATIVE_browser_fast_valid+1)=0;
+        workspace_checked=true;
+      }
+    }
+#endif
 #if TEST_REFERENCE
     VAR32(NATIVE_clock_seconds)=12*3600+34*60+56;
     VAR32(NATIVE_clock_frame)=VAR32(NATIVE_frame_count);
@@ -236,8 +263,12 @@ int main(void) {
     ok=ok&&frame_intact();
     wait_frame();((void(*)(void))(NATIVE_menu_flip|1u))();
 #if !TEST_REFERENCE
-    REG16(0x050001de)=ok?0x03e0:0x001f;
-    REG16(0x050001f0)=ok?0x7c00:0x001f;
+    bool passed=ok;
+#if TEST_WORKSPACE_SAVE
+    passed=passed&&workspace_checked;
+#endif
+    REG16(0x050001de)=passed?0x03e0:0x001f;
+    REG16(0x050001f0)=passed?0x7c00:0x001f;
     volatile uint16_t *front=(volatile uint16_t *)(0x06000000+((REG16(0x04000000)&16)?0xa000:0));
     for(unsigned y=1;y<7;y++)for(unsigned x=second?112:116;x<120;x++)front[y*120+x]=0xf8ef;
 #endif

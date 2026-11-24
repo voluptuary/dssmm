@@ -59,3 +59,31 @@ is needed.
 The shared PNG reader and glyph matching use no Pillow or OCR package. Keep any
 private BIOS outside the repository/releases and document changes to the stock
 emulator/harness setup in root local-development records.
+
+## Shared settings/artwork workspace
+
+The selected-image hot copy and the complete settings snapshot now share one
+9600-byte, FIL-aligned GBA EWRAM union. The settings capacity stays8192 bytes and
+the five authoritative artwork slots stay in cartridge SDRAM. A lease covers
+settings parsing or the entire cooperative write/readback/rollback transaction.
+While leased, the carousel reads its authoritative image instead of overwriting
+the workspace. A generation change forces a fresh hot copy afterward, including
+settings reads that did not start a save. Stable framebuffer pages remain valid.
+No byte-parsed settings live on the cartridge bus, and the16KiB stack minimum is
+unchanged. This recovers roughly8KiB main EWRAM before further menu additions.
+
+Host checks interleave navigation with saves/failures and reject artwork access
+while leased. The production carousel extraction tests unchanged scratch bytes
+while busy and exactly one recopy when the generation changes; the ARM cartridge
+bus model retains its no-byte/unaligned-store assertions. Native visual tests can
+also exercise real linked FatFs settings IO while forcibly composing art:
+
+```sh
+DSSMM_PREVIEW_SAVE_CAROUSEL=1 DSSMM_PREVIEW_FONTS=1 DSSMM_NOR_SCENES="16 19" bash scripts/test-native-nor-carousel-mgba.sh
+```
+
+This opt-in mode uses a separate virtual SD/save fixture, requires observing an
+active lease, reloads the persisted changed clock-format setting, and checks the
+normal Title/Box focus/neighbor pixels. Bothfonts were checked locally; the
+DSSMM-font pair is part of verify.sh. Standard mGBA0.10.1/Xvfb is unchanged; no
+BIOS, emulator patch, new dependency or physical SuperCard timing claim.

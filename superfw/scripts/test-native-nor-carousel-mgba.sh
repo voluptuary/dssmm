@@ -3,10 +3,16 @@
 set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 out="$root/build/native-nor-carousel"
+extra=()
+if [[ "${DSSMM_PREVIEW_SAVE_CAROUSEL:-0}" = 1 ]]; then
+ out="$root/build/native-workspace"
+ extra+=(--save-during-carousel)
+fi
 emulator="${MGBA_BIN:-/usr/games/mgba}"
 for font in ${DSSMM_PREVIEW_FONTS:-1 0}; do
  for scene in ${DSSMM_NOR_SCENES:-16 17 18 19}; do
-  python3 "$root/scripts/build-native-settings-preview.py" --scene "$scene" --font "$font" --out "$out"
+  if [[ "${DSSMM_PREVIEW_SAVE_CAROUSEL:-0}" = 1 ]]; then rm -f "$out/native-settings.sav"; fi
+  python3 "$root/scripts/build-native-settings-preview.py" --scene "$scene" --font "$font" --out "$out" "${extra[@]}"
   SDL_AUDIODRIVER=dummy xvfb-run -a bash -c '
    set -euo pipefail
    cd "$1"
@@ -20,7 +26,7 @@ for font in ${DSSMM_PREVIEW_FONTS:-1 0}; do
   ' _ "$out" "$emulator"
   python3 - "$out" "$root" "$scene" "$font" <<'PY'
 from pathlib import Path
-import shutil,sys
+import hashlib,json,os,shutil,sys
 out,root=map(Path,sys.argv[1:3]);scene,font=map(int,sys.argv[3:]);sys.path.insert(0,str(root/'tests'))
 from png_reader import read_rgb_png
 path=max(out.glob('native-settings-*.png'),key=lambda p:p.stat().st_mtime)
@@ -36,6 +42,9 @@ for (x,y),index in zip(points,((selected-1)%5,selected,(selected+1)%5)):
  expected=tuple((v<<3)|(v>>2) for v in channels)
  assert pixel(x,y)==expected,(scene,font,index,(x,y),pixel(x,y),expected)
 shutil.copy2(path,out/f'nor-{scene}-font{font}.png')
+record=json.loads((out/'fixture.json').read_text());record['screenshot_sha256']=hashlib.sha256(path.read_bytes()).hexdigest();record['result']='passed'
+(out/f'nor-{scene}-font{font}.json').write_text(json.dumps(record,indent=2)+'\n')
+if os.environ.get('DSSMM_PREVIEW_SAVE_CAROUSEL')=='1':print('Actual settings lease, write/readback and carousel artwork composition passed together.')
 print(f'Native NOR carousel scene{scene}/font{font}: focused/neighbors, artwork mode, wrap and frame reuse passed.')
 PY
  done

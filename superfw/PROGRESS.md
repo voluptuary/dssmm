@@ -1238,3 +1238,22 @@ recover main-EWRAM headroom: explore sharing the9600B selected-art cache with th
 save/navigation tests. Do not move byte-parsed settings into cartridge SDRAM or
 reduce settings capacity/stack. Current hardware-test artifact must remain until
 any future replacement passes the complete gates.
+
+## 2026-11-24 — Shared workspace candidate
+
+Before adding more settings pages, recover main EWRAM by sharing the9600B selected
+art hot copy and8192B settings snapshot in one aligned GBA-RAM union. Explicit
+settings lease blocks hot-cache writes until parsing/commit/readback/rollback ends;
+generation invalidates stale copies afterward. Five SDRAM artwork slots,8192B
+config capacity, original transaction semantics and minimum16KiB stack remain.
+No byte-parsed settings on cartridge SDRAM. New module is menu_workspace.c/.h.
+
+Focused host/FAT16/FAT32 all3 settings +cache/generation tests, ARM cart-bus tests,
+actual linked ARM save/reload and native mGBA simultaneous save/art in TitleH/BoxV
+with bothfonts pass. Development Chis link EWRAM248504 (8520free), IWRAM15256;
+recovered8144B; native stackpeak14152B unchanged. This is not yet a clean numbered
+hardware-test replacement: keep822 until full all3/native/mGBA/IGM gates pass.
+Freeze this source and run complete gates next. PR29 (head4fcc015) independently
+covers prior Atari guards and822 evidence; merge it only after checks pass, and
+do not change HEAD during the next three-board build sequence. Do not combine
+new View/submenu features before this memory/ownership checkpoint is validated.

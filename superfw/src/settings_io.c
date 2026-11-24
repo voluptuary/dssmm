@@ -2,25 +2,31 @@
 #include <string.h>
 #include <strings.h>
 #include "settings_io.h"
+#include "menu_workspace.h"
 #include "fatfs/ff.h"
 #include "config.h"
 #pragma GCC optimize ("Os")
-#define CONFIG_CAPACITY 8192
+#define CONFIG_CAPACITY MENU_SETTINGS_CAPACITY
 #define CONFIG_TEMP "/SYSTEM/.sf-settings.tmp"
 #define CONFIG_BACKUP "/SYSTEM/.sf-settings.bak"
-/* GBA RAM: ordinary byte parsing must never use cartridge SDRAM. */
-static char original[CONFIG_CAPACITY] __attribute__((section(".sbss"),aligned(__alignof__(FIL))));
+/* Holds a workspace lease throughout parsing or the cooperative transaction. */
+static char *original;
 static unsigned original_size;
 static bool read_original(const char *path,bool *exists) {
-  FIL file;*exists=false;original_size=0;original[0]=0;
+  FIL file;*exists=false;
+  char *buffer=menu_workspace_begin_settings();
+  if(!buffer)return false;
+  original=buffer;original_size=0;original[0]=0;
   FRESULT result=f_open(&file,path,FA_READ);
   if(result==FR_NO_FILE || result==FR_NO_PATH)return true;
-  if(result!=FR_OK)return false;
+  if(result!=FR_OK){menu_workspace_end_settings();return false;}
   *exists=true;UINT size=0,extra=0;char end;
-  result=f_read(&file,original,sizeof(original)-1,&size);
+  result=f_read(&file,original,CONFIG_CAPACITY-1,&size);
   if(result==FR_OK)result=f_read(&file,&end,1,&extra);
   FRESULT closed=f_close(&file);
-  if(result!=FR_OK || closed!=FR_OK || extra || memchr(original,0,size))return false;
+  if(result!=FR_OK || closed!=FR_OK || extra || memchr(original,0,size)) {
+    menu_workspace_end_settings();return false;
+  }
   if(size>=3 && !memcmp(original,"\xef\xbb\xbf",3)) {
     memmove(original,original+3,size-3);size-=3;
   }
@@ -50,6 +56,7 @@ bool settings_read_text(const char *path,settings_line_fn callback,bool *exists)
     if(!end)break;
     line=end+1;
   }
+  menu_workspace_end_settings();
   return true;
 }
 static uint32_t output_hash, output_size;
@@ -95,7 +102,7 @@ static int write_failed(void) {
   if(committed) {
     if(f_unlink(SETTINGS_FILEPATH)==FR_OK && moved)f_rename(CONFIG_BACKUP,SETTINGS_FILEPATH);
   } else if(moved)f_rename(CONFIG_BACKUP,SETTINGS_FILEPATH);
-  f_unlink(CONFIG_TEMP);phase=Idle;return -1;
+  f_unlink(CONFIG_TEMP);phase=Idle;menu_workspace_end_settings();return -1;
 }
 int settings_write_step(void) {
   UINT count;
@@ -139,7 +146,7 @@ int settings_write_step(void) {
       phase=Cleanup;break;
     case Cleanup:
       if(moved)f_unlink(CONFIG_BACKUP);
-      phase=Idle;return 1;
+      phase=Idle;menu_workspace_end_settings();return 1;
   }
   return 0;
 }
@@ -155,13 +162,13 @@ bool settings_write_start(const char *shared,const char *private_text,settings_o
   bool ok=append_bytes("# DSSMM shared settings\n",strlen("# DSSMM shared settings\n")) && append_bytes(shared,strlen(shared)) &&
       preserve(owned,false) && append_bytes("# SuperFW-specific settings\n",strlen("# SuperFW-specific settings\n")) &&
       append_bytes(private_text,strlen(private_text)) && preserve(owned,true);
-  staging=0;if(!ok)return false;
+  staging=0;if(!ok){menu_workspace_end_settings();return false;}
   memcpy(original,output,output_size);
   existed=exists;moved=committed=opened=false;position=0;phase=Open;
   f_mkdir(SYSTEM_DIR);
   unsigned align=__alignof__(FIL);
   unsigned aligned=(output_size+align-1)&~(align-1);
-  if(aligned+sizeof(FIL)<=sizeof(original))transaction=(FIL*)(original+aligned);
+  if(aligned+sizeof(FIL)<=CONFIG_CAPACITY)transaction=(FIL*)(original+aligned);
   else {
     /* Preserve support for near-capacity files without adding a persistent buffer. */
     FIL file;transaction=&file;
