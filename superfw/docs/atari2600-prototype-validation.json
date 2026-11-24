@@ -1,0 +1,13 @@
+{
+  "upstream_commit": "2eb18dd8a5b832c939efe510b4e493ad4cf25437",
+  "purpose": "emulator-only generated diagnostic",
+  "sha256": {
+    "diagnostic.a26": "d01da6830f59800530310d04bdaa796a999c38de5067a62e23c020a16e4c6b67",
+    "prototype.gba": "1e735709f14ea083e445cb79f7f57f446a76d35b337ec38c251c25af710b9a96"
+  },
+  "limits": "Not a runtime plugin or hardware-safe startup; no compatibility claim.",
+  "screenshot_sha256": "8403f79ff4cb38a24e403aa6bcea98ada9eda6ef54d2aca47bad9684db013424",
+  "test": "stock SDL mGBA0.10.1/Xvfb, no BIOS; exact 160x96 diagnostic rectangle",
+  "compiler": "devkitARM GCC16.1.0",
+  "packaging": "Source recipe only; no emulator binary or upstream core imported into firmware/release assets."
+}

@@ -1083,3 +1083,12 @@ EWRAM; old objects/embedded games excluded. Not an external plugin or safe physi
 startup yet: standard gba.specs startup WAITCNT needs review, runtime arguments,
 return, timing, controls, banks and licensing/provenance remain. Retain reproducible
 recipe in the project before session close; no Atari core bundled/claimed.
+
+Atari source recipe and optional mGBA pixel check now tracked under tools/;
+ATARI2600-PORT-PLAN.md documents clean pinned source/build/run and limitations.
+Modern GCC16.1 source build and exact diagnostic-frame test passed; validation
+JSON records hashes. No Atari binary/core imported, no firmware inputs changed,
+no new dependency/BIOS. Continue with safe startup before runtime Pogo arguments,
+Exit and controlled timing/controls/bank tests; resolve missing COPYING before
+binary distribution. Chis777 remains the validated physical-test candidate;
+this optional prototype does not create a replacement firmware build.

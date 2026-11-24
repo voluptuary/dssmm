@@ -30,3 +30,31 @@ needs a modern build and bounded runtime cartridge input before integration.
 
 This investigation is ongoing. No Atari2600 emulator is bundled or validated by
 Build769. PCE return/icon and Start alignment corrections proceed independently.
+
+## Reproducible emulator-only prototype
+
+The pinned source now compiles with current devkitARM and renders an original
+4KiB 6502 diagnostic in stock mGBA0.10.1. The exact 160x96 solid-color rectangle
+at (35,25) passes the shared PNG pixel reader. No commercial ROM, old binary
+object, BIOS, new emulator dependency or firmware asset is used.
+
+Clone the upstream repository outside the tracked tree and checkout the pin
+above, then run from the repository root:
+
+```sh
+python3 superfw/tools/build-atari2600-prototype.py --source /path/to/2600_gba
+bash superfw/tools/test-atari2600-prototype-mgba.sh
+```
+
+Generated files stay under ignored `superfw/build/atari2600-prototype/`.
+The recipe preserves source notices, normalizes includes/globals, replaces the
+embedded-game selector, fixes a 255-entry palette indexed through255, keeps the
+bounded half-height renderer and moves large buffers to EWRAM. It is optional;
+normal builds and CI do not fetch or bundle the external source.
+
+This is not an installable plugin. Standard `gba.specs` startup must be made safe
+before any SuperCard hardware trial; setting WAITCNT in main is too late to
+qualify startup. Runtime cartridge arguments, safe Exit, controls, sound, bank
+selection, speed and full licensing/provenance review remain. Upstream headers
+refer to a missing COPYING file; resolve that before distributing an emulator
+binary. Keep this prototype out of hardware-test and public release assets.
