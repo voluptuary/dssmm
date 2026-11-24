@@ -3115,3 +3115,5 @@ No production behavior/driver changes or hardware qualification.
   preserves the full tree and the separate active SuperFW build.
 
 2026-11-23: Owner now authorizes publication of affected SD-launch kernels. Prepare8.4.2-blue-test5 from previously validatedf88a7bd correction; only version/notes changed. Preserve firmware-free sealed stock-size packing and all hardware warnings. Final production rebuild/package and hosted checks required before publish.
+
+2026-11-24: v8.4.2-blue-test5 published at9bc24e0 after source45293538639 and all4 PR24 CI45293549636 passed. Firmware remains sealed stock2124252B; firmware and full folder-art.zip downloaded byte-identically, canonical notes match, latest restored/verifiedDEv8.4.1. Physical BLUE operation remains untested. Publication JSON retained. Superseded Test4 page removal follows root archived metadata; retain tag. Synchronize via dssmm.
