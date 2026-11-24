@@ -16,7 +16,11 @@ build, out = a.build.resolve(), a.out.resolve()
 assert build != out and build.is_dir()
 record = json.loads((build / 'prototype.json').read_text())
 assert record['purpose'] == 'runtime input experiment'
-assert json.loads((build / 'input-validation.json').read_text())['result'] == 'passed'
+inputs = json.loads((build / 'input-validation.json').read_text())
+assert inputs['result'] == 'passed'
+assert inputs['runtime_sha256'] == record['sha256']['prototype.gba']
+timing = json.loads((build / 'timing-validation.json').read_text())
+assert timing['runtime_sha256'] == record['sha256']['prototype.gba']
 fixture = build / 'runtime-fixture'
 assert json.loads((fixture / 'validation.json').read_text())['runtime_sha256'] == record['sha256']['prototype.gba']
 assert len(json.loads((fixture / 'menu-validation.json').read_text())['passed']) == 10
@@ -50,6 +54,7 @@ Other banking variants are not supported. There is currently NO SOUND.
 This unfinished core is an experimental trial, not a compatibility promise.
 Only original generated diagnostics have been tested in mGBA; actual games,
 performance and physical-card Exit remain unqualified. No games are included.
+RIOT timer/WSYNC clock fixes and control ports have native ARM regression checks.
 If return is unavailable, the plugin displays a power-off message.
 
 Based on MikeDX/2600_gba and Virtual VCS/X2600 by Alex Hornby, Daniel Boris
@@ -60,6 +65,7 @@ atari2600-test-source.zip. No upstream prebuilt emulator objects were used.
 record['hardware_test'] = 'Experimental local trial only; no physical qualification.'
 record['assets'] = {str(path.relative_to(out)): hashlib.sha256(path.read_bytes()).hexdigest()
                     for path in (plugin, source)}
+record['timing_checks'] = timing
 record['runtime_checks'] = json.loads((fixture / 'menu-validation.json').read_text())
 (out / 'atari2600-test.json').write_text(json.dumps(record, indent=2) + '\n')
 print(plugin)

@@ -1875,3 +1875,23 @@ will test when convenient; continue Atari compatibility/performance and DSSMM
 porting autonomously. Local source archive is not a GitHub firmware source asset;
 do not upload it through release tooling. Tracked packaging/runtime replay tools
 make this environment reproducible without private BIOS or old prebuilt objects.
+
+## 2026-11-24 — Atari timer/WSYNC corrections
+
+The unfinished core read an uninitialized timer value and subtracted time during
+WSYNC. Replaced countdown/underflow/status logic, advance clocks in all beam
+states, keep palette declarations256 entries, and poll menu every64 emulated
+instructions instead of each instruction (still works without video sync).
+Actual ARM passes64 timer boundaries including32-bit wrap,20 WSYNC cases and20
+real TIA/RIOT input-port cases; original21 input/12 bank/7 return checks retain
+passes. Actual runtime mGBA exact picture/menu10 passes; a new original6502 ROM
+waits for RIOT underflow before drawing: olde5cdd3ed fails, corrected1b344401 passes.
+No private BIOS/card emulation. Counted keypad reads fall5000→79 per5000 emulated
+instructions; this is not an FPS/hardware speed claim. Extra correct WSYNC work
+increases total cost relative to the broken baseline; no net speed claim.
+
+Updated hardware-test/SYSTEM/PLUG/a26.gba SHA1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a
+and exact independently rebuilt corresponding-source ZIP/notes/JSON. No sound,
+physical Exit, broad games or cycle-exact emulation qualification; Chis799 and
+public769 remain unchanged. Resume menu parity comparisons after committing this
+checkpoint; no user input needed. Preserve current plugin+source in cleanup.

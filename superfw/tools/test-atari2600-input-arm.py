@@ -3,6 +3,7 @@
 from pathlib import Path
 import argparse
 import json
+import hashlib
 import os
 import struct
 import subprocess
@@ -103,6 +104,7 @@ for magic, tail, size, marker, valid in (
     cpu.emu_start(symbols["atari_return_ready"] | 1, 0x01000000, count=10000)
     assert bool(cpu.reg_read(UC_ARM_REG_R0)) == valid
 record = {"startup": "actual ARM startup preserves all 96 ABI bytes and unowned EWRAM; owned VRAM/BSS cleared, data copied, WAITCNT=0x4000",
+          "runtime_sha256": hashlib.sha256((a.out / "prototype.gba").read_bytes()).hexdigest(),
           "cartridge_cases": len(cases), "bank_hotspots": 12, "return_header_cases": 7, "result": "passed", "limits": "CPU/bus model, not physical SuperCard or game compatibility qualification"}
 (a.out / "input-validation.json").write_text(json.dumps(record, indent=2) + "\n")
 print(f"Atari actual ARM startup and {len(cases)} runtime input/mirror/bounds cases passed.")

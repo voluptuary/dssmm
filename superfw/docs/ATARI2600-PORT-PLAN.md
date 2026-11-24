@@ -143,3 +143,28 @@ fixed-ABI cold-boot argument seed, then checks the exact diagnostic pixels and
 ten menu interactions. This covers the runtime build, not merely the separately
 compiled standalone diagnostic. Card remapping, physical Exit, broader games,
 speed and sound remain outside these tests; no sound implementation exists yet.
+
+## Timer/clock regression and current local trial
+
+The original RIOT function reads an uninitialized local, and WSYNC subtracts
+remaining line time. The adapter now computes countdown/underflow/status from
+emulated clocks and advances WSYNC through visible/blanking periods. It does not
+make the legacy instruction-level TIA/RIOT cycle-exact. References: the original
+[Stella Programmer's Guide](https://www.atarihq.com/danb/files/stella.pdf) describes
+WSYNC waiting for horizontal blank and the RIOT dividers; current
+[Stella RIOT source](https://github.com/stella-emu/stella/blob/master/src/emucore/M6532.cxx)
+provides an independent timing-boundary comparison. No Stella code is imported.
+
+`python3 superfw/tools/test-atari2600-timing-arm.py` checks64 timer boundaries,
+20 WSYNC writes and20 real joystick/fire/console port cases. Run
+`python3 superfw/tools/test-atari2600-runtime-mgba.py --timer` to require actual
+6502 timer underflow before the diagnostic can draw. The earlier local plugin
+fails this new regression; the current local trial passes. The ordinary runtime
+picture and ten L+R menu checks also pass. Details/hashes are in the validation
+JSON. Source ZIP still independently rebuilds the delivered binary exactly.
+
+Menu polling is bounded to once per64 emulated instructions, independent of ROM
+video synchronization. Optional `tools/benchmark-atari2600-arm.py` counts actual
+ARM instructions/keypad reads for a fixed diagnostic workload. It reports no FPS
+or physical GBA cycle timing. Correct WSYNC handling costs extra work relative to
+the broken baseline; do not present the polling change as a net speed guarantee.

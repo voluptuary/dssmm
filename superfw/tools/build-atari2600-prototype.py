@@ -14,7 +14,7 @@ PIN = "2eb18dd8a5b832c939efe510b4e493ad4cf25437"
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def diagnostic_rom():
+def diagnostic_rom(timer=False):
     """Original 6502 code: a solid-color, 262-line frame; no commercial data."""
     code, labels, branches = bytearray(), {}, []
 
@@ -28,6 +28,11 @@ def diagnostic_rom():
         branches.append((len(code) - 1, name))
 
     emit(0x78, 0xd8, 0xa2, 0xff, 0x9a)  # SEI; CLD; LDX #255; TXS
+    if timer:
+        emit(0xa9, 3, 0x8d, 0x96, 2)    # TIM64T = 3
+        labels["timer_wait"] = len(code)
+        emit(0xad, 0x84, 2, 0x10, 0)     # LDA INTIM; BPL until underflow
+        branches.append((len(code) - 1, "timer_wait"))
     emit(0xa9, 2, 0x85, 1)              # VBLANK on
     frame = len(code)
     emit(0xa9, 2, 0x85, 0)              # VSYNC on
@@ -52,7 +57,7 @@ def prepare(source, output, fixture):
     for path in source.iterdir():
         if path.suffix.lower() in (".c", ".h"):
             text = re.sub(r'(#include\s*")([^"]+)(")',
-                          lambda m: m[1] + m[2].lower() + m[3], path.read_text())
+                          lambda m: m[1] + m[2].lower() + m[3], path.read_text()).replace("color[255]", "color[256]")
             (output / path.name.lower()).write_text(text)
     for name in ("CREDITS", "readme.txt"):
         shutil.copy2(source / name, output / name)
@@ -68,8 +73,6 @@ def prepare(source, output, fixture):
     path.write_text(path.read_text().replace(
         "volatile u32* KEYS = (volatile u32*)0x04000130;",
         "#define KEYS ((volatile u32*)0x04000130)"))
-    path = output / "display.c"
-    path.write_text(path.read_text().replace("int color[255]", "int color[256]"))
     for filename, symbol in (("display.c", "vscreen[64000]"),
                              ("raster.c", "bscreen[62000]"),
                              ("vmachine.c", "cart[16384]")):
@@ -95,17 +98,42 @@ def prepare(source, output, fixture):
     text = path.read_text()
     old = "while (!(!((*KEYS) & KEY_L)))  {"
     assert old in text
+    text = text.replace("register BYTE b;", "register BYTE b;\n  unsigned menu_poll = 0;")
     path.write_text('#include "ui.h"\n' + text.replace(old,
         "while (1) {\n"
-        "  if (((~(*KEYS)) & 0x300) == 0x300 && atari_menu()) return;"))
-    for name in ("ui.c", "ui.h"):
+        "  if ((menu_poll++ & 63) == 0 && ((~(*KEYS)) & 0x300) == 0x300 && atari_menu()) return;"))
+    for name in ("ui.c", "ui.h", "timer.c", "timer.h"):
         shutil.copy2(ROOT / "tools/atari2600" / name, output / name)
+
+    path = output / "vmachine.c"
+    text = path.read_text()
+    begin = text.index("void set_timer(")
+    end = text.index("/* Main screen logic */", begin)
+    text = text[:begin] + text[end:]
+    reset = "timer_res=32;\n\ttimer_count=0;\n\ttimer_clks=0;"
+    assert reset in text
+    path.write_text('#include "timer.h"\n' + text.replace(reset, "atari_timer_reset();"))
+    path = output / "memory.c"
+    text = path.read_text()
+    # WSYNC waits forward to the next horizontal blank, including vertical blank.
+    old = "clk+=(ebeamx-tv_width)/3;"
+    assert old in text
+    text = text.replace(old, "/* Clock advance is shared below for every beam state. */")
+    text = text.replace("\t\thbeam_state=HSYNCSTATE;\n\t\tebeamx=-tv_hsync;",
+                        "\t\tif (ebeamx < tv_width) clk += (tv_width-ebeamx)/3;\n"
+                        "\t\thbeam_state=HSYNCSTATE;\n\t\tebeamx=-tv_hsync;", 1)
+    text = text.replace("case INTIM:\n\t\t\tcase 0x285:\n\t\t\tcase 0x29D:", "case INTIM:")
+    needle = "\t\t\tcase SWCHA:"
+    text = text.replace(needle, "\t\t\tcase 0x285:\n\t\t\tcase 0x29D:\n"
+                        "\t\t\t\tres=do_timer_irq(clkcount);\n\t\t\t\tbreak;\n" + needle, 1)
+    path.write_text('#include "timer.h"\n' + text)
 
     # Replace the embedded-ROM selector with bounded runtime input.
     path = output / "files.c"
     notice = path.read_text().split("*/", 1)[0] + "*/\n"
     rom = diagnostic_rom()
     (output / "diagnostic.a26").write_bytes(rom)
+    (output / "diagnostic-timer.a26").write_bytes(diagnostic_rom(timer=True))
     path.write_text(notice + (ROOT / "tools/atari2600/cartridge.c").read_text())
     shutil.copy2(ROOT / "tools/atari2600/startup.S", output / "startup.S")
     if fixture:
@@ -129,7 +157,7 @@ def main():
     prepare(source, output, not args.runtime)
     devkit = Path(os.environ.get("DEVKITARM", "/opt/devkitpro/devkitARM"))
     tools = Path(os.environ.get("DEVKITPRO", "/opt/devkitpro")) / "tools/bin"
-    files = "main collisio cpu display files keyboard misc mouse raster table vmachine memory ui".split()
+    files = "main collisio cpu display files keyboard misc mouse raster table vmachine memory ui timer".split()
     command = [str(devkit / "bin/arm-none-eabi-gcc"), "-std=gnu89", "-O2", "-mthumb",
                "-mthumb-interwork", "-mcpu=arm7tdmi", "-ffunction-sections", "-fdata-sections",
                "-fwrapv", "-fno-strict-aliasing", "-fcommon", "-Wno-implicit-int",

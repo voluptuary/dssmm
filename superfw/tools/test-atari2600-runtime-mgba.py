@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Boot the unmodified runtime Atari core after seeding the Pogoshell arguments."""
 from pathlib import Path
+import argparse
 import hashlib
 import json
 import os
@@ -9,7 +10,11 @@ import subprocess
 import sys
 
 root = Path(__file__).resolve().parents[1]
-out = Path(sys.argv[1] if len(sys.argv) > 1 else root / 'build/atari2600-runtime').resolve()
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('out', nargs='?', type=Path, default=root / 'build/atari2600-runtime')
+parser.add_argument('--timer', action='store_true', help='require RIOT underflow before drawing')
+a = parser.parse_args()
+out = a.out.resolve()
 # This cold-boot seam supplies only the fixed argument block, then branches into
 # the runtime image's original entry. It does not compile fixture-only core code.
 image = bytearray((out / 'prototype.gba').read_bytes())
@@ -45,9 +50,9 @@ subprocess.run([str(devkit / 'arm-none-eabi-objcopy'), '-O', 'binary',
 code = (out / 'runtime-seed.bin').read_bytes()
 assert len(code) <= 256
 image.extend(code + bytes(256 - len(code)))
-image.extend((out / 'diagnostic.a26').read_bytes())
+image.extend((out / ('diagnostic-timer.a26' if a.timer else 'diagnostic.a26')).read_bytes())
 struct.pack_into('<I', image, 0, 0xea000000 | ((seed_offset - 8) // 4))
-fixture = out / 'runtime-fixture'
+fixture = out / ('runtime-timer-fixture' if a.timer else 'runtime-fixture')
 fixture.mkdir(exist_ok=True)
 (fixture / 'prototype.gba').write_bytes(image)
 (fixture / 'prototype.json').write_text(json.dumps({
@@ -56,5 +61,7 @@ fixture.mkdir(exist_ok=True)
     'limits': 'Argument seeding substitutes filesystem/card launch; no physical SuperCard emulation.'
 }, indent=2) + '\n')
 subprocess.run(['bash', str(root / 'tools/test-atari2600-prototype-mgba.sh'), str(fixture)], check=True)
-subprocess.run([sys.executable, str(root / 'tools/test-atari2600-menu-mgba.py'), str(fixture)], check=True)
-print('Actual Atari runtime: fixed-ABI diagnostic, menu/resume/restart/Exit checks passed.')
+if not a.timer:
+    subprocess.run([sys.executable, str(root / 'tools/test-atari2600-menu-mgba.py'), str(fixture)], check=True)
+print('Actual Atari runtime: RIOT-gated diagnostic passed.' if a.timer else
+      'Actual Atari runtime: fixed-ABI diagnostic, menu/resume/restart/Exit checks passed.')
