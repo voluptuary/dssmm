@@ -2086,3 +2086,15 @@ Native9-scene stock mGBA run and normal full project verifier passed. Added
 Start clock draw used by the real native Start loop and retested scene0. Exact
 capture/source hashes and limits: docs/native-menu-preview-validation.json.
 No production behavior/driver changes or hardware qualification.
+
+## 2026-11-24 — Clipped alias-free SD launch correction
+
+Ordinary exFAT control passed before the fix; clipped alias-free names returned
+before metadata/open (native trace d700ee). Restored full-name lookup by existing
+paired dirent offset with size/type/prefix/capacity/close checks; normal path
+remains direct. current_filename256B, no record/driver/protocol changes.
+All5 native mGBA cases pass, sanitized production-helper negative cases pass,
+full verify-ezfomega passed; production2055088B, heap19368/gap8312 static bytes.
+Native fixtures mock storage/save/transfer/patch/reset, not hardware qualification.
+Owner authorizes8.4.1-omega-test5 prerelease; source/all4 CI then publish with
+full folder-art.zip, archive/prune prior prerelease page only (retain tag).

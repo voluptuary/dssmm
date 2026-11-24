@@ -583,7 +583,7 @@ static u8 launcher_virtual_gamecode[10][4]EWRAM_BSS;
 static u8 launcher_virtual_gamecode_valid[10]EWRAM_BSS;
 TCHAR currentpath[MAX_path_len] EWRAM_BSS;//
 TCHAR currentpath_temp[MAX_path_len] EWRAM_BSS;
-TCHAR current_filename[200] EWRAM_BSS;
+TCHAR current_filename[256] EWRAM_BSS;
 
 static u32 recents_view_active = 0;
 static u32 recents_view_favourites = 0;
@@ -16919,6 +16919,42 @@ static u32 Launcher_LoadTrimSize(TCHAR *filename, u32 romsize, u32 mode, BYTE sa
 	return 1;
 }
 
+static u32 Launcher_ResolveIndexedLaunchName(u32 index, TCHAR *name, u32 capacity)
+{
+	DWORD wanted, offset;
+	FRESULT result, closed;
+	u32 found = 0;
+	if(index >= game_total_SD) return 0;
+	dmaCopy(&pFilename_buffer[index], &pFilename_temp, sizeof(pFilename_temp));
+	if(!(pFilename_temp.flags & FM_ENTRY_ALIAS_DISPLAY) || pFilename_temp.altname[0])
+	{
+		const TCHAR *identity = Launcher_FileIdentityName(&pFilename_temp);
+		if(strlen(identity) >= capacity) return 0;
+		strcpy(name, identity);
+		return 1;
+	}
+	wanted = pFilename_dirent_offset[index];
+	if(wanted == LAUNCHER_FILE_DIRENT_INVALID ||
+		f_opendir(&dir, currentpath) != FR_OK) return 0;
+	while((result = f_readdir_with_offset(&dir,
+		&fileinfo, &offset)) == FR_OK && fileinfo.fname[0])
+	{
+		if(offset != wanted) continue;
+		if(!(fileinfo.fattrib & AM_DIR) &&
+			fileinfo.fsize == pFilename_temp.filesize &&
+			!strncmp(fileinfo.fname, pFilename_temp.filename,
+				strlen(pFilename_temp.filename)) &&
+			strlen(fileinfo.fname) < capacity)
+		{
+			strcpy(name, fileinfo.fname);
+			found = 1;
+		}
+		break;
+	}
+	closed = f_closedir(&dir);
+	return found && result == FR_OK && closed == FR_OK;
+}
+
 u8 SD_list_MENU(u32 show_offset,	u32 file_select,u32 play_re )
 {
 	u32 res;
@@ -16954,10 +16990,9 @@ u8 SD_list_MENU(u32 show_offset,	u32 file_select,u32 play_re )
 		if((absolute_index < folder_total) ||
 		   ((absolute_index - folder_total) >= game_total_SD))
 			return 0;
-		strncpy(current_filename,
-			Launcher_FileIdentityName(&pFilename_buffer[absolute_index - folder_total]),
-			sizeof(current_filename) - 1);
-		current_filename[sizeof(current_filename) - 1] = '\0';
+		if(!Launcher_ResolveIndexedLaunchName(absolute_index - folder_total,
+			current_filename, sizeof(current_filename)))
+		{ Show_error_num(1); return 0; }
 		pfilename = current_filename;
 	}
 	else{
