@@ -118,3 +118,8 @@ SuperFW's imported upstream subtree retains its own GPL-3.0-or-later license,
 component notices, tools and tests. It is not shared with or built through the
 OMEGA-family project sources. Local import or compilation does not establish
 physical SuperCard compatibility; see its project journals for validation status.
+
+The shared tool registry explicitly includes record-menu-preview.py and
+assemble-menu-previews.py for documentation capture/encoding. They accept native
+fixture ROMs/images as inputs and contain no cartridge protocols. Project-specific
+fixture source, mock storage and renderer adapters remain in their owning directory.

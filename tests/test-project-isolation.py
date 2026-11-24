@@ -71,8 +71,10 @@ class Isolation(unittest.TestCase):
             fixture(root)
             for branch in policy['TARGETS'] | {'dssmm'}:
                 self.validate(root, branch=branch)
-            # Shared artwork packaging is universal, not a card driver.
-            self.validate(root, extra=['scripts/prepare-folder-art.py'])
+            # Packaging/capture helpers contain no cartridge-specific protocol.
+            for tool in ['scripts/prepare-folder-art.py', 'scripts/record-menu-preview.py',
+                         'scripts/assemble-menu-previews.py']:
+                self.validate(root, extra=[tool])
             for path in ['source/driver.c', 'scripts/flash-de.py', 'targets/ezfomega/Makefile']:
                 with self.assertRaises(ValueError):
                     self.validate(root, extra=[path])
