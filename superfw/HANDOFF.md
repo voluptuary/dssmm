@@ -1905,3 +1905,41 @@ against the common DE Interface-label pixel mask. Native font spacing remains.
 Host highlight bounds pass; full clean all3/native/mGBA gates must pass before
 replacing hardware-test Chis799. Atari current plugin/source remain delivered
 separately; public769 unchanged. Continue without waiting for hardware feedback.
+
+## 2026-11-24 — Atari raster memory guards
+
+Native replay reproduced all three display queues writing81st entries into80-slot
+arrays; a real wide-copy player atx160 also writes2B past colvect230. Added queue/
+index guards and256B padded collision scratch (all declarations match), with28
+queue/index plus3 wide-copy ARM cases. Current external plugin14d28e63ac2d930d8c1849e030a3ff0701e59bc6e940863d5de9884e6b5f4500
+passes original input/timer/control, mGBA runtime/menu10 and timer-gated image;
+exact corresponding-source ZIP independently reproduces it. hardware-test plugin/
+source/notes/JSON updated. No sound/broad game/physical qualification claims.
+
+Build822/source2f73b53 all3 kernels finished clean with identical source-tree hash
+8932bc31... before these unrelated optional Atari-tool edits. Native visual/full
+gate remains running; don't rebuild firmware for the external-tool change. CI PR28
+head stays2f73b53 until its check/merge checkpoint; commit Atari follow-up locally
+and push after that merge to avoid restarting the same CI. Preserve prototype
+and current kernel/plugin artifacts, private BIOS/session scratch/ownerlock.
+
+## 2026-11-24 — Build822 validated and delivered
+
+Full local all3/nativeARM/host/mGBA/nativeIGM verifier exits0, including42 menu
+visual checks (Settings/Games/Hardware additions),8 NOR carousel checks, native
+save/reload and real plugin Exit/MiGoomba fixtures. Chis822/source2f73b53 is in
+hardware-test; old799 removed only after matching its recorded hash. All3 clean
+builds share source-tree8932bc31...; sizesSD497152/Lite496640/Chis1671680B.
+Chis EWRAM256648/257024 (376B free), IWRAM15240; minimum16KiB stack retained.
+SourceCI45395110531 and all4 PR28CI45395123043 pass; PR28 merged37d31fa. Report
+is docs/build-822-validation.json. No new physical qualification/public release;
+DEv8.4.1 latest verified. Atari plugin14d28e63 remains separate, with source ZIP.
+
+Root dssmm and EZ lanes synchronized normally to37d31fa; SuperFW8e54546 includes
+that integration plus the later Atari raster guards. Follow-up hardware PR next.
+Do not rebuild822 for tool/doc-only changes. Before adding sizeable UI features,
+recover main-EWRAM headroom: explore sharing the9600B selected-art cache with the
+8192B settings snapshot, with strict ownership/generation guards and full native
+save/navigation tests. Do not move byte-parsed settings into cartridge SDRAM or
+reduce settings capacity/stack. Current hardware-test artifact must remain until
+any future replacement passes the complete gates.

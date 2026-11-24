@@ -168,3 +168,18 @@ video synchronization. Optional `tools/benchmark-atari2600-arm.py` counts actual
 ARM instructions/keypad reads for a fixed diagnostic workload. It reports no FPS
 or physical GBA cycle timing. Correct WSYNC handling costs extra work relative to
 the broken baseline; do not present the polling change as a net speed guarantee.
+
+## Raster safety follow-up
+
+Actual ARM replay reproduced three queues writing an81st entry into80-entry
+arrays, and a legal wide-copy sprite writing two bytes past the230-byte collision
+scratch. Queue append/index guards now preserve adjacent memory and discard
+changes after capacity; the scratch padding is256 bytes, covering160 visible
+pixels plus64-copy offset plus32 expanded pixels. All declarations agree. No
+kernel RAM is used: these are allocations inside the external Atari runtime.
+
+`tools/test-atari2600-raster-arm.py` checks28 queue/index boundaries and three
+wide-copy sprite cases in the linked runtime. The input/timer/control regressions,
+actual runtime picture/menu10 checks and RIOT-gated mGBA diagnostic pass. The
+current hardware-test plugin/source archive is updated and independently rebuilds
+identically. Compatibility, sound and physical qualification limits still apply.

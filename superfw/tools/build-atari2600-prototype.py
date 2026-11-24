@@ -9,6 +9,7 @@ import re
 import shutil
 import shlex
 import subprocess
+from atari2600.raster_guards import apply_raster_guards
 
 PIN = "2eb18dd8a5b832c939efe510b4e493ad4cf25437"
 ROOT = Path(__file__).resolve().parents[1]
@@ -127,6 +128,8 @@ def prepare(source, output, fixture):
     text = text.replace(needle, "\t\t\tcase 0x285:\n\t\t\tcase 0x29D:\n"
                         "\t\t\t\tres=do_timer_irq(clkcount);\n\t\t\t\tbreak;\n" + needle, 1)
     path.write_text('#include "timer.h"\n' + text)
+
+    apply_raster_guards(output)
 
     # Replace the embedded-ROM selector with bounded runtime input.
     path = output / "files.c"

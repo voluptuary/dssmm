@@ -1,0 +1,67 @@
+{
+  "build": 822,
+  "source_commit": "2f73b53b731f2ec3592548981d2198805c5167c8",
+  "boards": [
+    {
+      "source_tree_sha256": "8932bc31ee9c9e9fdfbda9d9ea3c7930292c68cd9042117d297cc10f7f76c6b5",
+      "board": "sd",
+      "dssmm_build": 822,
+      "source_commit": "2f73b53b731f2ec3592548981d2198805c5167c8",
+      "source_dirty": false,
+      "firmware_sha256": "215984730c668c0fe3ed42cfa80a06bb11a8ed282c8ded8023555c9991b194d3",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 497152,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 27136
+    },
+    {
+      "source_tree_sha256": "8932bc31ee9c9e9fdfbda9d9ea3c7930292c68cd9042117d297cc10f7f76c6b5",
+      "board": "lite",
+      "dssmm_build": 822,
+      "source_commit": "2f73b53b731f2ec3592548981d2198805c5167c8",
+      "source_dirty": false,
+      "firmware_sha256": "11dbb136d649df28b450a23835a787f5ee907d75520846d62fc255558616bd9a",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496640,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 11264
+    },
+    {
+      "source_tree_sha256": "8932bc31ee9c9e9fdfbda9d9ea3c7930292c68cd9042117d297cc10f7f76c6b5",
+      "board": "chis",
+      "dssmm_build": 822,
+      "source_commit": "2f73b53b731f2ec3592548981d2198805c5167c8",
+      "source_dirty": false,
+      "firmware_sha256": "c9758c3d9c63026ff68f9fbc025e97d534eb7576b5a6e8d5bb9e04329d2e5ccb",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "local_verifier": "DSSMM_ARM_IGM=1 bash superfw/scripts/verify.sh exit0; full all3/native ARM/host/mGBA/IGM checks",
+  "local_log_sha256": "aea05800d435b6d2f3ccc2f6443bb0d9160c6a1ad315e9f4fbe1ec4ab5d5c538",
+  "source_ci": 45395110531,
+  "integration_ci": 45395123043,
+  "integration_pr": 28,
+  "integration_merge": "37d31fa66adc57445f28b0e99cf483ef1aed64c2",
+  "main_ewram_bytes": 256648,
+  "main_ewram_limit_bytes": 257024,
+  "iwram_bytes": 15240,
+  "user_stack_minimum_bytes": 16384,
+  "native_menu_visual_checks": 42,
+  "native_nor_carousel_checks": 8,
+  "de_reference": {
+    "art_style": "title",
+    "external_sample_art": false,
+    "scene": 1,
+    "source_commit": "540880fd306a74335ef3e2019651e0e00c50b6de",
+    "source_dirty": false,
+    "renderer": "actual project kernel translation unit; deterministic clock and filesystem seams",
+    "fixture": "ROM-backed read-only PSRAM directory, synthetic decoded artwork cache",
+    "limits": "visual tests only; no flash/save/SD protocol qualification",
+    "sha256": "2c1323feba779399d977543ef0a8f9ad9aa8de67890d8dd1121228ecd88352e8",
+    "screenshot_sha256": "43d3a5f9abd12f2fe7e9ecdb10b4bce06cd25e0452fc787931dc3e1a9a9c8966"
+  },
+  "limits": "Software validation only; no new physical-card, SD/Lite or complete DE parity qualification. External Atari plugin is a separate experimental artifact, not bundled in firmware."
+}

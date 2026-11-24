@@ -43,20 +43,26 @@
     "purpose": "runtime input experiment",
     "sha256": {
       "diagnostic.a26": "d01da6830f59800530310d04bdaa796a999c38de5067a62e23c020a16e4c6b67",
-      "prototype.gba": "1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a"
+      "prototype.gba": "14d28e63ac2d930d8c1849e030a3ff0701e59bc6e940863d5de9884e6b5f4500"
     },
     "limits": "Experimental 2K/4K/F8/F6 input and L+R menu; audio, broad game compatibility, physical Exit remain pending.",
     "hardware_test": "Experimental local trial only; no physical qualification.",
     "assets": {
-      "SYSTEM/PLUG/a26.gba": "1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a",
-      "atari2600-test-source.zip": "e895e65feb3b74a881ae2995e6e5aa6d27d2d938bbaed634139028962b014779"
+      "SYSTEM/PLUG/a26.gba": "14d28e63ac2d930d8c1849e030a3ff0701e59bc6e940863d5de9884e6b5f4500",
+      "atari2600-test-source.zip": "150e5aa0dd3f1913e10a606abd43bc3da84f16758df7f2b3f2a23ef62ba16e86"
+    },
+    "raster_checks": {
+      "queue_boundary_cases": 28,
+      "wide_copy_sprite_cases": 3,
+      "runtime_sha256": "14d28e63ac2d930d8c1849e030a3ff0701e59bc6e940863d5de9884e6b5f4500",
+      "limits": "Pinned core arrays on ARM; overflowed display changes are dropped, not cycle-exact emulation."
     },
     "timing_checks": {
       "timer_boundary_cases": 64,
       "wsync_cases": 20,
       "control_port_cases": 20,
       "status": "bus-offset, underflow flag/read-clear and reset checks passed",
-      "runtime_sha256": "1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a",
+      "runtime_sha256": "14d28e63ac2d930d8c1849e030a3ff0701e59bc6e940863d5de9884e6b5f4500",
       "limits": "Linked ARM model; legacy instruction-level core is not a cycle-exact TIA/RIOT implementation."
     },
     "runtime_checks": {
@@ -97,5 +103,35 @@
     "bounded_poll_keypad_reads": 79,
     "workload": "5000 emulated instructions; original generated ROM",
     "limits": "Unicorn instruction/read counts, not FPS or physical performance. WSYNC corrections add necessary work and change later totals."
+  },
+  "raster_before": {
+    "queues": [
+      {
+        "function": "do_unified_change",
+        "count_after": 81,
+        "entry_beyond_capacity_changed": true
+      },
+      {
+        "function": "do_plraster_change",
+        "count_after": 81,
+        "entry_beyond_capacity_changed": true
+      },
+      {
+        "function": "do_pfraster_change",
+        "count_after": 81,
+        "entry_beyond_capacity_changed": true
+      }
+    ],
+    "collision": {
+      "runtime_sha256": "1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a",
+      "case": "player0 x160, two copies64 apart, 8px sprite",
+      "writes_past_declared_array": 2
+    }
+  },
+  "raster_after": {
+    "queue_boundary_cases": 28,
+    "wide_copy_sprite_cases": 3,
+    "runtime_sha256": "14d28e63ac2d930d8c1849e030a3ff0701e59bc6e940863d5de9884e6b5f4500",
+    "limits": "Pinned core arrays on ARM; overflowed display changes are dropped, not cycle-exact emulation."
   }
 }
