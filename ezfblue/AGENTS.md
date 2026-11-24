@@ -52,3 +52,5 @@ resource insertion or firmware updater. Historical resource fixtures stay.
 Do not enable persistent NOR RTS without adapting/validating the matching runtime
 and SD sector-map behavior. Upstream Test5 and this integration remain physically
 unverified. Preserve the published 8.4.0 Test3 artifact and its evidence.
+
+2026-11-24 current prerelease: v8.4.2-blue-test5/source9bc24e0, with validated alias-free/clipped SD-launch correction and full folder artwork asset. Keep firmware-free stock-size seal, official FPGA-update requirement and hardware-untested warnings. Evidence under docs/releases/.

@@ -1,3 +1,9 @@
+# DS Style Merkin Mix 8.4.2 — BLUE Test 5
+
+- Fixed alias-free/exFAT and clipped-filename SD launch paths, including recents/favorites.
+- Software/native mGBA checks passed; physical BLUE remains untested.
+- [Release notes](docs/releases/v8.4.2-blue-test5.md).
+
 # DS Style Merkin Mix 8.4.1 — BLUE Test 4
 
 **NEWER EZ-FLASH OMEGA DEFINITIVE EDITION B / BLUE ONLY — HARDWARE UNTESTED. UPDATE AT YOUR OWN RISK.**
