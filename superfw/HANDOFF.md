@@ -1987,3 +1987,7 @@ for the existing native mocks or combine EZ drivers; retain as an optional futur
 bus-testing extension. Current change improves SDL fixture completion readiness.
 Next: finish default-branch integration/sync and verify a fresh clone can build
 all kernels, then owner-requested19px SuperCard top bar and matching colors.
+
+Owner follow-up: delete obsolete a26.zip rather than retaining a live archive.
+Removed the temporary project-history ZIP; original upload remains in Git history.
+Only lightweight provenance metadata remains. Atari development stays external.

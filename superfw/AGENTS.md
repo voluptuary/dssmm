@@ -284,8 +284,8 @@ Atari2600 plugin development has moved to https://github.com/voluptuary/a26.gba.
 Do not resume the old Atari implementation/audit TODOs here or update the frozen
 local plugin as the latest version. Preserve historical source recipes/evidence;
 ordinary kernel Pogoshell compatibility and kernel harness work remain in scope.
-The separate repository has progressed beyond this snapshot. The owner's original
-root a26.zip is retained byte-for-byte under docs/history/imports/; use the active
-repository for current plugin work. Owner Build822 boots and loads/exits Atari
+The separate repository has progressed beyond this snapshot. The owner authorized deleting the obsolete a26.zip from the active tree after
+review. Its original upload remains in Git history; use the active repository
+for current plugin work. Owner Build822 boots and loads/exits Atari
 on physical Chis; the plugin revision was not specified. This does not qualify
 Build827 memory sharing or SD/Lite hardware.
