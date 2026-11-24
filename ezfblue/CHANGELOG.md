@@ -1,10 +1,10 @@
-# DS Style Merkin Mix 8.4.2 — BLUE Test 5
+# DS Style Merkin's Mix 8.4.2 — BLUE Test 5
 
 - Fixed alias-free/exFAT and clipped-filename SD launch paths, including recents/favorites.
 - Software/native mGBA checks passed; physical BLUE remains untested.
 - [Release notes](docs/releases/v8.4.2-blue-test5.md).
 
-# DS Style Merkin Mix 8.4.1 — BLUE Test 4
+# DS Style Merkin's Mix 8.4.1 — BLUE Test 4
 
 **NEWER EZ-FLASH OMEGA DEFINITIVE EDITION B / BLUE ONLY — HARDWARE UNTESTED. UPDATE AT YOUR OWN RISK.**
 
@@ -52,13 +52,13 @@ SHA-256: `57db5bb4e9fd2cfacdbb1024b6d2d62dd7a83c562964f440d3e5cf02203549a3`
 - Safer staged saves/settings and filename checks; bounded PSRAM/NOR patch copies, consistent block padding, NOR erase/program/catalog readback and reserve-before-publish ordering.
 - Preserved cheat-group selection/visible-row fixes and removed the black plugin-launch strip; checked kernel staging before replacing an update file.
 
-Thanks to **FrankieT19**, **EZ-FLASH**, **Sterophonick**, **exploitz86**, **SkillerCMP**, **aidiadayo**, **Kekun** and **ChaN**; and to **michyprima**, **Jaga / EvilJagaGenius**, **Dwedit** and **FluBBa** for the emulator lineage. Merkin Mix artwork and port work is maintained by **Merkin / voluptuary**. [Credits and provenance](https://github.com/voluptuary/dssmm/blob/v8.4.1-blue-test4/ezfblue/CREDITS.md).
+Thanks to **FrankieT19**, **EZ-FLASH**, **Sterophonick**, **exploitz86**, **SkillerCMP**, **aidiadayo**, **Kekun** and **ChaN**; and to **michyprima**, **Jaga / EvilJagaGenius**, **Dwedit** and **FluBBa** for the emulator lineage. Merkin's Mix artwork and port work is maintained by **Merkin / voluptuary**. [Credits and provenance](https://github.com/voluptuary/dssmm/blob/v8.4.1-blue-test4/ezfblue/CREDITS.md).
 
 This project was developed with AI assistance.
 
 ---
 
-# DS Style Merkin Mix 8.4.0 — BLUE Test 3
+# DS Style Merkin's Mix 8.4.0 — BLUE Test 3
 
 **NEWER EZ-FLASH OMEGA DEFINITIVE EDITION B / BLUE ONLY — HARDWARE UNTESTED. UPDATE AT YOUR OWN RISK.**
 
@@ -74,7 +74,7 @@ Full platform software checks and generated-ROM save/conversion/legacy-battery r
 
 # Changelog
 
-## DS Style Merkin Mix 8.3.0
+## DS Style Merkin's Mix 8.3.0
 
 ### New features and improvements
 
@@ -100,7 +100,7 @@ Full platform software checks and generated-ROM save/conversion/legacy-battery r
 - Added mirrored artwork lookup, built-in and custom thumbnail fallbacks, marked-thumbnail transparency, console icons, wide and square system artwork, and the `CUSTOM Only` rounded-corner option.
 - Added optional Remember cheats with localized labels through **exploitz86**, and collapsible cheat groups based on **SkillerCMP's** work and adapted by **exploitz86**. Remember cheats is off by default.
 - Added browser wrap settings, Clean list and List folders controls, 12/24-hour clock options, Hide system files, and support for installing kernels from `/SYSTEM/KERNELS`.
-- Added Thai and Chinese language support, customizable launcher text and Start screen layouts, full-screen theme support, and the DS Style Merkin Mix branding/build number.
+- Added Thai and Chinese language support, customizable launcher text and Start screen layouts, full-screen theme support, and the DS Style Merkin's Mix branding/build number.
 - Added configurable Start screen sources and shortcuts, empty-folder/favourites messages, folder and file custom thumbnails, and built-in guidance for settings and menus.
 - Added multi-language settings/help categories, cheat-screen refinements, and improved menu, pop-up, carousel, list, sound and input behavior across the DS Style lineage.
 
@@ -114,4 +114,4 @@ Full platform software checks and generated-ROM save/conversion/legacy-battery r
 - Corrected save-type labels, translated settings, game launching with BIOS disabled, and handling of fragmented game and save-state files.
 - Earlier DS Style releases also improved file copy, backups, thumbnail loading, folder browsing and cheat-file stability across supported kernel variants.
 
-Thanks to **FrankieT19** for the DS Style v7.5 foundation and separately authored v8.0 interface features listed above; to **Merkin** for the v8.0 splash-screen and system-icon contributions and Merkin Mix improvements; and to **Copilot**, **exploitz86**, **SkillerCMP**, **Sterophonick**, and the EZ-FLASH team for their contributions to this project and its lineage. **aidiadayo** contributed Thai language support. See [CREDITS.md](CREDITS.md) for provenance. These changes were developed with AI assistance.
+Thanks to **FrankieT19** for the DS Style v7.5 foundation and separately authored v8.0 interface features listed above; to **Merkin** for the v8.0 splash-screen and system-icon contributions and Merkin's Mix improvements; and to **Copilot**, **exploitz86**, **SkillerCMP**, **Sterophonick**, and the EZ-FLASH team for their contributions to this project and its lineage. **aidiadayo** contributed Thai language support. See [CREDITS.md](CREDITS.md) for provenance. These changes were developed with AI assistance.

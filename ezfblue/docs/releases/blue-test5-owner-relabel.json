@@ -1,0 +1,24 @@
+{
+  "owner_action": "Renamed/re-tagged BLUE Test5 to8.4.1 to align the three EZ releases.",
+  "old_tag": "v8.4.2-blue-test5",
+  "current_tag": "v8.4.1-blue-test5",
+  "release_id": 456150186,
+  "assets_unchanged": true,
+  "asset_identity": [
+    [
+      785053434,
+      "ezbluekernel.bin",
+      2124252,
+      "sha256:ce6e5a4a2e61dae80a05668b9d58a73119daa647f5bff30bfe078f856f31a902"
+    ],
+    [
+      785053443,
+      "folder-art.zip",
+      255940,
+      "sha256:b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5"
+    ]
+  ],
+  "source_commit": "9bc24e04efe4fa815c6a2d83bf319ec9ebbcd278",
+  "embedded_version": "8.4.2-blue-test5 (unchanged published binary)",
+  "next_release": "Coordinate displayed/kernel release versions across EZ lanes; do not restore the superseded public label or replace existing firmware for a cosmetic rename."
+}

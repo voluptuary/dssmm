@@ -40,7 +40,7 @@ original authorship are not replaced by a blanket attribution to this project.
 
 | Upstream work | Decision |
 | --- | --- |
-| Original bitmap assets and DMA restoration | Retain our existing Merkin Mix artwork, transparency, caches and DMA paths, covered by differential tests. A wholesale replacement would discard independently tested features. Compact linking does not change the live artwork bytes. |
+| Original bitmap assets and DMA restoration | Retain our existing Merkin's Mix artwork, transparency, caches and DMA paths, covered by differential tests. A wholesale replacement would discard independently tested features. Compact linking does not change the live artwork bytes. |
 | Slot-derived warm-return, boot-entry trampoline and modified Jagoomba | Do not transplant them into our different CRT, reset/stack handoff and newly validated MiGoomba payload. They require a coordinated runtime integration, licensing/provenance work and additional compatibility tests. Current boot safety tests remain. |
 | BLUE text viewer and plugin namespace | Keep our existing plugin interfaces. Upstream's viewer and return path are coupled to its runtime; merely copying the binary would not validate return behavior. |
 | Native NES fallback | Keep the current tested external NES/plugin path; upstream's embedded fallback requires its resource/payload and launch-contract review. No claim of newly added native NES support. |

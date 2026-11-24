@@ -54,3 +54,5 @@ and SD sector-map behavior. Upstream Test5 and this integration remain physicall
 unverified. Preserve the published 8.4.0 Test3 artifact and its evidence.
 
 2026-11-24 current prerelease: v8.4.2-blue-test5/source9bc24e0, with validated alias-free/clipped SD-launch correction and full folder artwork asset. Keep firmware-free stock-size seal, official FPGA-update requirement and hardware-untested warnings. Evidence under docs/releases/.
+
+Owner relabel2026-11-24: current public BLUE Test5 is v8.4.1-blue-test5, matching DE/OMEGA8.4.1. Same release ID/source9bc24e0 and assets verified unchanged. Preserve this owner label; original8.4.2 publication report records history. Embedded binary version remains unchanged; coordinate future EZ versions, never silently replace the existing binary. See blue-test5-owner-relabel.json.

@@ -20,7 +20,7 @@ Current audit delivery: software audit complete; hardware-untested Test2 is publ
 
 ## Current state — DS Style integrated, hardware untested
 
-Active branch `ezfblue`. The frontend now uses Merkin Mix `ezfode` 5f700c9; target-specific hardware is based on EZ-FLASH BLUE 109f1a050d9c35008379ce61ae40d05dc528c614. Older baseline-only entries below are historical, not the current feature status. No physical BLUE results exist. DE and original OMEGA branches were not changed during this integration.
+Active branch `ezfblue`. The frontend now uses Merkin's Mix `ezfode` 5f700c9; target-specific hardware is based on EZ-FLASH BLUE 109f1a050d9c35008379ce61ae40d05dc528c614. Older baseline-only entries below are historical, not the current feature status. No physical BLUE results exist. DE and original OMEGA branches were not changed during this integration.
 
 | Area | Implemented and software evidence | Remaining limits |
 | --- | --- | --- |

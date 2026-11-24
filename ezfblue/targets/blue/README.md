@@ -22,7 +22,7 @@ The description below records the superseded split layout used in Test3.
 
 # BLUE DS Style target
 
-Active frontend/software donor: this repository's Merkin Mix `ezfode` at `5f700c9a89768309f06993984bb6c3a3190d04ef`. Hardware baseline: [EZ-FLASH blue-kernel](https://github.com/ezflash-team/blue-kernel) at `109f1a050d9c35008379ce61ae40d05dc528c614`. Vendor notices and Apache-2.0 license remain intact. `resources/image.bin` is unchanged, including its FPGA payload and legacy graphics.
+Active frontend/software donor: this repository's Merkin's Mix `ezfode` at `5f700c9a89768309f06993984bb6c3a3190d04ef`. Hardware baseline: [EZ-FLASH blue-kernel](https://github.com/ezflash-team/blue-kernel) at `109f1a050d9c35008379ce61ae40d05dc528c614`. Vendor notices and Apache-2.0 license remain intact. `resources/image.bin` is unchanged, including its FPGA payload and legacy graphics.
 
 Run from the repository root:
 
