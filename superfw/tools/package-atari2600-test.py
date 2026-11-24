@@ -21,6 +21,8 @@ assert inputs['result'] == 'passed'
 assert inputs['runtime_sha256'] == record['sha256']['prototype.gba']
 timing = json.loads((build / 'timing-validation.json').read_text())
 assert timing['runtime_sha256'] == record['sha256']['prototype.gba']
+raster = json.loads((build / 'raster-validation.json').read_text())
+assert raster['runtime_sha256'] == record['sha256']['prototype.gba']
 fixture = build / 'runtime-fixture'
 assert json.loads((fixture / 'validation.json').read_text())['runtime_sha256'] == record['sha256']['prototype.gba']
 assert len(json.loads((fixture / 'menu-validation.json').read_text())['passed']) == 10
@@ -65,6 +67,7 @@ atari2600-test-source.zip. No upstream prebuilt emulator objects were used.
 record['hardware_test'] = 'Experimental local trial only; no physical qualification.'
 record['assets'] = {str(path.relative_to(out)): hashlib.sha256(path.read_bytes()).hexdigest()
                     for path in (plugin, source)}
+record['raster_checks'] = raster
 record['timing_checks'] = timing
 record['runtime_checks'] = json.loads((fixture / 'menu-validation.json').read_text())
 (out / 'atari2600-test.json').write_text(json.dumps(record, indent=2) + '\n')

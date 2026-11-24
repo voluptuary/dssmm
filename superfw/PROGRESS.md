@@ -1200,3 +1200,20 @@ against the common DE Interface-label pixel mask. Native font spacing remains.
 Host highlight bounds pass; full clean all3/native/mGBA gates must pass before
 replacing hardware-test Chis799. Atari current plugin/source remain delivered
 separately; public769 unchanged. Continue without waiting for hardware feedback.
+
+## 2026-11-24 — Atari raster memory guards
+
+Native replay reproduced all three display queues writing81st entries into80-slot
+arrays; a real wide-copy player atx160 also writes2B past colvect230. Added queue/
+index guards and256B padded collision scratch (all declarations match), with28
+queue/index plus3 wide-copy ARM cases. Current external plugin14d28e63ac2d930d8c1849e030a3ff0701e59bc6e940863d5de9884e6b5f4500
+passes original input/timer/control, mGBA runtime/menu10 and timer-gated image;
+exact corresponding-source ZIP independently reproduces it. hardware-test plugin/
+source/notes/JSON updated. No sound/broad game/physical qualification claims.
+
+Build822/source2f73b53 all3 kernels finished clean with identical source-tree hash
+8932bc31... before these unrelated optional Atari-tool edits. Native visual/full
+gate remains running; don't rebuild firmware for the external-tool change. CI PR28
+head stays2f73b53 until its check/merge checkpoint; commit Atari follow-up locally
+and push after that merge to avoid restarting the same CI. Preserve prototype
+and current kernel/plugin artifacts, private BIOS/session scratch/ownerlock.
