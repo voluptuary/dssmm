@@ -46,7 +46,7 @@ def diagnostic_rom():
     return bytes(code)
 
 
-def prepare(source, output):
+def prepare(source, output, fixture):
     # Keep every upstream notice; never consume the old prebuilt object.
     for path in source.iterdir():
         if path.suffix.lower() in (".c", ".h"):
@@ -85,32 +85,30 @@ def prepare(source, output):
     path = output / "main.c"
     text = path.read_text().split("void * memcpy(")[0]
     text = text.replace("void C_Entry(void)", "int main(void)")
-    text = text.replace("//\tint i;", "*(volatile unsigned short*)0x04000204=0;", 1)
+    text = text.replace("MODE_3 | BG2_ENABLE | OBJ_ENABLE | OBJ_MAP_1D", "MODE_3 | BG2_ENABLE")
+    text = text.replace("loadCart(file);", "if (loadCart(file) != 0) {\n"
+                        "  unsigned n; for(n=0;n<240*160;n++) VideoBuffer[n]=31;\n"
+                        "  for(;;) {}\n}")
     path.write_text(text + "\n" + "\n".join(globals_once) + "\n")
 
-    # Replace the embedded-ROM selector completely, retaining its notice.
+    # Replace the embedded-ROM selector with bounded runtime input.
     path = output / "files.c"
     notice = path.read_text().split("*/", 1)[0] + "*/\n"
     rom = diagnostic_rom()
     (output / "diagnostic.a26").write_bytes(rom)
-    path.write_text(notice + '''
-#include <string.h>
-#include "types.h"
-#include "vmachine.h"
-static const unsigned char diagnostic[4096]={''' + ",".join(map(str, rom)) + '''};
-int loadCart(char *name) {
-    (void)name;
-    memcpy(cart, diagnostic, 4096);
-    memcpy(theRom, diagnostic, 4096);
-    return 0;
-}
-''')
+    path.write_text(notice + (ROOT / "tools/atari2600/cartridge.c").read_text())
+    shutil.copy2(ROOT / "tools/atari2600/startup.S", output / "startup.S")
+    if fixture:
+        (output / "diagnostic.c").write_text(
+            'const unsigned char atari_diagnostic_rom[4096] '
+            '__attribute__((aligned(4)))={' + ",".join(map(str, rom)) + '};\n')
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", required=True, type=Path, help="clean pinned upstream clone")
     parser.add_argument("--out", type=Path, default=ROOT / "build/atari2600-prototype")
+    parser.add_argument("--runtime", action="store_true", help="omit standalone diagnostic input")
     args = parser.parse_args()
     source, output = args.source.resolve(), args.out.resolve()
     assert source != output and output != ROOT
@@ -118,14 +116,15 @@ def main():
     assert commit == PIN, "Prototype expects the reviewed upstream revision"
     subprocess.run(["git", "diff", "--exit-code", "HEAD", "--", "."], cwd=source, check=True)
     output.mkdir(parents=True, exist_ok=True)
-    prepare(source, output)
+    prepare(source, output, not args.runtime)
     devkit = Path(os.environ.get("DEVKITARM", "/opt/devkitpro/devkitARM"))
     tools = Path(os.environ.get("DEVKITPRO", "/opt/devkitpro")) / "tools/bin"
     files = "main collisio cpu display files keyboard misc mouse raster table vmachine memory".split()
     command = [str(devkit / "bin/arm-none-eabi-gcc"), "-std=gnu89", "-O2", "-mthumb",
                "-mthumb-interwork", "-mcpu=arm7tdmi", "-ffunction-sections", "-fdata-sections",
                "-fwrapv", "-fno-strict-aliasing", "-fcommon", "-Wno-implicit-int",
-               "-Wno-implicit-function-declaration", "-I.", "-specs=gba.specs",
+               "-Wno-implicit-function-declaration", "-I.", "-specs=gba.specs", "-nostartfiles",
+               *([] if args.runtime else ["-DA26_FIXTURE", "diagnostic.c"]), "startup.S",
                *[name + ".c" for name in files], "-Wl,--gc-sections,-Map=prototype.map",
                "-o", "prototype.elf"]
     with (output / "compile.log").open("w") as log:
@@ -133,10 +132,10 @@ def main():
     subprocess.run([str(devkit / "bin/arm-none-eabi-objcopy"), "-O", "binary",
                     "prototype.elf", "prototype.gba"], cwd=output, check=True)
     subprocess.run([str(tools / "gbafix"), "prototype.gba"], cwd=output, check=True)
-    record = {"upstream_commit": PIN, "purpose": "emulator-only generated diagnostic",
+    record = {"upstream_commit": PIN, "purpose": "runtime input experiment" if args.runtime else "emulator-only generated diagnostic",
               "sha256": {name: hashlib.sha256((output / name).read_bytes()).hexdigest()
                          for name in ("diagnostic.a26", "prototype.gba")},
-              "limits": "Not a runtime plugin or hardware-safe startup; no compatibility claim."}
+              "limits": "Experimental input only; safe Exit, banked formats, audio, compatibility and physical qualification remain pending."}
     (output / "prototype.json").write_text(json.dumps(record, indent=2) + "\n")
     print(output / "prototype.gba")
 
