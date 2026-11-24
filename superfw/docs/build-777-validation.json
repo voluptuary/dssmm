@@ -1,0 +1,61 @@
+{
+  "build": 777,
+  "source_commit": "787ed0d404efd5023ef2c3c2f339bd5703fe39bf",
+  "boards": [
+    {
+      "source_tree_sha256": "1266aef8ec7a1c8294a6050715a46582b26894223fb920021af1861abcdb3036",
+      "board": "sd",
+      "dssmm_build": 777,
+      "source_commit": "787ed0d404efd5023ef2c3c2f339bd5703fe39bf",
+      "source_dirty": false,
+      "firmware_sha256": "9594a922efdaf3dbdef1964da07c0eaac7703937a747d2e8f5c500fcf4797006",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496640,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 27648
+    },
+    {
+      "source_tree_sha256": "1266aef8ec7a1c8294a6050715a46582b26894223fb920021af1861abcdb3036",
+      "board": "lite",
+      "dssmm_build": 777,
+      "source_commit": "787ed0d404efd5023ef2c3c2f339bd5703fe39bf",
+      "source_dirty": false,
+      "firmware_sha256": "92d0d9954881e17dfba85615b426c5eac91b0e3f608430c72fe6d07f6d637e32",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496640,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 11264
+    },
+    {
+      "source_tree_sha256": "1266aef8ec7a1c8294a6050715a46582b26894223fb920021af1861abcdb3036",
+      "board": "chis",
+      "dssmm_build": 777,
+      "source_commit": "787ed0d404efd5023ef2c3c2f339bd5703fe39bf",
+      "source_dirty": false,
+      "firmware_sha256": "b78eaa6a5687301f88a190120192271dd57e1db9484d27343f4c8f1d65a1f3b6",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "local_verifier": "make verify-superfw exit0: clean all3 builds, native ARM/host/mGBA; Chis native IGM ELF/halfword replay exit0",
+  "source_ci": 45291139008,
+  "integration_ci": 45291148001,
+  "integration_pr": 22,
+  "merge_commit": "deaf85a4d992783fa870cbd84c95307f935b75a0",
+  "main_ewram_bytes": 256568,
+  "main_ewram_limit_bytes": 257024,
+  "iwram_bytes": 15240,
+  "user_stack_bytes": 16384,
+  "native_menu_captures": 36,
+  "nor_captures": 8,
+  "start_art_captures": 4,
+  "plugin_exit_cases": [
+    "sms",
+    "gg",
+    "pce",
+    "pce-native"
+  ],
+  "limits": "Only previous Chis hardware observations. PCE Exit/save timing, SD/Lite physical behavior, performance and full DE parity remain unqualified. Atari is a separate source prototype, not bundled."
+}

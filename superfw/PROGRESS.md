@@ -1064,3 +1064,22 @@ Owner now prioritizes DE SD-launch regression versus Frankie8.2 before other
 porting. No interrupted process remains. Continue that audit in ezfomegade lane;
 then resume clean SuperFW gates and Atari source prototype. Preserve ownerlock,
 private BIOS, artwork archive and session scratch.
+
+## 2026-11-24 — Clean777 validated and delivered
+
+Full clean verify-superfw passed all3/native ARM/host/mGBA (including both PCE
+Exit paths); native IGM exact ELF/halfword replay passed. Source45291139008 and
+all4 PR22 CI45291148001 pass; PR22 mergeddeaf85a4 after EZ SD correction releases.
+Chis777/source787ed0d4 is in root hardware-test with validation JSON; replaced769
+only after old hash matched. No new physical PCE Exit/save/SD-Lite qualification.
+Chis mainEWRAM256568/257024, IWRAM15240; Lite IWRAM15648;16KiB stack unchanged.
+SD/Lite flash headroom27648/11264B. Public769 unchanged. Preserve compact resources
+and do not spend remaining456B Chis main-RAM without recovery. See build-777 JSON.
+
+Atari separate /tmp prototype now compiles current devkitARM and renders generated
+4KiB solid-color6502 diagnostic in stockmGBA (160x96 at35,25). Source-only recipe
+normalizes case/globals, corrects palette256 bound and moves large buffers to
+EWRAM; old objects/embedded games excluded. Not an external plugin or safe physical
+startup yet: standard gba.specs startup WAITCNT needs review, runtime arguments,
+return, timing, controls, banks and licensing/provenance remain. Retain reproducible
+recipe in the project before session close; no Atari core bundled/claimed.
