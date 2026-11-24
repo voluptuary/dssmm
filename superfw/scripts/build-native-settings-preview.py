@@ -3,7 +3,7 @@
 from pathlib import Path
 import argparse,struct,subprocess,os,json,re,hashlib
 root=Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(20),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");p.add_argument("--progress-action",type=int,choices=range(10),default=0);p.add_argument("--recent-title",help="Read-only synthetic recent filename; Start caption test only");p.add_argument('--theme',type=int,choices=(6,7),default=6);p.add_argument('--topbar',type=int,choices=range(6),default=0);p.add_argument("--recent-art",choices=("title","box"));a=p.parse_args();assert not a.recent_art or (a.scene==10 and a.recent_title),"Start art needs scene10 and --recent-title";a.out.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--elf',type=Path,default=root/'firmware.ewram.elf');p.add_argument('--out',type=Path,default=root/'build/native-settings');p.add_argument('--scene',type=int,choices=range(20),default=0);p.add_argument('--font',type=int,choices=(0,1),default=1);p.add_argument("--reference",action="store_true");p.add_argument("--showcase",action="store_true",help="D-pad navigation with synthetic artwork; no launch actions");p.add_argument("--progress-action",type=int,choices=range(10),default=0);p.add_argument("--recent-title",help="Read-only synthetic recent filename; Start caption test only");p.add_argument('--theme',type=int,choices=(6,7),default=6);p.add_argument('--topbar',type=int,choices=range(6),default=0);p.add_argument("--recent-art",choices=("title","box"));a=p.parse_args();assert not a.recent_art or (a.scene==10 and a.recent_title),"Start art needs scene10 and --recent-title";a.out.mkdir(parents=True,exist_ok=True)
 elf=a.elf.read_bytes();nm=subprocess.check_output(['arm-none-eabi-nm',str(a.elf)],text=True)
 syms={r.split()[-1]:int(r.split()[0],16) for r in nm.splitlines() if len(r.split())==3}
 if a.scene in (4,13) and 'nor_write_progress' not in syms:p.error('NOR scene is unavailable in this linked board image')
@@ -75,6 +75,7 @@ for f in ['menu_tab','uiset_selector','uiset_seloff']:text+='#define OFFSET_'+f+
 text+='#define TEST_THEME '+str(a.theme)+'\n#define TEST_TOPBAR '+str(a.topbar)+'\n'
 text+='#define TEST_PROGRESS_ACTION '+str(a.progress_action)+'\n'
 text+='#define TEST_RECENT '+str(int(bool(a.recent_title)))+'\n'
+text+='#define TEST_SHOWCASE '+str(int(a.showcase))+'\n'
 text+='#define TEST_REFERENCE '+str(int(a.reference))+'\n#define TEST_SCENE '+str(a.scene)+'\n#define TEST_FONT '+str(a.font)+'\n'
 text+='#define TEST_UI_TAB '+('4' if 'nor_write_progress' in syms else '3')+'\n'
 text+='#define TEST_NOR_CAROUSEL '+str(int(a.scene>=16))+'\n'
@@ -127,12 +128,26 @@ if a.scene>=16:
  insert_record(position,record)
  position=field_offset('sdr_state[0]','carousel_art');image_size=debug_size('sdr_state[0].carousel_art[0]')
  width=80 if a.scene>=18 else 120
- for i in range(5):insert_record(position+i*image_size,bytes([70+i*20])*(width*80)+bytes(image_size-width*80))
+ for i in range(5):
+  pixels=bytearray([70+i*20])*(width*80)
+  if a.showcase:
+   rgb=lambda r,g,b:20+36*r+6*g+b
+   for y in range(80):
+    for x in range(width):
+     c=rgb(1,3,5)
+     if (x-width*3//4)**2+(y-18)**2<64:c=rgb(5,5,2)
+     if y>48-abs(x-width//3)*2//3:c=rgb(1,2+i%2,3)
+     if y>60-abs(x-width*4//5)//3:c=rgb(1,3,1)
+     if y>=68:c=rgb(0,1,2)
+     if 71<=y<76 and 12<=x<width-12:c=rgb(2+i%3,3,4-i%3)
+     if x==0 or x==width-1 or y==0 or y==79:c=rgb(0,1,2)
+     pixels[y*width+x]=c
+  insert_record(position+i*image_size,pixels+bytes(image_size-width*80))
 if a.recent_art:
  insert_record(field_offset('sdr_state[0]','artwork_pixels'),bytes([70])*(80 if a.recent_art=='box' else 120)*80)
 font=(root/('res/fonts-ext-dssmm.pack' if 'nor_write_progress' in syms else 'res/fonts-dssmm.pack')).read_bytes();rom+=font
 # Standard GBA header complement; commercial BIOS is not needed for the harness.
 rom[0xb2]=0x96;rom[0xbd]=(-sum(rom[0xa0:0xbd])-0x19)&255
 (a.out/'native-settings.gba').write_bytes(rom)
-(a.out/'fixture.json').write_text(json.dumps({'nor_carousel_fixture':a.scene>=16,'progress_action':a.progress_action,'recent_title':a.recent_title,'recent_art':a.recent_art,'scene':a.scene,'font':a.font,'reference':a.reference,'native_elf_sha256':hashlib.sha256(elf).hexdigest(),'native_elf':str(a.elf),'nor_supported':'nor_write_progress' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
+(a.out/'fixture.json').write_text(json.dumps({'showcase':a.showcase,'nor_carousel_fixture':a.scene>=16,'progress_action':a.progress_action,'recent_title':a.recent_title,'recent_art':a.recent_art,'scene':a.scene,'font':a.font,'reference':a.reference,'native_elf_sha256':hashlib.sha256(elf).hexdigest(),'native_elf':str(a.elf),'nor_supported':'nor_write_progress' in syms,'virtual_sd':'64KiB sparse FAT12; low32KiB persists in SRAM','firmware_functions':'actual linked menu/settings/FatFs; only physical SD entrypoints replaced','bios':'not used','limits':'not SuperCard protocol or physical powercycle qualification'},indent=2)+'\n')
 print(a.out/'native-settings.gba')

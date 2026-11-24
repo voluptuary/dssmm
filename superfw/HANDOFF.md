@@ -1804,3 +1804,11 @@ EWRAM clear, not an established fast-wait write, was the confirmed startup issue
 Linked ARM startup +19 runtime2/4KiB copy/mirror/bounds cases pass; mGBA exact
 6502 diagnostic passes through the same loader. No runtime Atari binary supplied:
 Exit/banked formats/audio/controls/performance/licensing still pending.
+
+Owner reports PCE Exit now works; recorded without assuming an explicit test
+build/backend. Reworked HuCard portrait silhouette after viewing online photos;
+added reference-informed NGP/NGPC and Atari cartridge icons, original pixels,
+existing palette/read-only stream, no photo assets. Host all3/resource ARM checks
+pass; native full clean build follows. Added opt-in D-pad showcase mode to existing
+native NOR fixture, with synthetic landscape artwork and no launch keys, for
+owner-requested README GIFs. Default regression scenes remain unchanged.

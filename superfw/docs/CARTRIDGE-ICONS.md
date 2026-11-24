@@ -1,22 +1,27 @@
 # Native cartridge icons
 
-Game Gear and PC Engine use original DSSMM cartridge artwork matching the
-SuperFW icon style. Game Gear keeps its existing pixels; PCE uses a flat HuCard
-silhouette, white bevel, maroon label, landscape and contacts. Both have a
-transparent16x16 canvas. Sources, palette and credits live under assets/icons.
+Original DSSMM cartridge sprites match the native SuperFW bevels/palette, with
+transparent16x16 canvases. Photo references and pixel grids are recorded in each
+assets/icons/*-source.json; photographs and game-label artwork are not bundled.
 
-`python3 tools/generate-cartridge-icons.py --check` checks both RGB555 sources
-against their JSON pixel grids and generated tiled headers. `--preview` writes
-ignored enlarged transparent PNGs under build/icons. The HuCard reuses existing
-native/Game Gear colors; no palette IDs are shifted or added for it.
+- Game Gear keeps the established cartridge sprite.
+- PC Engine uses a portrait9x14 white HuCard, dark upper contact area and gold
+  pins along its top edge, following the referenced Fighting Run card.
+- Neo Geo Pocket and Color use landscape14x12 shells with upper grip ridges,
+  inset labels, lower embossed pads and insertion arrow. Color has a color label.
+- Atari2600 uses a portrait12x14 dark shell with raised rim and inset text label.
+  Its icon does not imply that an Atari emulator is bundled or hardware-ready.
 
-The read-only ICN1 font-resource tail now contains native tiles followed by
-Game Gear and PCE. One halfword DMA uploads the complete4608-byte standard or
-4864-byte Chis stream. Moving the extra tiles out of main EWRAM offsets the new
-icon's footprint; native tile IDs and selector slot63 remain unchanged. Make
-tracks all source/header dependencies to avoid stale incremental resources.
+`python3 tools/generate-cartridge-icons.py --check` verifies RGB555 sources,
+pixel grids and tiled headers; `--preview` writes enlarged transparent PNGs under
+ignored build/icons. Added sprites reuse the existing native/Game Gear palette.
+The read-only ICN1 stream uploads5376 standard or5632 Chis bytes in one halfword
+DMA, without restoring icon tiles to main EWRAM or changing native/selector IDs.
+The resource packer derives byte counts from the actual arrays.
 
-`bash scripts/test-cartridge-icons.sh` checks pixel colors, transparency,
-extension lookup and sprite bounds for all three boards. The actual ARM
-read-only resource test compares all tiles with the C initializer oracle and
-rejects corrupt tags/sizes. The icon is built in; it needs no SD artwork file.
+`bash scripts/test-cartridge-icons.sh` checks colors/transparency, aspect ratios,
+extension routing and sprite bounds on all3 board layouts. The ARM resource
+oracle compares every packed tile to C initializers and rejects corrupt tails.
+Icons are built in and need no SD artwork files. .ngp selects Pocket; .ngc/.ngpc
+select Color; .pce selects HuCard; .a26 selects Atari. Emulator compatibility is
+separate from file-icon support.

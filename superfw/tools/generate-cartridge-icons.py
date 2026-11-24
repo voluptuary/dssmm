@@ -6,7 +6,8 @@ root=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser();p.add_argument('--check',action='store_true');p.add_argument('--preview',action='store_true');a=p.parse_args()
 body=re.search(r'icons_pal\[\d+\] = \{(.*?)\};',(root/'src/res/icons.h').read_text(),re.S)[1]
 palette=[int(x,16) for x in re.findall('0x[0-9a-fA-F]+',body)];native=len(palette)
-for name,label,define in [('gamegear','Game Gear cartridge','ICON_GGCART'),('pce','PC Engine HuCard','ICON_PCECARD')]:
+previous=None
+for name,label,define in [('gamegear','Game Gear cartridge','ICON_GGCART'),('pce','PC Engine HuCard','ICON_PCECARD'),('ngp','Neo Geo Pocket cartridge','ICON_NGPCART'),('ngpc','Neo Geo Pocket Color cartridge','ICON_NGPCCART'),('a26','Atari2600 cartridge','ICON_A26CART')]:
  meta=json.loads((root/f'assets/icons/{name}-source.json').read_text());raw=(root/f'assets/icons/{name}.rgb555').read_bytes();width,height=meta['dimensions']
  assert width==16 and height<=16 and len(raw)==width*height*2
  assert hashlib.sha256(raw).hexdigest()==meta['pixels_sha256']
@@ -21,8 +22,9 @@ for name,label,define in [('gamegear','Game Gear cartridge','ICON_GGCART'),('pce
     if value and value not in palette:palette.append(value)
     pixels.append(palette.index(value) if value else 0)
  assert len(palette)<255,'Keep native selection slot255 free'
- if name=='pce':assert len(palette)==before,'HuCard reuses the native/Game Gear palette'
- index='(sizeof(icons_img)/sizeof(icons_img[0]))' if name=='gamegear' else '(ICON_GGCART+1)'
+ if name!='gamegear':assert len(palette)==before,'Extra cartridges reuse the native/Game Gear palette'
+ index='(sizeof(icons_img)/sizeof(icons_img[0]))' if previous is None else f'({previous}+1)'
+ previous=define
  text=f'''/* SPDX-License-Identifier: GPL-3.0-or-later
  * Original DSSMM {label} icon; native SuperFW style.
  * Source/credits: assets/icons/{name}-source.json.
