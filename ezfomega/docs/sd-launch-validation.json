@@ -1,0 +1,73 @@
+{
+  "before": {
+    "fat_alias": "d7feaa",
+    "ordinary_no_alias": "d7feaa",
+    "clipped_no_alias": "d700ee"
+  },
+  "after": {
+    "fat-sfn": {
+      "mode": 0,
+      "no_alias": false,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "b6cdd29dfce397831e75d8288b4870dc4e786a81",
+      "source_sha256": "53b3b67afc899cba7f32f675334f0c039607e4ffae32b4de8c2cb4e958d868de",
+      "rom_sha256": "da8f86eb23509666b6793e47899b29d09f645a6399432ff5c26bdd669aa40026",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7feaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    "quick-addon": {
+      "mode": 2,
+      "no_alias": true,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "b6cdd29dfce397831e75d8288b4870dc4e786a81",
+      "source_sha256": "53b3b67afc899cba7f32f675334f0c039607e4ffae32b4de8c2cb4e958d868de",
+      "rom_sha256": "3bc2842d1cd88f62baf7844757aba519c3e487a82df8e088b0f7ee9e75cda797",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7beaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    "exfat": {
+      "mode": 0,
+      "no_alias": true,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "b6cdd29dfce397831e75d8288b4870dc4e786a81",
+      "source_sha256": "53b3b67afc899cba7f32f675334f0c039607e4ffae32b4de8c2cb4e958d868de",
+      "rom_sha256": "4c8d6a1ef3e09ad05386e515eb259d7df93009fa065e7f1071ae75fdf3f1fc25",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7feaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    "exfat-long": {
+      "mode": 0,
+      "no_alias": true,
+      "name": "Native long filename AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (USA).gba",
+      "source_commit": "b6cdd29dfce397831e75d8288b4870dc4e786a81",
+      "source_sha256": "53b3b67afc899cba7f32f675334f0c039607e4ffae32b4de8c2cb4e958d868de",
+      "rom_sha256": "65938dd2f8b213e93074ea5383032c76eee0e8b3c41ac55205fe658bc644b58e",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7ffaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    },
+    "quick-clean": {
+      "mode": 1,
+      "no_alias": true,
+      "name": "Native launch test (USA).gba",
+      "source_commit": "b6cdd29dfce397831e75d8288b4870dc4e786a81",
+      "source_sha256": "53b3b67afc899cba7f32f675334f0c039607e4ffae32b4de8c2cb4e958d868de",
+      "rom_sha256": "8046e4511fee152b8b33000c417c7a7d2e5414c3d978ac7f3a7c8757e5162ee2",
+      "seams": "real launch UI/path resolution/metadata; mocked save, FAT transfer, patch and boot hardware; no physical card qualification",
+      "status": "all launch stages reached handoff",
+      "trace": "d7feaa0000000000",
+      "emulator": "stock SDL mGBA0.10.1, Xvfb, no BIOS"
+    }
+  },
+  "host": "sanitized extracted production helper passed",
+  "limits": "Physical card untested. Native storage/save/transfer/patch/reset effects mocked; layout is not runtime stack proof.",
+  "full_verifier": "make verify-ezfomega exit0: all five native launch cases, existing save/UI/art/plugin/NOR suites, production build and memory bounds",
+  "production_bytes": 2055088
+}
