@@ -3113,3 +3113,5 @@ No production behavior/driver changes or hardware qualification.
   pass. Ignored BLUE-only hardware-test imagef88a7bd and JSON are ready; no public
   release/tag/FPGA changes or hardware qualification. Normal lane synchronization
   preserves the full tree and the separate active SuperFW build.
+
+2026-11-23: Owner now authorizes publication of affected SD-launch kernels. Prepare8.4.2-blue-test5 from previously validatedf88a7bd correction; only version/notes changed. Preserve firmware-free sealed stock-size packing and all hardware warnings. Final production rebuild/package and hosted checks required before publish.

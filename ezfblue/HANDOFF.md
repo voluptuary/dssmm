@@ -2023,3 +2023,5 @@ No BLUE release/tag/FPGA update changed. All EZ lanes synchronized normally to
 980ba8f; SuperFW stays on its active clean build until its all3 checks finish.
 This fixes the reproduced alias-free exFAT path; physical launch/timing and any
 additional hardware causes are still unqualified. Preserve existing warnings.
+
+2026-11-23: Owner now authorizes publication of affected SD-launch kernels. Prepare8.4.2-blue-test5 from previously validatedf88a7bd correction; only version/notes changed. Preserve firmware-free sealed stock-size packing and all hardware warnings. Final production rebuild/package and hosted checks required before publish.
