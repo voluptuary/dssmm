@@ -1,4 +1,4 @@
-# Original Omega Merkin Mix port status
+# Original Omega Merkin's Mix port status
 
 Current audit delivery: software audit complete; hardware-untested Test3 is published and download-verified with shared bounds/path/save/artwork fixes and832-byte IWRAM recovery. See [audit findings and limits](../audits/cross-platform-2026-11.md) and [Test3 notes](../releases/omega-test3.md). Publication verification is in HANDOFF.md. Final kernel2,049,416 bytes; heap19,424; IWRAM user-stack gap8,312 (static only). Older milestone sizes/releases below are historical.
 
@@ -30,7 +30,7 @@ Next: perform the owner-authorized adversarial audit of all three branches. Do n
 
 ## Isolation and provenance
 
-Work only on ezfomega. Do not merge into ezfode, change DE release tags/assets, or use DE candidate filenames for this target. The owner explicitly requires branch isolation. Hardware source baseline: FrankieT19/omega-ds-style-kernel ef30b8ba78147943d95653dfa82f721b52096f67, DS Style v8.0; Merkin Mix source reference: this repository ezfode. Existing authorship/licenses remain in source/history. Wholesale hardware baseline replacement is intentional because this branch previously contained DE code, not an Omega port.
+Work only on ezfomega. Do not merge into ezfode, change DE release tags/assets, or use DE candidate filenames for this target. The owner explicitly requires branch isolation. Hardware source baseline: FrankieT19/omega-ds-style-kernel ef30b8ba78147943d95653dfa82f721b52096f67, DS Style v8.0; Merkin's Mix source reference: this repository ezfode. Existing authorship/licenses remain in source/history. Wholesale hardware baseline replacement is intentional because this branch previously contained DE code, not an Omega port.
 
 ## Inventory / feature matrix
 
