@@ -1,0 +1,51 @@
+{
+  "build": 799,
+  "source_commit": "30ff43a76b01b8d4e0a24d81746e6504bb4dc126",
+  "boards": [
+    {
+      "source_tree_sha256": "362334d4fa4255658cbe22c4811ca60403c17e44585be837d712d4240d803662",
+      "board": "sd",
+      "dssmm_build": 799,
+      "source_commit": "30ff43a76b01b8d4e0a24d81746e6504bb4dc126",
+      "source_dirty": false,
+      "firmware_sha256": "6d7e5c50a648d92d6a720c71957548f8b5b56c5665ef806ef11c2727ee69ba7c",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 497152,
+      "firmware_limit_bytes": 524288,
+      "firmware_headroom_bytes": 27136
+    },
+    {
+      "source_tree_sha256": "362334d4fa4255658cbe22c4811ca60403c17e44585be837d712d4240d803662",
+      "board": "lite",
+      "dssmm_build": 799,
+      "source_commit": "30ff43a76b01b8d4e0a24d81746e6504bb4dc126",
+      "source_dirty": false,
+      "firmware_sha256": "00b42b1aca94c6be0ffd2e263919fa7856cd6f29f29401c2db44459836d234ab",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 496640,
+      "firmware_limit_bytes": 507904,
+      "firmware_headroom_bytes": 11264
+    },
+    {
+      "source_tree_sha256": "362334d4fa4255658cbe22c4811ca60403c17e44585be837d712d4240d803662",
+      "board": "chis",
+      "dssmm_build": 799,
+      "source_commit": "30ff43a76b01b8d4e0a24d81746e6504bb4dc126",
+      "source_dirty": false,
+      "firmware_sha256": "02594aa0078a7487cdda476be1adb0b8ce0eb4c2eeba4fdd6a1d34ac14dc4a9e",
+      "validation": "built; runtime and hardware validation not implied",
+      "firmware_bytes": 1671680,
+      "firmware_limit_bytes": 2097152,
+      "firmware_headroom_bytes": 425472
+    }
+  ],
+  "local_verifier": "make verify-superfw exit0: all3/ARM/host/mGBA; native IGM ELF/halfword replay passed",
+  "source_ci": 45303504271,
+  "integration_ci": 45303565021,
+  "integration_pr": 26,
+  "main_ewram_bytes": 256600,
+  "main_ewram_limit_bytes": 257024,
+  "iwram_bytes": 15240,
+  "user_stack_bytes": 16384,
+  "limits": "Chis PCE Exit has an owner success report with test build/backend unstated; no SD/Lite or Atari physical qualification. Atari icon does not supply an emulator."
+}

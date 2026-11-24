@@ -1107,3 +1107,11 @@ existing palette/read-only stream, no photo assets. Host all3/resource ARM check
 pass; native full clean build follows. Added opt-in D-pad showcase mode to existing
 native NOR fixture, with synthetic landscape artwork and no launch keys, for
 owner-requested README GIFs. Default regression scenes remain unchanged.
+
+Clean799/source30ff43a7 full all3/ARM/host/mGBA/nativeIGM passed; sourceCI45303504271
+and all4 PR26 CI45303565021 passed. Chis799 delivered in root hardware-test after
+checking/removing superseded777 hash. All boards clean, Chis EWRAM256600/257024
+(424B free), IWRAM15240;16KiB stack unchanged. No Atari binary included, public769
+unchanged. Owner PCEExit report retained without assuming build/backend.
+README GIF work follows with opt-in original sample art; do not rebuild firmware
+just for fixture/doc changes. Preserve799 as the current physical-test candidate.
