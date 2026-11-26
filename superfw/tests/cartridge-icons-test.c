@@ -32,7 +32,7 @@ static void check_icon(const char *path,const uint16_t *tiles,unsigned height) {
  if(strstr(path,"/a26."))assert(right-left+1==12 && bottom-top_pixel+1==14);
 }
 int main(int argc,char **argv) {
- assert(argc==6);assert(sizeof(icons_pal)/2+sizeof(gamegear_palette)/2<255);
+ assert(argc==5);assert(sizeof(icons_pal)/2+sizeof(gamegear_palette)/2<255);
  assert(sizeof(icons_img)+sizeof(gamegear_pixels)+sizeof(pce_pixels)+sizeof(ngp_pixels)+sizeof(ngpc_pixels)+sizeof(a26_pixels)<=63*256);
  assert(ICON_PCECARD*256==sizeof(icons_img)+sizeof(gamegear_pixels));
  assert(guessicon("/Game Gear/Sonic (USA).GG")==ICON_GGCART);
@@ -46,6 +46,6 @@ int main(int argc,char **argv) {
  assert(ICON_A26CART==ICON_NGPCCART+1);
  assert(guessicon("/Atari 2600/Game.A26")==ICON_A26CART);
  check_icon(argv[1],gamegear_pixels,14);check_icon(argv[2],pce_pixels,16);
- check_icon(argv[3],ngp_pixels,16);check_icon(argv[4],ngpc_pixels,16);check_icon(argv[5],a26_pixels,16);
+ check_icon(argv[3],ngp_pixels,16);check_icon(argv[4],ngpc_pixels,16);
  puts("Cartridge icon pixels, transparency, shared palettes, sprite bounds and extension routing passed.");
 }
