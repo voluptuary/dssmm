@@ -1,0 +1,2005 @@
+## 2026-11-12 — SuperFW project bootstrapped
+
+- Added an isolated `superfw/` project from upstream `davidgfnet/superfw` commit `dabbf4909f85e556f7a12972cc8a7b94fc54ac51`. Preserved upstream source, assets, tests, nested workflows and notices; included GPL-3.0 text and provenance. The project covers upstream `sd`, `lite` and `chis` variants. No SuperFW firmware has yet been built or tested in this repository, and no physical validation is claimed.
+- Upstream files were imported and the shared registry/dispatch/CI/isolation setup is now being wired on `dssmm`. Remaining: collect configured CI results for the complete upstream test suite, then create/push the `superfw` lane and verify all five branch refs. Keep all target-specific follow-up inside this directory.
+
+
+## 2026-11-12 — Clean-checkout SuperFW validation complete
+
+- Root ignore rules initially omitted six upstream emulator payloads; the first clean-checkout CI run failed. Added those exact upstream-tracked assets under `emu/`, added the root ignore exception, and refreshed the source baseline.
+- Corrected hosted SuperFW verification passed in run [43263202200](https://github.com/voluptuary/dssmm/actions/runs/43263202200): all three board builds plus the upstream coverage-enabled host tests. The full dssmm matrix, including SuperFW and all OMEGA projects, passed in run [43263181698](https://github.com/voluptuary/dssmm/actions/runs/43263181698). Local policy/merge/snapshot/site checks and three board builds also pass; five local host groups passed, while hosted CI covered the complete suite. `chis` has an upstream unused-variable warning. No physical SuperCard hardware validation was performed.
+- Branch `superfw` is live on origin and tracks the same integrated tree. Continue future SuperFW work only in this directory on its matching lane, then merge through dssmm.
+
+## 2026-11-12 — SuperChis Prime port planning
+
+Owner identifies physical test hardware as SuperChis Prime v1.0. Added docs/PORTING-PLAN.md: retain native SuperFW chis backend, build DSSMM presentation incrementally, classify transferable features, and gate runtime/NOR/emulator work on physical tests. Exact revision compatibility and recovery path remain unverified. Documentation only; no firmware behavior changed or new hardware tests claimed. Next: review installed firmware/board identity and inventory rendering/assets before first UI slice.
+
+## 2026-11-12 — Designer-thread evidence
+
+Added the owner-provided ChisBread Prime introduction to docs/PORTING-PLAN.md. Refined clock/rumble exclusions, separate NOR/SDRAM qualification, chip/console identification and distinction between original SuperCard HDL and Prime specifications. Designer claims remain separate from local physical evidence. Documentation only; diff whitespace checked.
+
+## 2026-11-12 — Unsupported-feature scope decision
+
+Owner authorizes dropping features unsupported by Prime hardware, including automatic themes. Updated docs/PORTING-PLAN.md: manual Light/Dark/accent controls remain; absent hardware controls are omitted. Existing game software-RTC support is a separate native capability. Documentation only; git diff --check passed.
+
+## 2026-11-12 — DSSCC artwork compatibility target
+
+Owner requests retaining name-matched packs built with voluptuary/dsscc. Added its documented dimensions/layout/BMP format to docs/PORTING-PLAN.md, plus source-format audit and real-pack/physical rendering acceptance gates. Implementation remains pending; no generator or firmware code changed. Documentation whitespace check passed.
+
+## 2026-11-12 — First Prime implementation: manual palette foundation
+
+- Owner authorized starting implementation with the easiest parts. Added original Light/Dark palettes (IDs 6/7), named UI choices and Light default for new chis configurations. Existing numeric IDs 0–5 and persisted choices remain; sd/lite defaults remain upstream. Native theme application also supplies the in-game palette. No automatic themes, imported graphics or hardware/backend changes.
+- Added scripts/test-theme-settings.sh and tests/theme-settings-test.c, exercising the actual settings parser for legacy/new IDs, invalid values, per-board defaults and readable foreground/background separation. Both host variants pass; integrated in the project verifier. Full coverage suite remains unavailable locally because lcov is absent; do not count prior hosted results as validation of this new source.
+- An accidental overlap of chis/sd builds invalidated the initial build result; stopped the overlap and reran clean builds sequentially. Always serialize variants because upstream build intermediates are shared.
+- Next: independent accent control, then DSSCC format/lookup audit and bounded artwork reader before List + Art. Existing menu geometry remains upstream; this is not a completed DS-style skin. Physical theme contrast, persistence and gameplay remain untested. Get owner firmware/recovery details before hardware candidate instructions. Preserve all source/credits and the untouched pre-existing devcontainer lock.
+
+- Final local result: clean sequential chis, sd and lite builds all exited 0; theme parser/default tests and git diff --check pass. Retained upstream RWX linker/unused-variable warnings. Artifact hashes/sizes: docs/prime-theme-validation.json. Push this checkpoint to superfw; hosted full verifier still needs confirmation for this commit.
+
+## 2026-11-12 — Independent manual accents implementation checkpoint
+
+- Added Default/Blue/Green/Orange/Purple selection accents, with bounded `accent` settings parsing and serialization. Default retains exact existing palette values; overrides affect only selection/highlight roles. Main and in-game palettes use the same resolver. Theme changes retain the independent accent choice.
+- UI settings now has six rows spaced 18 pixels apart and the existing Save button. New accent labels are English pending the later localization pass, like the initial Light/Dark labels. Visual fitting/contrast remains physically untested.
+- Expanded actual-settings host tests: theme/accent bounds, legacy/default palette equivalence, text/background preservation, fallback, and serialized save/reload round trip with mocked filesystem writes. Host variants pass. Sequential all-board builds are underway; final results will be appended before handoff. Full local coverage remains unavailable without lcov.
+- Next: pin/audit DSSCC generator output and DSSMM artwork lookup rules; implement bounded external name-matched artwork loading before restructuring the browser. Do not copy another model’s hardware drivers or assume emulator/NOR save compatibility. Owner’s Prime firmware/recovery/console details still needed before hardware testing. Preserve all historical journals.
+
+- Hosted checkpoint: ed92ca1 passed full SuperFW verification (three board builds, theme settings tests and complete upstream host coverage suite), run https://github.com/voluptuary/dssmm/actions/runs/43271213482 . Prior palette checkpoint 32c3009 also passed run43270750833. Initial DSSCC format findings are pinned in docs/DSSCC-FORMAT-AUDIT.md: top-down GBA RGB555 BMP, DST1 transparency marker, indexed-frame rendering consideration. Full lookup/manifest audit and artwork implementation remain next.
+
+- Final local checkpoint: sequential chis/sd/lite builds all exited 0, actual-settings host tests and whitespace checks passed. Exact local artifacts: docs/prime-accent-validation.json. No physical test or release. Kernel code remains ed92ca1; subsequent changes record evidence only. Continue on superfw; integrate through dssmm when ready, preserving all four project trees.
+
+## 2026-11-12 — Bounded DSSCC BMP decoder implementation
+
+- Added src/artwork.c/.h: exact-read callback, strict supported BMP geometry/header/size checks, RGB555 conversion to a fixed 216-color palette at indices20–235, and distinct transparent sentinel0. Scratch row240bytes; caller output at most9600bytes. No static cache, file lookup, palette upload or browser display yet. Failed decode invalidates output; never show partial results. Palette conversion is lossy.
+- Sanitized actual-decoder tests pass for sizes, transparency, RGB ordering, canaries, malformed fields/offsets, capacity and read failures. Real pinned DSSCC writer interoperability passes both sizes and marker modes through optional tests/test-dsscc-writer.py (external checkout, no network/Pillow). Theme regression tests pass. All-board sequential builds started; append final status below. scripts/verify.sh includes the mandatory decoder tests.
+- Next: finish lookup/manifest audit; exact FatFs adapter; deliberate bounded cache lifetime; selectable List + Art rendering using safe halfword VRAM writes. See docs/DSSCC-FORMAT-AUDIT.md. Physical testing and full pack support remain pending. Preserve upstream backends and all journals.
+
+- Lookup follow-up: existing DE CUSTOM manifest is a runtime directory-scan hash index, not a mandatory on-disk file. DSSCC mirrored output follows relative ROM directories and strips the extension. Record these in docs/DSSCC-FORMAT-AUDIT.md; remaining fallback/encoding details must be reviewed before implementation. Do not impose a new pack manifest on users.
+
+- Final local results: clean sequential chis/sd/lite builds exited0; sanitized decoder tests, real pinned generator interoperability, theme tests and whitespace checks pass. Existing upstream warnings retained. Evidence: docs/prime-artwork-validation.json. Hosted run43272095902 for source63de698 is still pending at this entry; confirm its result before integration. New module is not called by the browser yet, so these builds do not measure future cache/rendering cost. No physical validation or release.
+
+- Hosted completion: source63de698 passed full SuperFW verifier in https://github.com/voluptuary/dssmm/actions/runs/43272095902 (all board builds, mandatory sanitized artwork/theme tests, full upstream host suite). Earlier pending entry is superseded. Next concrete task remains FatFs/name lookup and a selectable on-screen preview; decoder alone is not end-to-end artwork support.
+
+## 2026-11-12 — First selectable SD-browser artwork preview
+
+- Start cycles List/title/box in the SD browser, with a footer hint; existing UI Save persists artwork=0..2. Default remains List. Art modes narrow list text and show the selected file’s name-matched image. Lookup tries mirrored /SYSTEM/IMGS[2]/... then CUSTOM/<stem>.bmp, rejecting unsafe/truncated paths. No directory scan/manifest requirement.
+- Exact FatFs seek/read and checked close feed the decoder. Preview output uses a dedicated9600byte halfword buffer appended to native cartridge SDRAM state (existing14.5MiB bound retained), not an internal RAM image cache. The decoder now requires halfword alignment and writes packed pairs; production compositing does halfword-safe transparent overlays into Mode4. Palette20–235 is uploaded with theme reload. Fixed quantization remains lossy.
+- Cache hits/misses by full ROM path and style; invalidate on directory reload, mode/init and action/tab keys that may reuse cartridge RAM. Folder/no-art selections do not display stale images. Browser actions, loading and save protocols are unchanged.
+- Added actual adapter/path tests with mocked FatFs failures; extended compositor/canary/bounds/alignment and settings save/reload coverage. Sanitized decoder/adapter tests, theme tests and pinned real DSSCC writer check pass. New code is in sequential board builds; final results follow below. A strict host signedness diagnostic was corrected before passing tests.
+- docs/ARTWORK-PREVIEW.md describes paths, controls, limitations. No physical visual/performance/gameplay test yet. Folder/header-code/root/extension/NOR/recent fallbacks and localization remain pending. Next: hardware/emulator screenshot and cache invalidation smoke tests, then expand lookup behavior. Keep journals and native backends intact.
+
+- Repeat host validation encountered an ASan DEADLYSIGNAL startup loop under PIE; terminated that test process and rebuilt host sanitizer executables with -fno-pie -no-pie. All sanitized decoder/adapter/compositor, settings and real-generator checks then passed again. This is a host harness adjustment; keep sanitizer coverage enabled. Final committed-source builds and hosted checks follow.
+
+- Hosted full verification passed for implementation4d72847 (run43280511370) and final source/harness0596247 (run43280669644): all three board builds, sanitized artwork adapter/compositor/decoder tests, settings checks and upstream host coverage suite. Final local chis link reports IWRAM12008bytes and EWRAM235676bytes; this does not measure runtime stack peaks. Local final Lite build is still completing at this entry.
+
+- Completion: all three clean sequential local builds from source0596247 exited0; full hosted verification is green. Exact local artifacts/memory/limitations: docs/prime-preview-validation.json. Evidence-only descendants leave executable source unchanged. No physical testing/release claim. Next: confirm owner firmware/recovery and console, validate List/title/box selection/missing-art/transparent-art/cache return paths on hardware or a suitable cartridge model; then expand folder/code/NOR/recent lookups. Work remains in superfw lane, to be integrated normally through dssmm when appropriate.
+
+## 2026-11-12 — Test 1 publication preparation
+
+Owner explicitly requests end-user root README and a prerelease containing all three SuperFW board builds, with chis for physical testing. Prepare one superfw-test1 release with superfw-chis.fw, superfw-sd.fw and superfw-lite.fw; preserve upstream version0.22 and use tag/source hash to identify the first DSSMM test. Four-section end-user notes and first-test guidance are in docs/releases/superfw-test1.md and docs/ARTWORK-PREVIEW.md. No new physical claim, MiGoomba substitution or OMEGA release change. Next: integrate lane through dssmm, root README/baseline checkpoint, validate final source/builds/CI, publish prerelease without making latest, download/compare assets and record evidence.
+
+- Owner adds end-user artwork creation/install instructions. Added docs/ARTWORK-SETUP.md with actual DSSCC Custom Art/Scan SD Card/Mirrored/Build Pack flow, GBA inclusion checkbox, both sizes, output location, exact SYSTEM layout, Start/UI Save controls and troubleshooting. Linked from preview and release notes. Instructions reviewed against pinned DSSCC38424ce; no firmware changes.
+
+## 2026-11-12 — SuperFW Test 1 published and downloads verified
+
+- Owner-authorized https://github.com/voluptuary/dssmm/releases/tag/superfw-test1 is public, prerelease=true/draft=false/latest=false, annotated tag source8a22da16c2d755de8fc12db7c5482657e6813ecd. Three assets only: superfw-chis.fw (owner’s Prime v1.0 test), superfw-sd.fw, superfw-lite.fw. Native upstream version0.22 is retained; firmware source identifier8a22da16 distinguishes these builds. No physical test is claimed.
+- Final local sequential builds and full all-project/lane CI passed. Chis43282667921, trunk43282661424, DE43282666938, OMEGA43282667191, BLUE43282666475. Board IDs, GBA headers, embedded sizes/source hash and full-image seals verified. Draft then public downloads match staged bytes/hashes and GitHub digests. Canonical four-section body matches remote. Evidence: docs/releases/superfw-test1-publication.json.
+- All19 prior release metadata/bodies/assets and tag refs verified unchanged. DEv8.4.0 remains latest stable. Root README is end-user focused with correct hardware downloads and a DSSCC artwork workflow. docs/ARTWORK-SETUP.md covers Custom Pack (older name Custom Art), scan actual SD root, Include GBA, both sizes, Mirrored/Custom build, exact SYSTEM folders, Start preview controls and UI Save. No OMEGA source changes.
+- Next: owner tests chis. Record console/model/installed firmware/recovery details and observed boot/theme/artwork/save results before fixing or claiming qualification. Keep tag/assets immutable; subsequent evidence-only commits do not change tested firmware inputs. Next development remains full lookup/folder/NOR/recent support and DS-style layout after feedback. Preserve all journals and the user’s untracked devcontainer lock. Integrate this evidence through dssmm and sync lanes.
+
+
+## 2026-11-12 — Prime v1.0 boot/theme smoke test clarified
+
+Owner corrected the initial report: the stock kernel reports version 0.20, while the Test1 Chis image successfully chain-loads and reports SuperFW 0.22. Manual themes are available. The earlier interpretation of “returned to default loader” was mistaken; remove the failed-boot diagnosis. The user expected a more visibly DSSMM-style menu, but the overall layout is still mostly upstream SuperFW. Record this as successful initial boot/theme smoke testing on one SuperChis Prime v1.0, not full hardware qualification. Gameplay, saves, artwork rendering, NOR, installation, and SD/Lite variants remain untested. Evidence: `docs/prime-test1-hardware-observation.json`. Next work should focus on the DSSMM-style presentation.
+
+
+## 2026-11-12 — Owner clarification: Test 1 boots successfully
+
+SuperChis Prime v1.0 chain-loads the Test1 Chis image and reports SuperFW 0.22 (stock kernel reports 0.20); manual themes are available. The menu remains mostly upstream SuperFW, and the full DSSMM-style layout is still in progress. This supersedes the immediately preceding mistaken failed-boot interpretation. Only boot/version/theme availability are physically reported; do not infer artwork, gameplay, save, NOR, install, SD or Lite validation. See `docs/prime-test1-hardware-observation.json`.
+
+## 2026-11-12 — Identify DSSMM builds and name themes
+
+Updated the Info page identity to `SuperFW <VERSION_WORD major.minor> (DSSMM)`, retaining the commit identifier and board variant. The displayed version comes from the existing SuperFW `VERSION_WORD` build input (currently 0.22). Replaced numeric theme labels with palette names, removing the visible `< 6 >` while retaining IDs 0–7 and saved settings compatibility. Local theme settings and artwork host checks pass; `git diff --check` passes. Full verifier/build unavailable locally because `arm-none-eabi-gcc` is missing. Next: hosted SuperFW CI, then integrate through dssmm and sync lanes; no release or physical validation implied.
+
+## 2026-11-12 — Display DSSMM build number
+
+Replaced the Info-page short commit hash with `DSSMM Build N`, where `N` comes from `git rev-list --count HEAD` across full shared repository history. The existing firmware metadata still embeds `VERSION_SLUG_WORD` as the upstream commit identifier. CI already fetches full history. `make -n -C superfw BOARD=chis` confirms `-DDSSMM_BUILD_NUMBER="506"` for the current pre-commit checkout; `git diff --check` passes. No local ARM compiler is available, so await hosted matrix to validate all board builds before completion. No release was requested.
+
+## 2026-11-12 — First visible DSSMM browser skin pass
+
+Added a DSSMM wordmark to the tab strip, a full-width active-color selected row, and a framed artwork preview panel. The browser's selection/navigation, filesystem lookup/cache, and SuperFW launch actions are unchanged. Updated `docs/PORTING-PLAN.md`; its earlier “no physical result” status is corrected to the owner-reported boot/theme smoke test. Theme settings and sanitized artwork host tests pass; `git diff --check` passes. Physical visual validation and ARM builds remain outstanding (local devkitARM compiler unavailable). Next: hosted matrix, then inspect screenshot feedback and continue translating DSSMM browser composition; do not call this complete skin parity.
+
+- Hosted completion: integrated source `f9f36591c9e40ede9a6307febe3766e7bc244cb8` passed all four kernel jobs in [run 43317208545](https://github.com/voluptuary/dssmm/actions/runs/43317208545), including the three SuperFW board builds and host verifier. The preceding local theme/artwork tests also passed. Visual appearance is still unreviewed on physical Prime; this is not complete DS-style parity.
+
+## 2026-11-13 — Make Chis artwork discoverable and group system files
+
+Chis initially defaulted to Title artwork. The cross-variant follow-up below aligns SD and Lite; all board builds expose the Artwork row with List/Title/Box, Left/Right controls and Save persistence. The owner elevated consistent skinning of browser, settings, system/tools, game screens and in-game menus to the top project goal; recorded it in `docs/PORTING-PLAN.md` and agent guidance.
+
+New default save/state/log paths are under `/SYSTEM`: SAVEGAME, SAVES, SAVESTATE and `superfwlog.txt`; artwork remains in IMGS/IMGS2 and private state remains in `/.superfw`. Existing root-level per-game save sets are detected across main/temporary/backup saves and remain the active path when no SYSTEM copy exists; legacy savestates are detected across all disk slots. No old files are deleted or moved. `docs/SYSTEM-LAYOUT.md` explains the layout and safe manual migration.
+
+`bash scripts/test-theme-settings.sh` passes for native and Chis defaults, migration, serialization, save/state path selection and legacy fallback. `bash scripts/test-artwork.sh` and `git diff --check` pass. Local ARM build requires unavailable `arm-none-eabi-gcc`; hosted matrix is the next validation. No release/assets changed; pre-existing devcontainer lock untouched.
+
+## 2026-11-13 — SYSTEM path build fix
+
+The first hosted verification of Chis artwork defaults and SYSTEM paths failed because `ingame_menu.c` used shared path/slot constants without including `config.h`. Added that include; rerun the focused host tests and hosted project matrix before integrating. The failure was compile-time only, before any firmware artifact was produced. Preserve the untracked `.devcontainer/devcontainer-lock.json`.
+
+## 2026-11-13 — Workspace cleanup completed
+
+Removed ignored compiler/intermediate products and the superseded local board/release output directory after hosted verification (`make -C superfw clean`; removed `superfw/build/`). No tracked upstream assets, validation records, published tags/assets, or user-created untracked files were removed. Future SuperFW handoffs now include the same build-output cleanup check.
+
+## 2026-11-13 — Test 2 published
+
+Published https://github.com/voluptuary/dssmm/releases/tag/superfw-test2 as prerelease (not draft), tag `superfw-test2` pointing to tested source `c748fea2286721da21aa3394cf8d4ac330b19c8a`. It includes the Chis, SD and Lite firmware builds. Canonical four-section notes: `docs/releases/superfw-test2.md`; exact asset IDs, hashes, URLs, CI runs and validation evidence: `docs/releases/superfw-test2-publication.json`.
+
+All five hosted project checks passed (SuperFW `43436608738`, dssmm `43437592326`, DE `43437613874`, OMEGA `43437617055`, BLUE `43437621334`). Local theme/settings and artwork tests passed; all three board images built sequentially and passed board size, GBA header/size-field and firmware-seal checks. Public downloads byte-match those builds. The full upstream host suite passed in hosted checks; local `make verify` could not run because `lcov` is absent. The Test 1 Prime boot/theme smoke result does not validate Test 2 artwork, settings migration or paths; SD/Lite remain untested. DE `v8.4.0` remains latest stable; Test 1 and all prior releases/assets are preserved.
+
+After public byte verification, removed ignored local compiler products and `superfw/build/`. Keep this cleanup as a handoff step. Next, incorporate the owner's Prime results for default artwork, List/Title/Box persistence, SYSTEM save/state behavior and the broader DSSMM skin; do not claim hardware qualification from builds or mocks.
+
+## 2026-11-13 — Align shared DSSMM presentation across all boards
+
+The prior implementation already compiled the browser branding/selection/artwork renderer, themes/accents, UI settings selector, and SYSTEM paths into SD, Lite and Chis. The defaults were inconsistent: only Chis selected DSSMM Light and Title artwork. Aligned all three boards on those defaults. UI settings format is now version 3; pre-Test-2 unversioned/version-1 native defaults migrate to Light/Title, while Test 2 version-2 settings preserve explicit choices. Chis NOR and other hardware-specific features remain distinct.
+
+Expanded `scripts/test-theme-settings.sh` to compile the actual settings layer with SD, Lite and Chis flags. Settings migration/default tests, artwork tests and sequential local builds for all three variants pass. All three binaries link within their board memory limits; Chis retains the known unused NOR error-variable warning and upstream RWX linker warnings. Physical SD/Lite UI, artwork, storage, save and timing checks remain outstanding. Next: run hosted SuperFW/all-project verification, integrate normally through dssmm, sync every lane and retain these hardware limits in the next release plan.
+
+## 2026-11-13 — Cross-variant defaults and Test 3 checkpoint
+
+The shared DSSMM browser/theme/artwork/SYSTEM implementation already built for SD, Lite and Chis. Aligned new-install defaults across all three: DSSMM Light and Title artwork. Bumped the saved UI format to version 3; legacy unversioned/v1 native defaults migrate to Light/Title, while version 2 settings from Test 2 preserve explicit theme/artwork choices. Board-specific controls remain native (including Chis NOR).
+
+`bash scripts/test-theme-settings.sh` now compiles/runs under SD, Lite and Chis defines and passes migration, persistence, path and palette checks. `bash scripts/test-artwork.sh` passes. Sequential local builds for SD, Lite and Chis passed after the code changes; their pre-integration metadata still reflects the previous commit, so rebuild from the integrated commit for any release. Release-note draft for Test 3 is `docs/releases/superfw-test3.md`; no publication has occurred yet in this checkpoint. Hosted SuperFW and all-project checks are next. Keep physical SD/Lite/Chis behavior marked unvalidated for these changes.
+
+## 2026-11-13 — Test 3 published with aligned board defaults
+
+Published https://github.com/voluptuary/dssmm/releases/tag/superfw-test3 as a hardware-validation-pending prerelease with Chis, SD and Lite images. Tag/source `ad3cdd53ec0eaa5239bf113b858e7b86b75838b9`; displayed DSSMM Build 524. Canonical notes and asset/CI evidence: `docs/releases/superfw-test3.md` and `docs/releases/superfw-test3-publication.json`.
+
+All three builds now start with DSSMM Light and Title artwork. Version 3 settings migrate only unversioned/v1 native defaults; explicit version 2 Test 2 settings survive. Host settings tests passed with each board's compile flags, artwork tests passed, all three local board builds passed, and the integrated matrix plus every branch check passed. Public assets match local images and GitHub digests. Full upstream host suite passed in CI; local `make verify` remains unavailable without lcov. No Test 3 hardware validation is claimed. The Test 1 Prime boot/theme report does not establish SD/Lite behavior or verify new defaults. Test 2 and earlier tags/assets remain intact; DE `v8.4.0` is still latest stable.
+
+Generated compiler and build staging outputs were removed after public download verification. Root README now points to Test 3. Keep the three common interfaces/defaults aligned, while preserving real board-specific behavior such as Chis NOR support. Next: owner feedback from physical tests and continue DSSMM styling across settings, tools, game screens and in-game menus.
+
+
+## 2026-11-13 — Artwork matching and menu layout follow-up
+
+Owner provided GBA artwork layout under `/SYSTEM/IMGS` (Title) and `/SYSTEM/IMGS2` (Box), mirrored from ROM folders such as `/Game Boy Advance/P/`. DSSCC Box BMP names match the ROM filename stem; original EZ-FLASH Title art matches the four-byte GBA game code at header offset 0xAC, in paths such as `/SYSTEM/IMGS/B/P/BPRE.bmp`. Requested exact order: Title checks `CUSTOM/<ROM stem>`, mirrored `<ROM stem>`, then the native two-letter game-code path. Box checks CUSTOM then mirrored ROM filename, with no header lookup. Remove preview border and bar text; left-align menus/settings; reduce font only if renderer supports it.
+
+Implemented the native game-code lookup after the two filename candidates, using a validated four-byte code from offset 0xAC. Removed browser artwork frame and decorative DSSMM tab text; left-aligned Settings/UI Settings values, save/file-manager lists and in-game savestate choices. Existing font renderer uses fixed-height glyphs; no size control exists, so no font scaling was added. Updated artwork setup/preview guides. Local artwork and settings suites pass. All three board builds pass after the matching change; board size, GBA checksum/size and SHA seals verified (pre-commit build number 527). Full `make verify-superfw` stops at missing local `lcov`; hosted CI must run complete host suite. Current local edits await commit and integration. Next: commit on `superfw`, sync into `dssmm` and all hardware lanes per shared-tree policy, run hosted matrix, rebuild from integrated source, publish one new SuperFW prerelease with three assets, then remove older prerelease release objects for SuperFW, BLUE and Original OMEGA while retaining tags and keeping each project's newest release. Preserve DE stable and the untracked devcontainer lock.
+
+
+Correction from owner: artwork has not displayed at all. The reason the original EZ title image could not match was that I first treated “header artwork” as the 12-byte game title; the EZ kernel uses the four-byte game code and path `<IMGS>/<code0>/<code1>/<code>.bmp`. Code and docs now add this native lookup after CUSTOM and mirrored filename matching. DSSCC DST1 transparent-pixel support already exists in the decoder and host tests; retain it. Verify an exact BPRE-style header fixture plus transparency before integration.
+
+
+## 2026-11-14 — SuperFW Test 4 published and prereleases pruned
+
+Test 4 (`superfw-test4`) is published at `19429735b3b55f7c57dd3921f0aad61601521e06`, displayed build 531, as a prerelease with Chis, SD and Lite firmware. Canonical four-section notes and publication evidence are `docs/releases/superfw-test4.md` and `docs/releases/superfw-test4-publication.json`. The Test 4 source includes native GBA game-code title artwork matching (`0xAC`, `/SYSTEM/IMGS/<code0>/<code1>/<code>.bmp`), filename/CUSTOM Box artwork, existing DSSCC DST1 transparency, simplified left-aligned menu lists, no browser frame and no decorative tab text.
+
+All five hosted workflows passed (SuperFW 43453044083, dssmm 43453033523, DE 43453082774, OMEGA 43453070676, BLUE 43453055837). Local theme/settings and artwork tests passed; SD, Lite and Chis builds passed sequentially at build 531. All board limits, GBA checksums/size fields and firmware seals passed. Public downloads were fetched and byte-compared with local assets; GitHub digests match. `make verify-superfw` could not run the coverage-enabled upstream suite locally because `lcov` is absent; hosted CI passed it. No Test 4 artwork/menu hardware validation is claimed. The earlier Chis Test 1 boot/theme smoke remains the only reported physical test.
+
+Per owner request, deleted prior SuperFW Test 1–3, BLUE Test 1–3 and Original OMEGA Test 1–3 GitHub release pages/assets after Test 4 published. Retained their git tags and all release bodies/asset metadata in root `docs/history/releases/prerelease-retention-2026-11-14.json`. Each lane now shows only its newest prerelease; DE stable v8.4.0 and prior DE releases are untouched. Next: keep workspace tidy, remove ignored build outputs, and wait for the owner’s Chis/other-board artwork observations. Preserve the untracked devcontainer lock.
+
+## 2026-11-14 — Artwork follow-up and autonomous DSSMM parity goal
+
+Owner reports Test 4 Box art displays slowly on SuperChis Prime v1.0 and Title ROM-header art still fails. No current code path is physically confirmed. `src/artwork.c` now halves FatFS calls by reading two rows at once, accepts top-down/bottom-up 16-bit images and zero size fields, and `src/artwork_file.c` tries a flat game-code `/SYSTEM/IMGS/<CODE>.bmp` after the standard nested path. `src/menu.c` Info line now shows `SuperFW <version> (<8-digit upstream hash>)`, with `DSSMM Build N` on a separate line. Focused artwork/settings suites pass; adapter tests cover nested and flat code paths. Sequential SD/Lite/Chis builds passed.
+
+`lcov` and `libssl-dev` are now installed. The local coverage host suite passed separately (90.8% line coverage). A combined `make verify-superfw` passed the three firmware builds but hung in an ASAN-instrumented upstream cimpl host test with repeated `AddressSanitizer:DEADLYSIGNAL`; a later standalone full host-suite run passed. Treat as intermittent local sanitizer instability; do not suppress sanitizer or claim the combined verifier passed. Hosted CI still required.
+
+Owner now authorizes autonomous continuation until visual/interaction parity with EZ-FLASH DSSMM, particularly fluid carousels. Use `ezfomega` as reference for presentation only; never port its private hardware drivers/protocols. Keep changes to `superfw/`, all three boards in sync, and preserve SuperFW actions. Work in slices: title art/reliability, list browser geometry, transitions and adjacent artwork cache, horizontal/vertical carousels, then other screens and in-game menus. mGBA 0.10.1 was installed. It supports BIOS selection but BIOS is optional for many homebrew tests; mGBA does not emulate SuperCard storage/NOR/SDRAM. No mGBA runtime/screenshot test yet.
+
+Next: validate fallback paths/builds and hosted CI; then isolate browser state/drawing and implement the first reference-matched screen. Keep `/tmp/dssmm-context-scratch.md` until the whole session ends, and preserve `.devcontainer/devcontainer-lock.json`.
+
+## 2026-11-14 — First fluid browser-carousel slice
+
+Added persisted `browser_view` values List/Horizontal/Vertical (UI settings version 4; absent values default to List). In carousel modes, left/right move one item instead of paging by eight. Added bounded fixed-point transition state, a pure `browser_carousel_layout()` module, two orientations with three visible adjacent entries and selected artwork reuse. This is a first layout/motion foundation; mock cards and current icons do not yet achieve DSSMM parity. Geometry tests cover list edges, focused index during transition, viewport bounds and vertical/horizontal centering.
+
+The standalone mGBA preview ROM (`scripts/build-browser-preview.sh`) links the exact geometry/motion modules, draws schematic cards and accepts controls. Built and ran it in mGBA 0.10.1, capturing F12 screenshots under ignored `build/mgba/`. The main `.fw` image itself still stops at card storage initialization in mGBA, so only the isolated preview harness is usable there. BIOS was not needed. No physical hardware behavior was tested.
+
+`bash scripts/test-browser-motion.sh`, `test-artwork.sh`, `test-theme-settings.sh`, and `git diff --check` pass. SD, Lite and Chis builds all pass sequentially after adding `browser_carousel.c` to the firmware link. Next: review the schematic screenshots for both orientations, improve the first presentation surface (spacing, actual names/icons, selected art/adjacent cache), add an mGBA screenshot checkpoint, then continue through menus and in-game UI. Keep SD/Lite/Chis in sync. Hosted CI is still needed after commit/push; no release/publish yet.
+
+## 2026-11-14 — Single-read artwork loading optimization
+
+To address the reported slow Box preview, changed the FatFS adapter from many small decoder reads to one bounded contiguous `f_read` into an aligned 19,254-byte SDRAM staging buffer; the decoder then reads in bounded two-row memory chunks. This cuts SD filesystem calls per candidate image to one while preserving BMP field/orientation validation and path precedence. Added adapter assertions for one image read and rejection when the scratch buffer is too small. The additional 19 KB resides in the external SuperCard SDRAM state and remains covered by its 14.5 MB bound. Focused suites pass; rebuild all boards and collect hosted CI. This is only a speed hypothesis until physical card timing is observed.
+
+## 2026-11-14 — Reference-sized carousel artwork viewport
+
+Aligned the new carousel layout to EZ-FLASH DSSMM's presentation sizes: horizontal selected art is 120×80 with 60×40 side items; vertical selected art is 84×56 with 48×32 side items. Added `artwork_blit_scaled()` for bounded nearest-neighbor vertical rendering with even-width Mode 4 writes and transparency preservation. Removed trial outlines around carousel items, corrected right-edge positioning, and aligned the selected title under horizontal art / beside vertical art. These are shared presentation changes; SuperCard drivers and actions are untouched.
+
+`test-artwork.sh`, `test-theme-settings.sh`, `test-browser-motion.sh`, preview-ROM compilation, and clean sequential SD/Lite/Chis builds pass. `git diff --check` passes. The last Chis link uses about 93.0% of EWRAM and retains the existing unused `err` warning; all board linker regions fit. Opaque unscaled artwork rows now use DMA3; DST1 composition and vertical scaling remain software rendered. Carousel artwork cache misses wait until motion settles. The upstream coverage suite again loops on ASAN `DEADLYSIGNAL` at `cimpl_test`; stop such runaway attempts and don't count them as pass. Earlier mGBA run validated the schematic preview only; the latest preview ROM was rebuilt, but a new screenshot attempt hung in the GUI/Xvfb harness and was stopped. Hardware timing, title art, and visual parity remain unverified.
+
+Next: add a small artwork cache for adjacent carousel entries and improve the actual background/title treatments against reference screenshots; then carry the shared menu language into settings and system screens. The current renderer is not yet at DSSMM parity. Preserve the temporary scratch file until session end and leave `.devcontainer/devcontainer-lock.json` untouched.
+
+## 2026-11-14 — First successful mGBA browser artwork frame
+
+The packaged Debian mGBA executable is `/usr/games/mgba` (0.10.1); `mgba` is not on the default shell PATH. Built `scripts/build-browser-preview.sh`, launched its synthetic preview ROM under Xvfb with dummy audio, and saved/visually inspected a 240×160 F12 screenshot. The real GBA artwork decoder/blitter and shared carousel rendered synthetic Title art selected by the fake ROM's header code. This establishes execution of the isolated preview ROM on mGBA, not the full SuperFW kernel or real SD/artwork paths. The fixture ROMs are intentionally non-launchable; no BIOS was needed.
+
+Box-art display and key-driven navigation/orientation are not yet visually confirmed. A keyboard experiment did not yield a reliable visual result and is not counted as a pass. Earlier upstream 0.10.5 AppImage runs were blank, while packaged 0.10.1 now shows the Title frame; record exact executable/version in future reports. Generated screenshots/build fixtures are ignored outputs. Root devcontainer/docs changes are committed separately on dssmm as `9c577cea` and `874a2ee`; synchronize after this SuperFW checkpoint using the normal merge workflow.
+
+Added `scripts/test-browser-preview-mgba.sh` as a repeatable local smoke check. It invokes the preview builder, launches `/usr/games/mgba` headlessly under Xvfb, sends F12, parses the screenshot, and checks for the synthetic Title-art pixel marker. It passed with mGBA 0.10.1 after allowing 5 seconds for startup; a 3-second delay produced a blank screenshot and was too short. This is renderer-only execution, not the kernel/card path. The script removes only its generated preview screenshots before capture; outputs remain ignored.
+
+## 2026-11-14 — Carousel artwork follows animated geometry
+
+Fixed production carousel drawing to use the focused item's animated rectangle instead of fixed center coordinates. Box images remain square and centered; scaled rectangles preserve even Mode 4 write alignment. Cached artwork now requires an exact ROM-path and mode match before display, preventing previous-game art while reads wait for motion to settle. Icon fallback follows the actual blit result. Artwork adapter/decoder and carousel/fixture host suites pass; whitespace check passes. Serial SD/Lite/Chis builds are running in exec session 41036 with logs `/tmp/dssmm-carousel-{sd,lite,chis}.log`; initial invocation failed because devkitARM was absent from PATH, then restarted with `/opt/devkitpro/devkitARM/bin`. Inspect actual completion before claiming board passes. Next: adjacent artwork cache, Box/vertical emulator coverage, then other menu surfaces. Goal remains active.
+
+## 2026-11-14 — Scaled-artwork bounds review
+
+The preceding goal turn made concrete production-renderer progress. Revalidated live build session 41036: SD and Lite completed successfully; Chis is still building. While reviewing scaled rendering, found that `240 - width` / `160 - height` could underflow for oversized dimensions. Added explicit width<=240 and height<=160 guards before those subtractions, plus oversized/near-UINT32_MAX regressions. Artwork decoder/adapter tests and whitespace checks pass. This guard was edited while the earlier serial build was running, so those builds are not final evidence for the complete latest source; rerun board builds after session 41036 is terminal. No physical Title-art confirmation or visual parity claim. Next remains stronger Title/Box/vertical emulator coverage, adjacent artwork caching, then other menu surfaces.
+
+## 2026-11-14 — Preview tearing and smoke assertion corrected
+
+Session 41036 completed exit 0, including Chis; builds overlap the latest scaler guard so final settled-source builds remain required. Preview harness now draws to the hidden Mode 4 page and switches during VBlank, avoiding partially drawn screenshots. Builder accepts PREVIEW_VERTICAL=0|1 and PREVIEW_BOX=0|1 for deterministic initial views. Corrected a material smoke-test mistake: the earlier orange 'Title artwork marker' was actually the selected card fill. The assertion now excludes all four UI palette colors and requires at least 500 decoded BMP pixels plus eight distinct colors. Packaged mGBA 0.10.1 passes horizontal Title (13,154 BMP pixels, 20 colors) and vertical Box (4,209 BMP pixels, 15 colors). This proves isolated renderer paths only; original title-art filesystem/hardware issue remains unconfirmed. Next: test remaining view combinations, production adjacent-art cache, remaining menu surfaces, final builds/hosted checks. Goal active.
+
+## 2026-11-14 — RGB555 compatibility and four preview modes
+
+Previous turn made progress on double buffering and corrected a weak assertion. Added PREVIEW_MATRIX=1 to the mGBA smoke script: runs horizontal/vertical × Title/Box and retains generated view-0-0.png through view-1-1.png under ignored build/mgba. Matrix session 30060 completed exit 0: BMP-color pixel counts 13154, 8593, 6689, 4209 respectively. These validate isolated rendering, not real filesystem/card lookup. During that matrix run, decoder review found an unnecessary rejection of the unused RGB555 bit15 in BI_RGB BMP pixels. Decoder now masks that unused bit; regression cases verify opaque black/red and DST1 transparent black with bit15 set. Artwork decoder/adapter suites and whitespace checks pass. This is a plausible compatibility improvement for older Title art, not confirmation of the owner's actual BMP format or a hardware fix. Matrix overlapped the decoder edit, so latest-source complete builds and emulator evidence remain to be collected after a stable checkpoint. Next: adjacent artwork cache, other UI surfaces, final integration/build/CI. Do not mark goal complete.
+
+## 2026-11-14 — Three-slot production carousel cache
+
+Added three decoded artwork slots in cartridge SDRAM, keyed by exact ROM path and artwork mode, addressed by adjacent entry index modulo three. Populates at most one missing slot per settled frame in selected/previous/next order; no artwork file reads while motion is nonzero. Missing images are cached too. All visible items draw their matching cached image with animated geometry; directories/misses use icons. Existing cache-invalidating directory/mode/menu/action paths now clear the three slots; ordinary carousel movement retains neighbors. Full-size opaque selected art retains DMA blitting; smaller cards use bounded scaling. This adds roughly 30KB external SDRAM including metadata, guarded by the existing 14.5MB static assertion. Three-board build session 38222 is live with `/tmp/dssmm-cache-{sd,lite,chis}.log`; standalone syntax-only attempt lacked required build defines and is not a build result. The full-size DMA branch was edited just after build start: collect a settled-source final build before release. Artwork and motion/fixture checks were launched in session 36744; inspect terminal result. Next: cache lifetime/regression coverage, renderer/menu screenshots, remaining settings/tools/system/game surfaces, full latest builds and CI. No hardware speed/parity claim.
+
+## 2026-11-14 — Cache invalidation repair and game option columns
+
+Review caught a bug in the previous cache edit: the memset inserted after an unbraced key-action if ran unconditionally. Replaced all cache reset pairs with browser_invalidate_artwork(), which clears only cached/valid flags and preserves decoded bytes. The key-handler reset is conditional again; normal carousel navigation retains neighbor slots. This avoids wiping ~30KB and restores caching. Artwork/adapter, motion/fixture, and SD/Lite/Chis settings suites pass (sessions 86504 and 16435 terminal exit 0). Build session 38222 remains confirmed live; do not restart or claim success prematurely. Its source overlaps subsequent edits and is not final release evidence.
+
+Started the next menu surface: game patching/loading option headings and values are left aligned, with bounded 116px labels and 96px values separated at x132. This avoids the former full-width labels overlapping centered long values. Existing game actions/selection remain unchanged. No visual screenshot of these real game popups yet. Latest menu edits need real board compilation and visual validation; no parity/release claim. Next: finish current build, stable-source build checkpoint, cache regressions and real menu rendering harness, then settings/tools/system/in-game styling.
+
+## 2026-11-14 — Official EZ-FLASH artwork-pack source
+
+Owner supplied https://www.ezflash.cn/zip/IMGS.zip for compatibility testing. Direct curl and web fetch both return HTTP 403 Cloudflare challenge; official hostname without www also returns 403. No archive or representative BMP was downloaded, so do not claim compatibility validation against this pack. Keep this exact official URL for a future retry or owner-provided local archive. Do not infer format details from synthetic fixtures. Continue other work while download is unavailable; this alone does not block the full goal.
+
+## 2026-11-14 — Info/Tools layout and settled-source checkpoint
+
+Build session 38222 completed exit 0 with SD/Lite/Chis outputs; it overlapped later source edits and remains intermediate evidence. Expanded left-aligned bounded treatment to Info body lines (x12, 216px) while preserving its logo, and widened Tools labels to 206px. Game options already use separate bounded label/value columns. Updated artwork guide to describe the new adjacent cache accurately. Started fresh serial board builds on the now-frozen production source in session 42756, logs `/tmp/dssmm-checkpoint-{sd,lite,chis}.log`. Do not edit production source while those builds run; inspect terminal result before claiming final passes. Focused artwork, motion/fixture and three-variant settings tests run in session 33143. Next: record actual results, checkpoint all SuperFW work, then continue cache regressions and real UI screenshot coverage. Official thumbnail pack still inaccessible via Cloudflare; hardware Title-art result unresolved. Root mGBA environment commits remain on dssmm to merge through ordinary workflow after lane checkpoint. Goal active.
+
+## 2026-11-14 — Production cache orchestration regression
+
+Added scripts/test-carousel-cache.sh to full verifier. It extracts the actual browser_invalidate_artwork and render_browser_carousel functions, compiles them with the real carousel layout and mocked storage/draw dependencies, and exercises selected-first single-load frames, neighbor population, negative caching, no loads during motion, mode mismatch, and metadata-only invalidation. Passed. This covers production orchestration rather than a duplicate cache model; it does not cover real FatFS, card timing or framebuffer pixels. Production source remains frozen while board build session 42756 runs; last poll confirmed it live in SD compression. New script/verifier edits do not affect firmware inputs. Next inspect build completion, commit the validated lane checkpoint, merge dssmm environment changes normally, and continue visual parity work. Goal remains active.
+
+## 2026-11-14 — Directory isolation regression and vertical visual finding
+
+Previous goal turn progressed production-cache tests. Revalidated build 42756 live: SD passed, Lite is compressing fonts; no restart. Production source remains frozen. Expanded test-carousel-cache.sh using actual extracted render code to assert path changes during motion neither load nor draw old-directory images, and directory entries neither load artwork nor reuse cached file pixels. Passed with diff check.
+
+Visually inspected generated view-1-0.png: vertical next-item artwork overlaps the selected card and is drawn on top because browser_carousel_layout emits previous/selected/next rather than actual back-to-front order. Fix focused-item draw ordering after current frozen-source builds complete; add a regression for focused-last ordering and update geometry assertions. This is a confirmed visual gap, not a hardware blocker. Current mGBA pixel-presence checks cannot establish visual parity. Next build result, focused-last fix, real menu render coverage, remaining surfaces and final integration. Goal active.
+
+## 2026-11-14 — Three-board frozen-source checkpoint passed
+
+Session 42756 completed exit 0; logs confirm SD, Lite and Chis firmware built on unchanged production source. Artwork, motion/fixture, three-variant settings and extracted production-cache regressions passed. This is a build/host-test milestone, not full verifier or visual/hardware parity. Checkpoint lane source now before correcting the known focused-card painter order. Official IMGS archive remains inaccessible; full local ASAN verifier remains intermittent, hosted CI still needed after push.
+
+## 2026-11-14 — Focused carousel item painted last
+
+Validated source checkpoint committed as 944ec48 (all three board builds and focused suites passed before this follow-up). Fixed shared layout output to preserve neighbor order while moving the focused item to the final painter slot. Geometry tests now explicitly assert focused-last ordering at rest and during a transition. Motion/fixture and extracted production-cache tests pass; mGBA vertical Title renders 6700 BMP-color pixels and the screenshot was visually inspected. Marked transparent pixels correctly allow underlying artwork/background through. This follow-up still needs latest board/full verifier/CI evidence; previous board binaries predate painter fix. No release. Next push checkpoint, merge shared dssmm environment changes normally, continue real menu render validation and remaining surfaces.
+
+## 2026-11-14 — Shared setup synchronized and readable carousel titles
+
+Normally merged origin/dssmm into SuperFW after the lane checkpoint; brings standard mGBA Docker packages and setup/continuity docs without changing another project's hardware files. User-owned devcontainer lock remains untracked/untouched. Carousel selected filenames now use bounded left-aligned rotating text (horizontal x40/162px; vertical x98/136px), matching the owner's alignment request and exposing long names. Cache orchestration and motion/fixture tests pass; visual long-title and latest board/CI checks remain needed. CI run 43617571436 for 5fd1a30 was confirmed live before the shared merge; inspect its actual result and subsequent run after push. Next real UI preview/name rendering coverage, remaining settings/tools/system/in-game surfaces and actual pack/hardware Title-art confirmation. Goal remains active.
+
+## 2026-11-14 — Production text rendered in the mGBA preview
+
+CI 43617571436 for 5fd1a30 completed success; newer run 43617663224 for ae0ca6f remains confirmed live. Preview now links actual font_render.c/utf_util.c and extracts production draw_text_ovf_rotate into a generated private header. Uses embedded ASCII font plus empty supplemental database; no BIOS. Selected filename renders in production left-aligned regions and scrolling state advances. Added preview-only -Wno-old-style-declaration for existing hangul.h declaration order (initial Werror build caught it); font source unchanged. mGBA vertical Title passed (6700 BMP pixels) and screenshot visually shows Pixel Garden filename in the right pane. This improves rendering evidence but whole menu surfaces and interactive state/storage remain outside harness. Next expand actual menu surface rendering and collect latest CI; parity and hardware Title artwork remain open.
+
+## 2026-11-14 — Deterministic transition preview and geometry sweep
+
+CI 43617663224 for ae0ca6f completed success; newer 43617790127 for font-preview e44bde4 was confirmed live. Preview builder now accepts PREVIEW_OFFSET and PREVIEW_AUTOMOVE. Automatic mode retargets every 120 rendered frames; fixed offset supports deterministic intermediate visual inspection. Preview filename now follows actual focused layout item rather than eventual selected index. Vertical offset128 screenshot passed (5839 BMP pixels) and was visually inspected; automatic-motion smoke passed (13154 BMP pixels). No frame-pacing measurement/keyboard claim. Expanded actual layout tests across both orientations, counts1..5, every selection and offset -768..768 in steps16, asserting viewport bounds and exactly one final focused item; passes. Production source unchanged this turn. Next real menu/settings screens, interactive timing evidence and hardware/title pack confirmation; full goal active.
+
+## 2026-11-14 — First production Tools text screen in mGBA
+
+CI e44bde4 passed; 9df0b53 run43617898808 confirmed live at start. Added PREVIEW_SCREEN=1 to render extracted actual render_tools with real generated English messages and production draw_text_ovf/draw_central_text/font implementation. Fixture models five common tools; OAM selection submission is stubbed and actions never execute. mGBA 0.10.1 passed text-presence check (2312 body text pixels); screenshot visually shows all five left-aligned rows without clipping. This validates actual Tools text layout, not tool operation, Chis extra row or full menu skin parity. Production source unchanged. Next extend screen coverage/settings, align remaining appearance to EZ reference, and inspect newest CI. Goal remains active; actual official artwork/hardware Title result unresolved.
+
+## 2026-11-14 — Owner Build 534 report and candidate identity
+
+Owner confirms displayed hash126ae458 for Build534. That commit has no carousel code, so tested image included dirty source; exact image identity is unavailable. Reports first-edge attempted wrap crash, no carousel Title/Box art and severe artwork slowdown (List artwork improves responsiveness). Found unsigned Left-step subtraction producing negative selector; changed step to int. Added production-navigation extraction test: baseline fails selector>=0 assertion, fixed source passes List/Horizontal/Vertical edges/counts0..19. Included in verifier. New build-info.json records number, commit, dirty flag, project fingerprint and image hash. Added BUILD-TRACKING.md and candidate policy. No hardware fix claims; latest source needs board builds/CI and owner retest. Pause styling priority in favor of crash/artwork/performance investigation.
+
+## 2026-11-14 — Reduce scaler software division cost
+
+Prior turn fixed edge navigation and tracked owner Build534 identity. CI6ff2871 run43618378481 confirmed live; prior6e6f46e CI passed. Found software division inside every scaled-pixel pair: width*height horizontal divides plus height vertical divides. Now precomputes 240-byte maximum horizontal sample table once per blit. For120x80, variable divisions fall from9680 to200 with identical nearest-neighbor coordinates; this is operation-count evidence, not measured card speed. Added pixel-exact reference comparisons for9 widths×6 heights×opaque/DST1, including full-screen bounds/canaries; artwork/adapter and edge-navigation tests pass. Additional stack table is240 bytes and needs real runtime stack consideration.
+
+Diagnostic three-board builds live in session3360, logs `/tmp/dssmm-perf-{sd,lite,chis}.log`; production source frozen. These started with uncommitted optimization, so are diagnostic dirty-source outputs, not owner test/release candidates. New manifests record dirty status/fingerprint. After terminal result, commit source and rebuild clean for any distributed candidate; all boards must share same commit/build number. Missing-art root cause and measured responsiveness remain open. Next confirm builds/CI, inspect SD/cache calls and consider scaled cache to eliminate repeated resampling.
+
+## 2026-11-14 — Emulated renderer cost measured
+
+CI43618378481 for6ff2871 passed. Diagnostic board session3360 confirmed live during SD compression; do not restart it. Added preview-only PREVIEW_TIMING=1 using Timer0 CPU ticks cascaded into Timer1; footer excludes readout/page wait from measured render cost. Vertical Title screenshot passed and visibly reported1364130cycles (~4.86 frame periods), despite optimized divisions. This is important negative performance evidence: isolated full redraw/resampling still cannot achieve fluid motion. Uses EWRAM embedded artwork and schematic card/font rendering, so no physical SuperCard timing claim. Next pre-scaled cached surfaces/unchanged-frame reuse and identical-scene comparisons. Production source remains unchanged while builds run; harness/docs changed only. Keep measured limitations in future notes; goal incomplete.
+
+## 2026-11-14 — Owner-requested Animation toggle
+
+Added UI settings Animation On/Off, persisted as carousel_animation in format5. Defaults On for configurations without the key. Both carousel render-time motion advancement and selection retargeting require On; switching the setting resets pending motion, so Off changes entries immediately. Existing UI animation speed remains separate. SD/Lite/Chis settings/default/persistence tests and extracted cache suite pass. Diagnostic build3360 ended exit0, but images predate this toggle and are not distribution candidates. Current source needs clean candidate builds/CI after commit; preserve numbered manifests. Hardware art/performance remains open. Timer/scaler changes from previous turns are included in this next checkpoint, with their recorded evidence/limits.
+
+## 2026-11-14 — Animation Off skips scaling and neighbor preload
+
+Owner clarified Off must remove animation costs and requested disabling scaling for responsiveness. Implemented native-size selected artwork with neighbor system icons, no artwork_blit_scaled calls and only selected-entry preload when Off. Vertical native art occupies120x80 at y48 with filename atx128; neighbor icons stay outside that pane. Abandoned uncommitted large static-frame cache prototype in favor of this explicit fast path; no extra buffers remain. Actual production renderer regression loads valid selected art then asserts zero scaling calls across both orientations and exactly one load (no neighbor preload). Passes. Ongoing build92051 predates this change; SD547 clean passed, Lite was live, so output is not latest Off-path qualification. Need clean committed build/CI and hardware responsiveness/artwork checks; no measured speed claim yet.
+
+## 2026-11-14 — Fast-path regression and clean candidate preparation
+
+Build92051 completed exit0. SD547 manifest clean; Lite/Chis547 dirty because owner-requested fast-path source changes overlapped compilation. None is latest uniform candidate evidence; do not distribute that set. Expanded actual renderer regression to both Title120x80/Box80x80 and both orientations, asserting native blit screen bounds, zero scaler calls, selected-only single load and reuse across repeated draws. Cache/navigation/settings suites pass. Commit this fast path before new serial clean candidate builds, preserve same source number/manifests for all boards, then inspect CI and real card retest. Animation Off explicitly trades neighbor artwork for icons to avoid resampling/preloads; On retains full carousel art. Physical responsiveness and missing-art result still unresolved; full styling goal remains active.
+
+## 2026-11-14 — Generic artwork placeholders requested by owner
+
+Added original16x16 pixel placeholders for landscape Title screen and upright GBA box. Animation Off uses the matching placeholder for previous/next entries when Title/Box artwork is selected; selected real artwork stays native-size. Existing palette roles provide theme colors; no scaling, SD reads or extra OAM sprites. Production-cache regression compiles the actual drawing helper and verifies distinctive Title/Box pixels, transparent padding and out-of-bounds rejection, plus existing fast-path no-scale/no-neighbor-read assertions. Passes. Build548 session52898 was live and predates this source change; it is intermediate only. Need commit/clean all-board/CI and visual screen validation before distributing updated candidate. Official Title pack/card performance still unconfirmed.
+
+## 2026-11-14 — Fast placeholder screenshot checked
+
+Build52898 completed exit0 for all boards, but source changes during compilation mean548 outputs are intermediate (Lite dirty); do not distribute as uniform final candidate. Preview now extracts actual production placeholder helper and supports PREVIEW_ANIMATION=0: native selected art, no scaled neighbors, correct vertical name column. Vertical Box mGBA screenshot passed5731BMP-color pixels and was visually reviewed with upright neighbor placeholders. Timer1051587cycles is fixture-specific and not comparable to earlier Title benchmark; copying/compositing still expensive. New source needs committed uniform board/CI validation. No actual card speed/title-art fix claimed. Next commit before clean builds, then avoid tracked edits during compilation; continue production-frame optimization/parity.
+
+## 2026-11-14 — Skip opaque-pair framebuffer reads
+
+Current native-size transparent blitter read VRAM for every pair. It now reads background only when either indexed pixel is transparent; opaque pairs write directly. Added complete native-image reference checks for marked/unmarked pixels alongside existing scaled sweep. Artwork/adapter tests pass. Identical PREVIEW_ANIMATION=0 vertical Box timing changed1051587→985694cycles (~6.3% reduction); screenshot visually unchanged with5731BMP-color pixels. This is emulated fixture evidence only; redraw still ~3.5frame periods and physical SuperCard responsiveness remains unresolved. CI43619122243 forfa75815 passed; latest icon run43619424184 was confirmed live at start. Commit this measured improvement, then inspect CI and continue larger redraw/caching work; no release or parity claim.
+
+## 2026-11-14 — Retain fast artwork in both framebuffer pages
+
+Animation Off now tracks selection/view/artwork identity independently per Mode4 page. Stable pages skip full-body clear and artwork/placeholder copying, refreshing selected filename rectangle/footer and resubmitting OAM icons. Non-fast menu/modal/alert paths invalidate both pages; artwork invalidation also clears page validity. Selection/view/mode mismatch forces full redraw. This targets repeated native-art copying identified by timing, without scaling/preloads. Extracted production-cache regression asserts reused frames perform no blits; passes plus whitespace checks. Actual menu_render page-lifetime orchestration still needs board/runtime tests; no measured speed or hardware fix claim. Next validate page switching/modal/directory lifetimes, hosted builds, and mGBA integration with actual fast renderer. Goal remains active.
+
+## 2026-11-14 — Production fast-page lifetime regression
+
+Added test-fast-carousel-pages.sh extracting actual begin/end page policy from menu_render. Covers two independent pages, selection/view/artwork identity misses, and invalidation by confirmation popup/RTC popup/tool popup/alert/other tab/AnimationOn. Passes. Extended actual artwork-invalidation helper regression to require both page-valid flags cleared (directory reload invokes this helper). Included page test in full verifier. Existing cache test still confirms reused frame performs no artwork blits. These are mocked policy tests, not mGBA full-menu/hardware evidence. CI da27a03 and8d7be6e passed; ca64702 run43619650290 was confirmed live. Next real page-flip screen captures, latest clean board/CI validation, title-art investigation and remaining skin parity. Goal active.
+
+## 2026-11-14 — Reject mixed candidate sets automatically
+
+Added scripts/check-build-set.py: validates three manifests agree on clean source commit/build count/fingerprint, verifies each image hash, GBA checksum, embedded size,512byte alignment and full firmware seal. Current diagnostic set is rejected at Lite dirty-source status, as intended. This is a guard against distributing mixed historical outputs; no complete latest candidate validation claimed. Latest CIca64702/f97b3b8 were confirmed live at start; preceding scaler/icon runs passed. Next build clean same-commit set after checkpoint, collect CI, then real card artwork/performance feedback and remaining parity work. Goal active.
+
+## 2026-11-14 — Uniform Build553 validated and preview corrected
+
+Session66291 completed exit0. All three boards are clean source3ce7d917/Build553 with identical project fingerprint; identity/hash/GBA checksum/embedded size/firmware seal gate passes. Exact manifests retained in docs/build-553-validation.json. Hosted run43619877608 passed. These establish software build/integrity only, not owner artwork/performance qualification or full menu parity.
+
+Ported scratch preview corrections: DMA fills match production's fill method; generated messages header goes into output, so clean checkout preview does not depend on prior firmware build. Scratch without src/messages_data.h passed verticalTitleOff8604BMP pixels. Same verticalBoxOff DMA fill timing433206 versus prior CPU-fill985694cycles, image unchanged5731BMP pixels. Earlier total-cycle reports overstate production fill cost and are superseded for production comparison. Production firmware inputs unchanged by these preview-only edits. Next integrate validated lane normally, prepare owner-test prerelease if release gates met, obtain physical artwork/performance report, and continue remaining skins/fluidity. Goal active.
+
+## 2026-11-14 — Owner hardware-test Chis553 delivered locally
+
+Owner requested a root hardware-test folder then continued work. Copied verified clean Chis553 to /workspaces/dssmm/hardware-test/superfw-chis-build553.fw with build553.json and README.txt. Source3ce7d917; SHA9541a39d262a71e38134d412afe26a498e66e747e892786d15a537edc0aeedc3. Directory is local-only via .git/info/exclude, per owner location request; no root tracked hardware artifacts added. Provided chain-load test focus: first Left edge, Title/Box, AnimationOff responsiveness, return to browser. Await physical result; no resolved-hardware claim. Prepared four-section Test5 canonical draft with immediately prior changes folded into concise summaries; not published. Continue remaining skins/runtime evidence while owner tests; preserve hardware-test folder until superseded with owner knowledge.
+
+## 2026-11-14 — Production UI-settings preview
+
+Added PREVIEW_SCREEN=2 extraction of actual render_ui_settings, UiSet enum and box/text helpers with fixture preferences. mGBA text check passes3020pixels; initial six rows visually fit including AnimationOff. Corrected generic harness footer to avoid falsely covering Save. Does not validate OAM selection, scrolling/input/save action or physical theme palette. Build553 owner image remains unchanged in hardware-test. Continue actual selection/scroll settings coverage and remaining menu styling while awaiting card report; full parity/title-art hardware result still open.
+
+## 2026-11-14 — Lower UI-settings/Save screenshot
+
+Added PREVIEW_OPTION to select fixture UI row and extracted actual keypress-menu scroll-offset policy into preview selection setup. Save9 screenshot renders lower6rows (Animation through Accent) and selected Save button; mGBA check passed3157text pixels, screenshot visually fits. Does not execute key input/save writes or selection OAM. Firmware and supplied hardware-test553 unchanged. Next real theme palette/selection-surface parity and remaining system/game surfaces; awaiting owner artwork/performance observation. Goal active.
+
+## 2026-11-14 — Actual DSSMM palette in screen previews
+
+Added PREVIEW_THEME selecting extracted production theme table/type (Light6/Dark7), rather than schematic colors. Light lower-settings Save9 screenshot visually shows proper dark text/pale body/blue selected button. Smoke passes4699foreground pixels; count includes controls and is not a glyph-only assertion. Default-1 preserves prior artwork-test palette; theme-based artwork exclusion checks still need dedicated coverage. Accent/OAM blending not modeled. Firmware and owner553 image unchanged. Next improve actual selected rows/background surface to EZ reference and remaining menus; hardware artwork/performance report outstanding.
+
+## 2026-11-14 — Owner553 hardware feedback and placeholder revert
+
+Owner reports wrap/edge crash is gone on tested Chis553; artwork still does not display. This confirms edge-crash fix on that card only, not artwork/performance. Owner requests reverting Box/Title neighbor placeholders: removed original helper and restored normal system OAM icons in Off carousels. Updated preview to schematic icon stand-ins and adjusted actual cache test; cache/navigation regressions pass. Concurrent UI/Tools themed selected-row fill work is in tree and mGBA validation not yet completed (session40265 predates placeholder revert); inspect before claiming pass. Main diagnostic hypothesis to investigate next: contiguous FatFS reads currently target cartridge SDRAM directly, which cannot accept byte writes. Check real FatFS/driver copy paths before choosing a fix; mocks do not model that bus constraint. No artwork cause is yet proved. Hardware-test553 stays unchanged until new validated candidate requested/prepared.
+
+## 2026-11-15 — Carousel artwork root cause isolated
+
+Latest owner clarification: Box art DOES display in List view; carousel artwork does not. Found metadata-only difference: carousel bool flags/path/info lived on cartridge SDRAM and received unsupported byte writes. Moved metadata to GBA RAM (816 bytes IWRAM in initial Chis link), pixels remain halfword SDRAM. Added optional ARM/Unicorn test using actual extracted renderer and declarations: owner Build553 fails at a one-byte cart store; fixed source passes cache assertions and bus gate. Every board build now checks real ELF metadata placement. See docs/CAROUSEL-ARTWORK-MEMORY.md. This establishes a software defect/fix, not a physical result.
+
+Reverted neighbor placeholders as requested. Set aside unfinished unrelated selection styling in session-local /tmp/dssmm-unfinished-selection-style.patch; patch includes other changes, so inspect/select hunks before any future reuse. No root changes. Latest user narrows scope: finish artwork diagnosis, provide clean hardware-test Chis candidate, then PAUSE for model switch; do not continue parity work this turn. Focused checks/builds pending below. Preserve BIOS/session scratch and user devcontainer lock.
+
+## 2026-11-15 — Chis561 delivered; owner authorizes continued port
+
+Clean SD/Lite/Chis Build561 at76b7a493 share fingerprint and pass image identity/seal checks; each links816-byte metadata to IWRAM0x03000e74. Focused suites, ARM bus regression and all four AnimationOff mGBA Title/Box/orientation previews pass. Hosted full verifier43663344006 passed. Local upstream rerun hung with ASAN DEADLYSIGNAL in crc_test and was terminated; no local full-pass claim. Evidence: docs/build-561-validation.json.
+
+Copied Chis561 to root hardware-test/superfw-chis-build561.fw, SHA ffaf6863e320ec5aeb9c6521a7510167e58403e67508c17e9291f987cf8940ef, with manifest/guide. Removed our superseded553 local image/manifest; historical tracked evidence remains. Owner has switched models and explicitly revoked the requested pause: continue porting after delivery. Physical carousel result remains pending; retain561 unchanged while later menu work proceeds. No public release this turn.
+
+## 2026-11-15 — Resume DSSMM settings/Tools selection treatment
+
+After delivering frozen Chis561, resumed owner-authorized port. Light/Dark UI-settings and Tools selections now draw solid accent rows behind text; native themes retain upstream OAM highlights. Preview can select any Tools row. Visually inspected mGBA Light Animation row, Dark Accent/lower-settings page, and last Tools action; all fit. Removed doubled arrows from already-bracketed localized knob labels discovered during review. Native settings actions/persistence unchanged. Cache/page regressions pass; local Chis link of selection treatment passes (before the final arrow text adjustment); hosted full validation of committed follow-up is required. Build561 hardware-test image is unchanged; no physical artwork result yet. Remaining work includes production settings/game/in-game skins, true interactive/runtime coverage, physical carousel confirmation and fluidity; do not claim parity.
+
+## 2026-11-15 — Follow-up menu validation complete
+
+Source fd719d515a65ec7249bb829f2d306f0917e35df8 passed hosted full SuperFW verification43663757321 (three board builds, linked metadata gate and host suites). Final Dark lower-settings screenshot verifies duplicate arrows removed; earlier Light/settings and Tools screenshots inspected. Cleaned generated compiler/host-test/build folders after retaining validation evidence; kept root hardware-test Chis561 and its matching manifest/guide intact. User devcontainer lock, session scratch and private BIOS preserved.
+
+Next: await owner561 physical carousel result, then continue settings/game/in-game menu parity and real interaction/performance coverage. Do not treat isolated mGBA previews as card emulation. The mandatory artwork fix is published to the superfw source branch, not a new public release. Current development source is newer than the intentionally frozen561 test image.
+
+## 2026-11-15 — Owner561 result; native cropped carousel work in progress
+
+Owner confirms filename artwork now renders on hardware; ROM-header Title still fails. AnimationOn remains slow (improved), neighbor loads delayed, alignment differs from DE. Off offers no observed gain. Owner requests native-size previous/current/next with edges cropped, selected fully visible; continue autonomously. Implemented first native cropped blitter and renderer path, enabled neighbor cache population Off and invalidated retained pages when new neighbor arrives (otherwise cached pages hide newly loaded art). These edits are WORK IN PROGRESS, not distributed; update cache tests/builds before commit. Header lookup still unresolved; compare official pack format to strict decoder (DE reads thumbnail bytes directly). Frozen hardware-test561 unchanged. Broader parity goal remains active.
+
+## 2026-11-15 — Native cropped neighbors and settled-frame reuse
+
+Implemented native previous/current/next Off layout with edge/body clipping and selected-last layering, using production cropped blitter in preview. Opaque cropped rows use DMA. Both animation modes reuse settled pages, avoiding idle repeated scaling; motion/modal paths invalidate. New slot loads invalidate both pages so late neighbors become visible. RGB555 quantization uses exact32-entry lookup instead of three divisions per pixel. Pixel-reference cropping tests cover left/right/top/bottom and transparency/canaries; artwork/cache/page and ARM bus tests pass. Four Off mGBA screenshots pass; physical timing remains unconfirmed and synchronous SD reads can still stall.
+
+Compared DE game-code reader: fixed54+19200-byte direct-pixel record, unlike our strict BMP metadata parser. Added exact-length BM-only legacy interpretation after strict decode fails, ONLY for game-code Title fallback; metadata normalized in internal RAM. Adapter regression covers inconsistent desktop metadata and strict filename rejection. Official IMGS archive still403; this is a compatibility hypothesis, not pack/hardware confirmation. Next clean numbered all-board builds/CI and fresh Chis candidate, then continue parity/performance work without pausing. User explicitly requests sustained autonomous continuation.
+
+## 2026-11-15 — Uniform565 candidate delivered; continue alignment
+
+All three clean565 images source30829054 share fingerprint and pass integrity gate, linked metadata placement and hosted43665489569 full verifier. Four native-cropped Off previews pass; pixel/canary tests pass. Evidence docs/build-565-validation.json. Replaced our superseded561 local image/manifest with hardware-test/superfw-chis-build565.fw plus manifest/guide, retaining tracked561 evidence/owner confirmation. No physical565 performance or header-art result yet; no public release. Continue alignment/performance autonomously. DE reference vertical next y124 versus our108 clamp is a concrete mismatch; preserve footer via clipping instead of shifting the art upward.
+
+## 2026-11-15 — Animated DE geometry preserved with clipping
+
+Corrected horizontal interpolation to move image centers (DE left/right-5/185) and vertical next Y124. Removed fit-to-body geometry shifts; actual clipped scaler keeps source sampling anchored while protecting UI rows. Missing-image icons clamp independently, selection paints last. Added pixel-reference/canary regression for clipped scaling; motion/cache/page/navigation/ARM bus checks pass. All four settled animated mGBA views pass/visually reviewed; Chis source link fits (EWRAM94.13%,IWRAM39.28%). Mid-transition preview pending. No new distributed image; hardware-test565 frozen. Full parity/performance and physical legacy Title result remain open; continue autonomously.
+
+## 2026-11-15 — Alignment CI passed; main settings selection unified
+
+Animated alignment sourced7d761e passed hosted43665956534 all-board/full verifier and vertical midpoint mGBA smoke5539BMP pixels. Main settings now uses the same solid accent selection row as UI settings/Tools for themes6/7, retaining native themes' OAM and all actions. Chis link fits94.15%EWRAM; existing Dark UI-setting preview still passes. Main-settings input/visual screen itself has not been emulated; no physical claim. Updated draft Test5 notes to current native-neighbor behavior and owner561 filename confirmation; no public release. Next hosted source validation then normal integration into dssmm, shared-tree checks and combined CI. Continue performance/parity while awaiting owner565 report.
+
+## 2026-11-15 — Main settings emulator coverage and integration checkpoint
+
+391d7b7 passed hosted43666119527 all-board/full verifier. Added actual main-settings renderer/enum extraction to preview (Screen3), with clearly synthetic settings/date fixture and optional Chis NOR rows. Visually inspected Light Chis Fast-ROM, Dark SD lower save-policy and Save screens; smoke checks pass. Long values remain bounded/truncated; input/persistence are not emulated. Firmware inputs unchanged by this harness slice. Next normal merge into dssmm and combined CI; hardware-test565 remains fixed for performance/header-art result. Continue autonomous parity work; do not claim full parity or physical565 confirmation.
+
+## 2026-11-15 — Selected image hot cache; combined CI passed
+
+Integrationc7872aa passed all four hosted kernel jobs43666315152. All hardware lanes synchronized normally through dssmm: DE2da7584,OMEGA2c2d5cc,BLUE4b9255c; no force/squash or driver changes. Current new SuperFW follow-up adds selected-image DMA copy into9,600-byte EWRAM NOLOAD cache, so repeated sampling avoids cartridge reads. Three SDRAM backing slots remain; identity invalidates on load/path reset and tracks selection. Cache regression verifies no repeated copies when stable; ARM bus checks pass. Actual Chis link places hot pixels in EWRAM and fits97.95% (5268bytes spare), checked by mandatory ELF gate. Hardware speed remains unmeasured, and565 test image is unchanged. Need clean all-board builds/hosted gate of this follow-up before distributing another candidate; continue autonomous work.
+
+## 2026-11-15 — Clean571 all-board hot-cache candidate delivered
+
+All SD/Lite/Chis571 builds at3d0b1a80 are clean, identical source fingerprint, linked metadata/hot-buffer gates and image identities/seals pass. Hosted43666618620 full verifier passes. Evidence docs/build-571-validation.json. Current root hardware-test image is Chis571 (hash3d0b1a80), replacing our565 local image/manifest after retaining evidence. Includes cropped native neighbors, legacy code-art fallback, DE-position clipping and selected EWRAM hot cache. Physical performance/Title result pending. Continue autonomous info/game-menu parity; do not change this frozen candidate. No public release.
+
+## 2026-11-15 — Game information/patch/loading presentation
+
+ROM-info text is bounded/left-aligned with scrolling filename; game action button remains centered. Patch/loading Light/Dark rows use common accent fill; native OAM overlays retained for native themes and NOR driver/action paths unchanged. Headers now leave room for navigation arrows. Compact English Database/Engine/None/Skip BIOS labels and two-digit-year date with wider RTC column fix observed truncation. Screens4/5/6 extract actual renderer functions into mGBA preview with synthetic field fixtures, borders and text navigation arrows; actual launch, storage, NOR and disk OAM are not emulated. Light Flash128K info, Dark long-name/unknown-save, patch In-game and loading RTC previews pass and were inspected. Fixed fresh-preview messages shadowed by stale src/messages_data.h via local wrapper copy. Chis link pending final header adjustment; final hosted all-board tests required. Frozen hardware-test571 remains current; no physical571/art/speed claim.
+
+Final local game-screen result: Chis link passes with252072/257024EWRAM bytes (98.07%) and hot-image/metadata ELF gates pass. Framed patch preview visually confirms arrows/header separation; focused settings/cache/page/ARM bus checks pass. Source checkpoint next, then hosted all-board verification. Candidate571 remains unchanged.
+
+## 2026-11-15 — In-game main/reset/save selection slice
+
+Added solid selection rows to native in-game main/reset/save screens using existing accent palette color, across manual themes. Copied the existing OBJ accent into unused background palette20 (logo uses1..3; text16..19); no palette/header layout, action, save/reset, card protocol or restoration changes. These three screens suppress tiled OAM bar; other in-game screens retain it. Popup-active helper suppresses underlying highlight. Sanitized extracted production helper checks all Ypositions, exact pixels, canaries and popup suppression; added to verifier. Chis in-game payload link fits48904/61440 bytes and combined firmware252184/257024; no physical IGM qualification.
+
+New previews7/8/9 extract actual in-game presentation only with namespaced translations and synthetic flags. Light main/RTC and Dark reset/save Back screenshots pass and were inspected; logo/OAM/actions/storage/register restoration excluded. Current hardware-test571 predates this UI slice and remains frozen. Next hosted full all-board verifier, then integrate latest through dssmm and synchronize lanes. Continue performance/parity; ROM-header art and571 speed still need owner hardware results.
+
+## 2026-11-15 — Hot buffer follows visual transition focus
+
+Refined selected EWRAM cache to follow item->focused, not the new logical selection during the first half of a slide. This keeps the largest visible image in GBA RAM while names/geometry transition; idle/Off focus remains the selected file. Production cache regression asserts the previous image remains hot at the midpoint; ARM bus regression passes. No hardware speed claim. Latest source needs hosted all-board verification before final integration;571 candidate remains fixed and predates this refinement.
+
+## 2026-11-15 — In-game selection consistency and parity map
+
+Extended the shared in-game solid row helper to RTC Update, cheat rows and state actions, keeping numeric arrows/slot icons and all action/storage/restoration code native. State make-persistent selection is normalized before highlighting, as before. Screen10 actual RTC renderer with fake date/speed passes and was inspected; full cheat/state render fixtures remain pending. Bounds/popup helper sanitizer passes. e4c486b hosted43667997240 passed hot visual-focus refinement plus prior IGM slice. Latest extended IGM source still needs hosted all-board verification. Added docs/UI-PARITY.md as the live surface/performance/evidence map; corrected primary reference to ezfomegade per owner. Continue autonomously, with571 hardware image frozen.
+
+## 2026-11-15 — Full in-game renderer fixture coverage
+
+5ae64a7 passed hosted43668232783 full all-board verification, including new selection sanitizer. Added production cheat/state render extraction with native icon assets and synthetic flags/titles; preserved signed slot counts after initial fixture compiler failures exposed incorrect unsigned mocks. Memory slot, persistent slot, make-persistent-normalization and disabled cheat row screenshots pass and were inspected. Palette128..143 loaded only in slot previews to avoid corrupting artwork colors elsewhere. All slot/save/cheat action and restoration paths remain excluded; physical gameplay/state compatibility not qualified. This follow-up changes tests/harness/docs only, not firmware. Integrate the validated firmware milestone normally and keep hardware-test571 frozen.
+
+Final in-game fixture result: all memory/disk/copy/cheat screens pass mGBA0.10.1 smoke checks and visual inspection, using original renderers/icons with synthetic data only. Source firmware5ae64a7 remains the last tested all-board milestone; newer d80ccac+fixture edits are harness/docs only. Continue autonomous interaction coverage and normal integration;571 remains frozen.
+
+## 2026-11-15 — Actual UI input replay checked in mGBA
+
+Screen2 now routes GBA keys through actual extracted UI-settings key handler, with signed selector/offset like production, actual theme/accent resolver, and explicit no-op artwork/filter/false-save boundaries. Automated PNG marker asserts live Animation state. Right=>On, two Rights=>Off plus five Downs=>Accent, and four Ups=>top clamp then Right=>Dark pass; screenshots inspected. Repeated On check after make clean also passes without firmware-generated headers. Fixed production selection comparison with explicit int cast, matching actual selector type and avoiding preview -Wextra signedness warning; behavior unchanged. Native event handler is exercised, persistence/full browser filtering are not. Integration4ebcf3b hosted43668765783 passed all four kernel jobs; latest input-harness/cast checkpoint still needs hosted gate. Removed superseded board/compiler/test outputs after preserving571 evidence/hardware image; session BIOS/scratch/user lock preserved.
+
+## 2026-11-15 — BMP staging tail bus fault reproduced and fixed
+
+Clean uniform581 source814ee8e all3 packages and integrity gates passed (docs/build-581-validation.json); root all4 CI43669205497 passed and all5 trees matched65affc9c. Before distribution, audited linked memcpy+FatFS final-sector copy: STRB on final2BMP bytes. Optional actual-adapter ARM bus test rejects the pre-fix source at0x08004b34 and corrected code passes. Changed to word-aligned bulk request plus GBA-RAM tail copied with halfword stores; immediate tail read reuses cached sector. Compile-time FatFS cache alignment assertions guard source layout. Mandatory adapter test checks request alignment, misalignment rejection, tail/short-read/close faults. This is pixel-tail correctness, not confirmed cause of absent header Title. All-artwork sanitized suite passes; latest ARM replay pending final added fault tests.581 was not distributed;571 stays in hardware-test until replacement. Need new committed clean all3 package/hosted gate, then provide current image and continue. No pause or physical qualification claimed.
+
+Final BMP-tail checks: sanitizer and ARM adapter replay pass normal/short/close/tail failures, all tail lengths0..3 with valid odd BMP offsets, odd-capacity padding rejection, and buffer misalignment rejection. Both ARM tools now reject any non-halfword/word or improperly aligned cartridge store. This closes the reproduced tail fault without reverting to per-row reads. Commit and clean-package replacement next; no further source edits during packaging.
+
+## 2026-11-15 — Clean582 current hardware-test candidate delivered
+
+All SD/Lite/Chis582 at842bad386c5c3f5616a4b01eaa4f5e3f8596c5c2 are clean, share fingerprint, and pass image identities/seals plus linked metadata/hot-image placement. Hosted43670448850 full verifier passed. Chis uses252376/257024EWRAM and12872/32768IWRAM; static layout does not qualify stack/timing. Evidence docs/build-582-validation.json. Copied Chis582 to root hardware-test/superfw-chis-build582.fw, SHA5f3e919b878a252056c4bc31d1db869868cfca39ec0f1ade558d4680876350de, with manifest/guide. Superseded our571 local file/manifest after retaining tracked evidence.581 was never distributed. All broader menu/input previews remain applicable because staging fix only changes storage adapter.
+
+Owner has not yet reported582 Title/speed/IGM results. Filename art and edge fix remain physically confirmed only on earlier owner-tested builds. No public release. Next normal merge/sync of final staging fix/evidence, shared checks, collect combined CI, clean generated outputs while preserving hardware image and session BIOS/scratch/user lock. Then continue performance/parity from docs/UI-PARITY.md; do not claim full parity or pause for permission.
+
+## 2026-11-15 12:51 UTC — Build582 feedback; header history and five-image cache
+
+Owner582 confirms only AGS Aging/TCHK header art works, others have No-Intro tags; menu improves but adjacent icons briefly appear. Verified exact DE commit944ac131d0653b2e4a11e04f368fb00220303be5: startup/save-art validator accepted planes0 for owner-supplied19254-byte TCHK. This is distinct from DST1. Native DE browser ignores opaque record headers and reads fixedprefix; SuperFW582 wrongly limited legacy to exact-size BM records. New code-art reader accepts bounded19254-byte prefixes, preserves native DST1 fixed-layout semantics including ignored size fields, keeps filename parser strict. Synthetic TCHK/nested path, planes1, raw prefix/trailer, truncation, marked sizes and No-Intro unchanged-path cases pass; actual original pack remains403/uninspected. See HEADER-ART-COMPATIBILITY.md.
+
+Removed Animation setting, serialization and experimental instant/cropped route; version6 ignores legacy key and preserves other preferences. Normal transitions remain. Expanded SDRAM image cache3→5 (selected±2), metadata remains GBA RAM; visible3 prioritized, outer loads do not invalidate stable pages/hot image. Tests verify forward cache reuse and far-prefetch no redraw/copy. Centered SuperFW version/hash line in Info. Initial Chis link fits IWRAM13416bytes/EWRAM251620bytes before final reader refinement; final all-board link pending. Settings/artwork/cache/page/navigation/motion and both ARM bus suites pass. Four carousel mGBA views pass; new UI view-toggle input preview pending. No new build distributed yet; hardware-test582 remains until replacement. Commit checkpoint, clean same-source all3 build, hosted verifier and new Chis candidate next; continue autonomously.
+
+Follow-up validation before checkpoint: all four normal carousel mGBA screenshots pass; UI-settings View changed Horizontal→Vertical through actual key handler and screenshot passes. Historical Animation preview flags now reject stale commands, and its marker/instant route are removed from the harness. Latest reader marker check mirrors native fixed-layout fields (including ignoring size fields); both ARM bus regressions, sanitized artwork, settings, cache/far-prefetch/page/navigation/motion tests pass. Final all-board memory/link/package gates next; do not edit source/HEAD while serial candidate builds run.
+
+## 2026-11-15 — Build585 validated and delivered
+
+Clean uniform SD/Lite/Chis585 source45e4dbbcc70fcb83d83d55b465e52118eb750ad0 all pass image identities/seals and memory gates; hosted43716700372 full verifier passes. Chis IWRAM13416/EWRAM251732; metadata1360bytes (5slots), focused cache9600EWRAM. Evidence docs/build-585-validation.json. Current root hardware-test/superfw-chis-build585.fw hash45e4dbbc SHA4f1ae0b0e2648b05511a41bfa1217ecc9dcda95fefe24502930405ade00028fa, matching manifest/guide; removed our superseded582 local artifacts after preserving evidence. Hardware compatibility/speed not claimed; original pack unavailable403, synthetic/native-source behavior verified. No public release.
+
+Continue autonomously into directory-open cost: DE history shows header-art ROM reopen scans long-name directories repeatedly. Inspect native SuperFW FatFS R0.15 (LFN2/UTF8, exFAT1, lock/reentrant0) and design independently validated read-only indexed header open with full name/size checks and normal f_open fallback. Do not copy another card's driver. Browser has16384records; current SDRAM state15080036bytes,14.5MiB limit15204352, so a4-byte per-record index(+65536) fits,8bytes(+131072) does not. dir_next leaves dptr unchanged at EOC, so do NOT infer prior SFN offset by subtracting32 after f_readdir. Capture blk_ofs/LFN start (or current dptr for SFN) inside native readdir before advancing, and validate reconstructed name/size when opening. FAT/exFAT real-library RAM-disk tests are needed before retaining any change. Keep585 hardware image frozen through this next work.
+
+## 2026-11-15 — Owner585 confirms artwork/cache; folder art and font goals
+
+Owner reports585 header Title images now display and five cached images solve the reported neighbor problem. Record this as physical Chis585 evidence only. New focus: CUSTOM directory art (`Game Boy Advance.bmp` in both IMGS/CUSTOM and IMGS2/CUSTOM), and optional DE DSSMM font. Added docs/FOCUS-GOALS.md and current agent guidance. Defer indexed filesystem work; only its native source was inspected, no FF/library changes made. Begin folder-art loader/renderer support then font asset/metrics/provenance audit; preserve585 image until a validated replacement. Continue autonomously.
+
+## 2026-11-15 — CUSTOM directory artwork implemented
+
+Added dedicated validated directory-path/loader API: exact complete basename in mode-specific CUSTOM, preserving dots, rejecting parent/traversal names. Strict DSSCC decoding/DST1 and word-safe staging reused; no ROM header/mirrored fallback for directories. List+Art and both carousels dispatch folder entries through this loader, cache positive/negative results and draw valid art instead of folder placeholder. Missing/invalid art retains native icon. Sanitized path/format fixtures cover owner Game Boy Advance paths in Title/Box, dotted names, wrong dimensions, missing images and no ROM opens. Actual carousel dispatch/cache regression and both ARM bus tests pass. Updated end-user artwork guide (post585 development availability). Next optional DE font asset conversion/metrics/persistence/IGM propagation; no new hardware candidate yet,585 remains frozen.
+
+## 2026-11-15 — Optional DSSMM font implementation
+
+Added saved UI Font SuperFW/DSSMM choice (native default), printable DE ASCII
+asset conversion with Apache notice/provenance, and native Unicode fallback.
+All original pixels retained; 12 rows padded within native16-line metrics,
+tilde advances7 for its overhang. Settings7 persists bounded font key. In-game
+handoff uses reserved palette word5 without moving payload fields. Actual glyph
+pixel/odd-even/canary/metrics/scroll/fallback sanitizer and all-board settings
+fixtures pass. Chis development link254956/257024EWRAM; IGM50360/61440.
+mGBA UI screenshot inspected: compact DSSMM glyphs and Font option fit. Folder
+CUSTOM and both bus regressions remain required gates. Next clean committed
+all3 candidate, integrity/memory checks and hardware-test delivery. Physical
+font/folder/IGM qualification pending;585 remains until validated replacement.
+
+## 2026-11-15 — Build588 delivered
+
+Clean SD/Lite/Chis588 at2a150a379d28bac81418ece349a0bf343b963b15
+share fingerprint and pass integrity/seals/memory gates; hosted43720266778
+passes. Chis254956/257024EWRAM (2068bytes static headroom; stack/runtime not
+qualified). Local upstream standard ASAN sha256 startup hit known DEADLYSIGNAL;
+terminated that process and complete sanitizer/coverage suite passed with
+CFLAGS adding -fno-pie -no-pie (90.8%lines/94.5%functions). No tests suppressed.
+Evidence docs/build-588-validation.json. Root hardware-test now contains Chis588
+and manifest/guide; superseded own585 local artifacts after preserving evidence.
+Folder CUSTOM and optional font need physical observation. Owner585 confirms
+header art and five-cache behavior. Continue broader parity autonomously.
+
+## 2026-11-15 — Fixed SYSTEM storage owner update
+
+Owner explicitly supersedes preserve-.superfw: all resources now use SYSTEM,
+with directory choices removed from UI, persisted output and parsing. Migration
+runs immediately after mount and before pending-SRAM handling: rename absent
+targets, recursively merge existing dirs (depth8/path bounds), never overwrite
+files; conflict/error stops boot. Partial moves resume. Only empty source dirs
+are deleted. Existing root/alternate/next-ROM save sets still auto-detected if
+canonical data absent. Added real host-filesystem adapter tests for resources,
+art preservation, pending-marker conflict, failed move and retry. All-board
+settings tests pass. Cold action/setup code uses Os, renderers keep O2 to fit
+Chis. New storage policy still needs physical testing. Next clean all3 storage
+checkpoint and hardware image, then proceed with actual Start/assets/settings
+work; owner requests continuous autonomous progression until DE parity.
+
+Storage checkpoint packages are clean Build592/source9755f12, all3 matching
+integrity/seal/memory checks pass. Standard local host ASAN again failed at
+sha256 startup; complete non-PIE sanitizer rerun passes90.8/94.5 coverage. mGBA
+settings renderer inspected/test passes after removing directory controls.
+Hosted43721652107 is still running: do not distribute until it passes. Source
+renderer development may proceed because these clean packages are frozen.
+
+## 2026-11-15 — DS Start/background/settings navigation slice
+
+Added exact credited DE Light/Dark Start assets as3070-byte lossless halfword LZ,
+source pixel fixtures and optional actual ARM video-bus test. Added Start/Last
+Played/SD/board-specific NOR-or-Recents/settings navigation and settings hub.
+Production input extraction passes all3 variants. Generic pages use exact DE
+SD_LIST stripes; carousel text restores texture and retains five-cache/page reuse.
+DSSMM themes use functional headers; native themes keep upstream tabs/Start art.
+Settings children are still native flat pages, not finished parity. mGBA Start
+light/dark and category fixtures render; corrected preview palette role aliasing
+(FT18 vs background0..15). Production roles were already separate. Dialog/cold
+code uses Os to fit Chis; browser/font/motion retain O2. Static Chis255624 before
+final title tweak; clean all3 gates next. Storage-only592 was not distributed;
+hosted43721652107 stalled/canceled. Host test Makefile now uses non-PIE sanitizer
+executables to fix recurring startup loops; full standard verifier next.
+
+## 2026-11-15 — Build594 delivered, continue letter-folder pack
+
+Clean source26526437b192b1e26a706379a1ffdf3f9a110b4c Build594 all3
+identities/seals/memory pass. Standard local full verifier passes after non-PIE
+ASAN host fix (90.8/94.5 coverage); hosted43722736343 passes. Exact source pixels,
+ARM VRAM/store discipline, both artwork/cart suites and launcher navigation pass.
+Light/Dark Start/settings mGBA inspected. Evidence build-594-validation.json.
+Chis594 now root hardware-test; own588 superseded after tracked evidence. No
+public release. Full parity unfinished; category children/system/dialogs next.
+Owner confirms588 font works well. New task: transparent closed-folder #/A–Z art
+sets120x80 Title and80x80 Box, global basename matches anywhere. CUSTOM directory
+lookup already matches full basename independent of parent; prepare compatible
+ready-to-copy pack and verify all54 via actual decoder before delivery. Preserve
+CUSTOM override priority if a future embedded fallback is added.
+
+## 2026-11-15 — Letter-folder pack and explicit image budgets
+
+Owner588 confirms font good. Generated54 closed-folder Title120x80/Box80x80 BMPs
+plus alpha PNG copies for #/A–Z, actual credited DE glyphs, DSSCC DST1 transparent
+canvas. Existing CUSTOM folder lookup already matches basenames globally, so pack
+needs no firmware additions. Ready-to-copy ZIP and preview in root hardware-test;
+all54 production decoder sanitizer tests pass. Component licenses included.
+Independent board size gates now reinforce native linker budgets and record
+used/limit/headroom.594 margins SD19968/Lite35840/Chis425472bytes, Chis main EWRAM
+1368static bytes. User explicitly requires keeping hardware size limits. No
+limit increases. Next integrate evidence/scripts, then true settings categories
+and remaining menu/dialog/DS behavior. Keep594 hardware image frozen during work.
+
+## 2026-11-15 — True Games/Hardware settings category slice
+
+Replaced hub cursor shortcuts with filtered physical-option tables for Games and
+Hardware (board-specific NOR verification only on Chis). Renderer, keyboard
+movement and Save reset share the category mapping; native themes/LR general
+settings retain the full list. Save button recentered. Host production routing,
+category visibility/bounds and movement pass; mGBA actual hub A entry to both
+children and Games scrolling inspected. Chis diagnostic link256144/257024 before
+final helper/reset tweak.594 remains frozen. Next memory work: readonly background
+streams can be appended to native font-resource pack, whose reserved SDRAM area
+is14.5..16MiB (1.5MiB), with font prefixes unchanged. Existing fonts-ext1047800bytes
+leaves ample room for3076-byte appended stream blob. Preserve native byte-safe
+bootloader font unpack/copy, original font header/data_size, current heap/cache
+layout and hardware caps. Need prefix/region tests, actual ARM external-asset
+replay and clean all3 package/memory/CI gates before any candidate replacement.
+
+## 2026-11-15 — Owner594 Start refinement and read-only resource work
+
+Owner reports good594 progress. Implemented NAME.TXT/NAME first-line cache,
+UTF8/BOM/11-character bounds, right software time bar, A/Start HH/MM editor,
+stronger corners, NOR B→Start and wrapping0/remembered1or2/3/4. Clock runs only
+in menu using280896/16777216 frame duration, persists UI starting time (settings8),
+unknown until set; no off/game wall time or hardware RTC claim and no game-RTC
+changes. Native date modal field bounds reused with time-only presentation.
+Pure profile/clock tests pass; production editor callback/bounds/cancel/save
+checks and mGBA clock/NOR return fixtures in progress. Profile source Chis
+link254760EWRAM/13464IWRAM before final text refinements.
+
+Background streams appended as3076-byte DBG1 blob to original normal/extended
+font assets in native1.5MiB resource region; original prefixes/header sizes
+unchanged. Existing copy/apunpack algorithms/addresses retained. Build generates
+both packs; rounded ext copy still has516096bytes free. Actual ARM embedded,
+standard and extended background pixels pass and no read-only resource writes
+occur. Main RAM recovered~2.6KiB before new profile. Missing-tag fallback replay
+added; final tests/clean all3/hosted checks next.594 remains frozen. Preserve art
+ZIP/preview and session BIOS/scratch. Continue autonomously after next candidate.
+
+Final focused checks: username/clock parser and actual clock editor field bounds,
+cancel/accept/save/game-RTC isolation pass with sanitizers. All3 production
+launcher cycles, remembered SD/NOR row and NOR B-return pass. Actual ARM embedded,
+standard, extended and missing-tag fallback outputs pass, with no asset writes.
+mGBA time selection/editor/accept and Chis NOR A→B return pass; screenshots
+inspected (header name/time and bold corners). Editor arrows now use actual
+font metrics. Source checkpoint next; freeze source/HEAD for clean all3 candidate.
+
+## 2026-11-15 —598 gates passed; owner12-character follow-up
+
+Clean598/source3508d7328ccdb14f61b7cd9a35ab8d2f36b7d078 all3 packages,
+standard full verifier, flash/RAM/resource gates and hosted43725948594 pass.
+Evidence build-598-validation.json. Not distributed: owner changed displayed
+name limit to12 at this point. Proposed editable name/keyboard was explicitly
+canceled before implementation. Keep NAME.TXT editing manual and only Time
+selectable; wrap cycle remains Last/rememberedSDorNOR/Settings/Time. Updated
+parser/display storage to12 full UTF8 characters (49bytes). New clean candidate
+needed after this tiny follow-up;594 stays current until replacement.
+
+## 2026-11-15 — Build599 delivered
+
+Clean all3 Build599/source18a8c56eae41a8a61e5338aac7b87590d3199763
+passes identity/seals, board flash caps, GBA placement and resource budget.
+Standard local full verifier passes; hosted43726431002 passes. Evidence
+build-599-validation.json. Root hardware-test now Chis599/hash18a8c56e plus
+manifest/guide; own594 files superseded after tracked evidence. Letter art ZIP
+and preview retained. Name readonly12-character UTF8 first-line display; user
+canceled name keyboard/editing before implementation. Time remains selectable,
+wrapped Last/SD-or-NOR/Settings/Time, independent software clock and editor.
+No physical599 qualification; owner594 progress recorded. Continue DE settings
+layout/backgrounds, true View options grouping, System/Help/dialog presentation.
+Do not edit599 image while next work proceeds. Integrate/sync this milestone.
+
+## 2026-11-15 — Active owner follow-ups and RAM checkpoint
+
+Owner599 confirms clock/editing and prominent markers; asks Settings marker up/right
+and four distinct corners for Settings/Time. Implemented adaptive arms/masked
+halfword edges; host canary/gap test passes. Next default save folder is SYSTEM/SAVER,
+with SYSTEM/SAVEGAME and all earlier save-set fallbacks retained; settings tests
+pass. Owner asks DS backgrounds/no bottom bar on all menus except List and exact
+art/panel/settings alignment. SET Light/Dark assets and9-row DE-font/7-row native
+settings geometry now render in mGBA, value-column highlights/white text. Root/
+Games screenshots inspected. Remaining generic/carousel/background/clip alignment
+work is active; not complete. Update unlock now fresh Down-Up-Left-Right-A in5s;
+wrong keys/chords/timeouts reset. Basic order/boundary/wrap tests pass; native
+fresh-key/Info integration test pending. No update-write/confirm path changes.
+
+Latest Chis diagnostic256704/257024EWRAM leaves320bytes. Do not loosen limits.
+Before adding further UI, compress the fixed built-in IGM payload with the native
+UPKR codec already used by this kernel, retaining its runtime-size metadata and
+identical decoded install bytes/address/allocation. Keep compressed bytes in GBA
+RAM, not a cartridge region that game/font moves may overwrite. Require host
+round-trip, ELF embedded metadata/stream verification and actual ARM halfword
+unpacker byte-equivalence/guards for all3 variants. This affects install mechanics,
+so new hardware gameplay/restore validation remains necessary despite identical
+bytes.599 remains current/frozen while work proceeds; folder ZIP/BIOS/scratch kept.
+
+## 2026-11-16 — Codespace recovery and plugin loader checkpoint
+
+Owner reports Codespace crash. Rechecked git/files/processes: source edits, current
+hardware-test599 and manifests, canonical Folder-Art.zip, private BIOS and session
+scratch survive. No live compiler/mGBA process remained. One interrupted own file,
+scripts/test-pogo-reset-arm.py, was zero bytes; restored and reran successfully.
+Root dssmm fe2a427 (folder pack) and superfw dab4a81 are confirmed remotely before
+this checkpoint. User untracked devcontainer lock/audit/patch remain untouched.
+
+Owner additionally requests existing EZFODE emulator plugins. Portable Pogoshell
+extension lookup now supports PLUG/<extension>.bin/.gba/.mb/.mbz before native
+SuperFW fallback; no EZ-FLASH driver is imported. New reset preserves argument
+block, supports RAM/raw/LZ77 entry, validates bounds/complete streams; exact-read
+loader handles partial word tails without native32-byte copy overrun. PLUG
+migration safely merges SYSTEM/emulators, preserving conflicts. See
+PLUGIN-COMPATIBILITY.md. Focused all-board sanitized loader tests, ARM reset
+replay (BIOS calls modeled), SYSTEM migration and all20 existing pack RAM-format
+checks pass. No physical plugin/game/save qualification claimed.
+
+Recovered settings/background work remains IN DEVELOPMENT: unified shared
+SETTINGS.TXT + namespaced extras, unknown DE/private/legacy UI preservation and
+atomic replacement now have real-filesystem short-write/rollback/recovery/oversize
+checks. These pass; Save buttons/autosave, Clean list display, shared recents,
+remaining backgrounds/footer/alignment are unfinished. Do not claim completed
+SYSTEM portability or parity. New update/Start corner and theme tests pass.
+
+Current diagnostic Chis main links at248184/257024EWRAM and14088IWRAM (before
+last small settings fixes). Native IGM50356→28233 packed bytes, runtime216244:
+host roundtrip, actual ELF bytes/metadata and actual ARM halfword unpacker output
+and guards pass. scripts/build.sh now enforces host/ELF IGM package validation;
+DSSMM_ARM_IGM=1 adds optional Unicorn replay per board. Still rerun clean all3,
+full verifier, background ARM and hosted checks after source freeze before a new
+hardware-test image;599 remains frozen. Continue remaining owner goals autonomously.
+
+## 2026-11-16 — Settings/recents follow-up source freeze
+
+Save buttons are removed; exiting settings/submenus saves unified SETTINGS.TXT
+and blocks navigation on failure while retaining values. Production routing test
+now covers successful and failed autosave. Clean list option strips NoIntro tags
+and extensions only from displayed files in browser/carousels/Recents/NOR/Start;
+untouched names still drive IO/artwork/header matching. Sanitized name tests pass.
+Start Box art moves up2; Title is58x38 at even x28/y46, moving up/left slightly.
+Updated preview extractor after Save removal; production-renderer preview builds.
+
+Recents now record at successful selection before launch and independently of
+Recent-menu visibility. Shared RECENT.TXT contains10 newest SD paths; private
+SUPERFW-RECENT.TXT retains native/NOR history. Merge external shared ordering;
+identical first SD title retains private NOR ordering (external same-title
+reselection is inherently indistinguishable). Writers create SYSTEM, check closes,
+write replacement/backup before commit and recover backups. CRLF accepted.
+Sanitizers found a native rounded memcpy32 filename overread; staged bounded,
+aligned padded filename also prevents aliasing during reordering. Focused actual
+file-IO tests cover shared/private order, failures, rollback and recovery.
+
+Owner removes public Folder-Art.zip and authorizes relocating local copy. Exact
+archive now /workspaces/dssmm/.release-assets/folder-art.zip, SHA256
+b42f691461512c9c2933ef6c914392b6c00df875334cc5bd20aa8ef75969d3d5. Preserve this ignored
+input, attach on every future kernel release. Root policy0b5148f pushed after
+owner deletionf47afa6; never re-add public ZIP. Generated letter-only pack now
+also uses centered80x80 sprites on120x80 canvas; not a substitute for owner pack.
+
+Next: freeze checkpoint, clean full all3 verifier and optional ARM IGM/background/
+plugin reset replays, mGBA screenshots, hosted CI. Do not replace599 until gates
+pass. Full generic/H/V backgrounds, footer removal outside List, final DE-font
+alignment, System/Help/dialog parity remain unfinished. Keep goal active.
+
+## 2026-11-16 — Build603 verified and delivered
+
+Source f28de96b7c205cb148adf7b470fab22048d20c9e (603), clean same-source all3
+identity/integrity/flash/resource/RAM gates and standard full verifier pass.
+Hosted43780888958 succeeds at that exact source. All3 IGM host/ELF/ARM byte
+replays pass. ARM embedded/standard/extended/missing-tag backgrounds match source
+pixels and preserve readonly assets; current carousel bus replay and plugin reset
+ROM/MB/MBZ replay pass. mGBA0.10.1 Start/SET hub with actual Light palette and
+DSSMM font inspected; synthetic games/art, no physical card/BIOS qualification.
+Evidence docs/build-603-validation.json. Root hardware-test now Chis603 plus
+manifest/guide; own599 files superseded, tracked historical evidence preserved.
+
+Flash used/headroom: SD518656/5632, Lite485888/22016, Chis1671680/425472 bytes.
+Do not raise limits; next asset/code work must honor especially tight SD budget.
+Owner archive stays .release-assets/folder-art.zip, full contents preserved.
+No public release in this milestone. Full DE generic/H/V backgrounds, footer
+removal outside List, final font/art alignment, System/Help/dialog parity remain
+unfinished. Continue port autonomously;603 remains frozen during later work.
+
+## 2026-11-16 — Post603 background parity slice
+
+603 remains frozen. Added credited lossless Light/Dark H/V/Help assets plus
+48-row repeating DS grid, with reference hashes. DBG3 read-only resource blob
+18436bytes (old6035676), rounded extended headroom499712; all native prefixes
+remain byte-identical. SD compressed standard resource grows2616bytes in an
+isolated pack comparison; complete board image limit still must pass. Never
+infer the complete image fits from this partial measurement.
+
+Main renderer now draws DS H/V, grid and Help backgrounds before headers;
+carousels preserve existing page/cache reuse. DS carousel and Info/NOR footer
+bars removed, List/native retained. Artwork clipped at screen160 rather than
+old144, retaining full lower vertical neighbors. Info native logo palette is
+isolated to native themes; DS Help uses ordinary SuperFW text without palette
+collision. Existing version/hash stays centered. Caption wrapping/alignment and
+remaining settings/dialog visual parity remain next.
+
+Focused host all12-background pixel checks, actual ARM embedded/standard/extended/
+missing-tag checks, artwork clip/guard tests, cache/page tests and Chis diagnostic
+link pass. mGBA Light+DSSMM-font horizontal/vertical screenshots inspected:
+actual panels/grid and art, no bottom bar. Diagnostic EWRAM249060/IWRAM14072;
+no new candidate yet. Freeze, clean all3/full verifier/CI before replacing603.
+
+Root integration CI43781689758 caught unregistered universal folder-art tool;
+root ba4c310 registers that exact universal tool with regression test, preserving
+unknown hardware-tool rejection. All4 jobs now pass in43782162091. Policy fix
+is normally synchronized to all5 branches. Root edits stayed on dssmm. Current
+SuperFW source work remains under superfw/. Owner archive remains ignored local.
+
+## 2026-11-16 — Build613 background candidate delivered
+
+Source652aed373bbc4bce1fdc51c3593b1a07c915a369 count613; clean full verifier,
+all3 package/source/integrity/flash/resource/RAM gates and hosted43782888780 pass.
+All12 asset pixels/ARM readonly+halfword tests and artwork full160-height/cache/
+page checks pass. All3 native IGM host/ELF/ARM equivalence passes. mGBA H/V Light
+DSSMM-font screenshots inspected. Evidence docs/build-613-validation.json.
+Hardware-test now Chis613/manifest/guide, superseding own603 artifacts after
+retaining historical evidence. No physical613 validation and no public release.
+SD521216 leaves3072bytes, Lite488448 leaves19456, Chis1671680 leaves425472.
+
+mGBA synthetic full-redraw vertical fixture reports1226595cycles. It uses ROM
+code/art and lacks the actual firmware selected hot cache/page reuse; never
+claim that number is physical kernel FPS. Still, profile background/art/caption
+costs next before heavier skinning; consider run-fill background decoding and
+actual GBA DMA for long spans if measured/equivalent. Do not allocate large new
+GBA buffers or weaken SD's limit. Existing verified613 stays frozen. Continue
+caption wrapping/alignment from DE font metrics, settings/System/Help/dialog
+look/feel and performance autonomously; parity is not complete.
+
+## 2026-11-16 — Owner603 UI feedback and GG/save follow-up
+
+Owner reports603 Start/settings UI issues (not gameplay/plugin/save validation).
+Settings gear marker now expands1px on every side, x111/y142/w20/h16; four corners
+and masked odd-x writes retained. English labels exactly Show hidden, Fast ROM
+Load, Verify flash, EWRAM boost. Help hint exactly "Unlock: Down, Up, Left, Right,
+A in 5 sec". DSSMM submenu highlight14px instead of16 fits9-row geometry and
+preserves bottom frame151 with gap150; native font retains16px. Dedicated actual
+helper pixel/canary test and four-corner test pass. Interface bottom row screenshot
+inspected in mGBA: label fits and frame remains visible; Start screenshot follows.
+
+Owner wants GG to use SMS emulator but own icon. Shared Pogo extension helper maps
+GG→sms for resolver and loader; original GG filename/native wrapper flags remain.
+Actual native first/second emulator header flags and shared lookup tests pass on
+all3. No GG sprite existed: appended exact DE16x14 RGB555 icon to16x16 tile/palette
+with transparent row top/bottom; native IDs/colors unchanged. Read GAME-GEAR.md.
+All3 icon byte/pixel/palette/VRAM/icon-lookup checks pass (or rerun if interrupted).
+Bounded title copies also remove fixed-length reads beyond short emulator names.
+
+Owner asks regression checks for two-character GB/GG save filenames. Those worked;
+new realistic tests exposed separate repeated extension-stripping bug for dotted
+basenames. Now append .sav once after deriving stem, bounds-checked; .gb/.gg,
+uppercase, NoIntro, dots, legacy/backup/tmp and state-stem tests pass all3. Old
+shortened dotted-name saves are left untouched; cannot safely infer ownership
+when prefixes collide. Documented backup/manual rename, not automatic guesswork.
+
+Current613 remains frozen. New feedback/GG/save changes need clean same-source
+all3/full verifier/CI before next hardware-test image. Keep all3 synchronized;
+SD613 had3072bytes headroom, so added icon/code must pass real image gates. Broader
+performance profiling, caption/font/settings/dialog parity still active.
+
+615/source580906ddf6fdda5e08ac19a0b81fdc8fbc145b8e passes clean all3/full local
+verifier and hosted43785459391. Evidence build-615-validation.json; not distributed
+because existing dotted-name save compatibility needs a follow-up. New complete
+basenames stay canonical, but when no correctly named save exists, detect exact
+historical shortened names in current/legacy locations and preserve prior access
+without moving/renaming files. Correctly named saves always win. This retains
+old behavior/data; it cannot undo old prefix collisions. All3 focused name tests
+pass including correct-vs-shortened priority and legacy temporary saves.613
+remains frozen until complete new gates. Start expanded-marker screenshot also
+inspected. Root owner folder artwork still preserved in ignored .release-assets.
+
+Private timing prototype /tmp/dssmm-render-profile/profile.c (uncommitted) splits
+synthetic full-redraw costs: BG790922, art502309, total1296968cycles as screenshot
+profile-0.png. Values vary slightly and use ROM code/art, not actual firmware
+hot/page caches. Background is worth optimizing; compare a run-fill codec and
+DMA spans against all source pixels, actual mGBA hardware path and SD budget.
+Do not call these physical firmware FPS or remove the existing page/cache path.
+
+## 2026-11-16 — Measured background DMA optimization
+
+Private same-scene component timing: LZ BG790922→run-fill DMA310810cycles (~61%
+less), art502309 unchanged, total1296968→906856 (~30% less). ROM fixture only,
+not physical/kernel FPS. Adopted bounded DBR1 pair-run codec with native DMA3
+halfword fills for long spans, aligned CPU tails; no new GBA buffers/driver or
+cache/page changes. Raw blob58652 vsold18436, UPKR standard resource280401 vs
+279494 (+907bytes), rounded ext resource headroom458752. Real firmware gates
+still needed, especially SD. Read BACKGROUND-PERFORMANCE.md.
+
+All12 host source-pixel/guard and actual ARM internal/external/missing-tag checks
+pass. New optional test-background-mgba.sh compiles actual __GBA__ DMA path,
+captures12 stock0.10.1 SDL frames and compares every38400 pixels plus padding
+canaries; all pass. PNG decoder factored from existing browser script into shared
+standard-library helper (no Pillow/new package). Browser artwork proof now counts
+chromatic cube pixels, not gray backgrounds; new host tests reject all12 raw
+backgrounds as art and cover all5 PNG filters. Current browser mGBA passes with
+6142 chromatic synthetic-art pixels. Standard preview timing now has optional
+BG/art/total counters; no timer reads outside timing mode. Root standard mGBA
+setup is unchanged; add this harness method to root local-development docs at
+next normal integration. No emulator patch/private BIOS required.
+
+Next freeze and clean all3/full verifier/CI plus final mGBA checks, deliver next
+numbered Chis image including603 feedback, GG and legacy-save follow-ups.613
+stays frozen until then. Remaining DE caption/font/settings/System/Help/dialog
+parity and artwork scaling performance remain active; not100% parity.
+
+Follow-up before freezing run-fill source: failed emulator/plugin loads can have
+already overwritten SDRAM directory/cache tables. The menu now clears directory
+counts and rebuilds browser/NOR/recents plus cache state before showing an error;
+no stale cartridge pointers are reused. Native save/recent failures stop before
+loading. Actual production-handler sanitized test covers plugin/native failures
+and those early aborts. No card driver changed. This also covers legacy emulator
+load failures, not just the new portable plugin path.
+
+617 full verifier/hosted43789880974 stopped at production compilation: new recovery
+helper called browser_invalidate_artwork before its static declaration. Focused
+mock-handler tests had provided that declaration, hiding the integration issue.
+Added the real forward declaration and made the cache test's function extractor
+skip prototypes. Focused cache/recovery tests pass. Do not count617 as a passing
+firmware build or distribute it. Freeze corrected source and rerun full gates.
+
+## 2026-11-16 — Build618 delivered after owner feedback and DMA gates
+
+Clean source4fc627ac724a1a337b43419f9ebcc86013738b3d count618: standard full local
+verifier/all3 identity/seal/source/flash/resource/RAM gates pass; hosted43790527480
+passes exact source. All3 IGM host/ELF/ARM checks and current carousel bus replay
+pass. Actual mGBA __GBA__ DMA path matches every source pixel/guard on12 scenes;
+portable/ARM decoder paths also pass. Owner603 spacing/labels/hint and GG/save
+follow-ups included. Evidence docs/build-618-validation.json. Hardware-test now
+Chis618/manifest/guide, superseding own613 while preserving tracked history.
+
+SD522752/524288 leaves1536bytes; Lite489984/507904 leaves17920; Chis1671680/2097152
+leaves425472. Main Chis IWRAM14072/EWRAM249668; native resource prefix unchanged,
+DBR1 blob58652 and rounded extended458752free. Do not add unbudgeted assets or
+raise limits. Owner603 UI evidence separate, no physical618/plugin/save/NOR write
+or firmware-FPS qualification. No public release yet. Continue DE caption/font/
+menu/dialog parity and profile remaining art cost;618 stays frozen.
+
+Performance counter correction: the old LZ background was700922cycles, not790922.
+The panel's black border crossed the old debug digits and made a0 look like9.
+Matched every glyph against the actual DSSMM font while excluding that border
+row (zero glyph errors); Art502309 and All1296968 were already correct. Run-fill
+BG310810 therefore improves~56%, not61%; total906856 still improves~30%. Current
+performance guide/report618 corrected; historical journals remain intact with
+this explicit correction. Debug counters now clear their rectangle first, with
+an exact-glyph reader to avoid future manual transcription errors.
+
+Private next optimization: both hot background/scaler functions placed in IWRAM
+using existing project attributes, verified symbols at03000000/03000484 in stock
+GBA preview. Prototype BG184237/Art254309/All532283cycles, all internally consistent
+with93737other cycles. This is still ROM-fixture comparison, not physical FPS.
+Not applied to firmware yet; must inspect linked IWRAM/budgets, full pixels and
+actual bus behavior before adoption. Both standard/native linkers accept .iwram*.
+
+## 2026-11-16 — Owner618 follow-up in progress
+
+Owner physical618: GG white/frozen, SMS black but emulator menu opens; emulator
+Exit crashed. NES/GB/GBC/NGPC launch reported working. No gameplay/save or exit
+qualification inferred. SMS/PCE plugins in existing DE pack both contain ARM
+startup MOV r0,#0x14 / literal LDR r1,WAITCNT / STRH r0,[r1], resetting cartridge
+timing too fast for SuperCard SDRAM. Upstream bundled PCE explicitly has a
+WAITCNT patch (emu/README.md). New runtime correction validates entire chain
+and in-block address literal, changes MOV to #0x4000 before loading, leaves SD
+files/game bytes untouched. Raw BIN/GBA/MB only; compressed payload correction
+not claimed. Native hardware driver unchanged. Existing plugin exit code still
+assumes a different cart; safe return to chain-loaded DSSMM is unresolved.
+
+Owner wants one RECENT.TXT: writes now commit full SD/NOR history there and only
+then retire SUPERFW-RECENT.TXT/.bak. Legacy data merged behind canonical order;
+failed replacement keeps originals. NOR uses existing nor: encoding; DE's reader
+only understands SD records (may stop at NOR), a real cross-kernel limit rather
+than another hidden sidecar. Updated real-FatFs-fixture migration/failure tests.
+
+Unified SETTINGS.TXT was already present in618. Fresh/legacy host and actual
+compiled618 ARM shared-field parsing pass. New exhaustive real save/reload test
+found carousel artwork Off was lost: common DE view/art fields cannot express
+that combination. Added namespaced artwork_off (version10), preserving standard
+common keys. All8themes*5accents*3views*3art modes tested on all3 variants. Broader
+owner accent/view/theme loss still not reproduced; do not claim all physical
+persistence fixed merely from host checks. Continue tracing actual menu routes.
+
+Owner618 UI edits: root SD B→Start, four-key Down/Up/Left/Right unlock in5sec,
+exact shorter hint; opaque framed firmware/Help/System panels without QR/carousel
+backdrop; compact System row pitch; wider gear corners x109/w23; H caption width
+160 protects panel's right border. Focused checks passing; production all3/full
+validation pending.618 remains frozen until clean new-source gates. Preserve
+user untracked devcontainer-lock and retained private BIOS/scratch/artwork ZIP.
+
+Next candidate also replaces DE handheld GG sprite with original GPL cartridge
+pixel art in the native SuperFW style (editable JSON/raw/PNG); all3 icon tests
+pass and palette growth drops35→4entries. Actual ARM correction on owner-existing
+sms.mb/pce.mb changes only instruction0x1ac and writes WAITCNT0x4000; fixture
+records hashes, no binaries copied. Optional script test-plugin-waitcnt-arm.py
+accepts a supplied plugin directory. Background/scaler now use IWRAM_CODE;
+all12 actual mGBA source pixels/guards pass and explicit Light/Font/Vertical
+fixture measures184241/254317/532310cycles vs310810/502309/906856. Not physical FPS;
+production RAM/stack/all3 budgets pending. Owner authorizes next validated
+hardware-test milestone publication as Test5, including full folder-art.zip and
+brief user setup. Canonical notes rewritten for actual accumulated changes and
+explicit unresolved persistence/Exit/physical validation limits. No release yet.
+
+623/sourceeb5b39da SD passed but Lite link correctly rejected IWRAM16192 with
+minimum user-stack16KiB. Full verifier and hosted43868144493 FAILED; do not
+publish623 or describe it as validated. Moved cold shared-settings raw-value
+cache576bytes to existing byte-writable EWRAM .sbss; no stack-limit changes.
+Rerun clean all3/full/CI on corrected source. User also authorizes AFTER release
+an adversarial SuperFW source audit for errors/performance/orphaned code and
+concise maintainable organization/comments, then continued autonomous porting.
+Keep audit changes separate from frozen release source.
+
+624/sourcea4cafcaf1da9539234c01de0a6933d0816371698 now passes clean all3/full
+local verifier including native IGM ARM replay; hardware hosted43868556156 passes.
+Evidence docs/build-624-validation.json; Chis624/manifest/guide delivered in root
+hardware-test, superseding our618 artifacts. SD523264/524288(1024free), Lite490496/
+507904(17408free), Chis1671680/2097152(425472free). Chis IWRAM15208, EWRAM250712/
+257024, user-stack17304>=16384. Actual symbols show text cache576 in EWRAM, both
+hot renderers in IWRAM, and no shared-cache/hot-image/ctype overlap. All360 UI
+combinations per board roundtrip.12 actual mGBA backgrounds, ARM resource-bus/
+reset/plugin timing checks pass; Start/System screenshots inspected. Integration
+31ab1e88 is in hosted43868982790 (all4) before Test5 publication. Root archive15858e7
+preserves exact old prerelease bodies/assets before retention. No release yet;
+wait integration gates, publish existing frozen624 images+full folder-art.zip,
+verify downloads/metadata, delete oldTest4 release ONLY(tagkept), journal andsync.
+Then perform owner-requested adversarial audit and continue porting. Do not claim
+pluginExit, broader physical settings loss, SD/Lite physical or full DE parity fixed.
+
+## 2026-11-16 — Test5 published, audit next
+
+superfw-test5 is published as prerelease at exact sourcea4cafcaf, Build624, with
+Chis/SD/Lite images and full owner folder-art.zip. Four-section notes carry a
+brief root-extract/SYSTEM-merge instruction. All4 downloaded assets byte-match;
+body/prerelease/tag match. HardwareCI43868556156 and all4 integration43868982790
+pass. Old Test4 release page/assets removed only after root archive15858e7 and
+new downloads verified; git tag kept. BLUE/OMEGA each retain their sole newest
+prerelease, stable DEv8.4.0 remains latest. Publication evidence in
+superfw-test5-publication.json; Chis624 remains root hardware-test. Root README
+and release baseline checkpoint being updated on dssmm, then normal sync.
+
+Now perform requested adversarial audit, confined to SuperFW: correctness,
+settings persistence, plugin timing/Exit boundaries, renderer/cache/performance,
+orphan/deprecated code, concise comments and logical maintainable structure.
+Keep release624 frozen. Prioritize reproducible bugs and measurable gains; retain
+history/licenses and do not weaken hardware budgets or tests. Continue porting
+after audit; no feedback/input pause expected. No full parity/physical claim.
+
+## 2026-11-16 — Postrelease adversarial audit first pass
+
+Read docs/SOURCE-AUDIT-2026-11-16.md. Fixed max-length parent-path overflow,
+streaming recent-line truncation/fault preservation, benchmark zero divisor,
+signed-char comparisons; removed split-save alias/duplicate precondition and
+orphan QR Help streams/assets. DBR2active10/33320B blob vsold58652; all10 host/ARM/
+actualmGBA source pixels/guards pass. Scaler exact remainder stepping replaces
+per-position divisions;132 fractional/source-size/transparency/edge cases match
+independent division oracle and guards. Art254317→147096/total532310→425089cycles
+in same mGBAfixture; not physicalFPS. All40-source forcedCppcheck complete; only
+volatile-SRAM full-byte-copy cache warning remains (explained, no suppression).
+New full-all3/CI gates still needed; released624/hardware-test stay frozen.
+
+Next native patchengine audit: CLI has malloc(BLK_SIZE+64)FIXME masking overreads;
+scanner lacks signature/table bounds and op-capacity checks, production chunk
+reader fails to close/check short reads. Fix bounds with explicit lookbehind/
+lookahead windows and preserve cross-chunk matches, fail safely on capacity or
+IO errors without caching partial patches. This is potentially substantial;
+checkpoint first-pass changes before proceeding. Owner wants audit then port,
+no input pause. Root release sync completed normally, baseline checks all4 pass.
+
+Audit second pass: bounded patch scanner signatures/setup tables and128operation
+capacity, fixed IRQ insertion clobbering RTC group, and added scan windows with
+4096Blookbehind/64Blookahead so cross-boundary matches and table skips are retained.
+Production read/seek/size/short-read failures now close/restoreSD and nevercache
+partial patches. CLI padding workaround removed. Exact allocations/capacity/
+whole-vs-window regression and actual9MiB+3 reader fault tests pass. NDS optional
+DLDI-null/invalidshift and early-return handle leaks fixed; synthetic-RAM tests
+pass (not DS hardware). Whole-programCppcheck late diagnostics also contained
+NDSnull and third-party nanoprintf byte-casts: earlier journal's 'onlywarning'
+statement was premature. Cache-byte-copy/float-byte-casts explained; NDSfixed.
+
+Scanner expansion hit Lite stack limit48Bover during a dirty preliminary build;
+existing256B artwork filename cache moved to EWRAM (hotmetadata stays IWRAM).
+PreliminaryLite nowstack16592>=16384; no limits changed, no dirty build delivered.
+New native ELF checker verifies cold caches and reserve. Audit report and current
+performance guide consolidated; new gates on clean frozen source next. Test5/
+Chis624 remain frozen. After audit checkpoint and all3 gates, deliver next numbered
+Chis hardware test then continue menu parity; do not republish624 or claim new
+physical qualification. User's devcontainer-lock/private retained files intact.
+
+632/sourcec22ac3a83fed6cc4b764ea2f36afee8669c7ceaf passes clean full local verifier
+with nativeIGM ARM replay/all3 and hosted43874378364. Chis632/manifest/guide now
+in hardware-test, superseding our624 test copy; public Test5 stays frozen624.
+Report docs/build-632-validation.json. SD519680/524288 leaves4608; Lite487424/507904
+leaves20480; Chis1671680/2097152 leaves425472. Active10 backgrounds and new code
+fault/oracle/budget checks passed. No new physical qualification.
+
+Audit follow-up still needed before declaring it finished: load_gba_rom allocation
+omits cheat bytes (menu availability includes them); load_ingame_menu subtracts
+unchecked totals and can underflow scratch_size. GBA transfer loops ignore short
+read counts, may read/copy past EOF padding and native slow-copy rounds32bytes.
+Need exact aligned tail helper reused with plugins, bounded sharedIGM size helper,
+hole bounds/cheat allocation/read/close validation. Full-ROM load failure can
+also overwrite font/VFS resources at14.5/31MiB, so emulator-only cache recovery
+cannot simply be reused for every GBA error; document this limitation and do not
+claim generic recovery without safe asset restoration. Chis NOR caller has an
+unused 'err' TODO (backend currentlyalwaysreturns0); honor new early IGM guards.
+After corrections/new gates, continue DE alignment/grouping parity. No owner input
+required. Root Test5integration/all4CI43869704338 passed; all5branches synced normally.
+
+## Owner624 follow-up queue (2026-11-16, not yet implemented)
+
+- Help/System/firmware-update panels should match the first Settings screen's
+  right panel frame and subtle horizontal lines, not plain white. Center System
+  rows vertically while retaining left justification. Restore graphical SuperFW
+  logo in Help if budgets allow. Restore NOR browser bottom bar.
+- GG cartridge: one pixel shorter, as wide as permitted, flat bottom, blank label
+  like GB/GBC. Add bespoke PCE/NGC/A26/CRT cartridge icons. Owner now confirms GG
+  loads on624, but SMS/GG Exit resets/crashes to black and requires powercycle.
+  PCE produces exact kernel MSG_ERR_READ ('Error: could not load ROM!'), not a
+  plugin runtime message. A26/CRT showUnknownfiletype. Current canonical DE pack
+  contains pce.mb, ngc.mb, no a26 orcrt named plugin; do not inventalias mapping.
+  Genericextensionpluginroutingalreadyexists butknownplatform recognition/icon
+  table lacks these. Investigate non-word-sized MB: ours rejectsrawsize whileDE
+  validates/copies paddedrom_start_address. Proposed loaderpad MBreset/validation
+  count to4 (alreadyzero-padded; preserve ROMstart), test oddMB. Not implemented.
+- Start last-game top corners down1px, clock left corners right2px. Horizontal
+  previews STILLcross caption frame; clip art to the actual artwork panel region
+  rather than entire display. Full title/name caption inner bounds remain needed.
+- Interface UI prefs still not retained across powercycle; do NOT claim fixed.
+  POSIX360/board and a PRIVATE realFatFs FAT16 save/unmount/remount probe bothpass
+  (/tmp/dssmm-real-fatfs-settings.c). Consider actual ARM/FAT32 + diagnostic reads,
+  sourcecode paths/persistence actualdevice; no userfeedbackpause.
+- New requested Chis launch selector: D-pad cycles bottom LoadGBA / WriteGBAtoNOR.
+  Check existing games and capacity. If fits confirmwrite. If occupiedgames stop
+  fit buterasewouldfit, offereraseexistinggames+write confirmation. If too big
+  evenemptyNOR explaincannotfit. HideunsupportedNORaction SD/Lite. Reuse existing
+  Chis allocator/erase/write backend and explicit firmware user confirmations;
+  no physical NOR operations are authorized/executed by agent tools.
+
+Current dirty audit3 (after clean checkpoint5833e05): added loader_layout.c/h pure
+bounded menu/font/cheat size+cartridge allocation plan, reused byUI/SDloader; menu
+installer boolguard beforewrites, SD/NOR honorfailure. Shared exact16bit-tailhelper
+hoisted/reusedwithplugins, nativeGBA fast/slow copies bounded/exactreads, FFpadding,
+short/seek/close errors handlecorrectly. Full-ROMerroraftercartchanged returns
+ERR_LOAD_RESTART; embeddedASCII-only frameblocksnormalmenus untilrestart, avoiding
+clobbered font/VFS/browser assets. Missing/sizeerrorbeforewritesnormaldialog.
+Progressbarclamped/zero-safe. Newscalar and actual32MiBinternal-hole/odd-tail/IO
+fault tests pass; plugin testsall3 and mGBArestartscreen15 pass. No full-all3 on
+thisdirtysourceyet. Public624/localChis632frozen. Continuevalidation, commit audit3,
+then ownerfollowupfeature/prefs/plugin work. New .devcontainer lock untouched.
+
+Audit3 and requested NOR selector implemented; freeze/checkpoint before clean
+all3 gates. Chis GBA Info bottom action cycles with any D-pad direction between
+Load and WriteNOR; shoulders still select tabs. A confirms default-No write or
+replace-all question after fresh capacity/per-game checks; source preflight before
+metadata wipe; native backend erases reused blocks. SD/Lite hide unsupported NOR.
+New test-nor-launch.sh covers real production control flow with mocked flash and
+NOR backend data/cleanup including32MiB null-patch/odd tails. No physical NOR test.
+Settings read-error preservation + actual FAT16/FAT32 RAMdisk remount90 UI combos
+passed; physical persistence remains unresolved. Audit3 loader/restart tests pass.
+First exploratory full verifier was intentionally stopped before board builds to
+correct newly exposed NOR backend bounds/tail/close issues; do not record it as
+passed. Next: commit, clean full/nativeIGM/all3, package/CI, numbered Chis delivery.
+Then continue owner624 panel/plugin/icon/alignment/persistence queue autonomously.
+
+634 failed ARM fixed-width-pointer compile (corrected);635 exploratory run stopped
+in SD packaging to strengthen final NOR preflight. NOR availability now includes
+trampoline bytes, aligned hole bounds and overflow-safe arithmetic; allocation
+failure aborts before writer. Native control/backend/payload regression tests pass.
+Final frozen source636 full gates next; no634/635 candidate distributed.
+
+636/e894d25 passed clean full/nativeIGM/all3 verifier, integrity and hosted
+43885295944. Evidence docs/build-636-validation.json; no hardware delivery yet.
+Final retry review isolates NOR-only DS/IGM choices in local variables instead of
+mutating the shared normal-load settings after a failed write. Regression asserts
+launch options remain unchanged. Freeze637 for final full gates/delivery, then
+continue624 UI/plugin/persistence queue. Public Test5 stays624.
+
+Owner explicitly authorizes publishing the newest validated correction as next
+release (Test6), all3 assets + retained full folder-art.zip, four-section notes.
+637 local run stopped during host checks after native DMA signature review found
+new NOR2MiB padding passed1MiB halfword count into uint16_t helper (truncates).
+Chunk fills at8KiB now match hardware DMA bounds; mocks use native uint16_t and
+NOR test uses actual2MiB scratch. All targeted tests pass. Canonical Test6 notes
+prepared;638 full/nativeIGM/all3/hosted/package gates required before delivery and
+publication. Integrate normally, verify integration checks, archive Test5 metadata
+BEFORE pruning its release page/assets; retain tag/stableDE/other lanes. Continue
+port after publication; do not conflate physical validation with mocks.
+
+638/source6d02c1915dfece4bb90b9c0353c5215b0228a1a8 passes full clean local verifier,
+all3/nativeIGM ARM replay and hosted43886442413. Package source/hash/header/seals
+pass; SD520704/524288 (3584free), Lite487936/507904 (19968free), Chis1671680/2097152
+(425472free). Chis638 image/manifest/guide delivered hardware-test, superseding
+our632 copy after evidence retained. docs/build-638-validation.json records exact
+checks/limits. Next normal integration+all4 CI, Test6 publication using this source
+and staged /tmp/dssmm-release-test6 assets, then archive/prune Test5 page retaining
+tag. Owner authorized publication; no approval pause. Continue624 parity queue.
+
+Owner physically tested638: panels/logo/corners/GG/title bounds/persistence and
+plugin Exit still deficient. No638/Test6 publication occurred; authorized release
+now targets next corrected validated source. Dirty follow-up implements original
+Settings-right-panel bevel/stripes via compact generated profile (no new bitmap),
+full modal background replacement preserving header, System vertical centering,
+Help graphical logo at palette236..238, NOR List background+footer, plain bracketed
+Load/Write action, recent topcorners+1y/clockleft+2x, horizontal caption inset3px
+per side with even aligned clear rectangle,13px-high/fullwidth blank GG cartridge.
+Original panel pixel+guard host test and actual Help/ROM/System mGBA previews pass.
+Canonical-only settings: removed all production UISETTINGS refs and duplicate
+boot probe; UI/US legacy files ignored/untouched. Immediate changes and exit saves
+read back hash+size after commit; corruption restores backup. Host fault/all3
+roundtrip and actual FatFs FAT16/32 remount tests pass; hardware persistence still
+not claimed. Odd raw MB plugin validation/reset uses already-zero-padded word
+size (compressed sizes unchanged); all3 plugin regression passes, PCE hardware
+cause unresolved. GG/SMS Exit remains unresolved; no blind reset patch. ARM syntax
+check passed with native -fno-builtin; first ad hoc check omitted it and flagged
+pre-existing isascii name, not a firmware build failure. Freeze next source and
+run all3/full/package/CI before replacing hardware-test and publishing Test6.
+
+640/source4a85efb8d8e35e66259d89be133890fb458d4e36 passes clean full local/all3/
+nativeIGM ARM and hosted43978497350. All identities/header/seals/limits pass;
+report docs/build-640-validation.json. Chis640 now hardware-test with manifest/
+guide, superseding own638 after retained evidence. No640 hardware qualification.
+Publication pending: normal integration/all4CI, publish Test6 from source640 with
+/tmp/dssmm-release-test6 three images/full ZIP, then exact archive/pruneTest5,
+retaintags/DE/other lanes; root release docs/baseline ontrunk and normal branchsync.
+After publication continue unresolved physical settings/PCE/Exit/NOR-carousel/
+full parity. BIOS/scratch/fullZIP/ownerdevcontainerlock retained.
+
+Test6 published: tag/source4a85efb8/Build640; all3 firmware + full folder-art.zip
+assets downloaded byte-identical, canonical notes exact. Local full/all3/nativeIGM,
+hardwareCI43978497350 and all4 integrationCI43979085712 passed. Test5 page/assets
+removed ONLY after exact root archive c55ba49 pushed; tag retained. BLUE/OMEGA/DE
+metadata/assets unchanged, DEv8.4.0latest. Publication evidence projectJSON. Chis640
+hardware-test remains current. Next root user docs/baseline/recovery milestone and
+normalall5sync, cleanownignoredcompiler outputs after retainedevidence; then
+continue unresolvedsettings/PCE/Exit/NORcarousel/fullparity withoutfeedbackpause.
+
+URGENT owner640 hardware regression: changing Interface Artwork/Theme/Accent etc
+hard-freezes until powercycle. Owner DELETED Test6 release. Do NOT recreate640 or
+reuse Test6 tag; retain source/history/publication evidence, mark withdrawn. Pause
+NORcarousel/otherporting and prioritize save-path crash. New immediate save after
+keypress (added640) removed locally first; original requested save-on-exit retained.
+Need actual ARM save/boot replay+stack/memory/SD-buffer alignment audit, not only
+POSIX/FatFs host tests. No corrected candidate/build yet; hardware-test640 unsafe
+and must be clearly flagged/removed from recommended test location. Root README
+withdrawal/docs update ontrunk required. Current root/SuperFW7eeeada synced all5;
+source640publication/local/host checks were green but NOT physicalqualification.
+
+Crash REPRODUCED in actual native ARM ELF+real FatFs replay (Python virtual SD,
+not physical protocols). /tmp/dssmm-settings-native-replay.py and trace log:
+save_settings.part.0 calls shared_current(SharedView), keeps views base in r1.
+GCC IPA register allocation assumes r1 preserved, but Thumb1 helper epilogue is
+pop{r1}; bx r1. Caller then indexes return-code address as views array; fifth
+common-setting snprintf receives0xbff9b3f7 and faults at npf_vpprintf%s read.
+Shared settings_owned also incorrectly relies on r1 across same helper, plausibly
+explaining older persistence failures. Native stack peak~4890B, not an overflow.
+Hostx86/FatFs tests could not catch this ABI/codegen issue. Test -fno-ipa-ra for all
+ARM firmware/payload CFLAGS, replay all3 nativeELFs; must show old fails/new passes.
+Then full compiled-menu mGBA storage fixture + key changes/powercycle persistence
+before new hardware candidate. Owner explicitly wants validated mGBA, then build,
+commit/push PR and normal all5sync throughtrunk, no cross-kernel edits. Rootwithdrawal
+58b9a7a pushed separately; Test6 tagretained. Do not recreate640 or reuseTest6 tag.
+
+-fno-ipa-ra native Chis ELF replay now passes save/reload with6760B stack peak;
+actual linked-menu mGBA fixture passes two separate emulator boots with persisted
+Theme/Accent/View/Artwork. Last Interface row now clips selection before149 to
+preserve bevel; real mGBA pixel comparison passes. Fixture/generator/runner/docs
+tracked under SuperFW, not private /tmp-only; std devcontainer has all dependencies.
+Only physical SD sector entrypoints replaced by SRAM virtual disk, rest actual
+compiled native firmware/FatFs. Original pointer failure also being recompiled as
+negative control in /tmp (not a candidate). Next commit checkpoint, full/all3/
+nativeIGM/mGBA/hosted gates, new Chis candidate then PR/sync as owner requests.
+
+Build647/sourcea55f4a77 clean full/all3/nativeIGM passes, including actual native
+ARMsettings regression all3 and native-menu mGBA two-process persistence+frame
+checks. Compiler control withoutflag faults as expected; corrected6760B stackpeak.
+Chis647+manifest/guide now hardware-test;640 artifact/manifest removed after
+history retained. Test6withdrawalJSON records owner deletion. Initial pushCI
+43984286751 builtall3/ARMchecks but failedonlymissingxvfb-run oldenvironment;
+root sharedCI/devcontainer dependency fix770f783 pushed. Next createhardware-only
+PR to dssmm, verifychecks withupdatedbase, mergecommit andnormalall5sync. Fixture
+sources alreadycommitted/pusheda55f4a7; userrequestedretention satisfiedonlane,
+mainintegration next. Rootnewcompilerinfo/docs separatedfromhardwarePR.
+
+PR9 merged with mergecommit after currentheadceef1d1 all4 CI43985535980 and push
+43985527343 passed. Hosted logs explicitly confirm actual linkedARM replay all3
+and mGBA bothpersistedboots; repeatedbaselinecases6768B stackpeak pass. PRdiffonly
+superfw16paths; sharedenvironment770f783 ontrunk separately. Fixture sources are
+now onmain repository/dssmm, reproduciblewithoutprivateBIOS. Chis647 frozen remains
+hardware-test; codeinputsunchanged froma55 (laterdocs/tests/env). Test6 remains
+withdrawn, no public replacement release. Complete normalrootdocs/all5sync then
+continue native mGBA visual scenes/NOR/performance work; no feedbackpause.
+
+Continuation after647fix/PR9sync: actual native visual matrix added (Help/System/
+GBA/NOR/update/erase/load-options/patch-options/Orangebottomrow). Seeds only back
+page magenta, asserts no stale pixels and compares source-frame edges. All9Chis
+scenes pass locally on dirty development ELF after corrections. Foundreal defects:
+loadhelpdescenders4pixels at149/150, Orangeg2pixels at149. SharedGBApopuphelp DSy135
+(native137), DSSMMsettings/Interfacetop23 (nativefont24) keepinkinside. Firsthelper
+refactor dirtycompile caught brace-extraction error; restored functions from HEAD
+and applied boundedreplacement preserving nativeOAM loops, noimage fromfailedrun.
+Generator now readsGDBptype layouts (noPythonGDB) for optimizedfields, choosesfont
+pack perboard; sourcefixture/runner changes needcheckpoint/fullall3gates before
+newcandidate. 647remains frozenvalidatedcurrenthardware-test. Nativevisualscenes
+read-only and controlledInterfacekeys only; no agent physicalNOR operations.
+Next commit/verify/fullCI/hardware image and normalPRintegration; sourceprojectonly.
+
+657/source169b0430a1a075434b2bd0a10e968b2de3c1e994 clean full/all3/nativeIGM,
+repeatednativeARMsettings, two-bootmGBA and9nativevisualscenes pass. Hosted
+43989337269success, allpacket/size/sealchecks pass (SD520704/Lite488448/Chis1671680).
+Chis657 nowhardware-test/manifest/guide, supersedesown647 after retainedreports.
+Stillno physicalqualification orpubliccorrectiverelease. Next PR10 forvisualslice,
+currentbranchonlySuperFWchanges, all4PRchecks/mergecommit/all5sync thencontinuing
+NOR/perf/parity. Standardfixture retained onmain viaPR9; expandedscenes now onlane.
+
+PR10 nativevisualslice merged after all4CI43990263281 passed; 9native scene
+frame/stale-art checks are now main-repo regression gates. Chis657 remains current
+local candidate (source169b). Complete doccheckpoint/normalall5sync; then continue
+NOR/perf/parity and expand native font/theme visual coverage as needed. No public
+release recreated; Test6withdrawn andphysicalqualification limits unchanged.
+
+AfterPR10/all5sync e638a27: nativeSuperFWfont0 popup snapshot exposed6descender
+pixels across149/150 (DSSMMfont1 alreadypassed). Added --font0/1 viewer override,
+read-onlymatrixbothstyles, source action/help/unlock baselines dependonfont.
+Native-theme placement retained; NORactions reusecommon action renderer. Current
+18scene dirtyELFmatrix nearingcompletion, first15passed; no newcandidateyet,
+657frozen. Next verifyremaining, commit/fullall3/mGBA/CI thenhardwareupdate+PR/sync.
+
+Bothfonts/all18 native mGBA scenes nowpassed. Freezefontcoverage source andrun
+fullclean/all3/nativeIGM/persistence/matrix/CI; nextcandidateonlyafterallgates.
+
+Source19a4/Build662 hosted43993253063FAILED: font0Help scrollingunlock crosses
+rightbevelx234,y140; localsnapshot happened onspacephase andpassed. Notflakytest:
+oldwidth230 fromx5 reached234 outsideinterior. NarrowDSwidth228; nativelegacy
+widthunchanged. Newfixture checks everyrenderedframe's edges/bevel andlatches
+failure, notjustoneanimationphase screenshot. Nativeframen symbol selectsactual
+backpage forseed/check. Local662fullstillrunningmustpoll; no662candidate delivered.
+657remainsvalidatedcurrent. Freeze correctivefont source after regressionpasses.
+
+## Build 657 hardware feedback follow-up — 2026-11-17
+Owner confirms settings now persist on Chis. New work removes redundant unchanged
+settings writes while retaining verified transactions for changes; adds Interface
+Clock format (24-hour default/12-hour AM/PM), accent header contrast, centered
+horizontal captions, Gray label, six-pixel Help logo adjustment, filtered empty
+settings headings, Recents list chrome and themed GBA actions. Native mGBA success
+marker now uses two colors so green accents cannot masquerade as a passing test.
+Native ARM replay must assert unchanged exits produce no SD writes. Earlier 662
+hosted failure is addressed by bounded scrolling width and per-frame bevel checks.
+All changes require clean all-board/local/native mGBA and hosted gates before a
+new hardware-test image or release. Owner authorizes publishing this correction,
+then normal merge-commit PR/integration and synchronization; preserve withdrawn
+Test6 tag, use a new release tag and attach the full retained folder-art archive.
+The first 663 verifier stopped before board builds: the cache unit harness needed
+its new font-width dependency. The schematic preview also needed header palette
+and declaration updates; both are corrected. Actual native two-process mGBA
+persistence passes with the two-color marker. Clock formatter tests cover midnight,
+noon, PM and unset; ARM replay now covers both clock formats and unchanged exits.
+
+## Owner Build 664 follow-up — 2026-11-17
+664 full local/all-board/native IGM/ARM/mGBA18 scenes passed; source CI43998552194
+and all-four PR CI43998953470 passed. PR11 merged; Chis664 is in hardware-test.
+No Test7 release was published. Owner now requests a NORMAL (not prerelease)
+release after independent Top bar color/default gray+black text, white text for
+colored bars, unified clock x234, a shorter illustrated Game Gear label, and
+background settings saves where feasible. Preserve verified rollback; cooperative
+save work must yield between bounded filesystem operations and drain before game
+handoff. Only Chis has owner hardware tests; SD/Lite remain untested. Release notes
+must summarize major changes since the fork, remaining bugs and SD setup, attach
+full retained folder-art.zip and preserve DE latest stable unless explicitly changed.
+Cooperative implementation now stages output using temporary 8KiB stack storage,
+then owns existing original[] buffer across steps. Aligned FIL uses unused tail;
+near-capacity configs fall back synchronously. No second static buffer. Native ARM
+queued replay passes, stack14128B against linked live-data guard; Chis EWRAM
+256824/257024 (200B headroom). Do not add static data/raise limits. Host fault,
+rollback, unknown-key, FAT16/FAT32, interleaved read/requeued edit/retry tests pass
+with UBSAN halt enabled after fixing host FIL alignment. Native mGBA queued-input
+check and all3/full/hosted gates remain pending; hardware-test664 stays frozen.
+666 first full gate stopped before board builds because navigation fixture matched
+an obsolete save-on-exit comment and synchronous-failure behavior. Updated it to
+assert queued exit/navigation; transaction failures remain covered in IO/native
+suites. No666 hardware-test artifact delivered. Next clean candidate/full gates.
+
+667/sourcea7259a83 published NORMAL as superfw-build667 after full all3/nativeIGM,
+actual ARM queued-save (14128B peak), native mGBA pending-navigation/two boots,
+18font scenes and all4 PR CI44085053018/source44085042488 passed. PR12 merged
+b7d91488. All4 downloaded assets/body match; full owner folder-art.zip retained.
+Chis667 now hardware-test;664 validation retained in docs. Only Chis owner testing,
+not new667 hardware qualification. DEv8.4.0 remains latest via explicit API metadata
+correction (CLI --latest=false initially still selected667). No older SuperFW
+pages to prune; BLUE/OMEGA latest prereleases and all DE history preserved.
+Next: normal doc integration/root publication overview/baseline and all5sync, then
+recover EWRAM via measured cold-code size work before more UI parity. Plugin Exit,
+PCE and full DE parity still open. Keep owner lock/private BIOS/scratch/fullZIP.
+
+2026-11-17 owner changes first normal release notes to upstream-relative New
+features/New fixes only (exclude regressions introduced during port), then Known
+issues/hardware, SD setup, credits only davidgfnet/FrankieT19/emulator authors.
+Rewrote canonical+remote667 body, archived exact previous metadata/body, verified
+assets/title/tag/status unchanged. New instruction supersedes four-section style
+for this first normal release. Next priority is GG/SMS Exit and general Pogoshell.
+Evidence: existing SMS/PCE MB binaries contain FluBBa Visoly doReset sequences;
+they page a different cartridge and reset into plugin at ROM0. Proposed fix must
+preserve chain-loaded DSSMM via reserved SDRAM firmware snapshot at boot, patch
+only exact recognized exit routines, retain native SuperCard mapping and test
+actual ARM/emulator execution. Need RAM headroom recovery before added code;
+never import OMEGA drivers or claim hardware exit qualification from mocks.
+
+## 2026-11-21 recovery and owner patch review
+No old validation process remained active. Owner committed root PATCHES.md/patches
+as0563331; preserve them. Review is docs/PATCH-REVIEW-2026-11-21.md: none apply
+verbatim; useful005–010 behavior will be reimplemented in real SuperFW APIs.
+Reject012: removes WAITCNT destination validation. 011 invents caching APIs already
+covered by current motion/miss cache. Root artifact integration is separate before
+new hardware PR so its diff remains private to superfw.
+
+Interrupted plugin prototype is NOT a validated candidate. It snapshots the
+running installed/chain-loaded firmware to SDRAM24..26MiB, return stub26MiB;
+8MiB patch scratch16..24MiB must not overlap it. Modeled ARM return passes complete
+image restoration, halfword-only writes and invalid-size guards. MBZ now decodes
+to halfword scratch and receives full-image startup/exit adaptation. Exact SMS/PCE
+reset patterns match real portable pack; mutation/truncation tests pass. First
+mGBA Exit marker was garbage-collected by linker; fixed fixture link retains it.
+Actual SMS/GG/PCE Exit replay is rerunning. Keephardware-test667 until all3/full
+native/mGBA/hosted gates pass. Bootloader3KiB and RAM/flash budgets remain fixed;
+return stub is copied separately outside that bootloader limit.
+Owner now also requests native EZ-FLASH mGBA comparison harnesses in each hardware
+lane. New667 UI queue: accent clock corners/defaultbar; visible Saving settings
+snapshot, centered uniform headers/Info, time prompts/baselines, optional carousel
+wrap with correct cache, and sensible DS Style NOR progress/management presentation.
+
+2026-11-21 continuation: Implemented exact SMS/PCE reset adaptation, boot snapshot
+and halfword MBZ expansion. Actual native loader/FatFs cases and stock mGBA real
+SMS/GG/PCE Exit-to-marker passed focused tests; no physical exit claim. Native
+loader replay is now part of each board build. Optional carousel wrap uses
+index-keyed five-slot metadata without increasing its RAM size; host tests cover
+0/15 collisions, missing art and one/two-file boundaries. Native settings ARM
+roundtrips include wrap. UI queue implemented: defaultbar accent clock corners,
+visible blocking snapshot notice, uniform headers/Info, clock instructions and
+NOR capacity/progress presentation with original backend guards. Chis partial
+ELF had312B free EWRAM; preserve stack/flash limits. Full all3+native visual gates
+are running; hardware-test667 remains frozen until a clean candidate passes.
+Owner root audit artifacts moved intact on trunk to docs/history/patch-review-2026-11-21;
+review remains project-local. New shared comparison tool is universal, and each
+EZ harness compiles its own translation unit; no foreign driver imports.
+
+First expanded matrix stopped at new Start scene10: fixture overwrote both cached
+Start pages every frame, then incorrectly required the production cache to redraw.
+Seed Start pages once each; modal scenes still reseed every frame. This is a
+fixture correction, not a production stale-art fix. All earlier9/font1 scenes
+and native2boot saves passed. Rerun expanded matrix and final clean all3 build.
+
+Expanded scene11 exposed one real DSSMM clock-popup descender touching frame at
+(191,149). Moved the clock-running hint up2px; native font keeps its existing
+baseline. Start scene10 now passes with correct cache seeding. Added optional
+DSSMM_PREVIEW_FONTS/SCENES for focused reruns, defaults still full26 scenes.
+
+Clean e1494ba0/Build677 all3 builds passed native settings/plugin ARM and IGM ARM
+checks; SD522240/524288, Lite489472/507904, Chis1671680/2097152 bytes. Native2boot
+mGBA passes. Font1 scenes1..12 pass. Scene13 initially called an optimized-away
+private helper (address0); now calls retained nor_write_progress and compensates
+its own flip before frame inspection. Focused13/font1 passes; font0 matrix now
+running. Firmware bytes did not change for this fixture correction. Added2KiB
+return-code reservation test. Hold hardware-test667 until final matrix/CI passes.
+EZ native harness PR13/14/15 merged normally after all4 CI passes; no production
+hardware inputs changed. New DE/SuperFW Start overlay is build/de-superfw-start-comparison.html
+(ignored) and shows remaining Start fallback icon/text-centering parity work.
+
+Build677 delivered to hardware-test after all local/native/mGBA26/sourceCI44954125901
+and all4 PR16 CI44954129956 passed. Sourcee1494ba0, clean Chis1671680 bytes;
+record docs/build-677-validation.json retains all3 identities/budgets/tests and
+limits. Superseded ignored667 image/JSON removed only after hash-verified677 copy;
+tracked667 publication/validation remains. No new public release or hardware
+qualification. Next: integrate final evidence, normal all5 synchronization, then
+Start fallback icon/recent-caption centering using the new native comparison.
+
+2026-11-22 Start parity slice: all5 remote heads synchronized at6e82a9b after
+PR16 merged9fab796; root/shared integration CI passed. Build677 remains current
+hardware-test. Native overlay exposed a two-pixel font-origin difference with
+identical162 caption pixels. New launcher_title_top accounts for it and centers
+one/two/three lines; empty label now matches DE. Title art geometry56x37 at30,48;
+Box geometry/fallback asset remain next. Start body uses size optimization while
+cached pages/header hot paths remain unchanged. Partial Chis ELF passes budget:
+EWRAM256824/257024, IWRAM15576; no new buffers/raised limits.
+Native fixture --recent-title bakes only a bounded read-only recent record into
+unused ROM; actual renderer, no launch/art IO claims. All4 caption cases match
+every original DE glyph pixel/position in stock mGBA. Host profile/clock and
+corner/navigation checks pass. Registered caption oracle in full verifier.
+Next: clean source checkpoint, full all3/native/mGBA/hosted gates, then replace
+hardware-test677 only after those pass. Current partial ELF is dirty, not a test
+firmware. Owner lock/private BIOS/session scratch/full artwork archive retained.
+
+Owner677 hardware follow-up (2026-11-22): GG/SMS now load on Chis, but Exit has a
+longer white interval and the return splash's Writing previous savegame text is
+orange-red rather than black; PCE still returns kernel MSG_ERR_READ after load
+progress. Do not call Exit/PCE physically fixed. NOR fill needs x-2/y-1 expansion
+up/left. Saving settings popup should stay at least1second and coalesce further
+writes with only a short extension, avoiding flicker. Shared lined panels lack a
+thin left inner outline. Owner requests textured/shaded DE-style top bars, but
+omit if firmware exceeds the original hardware limits; try procedural shading,
+not new image assets. These supersede the next-candidate delivery queue;677 stays
+hardware-test until a candidate includes the corrections and passes gates.
+
+Start-only743/ad2b8b36 finished full all3/native/IGM/mGBA26+4caption/host checks
+locally; do not distribute yet because owner feedback now has priority. A later
+sync-source CI45030119788 failed ONLY new NOR scene13 whereas identical-tree
+integration45030107951 passed. Need inspect/stabilize native callback availability
+or ABI instead of ignoring it; renderer probe must never silently call address0.
+Current frozen743 image is not the requested next hardware image.
+
+743 full verifier and sourceCI45030978467 passed; checkpoint identity recorded in
+docs/build-743-validation.json but not delivered because newer owner feedback is
+pending. Current Chis has200B free EWRAM. Before adding notice/topbar/error work,
+reviewed moving existing4352-byte icons_img (only consumed by menu_init upload)
+into the existing read-only font/resource partition. No new art, native font
+prefix change or limit raise. Need exact icon roundtrip/read-only/missing-tag tests
+and measured all3 RAM/flash checks; retain palettes and existing icon source/credits.
+
+Owner adds: replace every old white/light-gray loading bar with the corrected
+framed NOR-style panel and describe the real operation. Shared progress renderer
+now covers game/emulator SD reads, save preparation/loading, patch generation,
+firmware backup and RAM/SD tests; NOR uses the same widget. Labels distinguish
+SDRAM ROM loading from SRAM saves. Rendering is asset-independent (built-in ASCII
+and panel profile); header sanitizes non-ASCII names during loading because ROM
+loads/RAM tests may overwrite external fonts. Native/manual themes get readable
+styled progress too. New generic scene14 poisons the external font pointer and
+uses a CJK username to exercise that constraint. Full matrix becomes28 scenes;
+caption oracle remains4. Compile/focused checks are in progress, not a delivered
+candidate. Keep677 frozen.
+
+Additional implemented prototypes: steady60-frame save notice with3-frame
+coalesced extensions (including boundary/wrap tests), procedural shaded/textured
+top bar without new art, black inner left panel outline, gap-free200px NOR fill.
+Exact existing icon tiles moved into appended read-only resources; standard has
+4096bytes, Chis4352 (NOR icon conditional). C-initialized ARM oracle caught/fixed
+that variant difference; tags/counts/read-only checks pass. Chis main RAM regained
+about4KiB; original font prefixes and existing native icon/palette sources remain.
+
+Plugin return requests BIOS video/palette/OAM/IO reset and reapplies safe waits;
+halfword copy is unrolled. A consumed20-byte token at EWRAM0203FFE0..0203FFF3 stores
+DRET+the firmware header's16-byte SHA prefix. ROM-only pogo_boot_reuse compares it
+before mapping changes and skips only the redundant same-image snapshot. Boot
+caller uses its explicit Z/R0 contract; Chis boot actual_end=0xBF0 (3056/3072),
+main/stack limits unchanged. ARM cold/flash/SDRAM/matched/mismatched tests pass.
+Known Exit hooks preserve the plugin ROM entry; generic RAM plugins retain the
+ROM0 fallback. PCE2.5MiB actual-loader/FAT16/ABI/halfword replay with the existing
+EZ pack passes; physical error remains unreproduced. Failures now distinguish
+plugin/game/format/size and log only errors to SYSTEM/superfwlog.txt (stage/detail
+plus game context), not ordinary writes. No physical Exit/PCE fix claim yet.
+
+Shared loading-panel follow-up: operation labels now cover game/emulator reads,
+save-to-SRAM/preparation, patches, firmware backup, SDRAM/SD diagnostics and NOR.
+The panel uses builtin ASCII and internal palette/profile data, not external
+fonts/backgrounds that a large ROM may overwrite. Native scenes13/14 deliberately
+poison the runtime font pointer and use a non-ASCII username; both font settings
+render safely. The runtime font pointer remains externally visible for native/IGM
+probes (4-byte storage; main RAM254704/257024 on the current Chis prototype).
+The fixture writes progress_action as a byte, matching the actual ARM enum ABI.
+Host topbar/notice/panel/plugin-phase and ARM icon tests pass; clean all-board
+validation and fresh hardware-test delivery still required. Do not distribute
+these dirty-source743 intermediates or overwrite the validated677 image yet.
+
+744 full verifier stopped before board builds because two extracted host seams
+needed the new production progress enum/callback dependencies. Updated extraction
+to reuse the actual enum and the emulator mock to distinguish plugin/game callbacks;
+both focused suites pass. This was a fixture compile failure, not a runtime pass.
+Restart the complete verifier on the corrective checkpoint before hardware delivery.
+
+745 clean-checkout CI caught the new icon test relying on a local generated pack;
+it now explicitly generates its resource input. Local SD replay also exposed a
+fixture assumption: passing a NULL progress callback into a whole-program-
+optimized function whose production callers are all non-NULL is invalid after
+LTO removes that guard. Replay now supplies the actual loadpogo_progress callback,
+intercepts only final rendering, and verifies both game/emulator phases. All six
+SD plugin cases pass with10528B stack. No production loader workaround or ABI
+flag change was needed. Restart full validation on the corrected checkpoint.
+
+## 2026-11-22 — Build746 delivered; PR17 integrated
+
+Clean source43065c9a / Build746 passes full all3/native settings/plugins/IGM ARM,
+host suites, mGBA2 boots/28 scenes/4 pixel-exact Start captions and plugin Exit.
+SourceCI45039947282 and all4 PR17 CI45039951109 pass. PR17 mergedccff55c;
+normal FF synchronization/push of all5 lanes follows (verify remote refs).
+Root hardware-test now contains hash-verified superfw-chis-build746.fw and
+build746.json; superseded local677 files removed after hash validation.
+Tracked docs/build-746-validation.json preserves all3 identities and limits.
+Chis main254704/257024, IWRAM15592 with16KiB stack, boot3056/3072 bytes.
+SD524288/524288, Lite492032/507904, Chis1671680/2097152 bytes. Physical PCE
+failure and GG/SMS Exit timing remain unqualified; no public release changed.
+
+Owner now prioritizes SD flash headroom and clean omission of unsupported
+board-specific media. Existing guards already omit Chis NOR code/icon/extended
+fonts on SD/Lite, all bundled emulators on Lite, and the five extra emulators
+on SD. Shared GBA menu graphics remain supported on all boards. Investigate
+measurable lossless compression before dropping supported languages/features.
+Offline study in ignored build/compression-study: default apultra font pack
+308252 bytes; UPKR level9 patch DB48085 (vs48944 at4), GB/C32143 (vs32395 at4).
+Font UPKR4/9 trials still running; compare exact roundtrips, decoder size, ARM
+halfword writes and boot time before any format change. Do not run make clean
+until these processes finish (tools live in project intermediates). Scratch
+/tmp/dssmm-context-scratch.md remains session-only, <=1GiB; BIOS/owner ZIP retained.
+
+## 2026-11-23 — Recovery and Build746 owner notes
+
+All prior compressors/verifiers ended; no lingering build/mGBA processes. PR17
+is merged; all5 remotes were verified atccff55c before SuperFW journal8704341.
+Default-branch CI45040890887 passed. Chis746 remains the validated hardware-test.
+Owner confirms GG/SMS now work correctly; keep this separate from remaining PCE
+failure. New work: SD/NOR Start upper corners-1y, flat topbar selector palette,
+slightly stronger gradient, optional Dark bar and visible Dark inner panel line.
+MiGoomba generic integration is requested next (same pinned core as DE, never
+its DE-specific payload). Finish these and PCE investigation before NOR carousel
+and NOR Last Played artwork. Then publish a normal release with folder-art.zip,
+previous note style/credits/hardware limits. BLUE SD GBA launch audit is an added
+separate lane task in /tmp/dssmm-blue-preview; no BLUE edits yet.
+
+Pending compression prototype is preserved, not delivered: UPKR4 fonts734296→
+277868 vs apultra308252; exact SD boot fonts/patches/firmware ARM replay passes,
+prototype493056/524288 bytes. New inline halfword decoder reduces UPKR font
+instructions71.7M→52.1M, still above apultra10.1M; startup tradeoff is documented
+in docs/BOOT-RESOURCE-COMPRESSION.md. Chis raw fonts are unaffected. Distinct
+.pack.upkr names avoid stale incremental codec data. Boot media checks assert
+SD=GCEM only, Lite=none, Chis=all six. Alternate transforms/windows were larger;
+run compressor studies serially (three parallel benchmark OOM kills, no loss).
+Updated UI host topbar/corner/panel/settings tests pass. New native theme/topbar
+flags and scene15 check flat clock corners; full compilation/mGBA/all3 still due.
+
+749 full verifier and sourceCI45092221448 pass. All3 clean identities are in
+ docs/build-749-validation.json. Extra dark Info/System scenes and flat clock
+selectors on both fonts pass; light default clock selectors pass too. The first
+clock oracle sampled8px arms while actual16px-high corners use6px; corrected
+only the oracle and replayed the same749 ELF. Added native Dark/selector cases
+to the permanent verifier and a direct Dark topbar parser assertion. Chis749
+hash-verified hardware-test replaces746; no MiGoomba change is in749 yet. Owner
+746 GG/SMS confirmation remains valid for that tested source only. PCE stays open.
+BLUE audit has independently reproduced and corrected an exFAT alias assumption
+in its own worktree; no BLUE code belongs in this lane.
+
+MiGoomba work after750 is pending/unvalidated: copied exact upstream generic
+81892-byte payload (SHAa2e3fa5a..., pinned4b401e2). Never use ezode binary.
+SD/Chis GCEM changes to MiGoomba; Lite also enables native GB/GBC with its new
+resource margin. Packed core35330bytes vs old32395: estimated SD27KiB/Lite11KiB
+free; must remeasure clean packages. Existing external-plugin precedence and
+SRAM save/reboot paths remain. Old Jagoomba reference is not bundled twice.
+Native ARM plugin fixture has --native-gbc mode for actual packaged VFS decode,
+exact core/game append and launch_reset boundary; build.sh runs it on all3.
+New GB/GBC synthetic stripe-core mGBA smoke is in progress; see project scripts.
+PCE stays open; do not start NOR view work before this queue/release checkpoint.
+
+## 2026-11-23 — Build751 and native emulator transfer correction
+
+Build751/source d1e0e8d passed full all3/native ARM/host/mGBA verification and
+source CI45095410222; Chis751 is in hardware-test with exact hash recorded in
+docs/build-751-validation.json. Generic MiGoomba executes generated GB/GBC
+programs; SD/Lite remain physically unqualified.
+
+Native PCE replay exposed a word-sized header write into cartridge memory in
+751. Native headers now stage in aligned internal RAM and transfer by halfword.
+Native file copies use exact read lengths, aligned padded tails, file size and
+close checks. Old-source host/ARM tests reproduce the defect; corrected host
+transfer/recovery and actual linked Chis PCE replay pass (9040B stack peak).
+PCE portable-load errors can try the existing native core; working portable
+plugins retain priority. This is not confirmation of the physical PCE cause.
+Full clean all3 verification is next, then normal integration/release before
+NOR carousel work. Preserve BLUE candidate and private session artifacts.
+
+## Build758 validation and owner751 follow-up
+
+Clean source3e51917a/Build758 passed full all3/ARM/host/mGBA verifier and all4
+PR19 checks45098710443. Chis758 replaces751 in hardware-test; SHA
+7fca9fc6c79833369c4ae795997d89e3433acd36363f4e58135803d058941946.
+Owner751 PCE says Plugin format unsupported;751 predates native transfer/fallback
+corrections. Physical resolution remains unconfirmed. Added Interface overflow
+arrows matching Games and a lighter neutral Dark header base0x318c. Header
+shading host bounds pass; validate revised native scenes/build before publishing.
+
+## Build759 normal release published
+
+Full all3/local/native ARM/mGBA and source45172727651/all4 PR19
+45172737715 passed. PR19 merged c0c6b52. Published superfw-build759 at clean
+67b20b57 with all3 firmware files and full folder-art.zip; all4 downloads and
+notes match. DE latest unchanged;667 retained. Chis759 is current hardware-test.
+Owner751 format rejection remains physically unconfirmed; fallback is new here.
+Interface arrows and lighter Dark bar pass visual checks. Next: sync branches,
+then NOR carousel/last-played art, preserving RAM/flash budgets and card isolation.
+
+## NOR Last Played artwork continuation
+
+Normal759 release and all5 remote refs verified at b1781072. New work enables
+CUSTOM/filename art for NOR Last Played, then Title fallback from stored NOR
+metadata, independent of an SD ROM. Shared artwork_load_named/gamecode helpers
+preserve ordering and avoid reading a replacement SD ROM header for NOR.
+Focused sanitized adapter/bus tests and production routing tests pass for
+NOR/non-NOR, priority, missing entries, Box and file-close failure. Partial
+Chis link before helper extraction used255520/257024 EWRAM; final clean all3
+validation is next.759 remains public/local hardware-test until replacement
+passes. NOR carousel itself is not implemented yet.
+
+Build764 full all3/local/ARM/mGBA and all4 PR20 CI45175890006 passed, but
+was intentionally not delivered: review found invalid named paths could fall
+through to an SD ROM-header probe. Added initial canonical validation plus
+no-file-opens traversal regression (fails764, passes correction). Build765
+clean verification follows.759 public/hardware-test remains current.
+
+## Build765 validated hardware-test checkpoint
+
+Clean source3c8588ec passed full all3/ARM/host/mGBA verifier, source CI
+45178247462 and all4 PR20 CI45178256596. Chis765 replaces759 only in the local
+hardware-test folder. Public normal759 stays unchanged. NOR Last Played now
+uses CUSTOM/filename art and stored-code Title fallback without the SD ROM.
+No new physical qualification; PCE still needs card testing.764 was held for
+its path-guard correction and never delivered. Next: shared NOR carousel
+prototype and permanent synthetic cached-art native fixture; no extra cache pool.
+
+## Shared NOR carousel prototype
+
+After765 integration/sync b8dcd3b, implemented source helpers so NOR shares SD
+cache/layout/rendering, motion and fast page reuse. NOR list and launch/delete
+backends remain; carousel movement is one entry with existing wrap setting.
+Partial Chis link uses256264/257024 mainEWRAM, original stack unchanged.
+Source-routing host tests pass NOR/non-NOR. New actual-ELF cached-art mGBA
+scenes16–19 pass DSSMM-font horizontal/vertical Title/Box, neighbor colors,
+first->last wrap, stale-frame and stable-page checks. Native-font cases running.
+See NATIVE-NOR-CAROUSEL.md for the read-only ROM cache fixture limit. Full clean
+all3/ARM/mGBA/CI remains required before replacing hardware-test765.
+
+Native-font NOR scenes16–19 also pass (all8 cases across bothfonts). Updated
+cache/fast-page fixtures retain production helpers; SD/NOR page identities stay
+isolated. ARM cache and artwork adapter bus tests pass (halfwords/alignment).
+Cold artwork file/path Os, with row-copy O2 retained, saves232bytes: Chis partial
+link256032/257024 EWRAM, unchanged15592 IWRAM and16KiB user stack. No physical
+NOR qualification. Next clean all3/CI before replacing hardware-test765.
+
+## Build769 validated NOR carousel checkpoint
+
+Clean37c9e06/Build769 passed full all3/native ARM/host/mGBA, sourceCI45181742291
+and all4 PR21 CI45181773686. All8 actual-ELF NOR Title/Box horizontal/vertical
+cases pass across bothfonts, including neighbor pixels/wrap/frame reuse.
+Chis769 replaces765 in hardware-test with exact hash in build-769-validation.json.
+No physical NOR/new-build qualification; PCE remains open. Public759 unchanged.
+Next: Start Box art parity37x37 at39,48 (DE source confirmed), Title56x37 at30,48
+already matches; add masked halfword odd-edge compositor and native Start art
+oracle. Drafts are session scratch only, not committed/applied to769.
+
+GitHub /latest unexpectedly selected759 despite CLI --latest=false. Explicit
+REST make_latest=true on DE release443130065 restored verified v8.4.0;759
+notes/assets unchanged. Publication record now captures this follow-up.
+
+## Owner-requested Build769 normal publication
+
+Published superfw-build769 at validated37c9e06, using the already-validated
+three firmware files and full folder-art.zip. All4 downloads and canonical
+body verified. Owner specifically requested cumulative additions/upstream fixes
+since the SuperFW fork, so769 uses that catalog instead of new/past delta
+sections; internal port regressions are omitted. Normal759/667 retained.
+DE /latest explicitly restored/verified v8.4.0 after create --latest=false did
+not preserve it. See releases/superfw-build769-publication.json. No new hardware
+qualification;769 remains in hardware-test. Continue Start37x37 alignment next.
+
+## Owner769 PCE follow-up / next candidate in progress
+
+Owner confirms PCE games load at769, but Exit restarts the emulated game and
+PCE has no cartridge icon. Recorded prime-build769-hardware-observation.json;
+updated current769 known-issue note after archiving its prior body. DE latest
+restored/verified v8.4.0; public769 assets unchanged. Backend is not established
+by the report. Native PCE lacked portable's known Exit adaptation; candidate
+now applies that adapter only to PCE emulator bytes with a validated return
+image. Actual native loader ARM and native ROM/header mGBA Exit pass; hardware
+return/save timing remains unqualified. GB/GBC bytes remain unchanged.
+
+Added HuCard-style PCE icon using existing shared palette. Unified cartridge
+generator/tests replace GG-only names. ICN1 includes both extra tiles; moving
+GG out of EWRAM recovers280bytes of data/upload code. Icon pixel/bounds/route
+tests pass all3, actual read-only ARM resource oracle passes. No owner ZIP edit.
+
+Start Box geometry now37x37 at39,48 (Title56x37 at30,48). Odd-edge compositor
+passes host oracle and36 actual ARM cases (halfword VRAM,332B function stack);
+all4 native Start art/style/font captures pass. Full clean all3/CI is next after
+focused review; hardware-test/public769 remain frozen. Partial link before
+loop-bound experiment used256056/257024 EWRAM and15752 IWRAM,16KiB stack kept.
+
+Atari2600 is now an additional owner goal. Current PLUG pack has no a26 core;
+found MikeDX/2600_gba pinned2eb18dd8, legacy Virtual VCS/X2600 GPL source.
+See ATARI2600-PORT-PLAN.md. Prototype stays outside tracked source until it
+builds and renders generated homebrew; do not ship missing embedded ROMs or
+old prebuilt objects. Continue this investigation during clean current-fix gates.
+
+Rejected pair_end scaling-loop variant:93,679 vs93,597 instructions and336 vs
+332B stack for the same linked120x80 opaque case; restored the prior form.
+These counts are not physical timing. Current focused36-case compositor,
+Start art/font4cases, native PCE loader+Exit mGBA, shared icon resource oracle
+and all3 icon checks pass. Final partial link256056/257024 EWRAM,15752 IWRAM.
+Next: clean commit/build all3 and integration before replacing hardware-test769.
+
+## Recovery / DE launch audit takes priority
+
+Build776 stopped cleanly at Lite link: IWRAM16160 exceeded unchanged stack
+start0x03003f00 by32B. Nothing776 was delivered. Moved the fully written-per-frame
+512B sprite command buffer to GBA EWRAM (full64 capacity kept, hot pixel code
+and16KiB stack unchanged). Partial Lite link nowIWRAM15648/EWRAM241944; memory
+guard and36 actual ARM odd-edge cases pass. Full clean777+all3/CI remains pending.
+Public/hardware-test769 remains frozen. Source776 includes PCE return/icon and
+Start fixes with focused tests; no new physical Exit qualification.
+
+Owner now prioritizes DE SD-launch regression versus Frankie8.2 before other
+porting. No interrupted process remains. Continue that audit in ezfomegade lane;
+then resume clean SuperFW gates and Atari source prototype. Preserve ownerlock,
+private BIOS, artwork archive and session scratch.
+
+## 2026-11-24 — Clean777 validated and delivered
+
+Full clean verify-superfw passed all3/native ARM/host/mGBA (including both PCE
+Exit paths); native IGM exact ELF/halfword replay passed. Source45291139008 and
+all4 PR22 CI45291148001 pass; PR22 mergeddeaf85a4 after EZ SD correction releases.
+Chis777/source787ed0d4 is in root hardware-test with validation JSON; replaced769
+only after old hash matched. No new physical PCE Exit/save/SD-Lite qualification.
+Chis mainEWRAM256568/257024, IWRAM15240; Lite IWRAM15648;16KiB stack unchanged.
+SD/Lite flash headroom27648/11264B. Public769 unchanged. Preserve compact resources
+and do not spend remaining456B Chis main-RAM without recovery. See build-777 JSON.
+
+Atari separate /tmp prototype now compiles current devkitARM and renders generated
+4KiB solid-color6502 diagnostic in stockmGBA (160x96 at35,25). Source-only recipe
+normalizes case/globals, corrects palette256 bound and moves large buffers to
+EWRAM; old objects/embedded games excluded. Not an external plugin or safe physical
+startup yet: standard gba.specs startup WAITCNT needs review, runtime arguments,
+return, timing, controls, banks and licensing/provenance remain. Retain reproducible
+recipe in the project before session close; no Atari core bundled/claimed.
+
+Atari source recipe and optional mGBA pixel check now tracked under tools/;
+ATARI2600-PORT-PLAN.md documents clean pinned source/build/run and limitations.
+Modern GCC16.1 source build and exact diagnostic-frame test passed; validation
+JSON records hashes. No Atari binary/core imported, no firmware inputs changed,
+no new dependency/BIOS. Continue with safe startup before runtime Pogo arguments,
+Exit and controlled timing/controls/bank tests; resolve missing COPYING before
+binary distribution. Chis777 remains the validated physical-test candidate;
+this optional prototype does not create a replacement firmware build.
+
+2026-11-24 continuation: Atari custom ROM startup preserves fixed96B ABI,
+clears owned BSS/VRAM only and establishes safe WAITCNT/bitmap state. SDK whole
+EWRAM clear, not an established fast-wait write, was the confirmed startup issue.
+Linked ARM startup +19 runtime2/4KiB copy/mirror/bounds cases pass; mGBA exact
+6502 diagnostic passes through the same loader. No runtime Atari binary supplied:
+Exit/banked formats/audio/controls/performance/licensing still pending.
+
+Owner reports PCE Exit now works; recorded without assuming an explicit test
+build/backend. Reworked HuCard portrait silhouette after viewing online photos;
+added reference-informed NGP/NGPC and Atari cartridge icons, original pixels,
+existing palette/read-only stream, no photo assets. Host all3/resource ARM checks
+pass; native full clean build follows. Added opt-in D-pad showcase mode to existing
+native NOR fixture, with synthetic landscape artwork and no launch keys, for
+owner-requested README GIFs. Default regression scenes remain unchanged.
+
+Clean799/source30ff43a7 full all3/ARM/host/mGBA/nativeIGM passed; sourceCI45303504271
+and all4 PR26 CI45303565021 passed. Chis799 delivered in root hardware-test after
+checking/removing superseded777 hash. All boards clean, Chis EWRAM256600/257024
+(424B free), IWRAM15240;16KiB stack unchanged. No Atari binary included, public769
+unchanged. Owner PCEExit report retained without assuming build/backend.
+README GIF work follows with opt-in original sample art; do not rebuild firmware
+just for fixture/doc changes. Preserve799 as the current physical-test candidate.
+
+README preview continuation: optional --art-dir imports the original fictional
+Title/Box PNGs using the production red-fast216-color cube. Showcase disables
+intentional magenta palette/back-page poison and enables real Clean list; ordinary
+regression modes retain poison. Exact default scene15/font0/Light/gray GBA hash
+633d9ee485d6ca727eb2afe9f11a442f085311e636b95a8247ca630ab25df88f stayed byte-identical.
+Actual799 horizontal/vertical motion captures and Start/options previews pass
+visual inspection. No new firmware needed for these fixture-only changes.
+
+Owner clarified branding: DS Style Merkin's Mix / Merkin's Mix in current docs;
+historical journals/releases retain exact records. Owner799 .a26 Unknown type is
+expected without an installed plugin; now prioritize a working MikeDX or PocketStella
+external a26 plugin with familiar L+R menus, D-pad/A/B and normal Resume/Reset/Exit.
+PocketStella pin1e299b9 has disabled/absent core/video/audio; existing MikeDX native
+startup/ROM/render tests are the practical starting point. No a26 binary delivered.
+Native Info screenshot also exposes an overlong unlock hint at the bottom; fix
+its wrapping/alignment in the subsequent menu parity pass, preserving exact words.
+
+## 2026-11-24 — Atari classic menu prototype
+
+Implemented owner-requested L+R/D-pad/A/B classic emulator menus in the separate
+source recipe: Controller, Display, Other Settings, Help, Resume, Restart, Exit.
+L alone no longer resets. mGBA exposed stale menu pixels on Restart; restoring
+the saved framebuffer fixes it. Ten real SDLmGBA0.10.1/Xvfb interaction checks
+pass, including Exit to a deliberately substituted return marker (not physical
+firmware remapping). No BIOS or emulator changes. Actual ARM startup +21 loader
+cases,12 F8/F6 bank hotspots and7 invalid/valid return-header cases pass. Original
+6502 exact-pixel diagnostic passes. Native evidence is in atari2600-prototype-
+validation.json; replay tools are tracked under tools/.
+
+Runtime remains a source-only experiment: no sound, only the generated diagnostic
+qualified, other Atari bank formats unsupported, upstream COPYING/provenance
+review and physical compatibility/Exit remain. No plugin distributed; Chis799
+hardware-test and public769 stay unchanged. Continue Atari source/license/core
+compatibility review, then supply an explicitly experimental external a26 plugin;
+subsequent menu parity pass should fix the native Info unlock-hint clipping.
+
+## 2026-11-24 — Experimental Atari hardware-test plugin delivered
+
+Owner explicitly requested the plugin in hardware-test. Delivered
+SYSTEM/PLUG/a26.gba (SHAe5cdd3ed708fb6ad59f205299878fbff1ef13998c745032b4e19df0c77d5ca7b),
+setup/limits text, validation JSON and exact prepared-source ZIP with original
+notices/CREDITS, GPLv3 text and standalone rebuild script. Independently extracting
+and rebuilding the source ZIP gives the identical binary. Runtime2K/4K/F8/F6,
+L+R menu, no sound; only generated diagnostics qualified. Actual runtime image
+with fixed-ABI cold-boot seeding passes exact pixels and ten mGBA menu/Exit-marker
+checks, plus21 input/12 bank-hotspot/7 return-header ARM checks. No public release
+or firmware change, no physical-card or broad game/Exit/speed qualification.
+
+Current local kernel remains Chis799. Generic extension loader already supports
+this external asset. Preserve it alongside its source/notes during cleanup. Owner
+will test when convenient; continue Atari compatibility/performance and DSSMM
+porting autonomously. Local source archive is not a GitHub firmware source asset;
+do not upload it through release tooling. Tracked packaging/runtime replay tools
+make this environment reproducible without private BIOS or old prebuilt objects.
+
+## 2026-11-24 — Atari timer/WSYNC corrections
+
+The unfinished core read an uninitialized timer value and subtracted time during
+WSYNC. Replaced countdown/underflow/status logic, advance clocks in all beam
+states, keep palette declarations256 entries, and poll menu every64 emulated
+instructions instead of each instruction (still works without video sync).
+Actual ARM passes64 timer boundaries including32-bit wrap,20 WSYNC cases and20
+real TIA/RIOT input-port cases; original21 input/12 bank/7 return checks retain
+passes. Actual runtime mGBA exact picture/menu10 passes; a new original6502 ROM
+waits for RIOT underflow before drawing: olde5cdd3ed fails, corrected1b344401 passes.
+No private BIOS/card emulation. Counted keypad reads fall5000→79 per5000 emulated
+instructions; this is not an FPS/hardware speed claim. Extra correct WSYNC work
+increases total cost relative to the broken baseline; no net speed claim.
+
+Updated hardware-test/SYSTEM/PLUG/a26.gba SHA1b34440155cbca8719ecd4329440230bf0effcabe3e3aa91a7f2d62b46b7e69a
+and exact independently rebuilt corresponding-source ZIP/notes/JSON. No sound,
+physical Exit, broad games or cycle-exact emulation qualification; Chis799 and
+public769 remain unchanged. Resume menu parity comparisons after committing this
+checkpoint; no user input needed. Preserve current plugin+source in cleanup.
+
+## 2026-11-24 — Settings visual parity candidate
+
+Compared native DE Settings/Games captures against linked Chis799. Add native
+scenes20/21/22 for Settings home/Games/Hardware via actual category input, without
+requiring NOR. Correct DSSMM-font text baseline and13px selection fill/14px row
+against the common DE Interface-label pixel mask. Native font spacing remains.
+Host highlight bounds pass; full clean all3/native/mGBA gates must pass before
+replacing hardware-test Chis799. Atari current plugin/source remain delivered
+separately; public769 unchanged. Continue without waiting for hardware feedback.
+
+## 2026-11-24 — Atari raster memory guards
+
+Native replay reproduced all three display queues writing81st entries into80-slot
+arrays; a real wide-copy player atx160 also writes2B past colvect230. Added queue/
+index guards and256B padded collision scratch (all declarations match), with28
+queue/index plus3 wide-copy ARM cases. Current external plugin14d28e63ac2d930d8c1849e030a3ff0701e59bc6e940863d5de9884e6b5f4500
+passes original input/timer/control, mGBA runtime/menu10 and timer-gated image;
+exact corresponding-source ZIP independently reproduces it. hardware-test plugin/
+source/notes/JSON updated. No sound/broad game/physical qualification claims.
+
+Build822/source2f73b53 all3 kernels finished clean with identical source-tree hash
+8932bc31... before these unrelated optional Atari-tool edits. Native visual/full
+gate remains running; don't rebuild firmware for the external-tool change. CI PR28
+head stays2f73b53 until its check/merge checkpoint; commit Atari follow-up locally
+and push after that merge to avoid restarting the same CI. Preserve prototype
+and current kernel/plugin artifacts, private BIOS/session scratch/ownerlock.
+
+## 2026-11-24 — Build822 validated and delivered
+
+Full local all3/nativeARM/host/mGBA/nativeIGM verifier exits0, including42 menu
+visual checks (Settings/Games/Hardware additions),8 NOR carousel checks, native
+save/reload and real plugin Exit/MiGoomba fixtures. Chis822/source2f73b53 is in
+hardware-test; old799 removed only after matching its recorded hash. All3 clean
+builds share source-tree8932bc31...; sizesSD497152/Lite496640/Chis1671680B.
+Chis EWRAM256648/257024 (376B free), IWRAM15240; minimum16KiB stack retained.
+SourceCI45395110531 and all4 PR28CI45395123043 pass; PR28 merged37d31fa. Report
+is docs/build-822-validation.json. No new physical qualification/public release;
+DEv8.4.1 latest verified. Atari plugin14d28e63 remains separate, with source ZIP.
+
+Root dssmm and EZ lanes synchronized normally to37d31fa; SuperFW8e54546 includes
+that integration plus the later Atari raster guards. Follow-up hardware PR next.
+Do not rebuild822 for tool/doc-only changes. Before adding sizeable UI features,
+recover main-EWRAM headroom: explore sharing the9600B selected-art cache with the
+8192B settings snapshot, with strict ownership/generation guards and full native
+save/navigation tests. Do not move byte-parsed settings into cartridge SDRAM or
+reduce settings capacity/stack. Current hardware-test artifact must remain until
+any future replacement passes the complete gates.
+
+## 2026-11-24 — Shared workspace candidate
+
+Before adding more settings pages, recover main EWRAM by sharing the9600B selected
+art hot copy and8192B settings snapshot in one aligned GBA-RAM union. Explicit
+settings lease blocks hot-cache writes until parsing/commit/readback/rollback ends;
+generation invalidates stale copies afterward. Five SDRAM artwork slots,8192B
+config capacity, original transaction semantics and minimum16KiB stack remain.
+No byte-parsed settings on cartridge SDRAM. New module is menu_workspace.c/.h.
+
+Focused host/FAT16/FAT32 all3 settings +cache/generation tests, ARM cart-bus tests,
+actual linked ARM save/reload and native mGBA simultaneous save/art in TitleH/BoxV
+with bothfonts pass. Development Chis link EWRAM248504 (8520free), IWRAM15256;
+recovered8144B; native stackpeak14152B unchanged. This is not yet a clean numbered
+hardware-test replacement: keep822 until full all3/native/mGBA/IGM gates pass.
+Freeze this source and run complete gates next. PR29 (head4fcc015) independently
+covers prior Atari guards and822 evidence; merge it only after checks pass, and
+do not change HEAD during the next three-board build sequence. Do not combine
+new View/submenu features before this memory/ownership checkpoint is validated.
+
+## Recovery, owner822 report and external Atari migration
+
+Recovered clean827/db4e640 all3 builds and passing sourceCI45402219616/all4
+integrationCI45402235990. Local full verifier stopped on the new workspace test's
+fixed5s marker; retained that failure, reran focused cases successfully, completed
+remaining Start/plugin/MiGoomba/resource/host checks, and added bounded completion
+polling with a distinct pending color. Bothfonts TitleH/BoxV simultaneous real
+save/reload/art checks pass. Kernel inputs/827 bytes unchanged by fixture fix;
+docs/build-827-validation.json records composed evidence and limits.
+
+Owner reports Chis822 boots and Atari games load/Exit successfully; exact plugin
+revision unspecified. Stop Atari development here: active repository is now
+https://github.com/voluptuary/a26.gba and is already ahead. Old recipes/journals
+are historical. Original owner a26.zip upload preserved exactly in project
+history/imports (SHA d1f97f8b...), removing the need for a root binary that fails
+isolation. No Atari engine changes made during this recovery.
+
+Read-only harness review at external66017dcb: added optional pinned mGBA-core
+SuperCard model, real image-backed Lite SD reads and memory-multiple callbacks.
+Chis NOR/non-Lite ports/plugin handoff remain unqualified. Do not substitute it
+for the existing native mocks or combine EZ drivers; retain as an optional future
+bus-testing extension. Current change improves SDL fixture completion readiness.
+Next: finish default-branch integration/sync and verify a fresh clone can build
+all kernels, then owner-requested19px SuperCard top bar and matching colors.
+
+Owner follow-up: delete obsolete a26.zip rather than retaining a live archive.
+Removed the temporary project-history ZIP; original upload remains in Git history.
+Only lightweight provenance metadata remains. Atari development stays external.
+
+## 2026-11-26 — Build822 normal publication
+
+Owner requested publishing the local Build822. Rebuilt all three boards from
+2f73b53b in a clean detached worktree; sd/lite/chis SHA-256 match
+docs/build-822-validation.json exactly. Published the normal (non-prerelease)
+release superfw-build822 with superfw-sd.fw, superfw-lite.fw, superfw-chis.fw
+and the full folder-art.zip. Canonical notes follow the Build769 cumulative
+format and add the 822 icons, DE-aligned settings spacing and PCE return fix.
+All four downloaded assets were byte-identical. The CLI --latest=false again
+selected 822 as latest; DE v8.4.1 was restored with REST make_latest=true and
+the endpoint re-verified. See docs/releases/superfw-build822-publication.json.
