@@ -1991,3 +1991,15 @@ all kernels, then owner-requested19px SuperCard top bar and matching colors.
 Owner follow-up: delete obsolete a26.zip rather than retaining a live archive.
 Removed the temporary project-history ZIP; original upload remains in Git history.
 Only lightweight provenance metadata remains. Atari development stays external.
+
+## 2026-11-26 — Build822 normal publication
+
+Owner requested publishing the local Build822. Rebuilt all three boards from
+2f73b53b in a clean detached worktree; sd/lite/chis SHA-256 match
+docs/build-822-validation.json exactly. Published the normal (non-prerelease)
+release superfw-build822 with superfw-sd.fw, superfw-lite.fw, superfw-chis.fw
+and the full folder-art.zip. Canonical notes follow the Build769 cumulative
+format and add the 822 icons, DE-aligned settings spacing and PCE return fix.
+All four downloaded assets were byte-identical. The CLI --latest=false again
+selected 822 as latest; DE v8.4.1 was restored with REST make_latest=true and
+the endpoint re-verified. See docs/releases/superfw-build822-publication.json.

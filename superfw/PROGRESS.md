@@ -1286,3 +1286,12 @@ all kernels, then owner-requested19px SuperCard top bar and matching colors.
 Owner follow-up: delete obsolete a26.zip rather than retaining a live archive.
 Removed the temporary project-history ZIP; original upload remains in Git history.
 Only lightweight provenance metadata remains. Atari development stays external.
+
+## 2026-11-26 — Build822 normal publication
+
+Rebuilt sd/lite/chis from 2f73b53b and confirmed exact build822 hashes. Published
+superfw-build822 with all three firmware images and folder-art.zip; downloaded
+assets match. Notes use the Build769 cumulative catalog plus 822 cartridge icons,
+DE-aligned settings rows and the PCE return fix. --latest=false again made 822
+latest; DE v8.4.1 was restored by REST and verified. No new hardware claim:
+Chis822 owner reports cover boot, Atari plugin load/Exit and PCE Exit only.
