@@ -3,7 +3,9 @@
 Always work in the most token-efficient manner possible: reuse existing findings and validation evidence, read only relevant context, batch independent checks, and avoid duplicate work or unnecessary output. Preserve correctness, required testing, and clear continuation notes.
 
 Target: EZ-FLASH OMEGA (original). Repository: voluptuary/dssmm.
-Read root AGENTS.md plus this directory's HANDOFF.md and PROGRESS.md first.
+Read root `AGENTS.md` and `docs/AGENT-QUICKSTART.md`, then this directory's
+compact `HANDOFF.md`; use `PROGRESS.md` for recent entries. Pre-compaction
+journals are archived under `docs/history/journal-pre-compaction-2026-11-26/`.
 
 All five branches (`dssmm`, `ezfomegade`, `ezfomega`, `ezfblue`, `superfw`) track the same combined tree with four isolated project directories. This hardware branch is a
 development lane for ezfomega/, optionally shown through worktree-local sparse
