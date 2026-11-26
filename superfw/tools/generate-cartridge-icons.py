@@ -8,9 +8,7 @@ body=re.search(r'icons_pal\[\d+\] = \{(.*?)\};',(root/'src/res/icons.h').read_te
 palette=[int(x,16) for x in re.findall('0x[0-9a-fA-F]+',body)];native=len(palette)
 previous=None
 for name,label,define in [('gamegear','Game Gear cartridge','ICON_GGCART'),('pce','PC Engine HuCard','ICON_PCECARD'),('ngp','Neo Geo Pocket cartridge','ICON_NGPCART'),('ngpc','Neo Geo Pocket Color cartridge','ICON_NGPCCART'),('a26','Atari2600 cartridge','ICON_A26CART')]:
- source_meta=root/f'assets/icons/{name}-source.json';source_raw=root/f'assets/icons/{name}.rgb555'
- if name=='a26' and not source_raw.is_file():continue  # committed icon-a26.h remains; sources moved to pogo.gba
- meta=json.loads(source_meta.read_text());raw=source_raw.read_bytes();width,height=meta['dimensions']
+ meta=json.loads((root/f'assets/icons/{name}-source.json').read_text());raw=(root/f'assets/icons/{name}.rgb555').read_bytes();width,height=meta['dimensions']
  assert width==16 and height<=16 and len(raw)==width*height*2
  assert hashlib.sha256(raw).hexdigest()==meta['pixels_sha256']
  assert len(meta['pixel_rows'])==height and all(len(row)==width for row in meta['pixel_rows'])
