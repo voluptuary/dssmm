@@ -8,6 +8,11 @@ mission/rules, then this file, then `PROGRESS.md` and the owning project's
 If you only need the current continuation, jump to
 [§7](#7-current-state-and-recent-task-log) and [§8](#8-immediate-next-steps).
 
+For a compact read order, commands, evidence pointers and search hygiene, see
+[`docs/AGENT-QUICKSTART.md`](docs/AGENT-QUICKSTART.md). Per-project `HANDOFF.md`
+and `PROGRESS.md` are large append-only journals; grep their headings instead of
+reading them whole.
+
 ## 1. What this repository is
 
 DSSMM is a DS-style menu firmware family in one shared tree:

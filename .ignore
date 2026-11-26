@@ -1,0 +1,20 @@
+# Search-only exclusions for ripgrep/fd-style tools (files stay tracked in Git).
+# These are archived journals or generated/vendor data. Reading them whole wastes
+# context; use `rg --no-ignore` when history is genuinely needed.
+
+# Archived journals and pre-shared-tree records.
+**/docs/history/
+
+# Packaged manager/release inputs (large binaries and duplicated style data).
+**/docs/manager/packages/
+
+# Generated or vendored source blobs; logic lives elsewhere.
+**/source/fw.h
+**/source/HZK12.h
+**/source/Newest_FW_ver.h
+**/ff15/ffunicode.c
+**/fatfs/ffunicode.c
+**/*.pack
+**/*.hex
+**/*.bin
+**/*.gba

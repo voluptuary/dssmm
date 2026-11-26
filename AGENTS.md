@@ -5,10 +5,12 @@ Default/integration branch: `dssmm`
 Hardware lanes: `ezfomegade`, `ezfomega`, `ezfblue`, `superfw`
 Retired branches: do not recreate `main` or `ezfode`.
 
-Read this file first. Then read `HANDOFF.md` for environment/recovery and
-`PROGRESS.md` for the milestone history and open threads. Before touching a
-project, read that project's own `AGENTS.md`, `HANDOFF.md`, `PROGRESS.md` and
-current evidence JSON.
+Read this file first, then [`docs/AGENT-QUICKSTART.md`](docs/AGENT-QUICKSTART.md)
+for commands, current-state pointers, evidence locations and search hygiene. Use
+`HANDOFF.md` §7–§8 for the recent task log and open threads, and `PROGRESS.md`
+for milestone history. Before touching a project, read that project's own
+`AGENTS.md`; the per-project `HANDOFF.md`/`PROGRESS.md` are large append-only
+journals, so grep their newest headings instead of reading them whole.
 
 ## 1. Mission
 
