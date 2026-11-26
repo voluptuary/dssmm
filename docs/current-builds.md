@@ -23,7 +23,7 @@ clone, not a shallow checkout, when reproducing SuperFW's recorded build number.
 | DE Rev.A/B | 8.4.1, source `a948b936` | `ezfomegade/docs/` release/native-launch records |
 | Original OMEGA | 8.4.1 Test5, source `29bbb055` | `ezfomega/docs/` release/native-launch records; hardware untested |
 | BLUE | 8.4.1 Test5 release, source `9bc24e04` | `ezfblue/docs/releases/blue-test5-owner-relabel.json`; embedded8.4.2 preserved; hardware untested |
-| SuperFW SD/Lite/Chis | Build827, source `db4e6405` | `superfw/docs/build-827-validation.json`; software qualification only |
+| SuperFW SD/Lite/Chis | Build822 public, source `2f73b53b` | `superfw/docs/build-822-validation.json`; Build827 is the newer local software checkpoint, not published |
 
 To reproduce a checkpoint's exact build stamp, make a detached worktree at the
 full source commit recorded in its JSON report and run the matching project

@@ -10,6 +10,19 @@ The full root logs before the 2026-11-26 restructure are archived verbatim in
 Earlier pre-shared-tree branch journals are under each project's
 `docs/history/pre-shared-tree/`.
 
+## 2026-11-26 — SuperFW Build 822 published
+
+- Rebuilt all three boards from `2f73b53b`; sd/lite/chis hashes match
+  `superfw/docs/build-822-validation.json` exactly. Published the normal release
+  `superfw-build822` with the three `.fw` images and full `folder-art.zip`.
+- Notes follow the Build 769 cumulative catalog with the 822 cartridge icons,
+  DE-aligned settings rows, PCE return fix and external Atari status. Body
+  matches the canonical file; all four downloaded assets are byte-identical.
+- `--latest=false` again failed to preserve `/latest`: 822 became latest. DE
+  `v8.4.1` was restored with REST `make_latest=true` and the endpoint verified.
+  Build 827 remains an unpublished local software checkpoint.
+- Evidence: `superfw/docs/releases/superfw-build822-publication.json`.
+
 ## 2026-11-26 — Root journal restructure
 
 - Split the three overgrown root files by purpose: `AGENTS.md` (charter,

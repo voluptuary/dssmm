@@ -30,10 +30,11 @@ Published state (re-verify on GitHub; see `docs/current-builds.md`):
 - Original OMEGA `v8.4.1-omega-test5` — prerelease, hardware-untested.
 - BLUE `v8.4.1-blue-test5` (firmware reports 8.4.2) — prerelease,
   hardware-untested; sealed stock-size image, official FPGA update required.
-- SuperFW public `superfw-build769`.
+- SuperFW `superfw-build822` — normal release, software-qualified; Chis
+  hardware-tested.
 
-Local SuperFW Build 822 is the owner's current Chis hardware-test image; Build
-827 is the current software checkpoint. Neither is published.
+Build 822 is the current public and owner Chis hardware-test image. Build 827 is
+a newer local software checkpoint and is not published.
 
 ## 2. Rebuild from zero
 
@@ -243,6 +244,20 @@ portable and not required; do not rely on their absolute paths.
 Newest first. Detailed entries are in `PROGRESS.md`; this is the short takeover
 log.
 
+### 2026-11-26 — SuperFW Build 822 published
+
+- Rebuilt sd/lite/chis from `2f73b53b` in a clean detached worktree; all three
+  hashes match `superfw/docs/build-822-validation.json`.
+- Published the normal release `superfw-build822` with `superfw-sd.fw`,
+  `superfw-lite.fw`, `superfw-chis.fw` and the full `folder-art.zip`. All
+  downloaded assets are byte-identical. Notes follow the Build 769 cumulative
+  format and add the 822 cartridge icons, DE-aligned settings spacing and PCE
+  return fix.
+- `--latest=false` again selected 822 as latest; DE `v8.4.1` was restored with
+  REST `make_latest=true` and the endpoint re-verified. See
+  `superfw/docs/releases/superfw-build822-publication.json`.
+- Build 827 remains the newer local software checkpoint and is not published.
+
 ### 2026-11-26 — root journal restructure
 
 - The three overgrown root documents were split by purpose and their full
@@ -258,16 +273,19 @@ log.
   Focused host/FAT16/FAT32/ARM/linked/native checks pass; the first full verifier
   stopped on a fixed 5 s fixture marker, which was replaced with bounded polling.
   Evidence: `superfw/docs/build-827-validation.json`.
-- Build 822 (`2f73b53b`) is the current Chis hardware-test image:
+- Build 822 (`2f73b53b`) is the current public and Chis hardware-test image:
   `hardware-test/superfw-chis-build822.fw` / `hardware-test/build822.json`.
   Owner observations on Chis: boots; Atari games load and Exit works; PCE games
-  load and PCE Exit now works; PCE icon remains generic. Exact plugin revision
-  was not stated. No SD/Lite or full Atari qualification.
+  load and PCE Exit now works. The build adds HuCard, NGP/NGPC and Atari icons;
+  the owner had reported the PCE icon as generic on Build 769, but icon
+  appearance on 822 was not separately confirmed. Exact plugin revision was not
+  stated. No SD/Lite or full Atari qualification.
 - Atari 2600 plugin development moved to <https://github.com/voluptuary/a26.gba>.
   The owner upload remains only as provenance metadata; the obsolete ZIP was
   removed with authorization.
-- The superfw lane is ahead of `dssmm` and public SuperFW is still Build 769.
-  Do not publish 822/827; integrate through the normal flow after gates pass.
+- At the 2026-11-24/25 checkpoint the superfw lane was ahead of `dssmm` and
+  public SuperFW was still Build 769. Build 822 was published on 2026-11-26;
+  Build 827 remains unpublished.
 
 ### 2026-11-24 — SD-launch corrective releases and README
 
@@ -300,7 +318,8 @@ Earlier history is condensed in `PROGRESS.md` and fully archived in
 
 ## 8. Immediate next steps
 
-1. Confirm the root-doc restructure is on `dssmm` and synced to the lanes.
+1. Confirm the root-doc restructure and Build 822 publication records are on
+   `dssmm` and synced to the lanes.
 2. Finish/integrate the superfw Build 827 workspace change through the normal
    lane → `dssmm` merge, then sync `dssmm` back.
 3. Prove a fresh clone can build all four projects and all six board variants
@@ -309,5 +328,5 @@ Earlier history is condensed in `PROGRESS.md` and fully archived in
    within the validated memory budget.
 5. Continue SuperFW parity work (settings layout/persistence, PCE icon/return,
    plugin exit, NOR/artwork edges, SD/Lite behavior) in `superfw/`.
-6. Do not publish Build 822/827, recreate Build 640/Test 6, or resume Atari
-   engine work here without an explicit owner request.
+6. Do not publish Build 827 (822 is published), recreate Build 640/Test 6, or
+   resume Atari engine work here without an explicit owner request.

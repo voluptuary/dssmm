@@ -66,7 +66,7 @@ for your model, and follow its release instructions.
 
 ## SuperCard and SuperChis
 
-**[Download SuperFW Build 769](https://github.com/voluptuary/dssmm/releases/tag/superfw-build769)**
+**[Download SuperFW Build 822](https://github.com/voluptuary/dssmm/releases/tag/superfw-build822)**
 for **SuperChis/SuperChis Prime**, **SuperCard SD** or **SuperCard Lite**. Choose
 the file for your exact card. The optional folder-art pack is included.
 

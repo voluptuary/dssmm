@@ -165,11 +165,10 @@ Current published state (verify on GitHub before relying on it):
 | DE Rev. A/B | 8.4.1 | `v8.4.1` / `a948b936` | Stable, latest |
 | Original OMEGA | 8.4.1 Test 5 | `v8.4.1-omega-test5` / `29bbb055` | Prerelease, hardware-untested |
 | BLUE | 8.4.1 Test 5 (firmware reports 8.4.2) | `v8.4.1-blue-test5` / `9bc24e04` | Prerelease, hardware-untested |
-| SuperFW | Build 769 | `superfw-build769` / `37c9e06` | Public prerelease-quality build; software-qualified only |
+| SuperFW | Build 822 | `superfw-build822` / `2f73b53b` | Normal release; software-qualified only, Chis hardware-tested |
 
-Latest local SuperFW work (Build 822/827) is not published. Build 822 is the
-owner's current Chis hardware-test image; Build 827 is the current software
-checkpoint.
+Build 822 is the current public and owner Chis hardware-test image. Build 827 is
+a newer local software checkpoint and is not published.
 
 Release rules:
 
