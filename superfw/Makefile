@@ -244,7 +244,7 @@ firmware.ewram.gba ingamemenu.payload: src/fonts/dssmm_ascii.h src/fonts/font_re
 
 firmware.ewram.gba: src/dssmm_background_data.h src/dssmm_background.h src/dssmm_background_offsets.h res/fonts-dssmm.pack res/fonts-ext-dssmm.pack
 
-src/res/icon-gamegear.h src/res/icon-pce.h src/res/icon-ngp.h src/res/icon-ngpc.h src/res/icon-a26.h &: assets/icons/gamegear-source.json assets/icons/gamegear.rgb555 assets/icons/pce-source.json assets/icons/pce.rgb555 assets/icons/ngp-source.json assets/icons/ngp.rgb555 assets/icons/ngpc-source.json assets/icons/ngpc.rgb555 tools/generate-cartridge-icons.py src/res/icons.h
+src/res/icon-gamegear.h src/res/icon-pce.h src/res/icon-ngp.h src/res/icon-ngpc.h src/res/icon-a26.h &: assets/icons/gamegear-source.json assets/icons/gamegear.rgb555 assets/icons/pce-source.json assets/icons/pce.rgb555 assets/icons/ngp-source.json assets/icons/ngp.rgb555 assets/icons/ngpc-source.json assets/icons/ngpc.rgb555 assets/icons/a26-source.json assets/icons/a26.rgb555 tools/generate-cartridge-icons.py src/res/icons.h
 	python3 tools/generate-cartridge-icons.py
 
 res/fonts-dssmm.pack res/fonts-ext-dssmm.pack src/dssmm_background_offsets.h &: res/fonts.pack res/fonts-ext.pack src/dssmm_background_data.h tools/pack-dssmm-resources.py src/res/icons.h src/res/icon-gamegear.h src/res/icon-pce.h src/res/icon-ngp.h src/res/icon-ngpc.h src/res/icon-a26.h

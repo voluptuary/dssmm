@@ -15,5 +15,5 @@ for board in sd lite chis; do
  gcc -O1 -g -fsanitize=address,undefined -fno-pie -no-pie -ffunction-sections -fdata-sections "${flags[@]}" \
   -I "$tmp" -I "$root/src" "$root/tests/cartridge-icons-test.c" "$root/src/util.c" \
   -Wl,--gc-sections -o "$tmp/test"
- "$tmp/test" "$root/assets/icons/gamegear.rgb555" "$root/assets/icons/pce.rgb555" "$root/assets/icons/ngp.rgb555" "$root/assets/icons/ngpc.rgb555"
+ "$tmp/test" "$root/assets/icons/gamegear.rgb555" "$root/assets/icons/pce.rgb555" "$root/assets/icons/ngp.rgb555" "$root/assets/icons/ngpc.rgb555" "$root/assets/icons/a26.rgb555"
 done
