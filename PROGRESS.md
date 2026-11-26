@@ -10,6 +10,16 @@ The full root logs before the 2026-11-26 restructure are archived verbatim in
 Earlier pre-shared-tree branch journals are under each project's
 `docs/history/pre-shared-tree/`.
 
+## 2026-11-26 — Agent token-efficiency quickstart
+
+- Added `docs/AGENT-QUICKSTART.md` (read order, commands, current-state and
+  evidence pointers, search hygiene), a root `.ignore` excluding archived
+  journals and generated/vendor blobs from searches, log-first
+  `make build-*`/`verify-*` output under `build/`, and `make check-context` to
+  report documentation context cost.
+- No firmware, build input, release artifact or historical journal changed.
+  This is a universal root/docs/tooling change on `dssmm`.
+
 ## 2026-11-26 — SuperFW Build 822 published
 
 - Rebuilt all three boards from `2f73b53b`; sd/lite/chis hashes match

@@ -8,12 +8,13 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 TARGETS = {'ezfomegade', 'ezfomega', 'ezfblue', 'superfw'}
 UNIVERSAL = {'.devcontainer', '.editorconfig', '.git-blame-ignore-revs', '.gitattributes',
-             '.github', '.gitignore', 'AGENTS.md', 'CREDITS.md', 'HANDOFF.md', 'LICENSE',
+             '.github', '.gitignore', '.ignore', 'AGENTS.md', 'CREDITS.md', 'HANDOFF.md', 'LICENSE',
              'Makefile', 'PROGRESS.md', 'README.md', 'docs', 'projects.json', 'scripts', 'tests'}
 SHARED_TOOLS = {'scripts/project.py', 'scripts/project_policy.py',
                 'scripts/build-site.py', 'scripts/check-snapshots.py',
                 'scripts/prepare-folder-art.py', 'scripts/compare-menu-captures.py',
-                'scripts/record-menu-preview.py', 'scripts/assemble-menu-previews.py'}
+                'scripts/record-menu-preview.py', 'scripts/assemble-menu-previews.py',
+                'scripts/audit-context-cost.py'}
 
 
 def validate_pr(base, head, changed_paths=None):
