@@ -11,11 +11,12 @@ unsigned lang_lookup(uint16_t code){(void)code;return 0;}
 uint16_t lang_getcode(void){return 0x6e65;}
 static uint8_t *disk;
 static unsigned sectors;
+static unsigned fail_next_write;
 static FATFS filesystem;
 DSTATUS disk_status(BYTE drive){(void)drive;return 0;}
 DSTATUS disk_initialize(BYTE drive){(void)drive;return 0;}
 DRESULT disk_read(BYTE drive,BYTE *buffer,LBA_t sector,UINT count){(void)drive;if(sector>sectors||count>sectors-sector)return RES_PARERR;memcpy(buffer,disk+sector*512,count*512);return RES_OK;}
-DRESULT disk_write(BYTE drive,const BYTE *buffer,LBA_t sector,UINT count){(void)drive;if(sector>sectors||count>sectors-sector)return RES_PARERR;memcpy(disk+sector*512,buffer,count*512);return RES_OK;}
+DRESULT disk_write(BYTE drive,const BYTE *buffer,LBA_t sector,UINT count){(void)drive;if(sector>sectors||count>sectors-sector)return RES_PARERR;if(fail_next_write){fail_next_write=0;return RES_ERROR;}memcpy(disk+sector*512,buffer,count*512);return RES_OK;}
 DRESULT disk_ioctl(BYTE drive,BYTE command,void *buffer){(void)drive;(void)command;(void)buffer;return RES_OK;}
 static void write16(unsigned offset,unsigned value){disk[offset]=value;disk[offset+1]=value>>8;}
 static void write32(unsigned offset,uint32_t value){write16(offset,value);write16(offset+2,value>>16);}
@@ -49,7 +50,13 @@ int main(void) {
    assert(save_settings());remount();
    assert(menu_theme==theme&&menu_accent==accent&&browser_view==view&&artwork_mode==art);
   }
+  menu_theme=6;menu_accent=2;browser_view=1;artwork_mode=1;
+  assert(save_settings());
+  menu_theme=7;fail_next_write=1;
+  assert(!save_settings());
+  remount();
+  assert(menu_theme==6&&menu_accent==2&&browser_view==1&&artwork_mode==1);
   assert(f_mount(0,"",0)==FR_OK);free(disk);
  }
- puts("Actual FatFs FAT16/FAT32 settings save/unmount/remount:90 UI combinations per filesystem passed (RAM disk, not card hardware).");
+ puts("Actual FatFs FAT16/FAT32 settings save/unmount/remount and failed-write recovery passed (RAM disk, not card hardware).");
 }
