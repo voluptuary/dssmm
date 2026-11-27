@@ -9,8 +9,9 @@
 #define LAUNCHER_SAVE_NAME_MAX_BYTES 255U
 
 /* Older launcher indexes and saved paths could retain at most 99 bytes from
-   any one name. A component at that boundary cannot be distinguished from a
-   longer LFN whose prefix was stored. The old favourite cache also held at
+   any one name. A component exactly at that boundary cannot be distinguished
+   from a longer LFN whose prefix was stored. Longer complete components are
+   valid. The old favourite cache also held at
    most path_capacity - 1 bytes, so a path at that length may be truncated. */
 static inline int LauncherPathMayBeLegacyTruncated(const char *path, size_t path_capacity)
 {
@@ -29,7 +30,7 @@ static inline int LauncherPathMayBeLegacyTruncated(const char *path, size_t path
 	{
 		if(*p == '/' || *p == '\0')
 		{
-			if(component_length >= 99)
+			if(component_length == 99)
 				return 1;
 			if(*p == '\0')
 				break;

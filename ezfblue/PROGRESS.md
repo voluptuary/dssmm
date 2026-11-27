@@ -12,6 +12,14 @@ BLUE 8.4.1 Test 5 (`v8.4.1-blue-test5`, source `9bc24e04`; firmware reports 8.4.
 
 ## Recent entries
 
+## 2026-11-27 — Recent artwork path correction
+
+BLUE source f1a9d64 retains complete names beyond the old 99-byte index limit and
+loads Start/Recent artwork using the resolved ROM directory. The project
+verifier passed. An exFAT/mGBA card-model fixture showed a visible Recent name
+with generic art before the correction and matching art afterward. See
+`docs/recent-art-2026-11-27.json`. Owner hardware qualification remains open.
+
 ## 2026-11-23 — Reproduced silent SD launch refusal without FAT alias
 
 - Native mGBA actual launch UI/path replay: SFN case reaches all phases, exFAT-

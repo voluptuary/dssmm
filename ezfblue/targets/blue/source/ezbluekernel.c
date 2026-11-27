@@ -275,6 +275,7 @@ static const u16 *Launcher_NotFoundImage(void);
 static int Launcher_NotFoundWidth(void);
 static int Launcher_NotFoundHeight(void);
 u32 Load_ThumbnailEx(TCHAR *pfilename_pic, u8 *dst);
+static u32 Launcher_LoadThumbnailAtPath(const TCHAR *filename, const TCHAR *rom_dir, u8 *dst);
 u32 Check_file_type(TCHAR *pfilename);
 
 #define LAUNCHER_THEME_ASSET_DEFINITIONS
@@ -4660,7 +4661,6 @@ static u32 Launcher_StartPreviewEnsureCached(u32 index)
 {
 	TCHAR path[MAX_path_len];
 	TCHAR name[256];
-	TCHAR saved_path[MAX_path_len];
 	char full[LAUNCHER_FAVOURITE_PATH_LEN];
 	u32 slot;
 	u32 have_thumb = 0;
@@ -4672,7 +4672,6 @@ static u32 Launcher_StartPreviewEnsureCached(u32 index)
 
 	memset(path, 0, sizeof(path));
 	memset(name, 0, sizeof(name));
-	memset(saved_path, 0, sizeof(saved_path));
 	memset(full, 0, sizeof(full));
 	if(!Launcher_StartPreviewIndexPath(index, path, sizeof(path), name, sizeof(name), full, sizeof(full)))
 		return 0;
@@ -4691,11 +4690,7 @@ static u32 Launcher_StartPreviewEnsureCached(u32 index)
 	strncpy(launcher_start_preview_path[slot], full, sizeof(launcher_start_preview_path[slot]) - 1);
 	launcher_start_preview_path[slot][sizeof(launcher_start_preview_path[slot]) - 1] = '\0';
 
-	f_getcwd(saved_path, sizeof(saved_path) / sizeof(*saved_path));
-	if(f_chdir(path) == FR_OK)
-		have_thumb = Load_ThumbnailEx(name, pReadCache + 0x10000);
-	if(saved_path[0])
-		f_chdir(saved_path);
+	have_thumb = Launcher_LoadThumbnailAtPath(name, path, pReadCache + 0x10000);
 
 	if(have_thumb)
 	{
@@ -6722,6 +6717,11 @@ static u32 Launcher_LoadThumbnailForPath(const char *filename, const char *rom_d
 		return 1;
 	}
 	return 0;
+}
+
+static u32 Launcher_LoadThumbnailAtPath(const TCHAR *filename, const TCHAR *rom_dir, u8 *dst)
+{
+	return Launcher_LoadThumbnailForPath(filename, rom_dir, dst, 0, 0, 0);
 }
 
 u32 Load_ThumbnailEx(TCHAR *pfilename_pic, u8 *dst)
@@ -13679,7 +13679,6 @@ static void Launcher_DrawStartLastThumb(int x, int y)
 {
     TCHAR recent_path[MAX_path_len];
     TCHAR recent_name[256];
-    TCHAR saved_path[MAX_path_len];
     const u16 *cached_preview = 0;
     u32 have_thumb = 0;
     u32 use_favourite_cache = 0;
@@ -13688,7 +13687,6 @@ static void Launcher_DrawStartLastThumb(int x, int y)
 
     memset(recent_path, 0, sizeof(recent_path));
     memset(recent_name, 0, sizeof(recent_name));
-    memset(saved_path, 0, sizeof(saved_path));
 
     if(Launcher_GetStartGameEntry(recent_path, sizeof(recent_path), recent_name, sizeof(recent_name)))
     {
@@ -13697,11 +13695,8 @@ static void Launcher_DrawStartLastThumb(int x, int y)
             cached_preview = Launcher_StartPreviewCachedImage(launcher_favourite_index);
         else
         {
-            f_getcwd(saved_path, sizeof(saved_path) / sizeof(*saved_path));
-            if(f_chdir(recent_path) == FR_OK)
-                have_thumb = Load_ThumbnailEx(recent_name, pReadCache + 0x10000);
-            if(saved_path[0])
-                f_chdir(saved_path);
+            have_thumb = Launcher_LoadThumbnailAtPath(recent_name, recent_path,
+                pReadCache + 0x10000);
         }
     }
 
