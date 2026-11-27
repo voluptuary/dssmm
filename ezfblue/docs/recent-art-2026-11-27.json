@@ -1,0 +1,11 @@
+{
+  "date": "2026-11-27",
+  "source_commit": "f1a9d64987d2f3526b11614e882b2d70b26ba4d7",
+  "fixture": "64 MiB exFAT image with a nested /ROMS path near the 256-byte directory limit, RECENT.TXT entry, synthetic NES ROM and matching mirrored BMP",
+  "before": "Recent name visible, generic thumbnail",
+  "after": "Recent name visible, matching artwork thumbnail",
+  "changed_capture_bounds": [42, 52, 74, 82],
+  "additional_case": "A complete filename longer than the former 99-byte index limit now appears in Recent and loads matching CUSTOM artwork; the ambiguous exactly-99-byte legacy prefix remains rejected",
+  "verifier": "make verify-ezfblue passed",
+  "limits": "mGBA with a synthetic card model; reported owner's card and SD contents were unavailable, and physical behavior was not tested"
+}
