@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-27",
+  "source_commit": "73da3ac25ea3b4ce079ab480ea9369c57036c70b",
+  "runner_source": "pogo.gba 3e3ac393e6f0ed6edd4de933a57560958cd1daa7",
+  "mgba_source": "c4fe856f2b33d116b8f54267359d4c81653759f6",
+  "image": "64 MiB FAT32 with repository NES plugin and synthetic loop.nes",
+  "baseline_sha256": "c8270ceda6923889b074cc011eaf03cd86482ff3a2a65abf758a5f86b2f6bcd9",
+  "frames": {
+    "menu": 1000,
+    "interactive": 3200
+  },
+  "profiles": [
+    {
+      "profile": "ezfomegade",
+      "result_sha256": "e2ce1a1014b8f29b18e1d57a34fb7008df387b237d5ca447ba6338e7e01300ca",
+      "menu_capture_colors": 182,
+      "model_failures": 0
+    },
+    {
+      "profile": "ezfomega",
+      "result_sha256": "e14e562bdd43c4d4c75d21d633ffcaf19a52e3d299c5675f1870070e453888d1",
+      "menu_capture_colors": 182,
+      "model_failures": 0
+    },
+    {
+      "profile": "ezfblue",
+      "result_sha256": "e2ce1a1014b8f29b18e1d57a34fb7008df387b237d5ca447ba6338e7e01300ca",
+      "menu_capture_colors": 182,
+      "model_failures": 0
+    },
+    {
+      "profile": "supercard-sd",
+      "result_sha256": "5757783660f4717e2256361da8208f4a03a9ecac1ad0805a2b84f041355a9a04",
+      "menu_capture_colors": 14,
+      "model_failures": 0
+    },
+    {
+      "profile": "supercard-lite",
+      "result_sha256": "5757783660f4717e2256361da8208f4a03a9ecac1ad0805a2b84f041355a9a04",
+      "menu_capture_colors": 14,
+      "model_failures": 0
+    },
+    {
+      "profile": "supercard-chis",
+      "result_sha256": "5757783660f4717e2256361da8208f4a03a9ecac1ad0805a2b84f041355a9a04",
+      "menu_capture_colors": 14,
+      "model_failures": 0
+    }
+  ],
+  "limits": "Synthetic card models and mGBA; physical card behavior and successful plugin handoff unverified."
+}
