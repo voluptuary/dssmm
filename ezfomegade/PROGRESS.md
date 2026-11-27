@@ -12,6 +12,14 @@ DE 8.4.1 (`v8.4.1`, source `a948b936`) is stable/latest; the optional-alias and 
 
 ## Recent entries
 
+## 2026-11-27 — Recent artwork path correction
+
+DE source afb649f retains complete names beyond the old 99-byte index limit and
+loads Start/Recent artwork using the resolved ROM directory. The project
+verifier passed. An exFAT/mGBA card-model fixture showed a visible Recent name
+with generic art before the correction and matching art afterward. See
+`docs/recent-art-2026-11-27.json`. Owner hardware qualification remains open.
+
 ## 2026-11-23 — DE SD-launch regression investigation
 
 Owner prioritizes this before SuperFW porting. Frankie8.2 referencecff4b2f
