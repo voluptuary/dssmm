@@ -157,6 +157,9 @@ static void test_legacy_path_policy(void)
 	memset(path + 1, 'a', 99);
 	path[100] = '\0';
 	check(LauncherPathMayBeLegacyTruncated(path, 512), "reject a component at the old 99-byte truncation boundary");
+	path[100] = 'a';
+	path[101] = '\0';
+	check(!LauncherPathMayBeLegacyTruncated(path, 512), "allow a complete 100-byte component");
 
 	memset(path, 0, sizeof(path));
 	path[0] = '/';
