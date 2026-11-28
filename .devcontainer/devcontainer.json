@@ -19,5 +19,6 @@
     "DEVKITPRO": "/opt/devkitpro",
     "DEVKITARM": "/opt/devkitpro/devkitARM"
   },
-  "remoteUser": "vscode"
+  "remoteUser": "vscode",
+  "postCreateCommand": "npm install -g opencode-ai @openai/codex"
 }
